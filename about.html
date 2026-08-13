@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私たちについて — Base Craftas</title>
+<meta name="description" content="Base Craftasの思想・ミッション・ビジョン・バリューをご紹介します。医療・健康領域を起点に、人と組織の土台づくりを支援する事業体です。">
+<link rel="icon" href="images/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.bg-section { background:#fafcfb; border-top:1px solid var(--border); }
+.mvv-full { max-width:1120px; margin:0 auto; }
+.mvv-block { padding:4rem 0; border-bottom:1px solid var(--border); }
+.mvv-block:last-child { border-bottom:none; }
+.mvv-block-label { font-family:'Montserrat',sans-serif; font-size:.68rem; letter-spacing:.28em; text-transform:uppercase; color:var(--terra); font-weight:600; margin-bottom:.8rem; }
+.mvv-block-ttl { font-size:clamp(1.4rem,2.5vw,2rem); color:var(--green); font-weight:700; margin-bottom:1.2rem; line-height:1.45; }
+.mvv-block-desc { font-size:.95rem; color:var(--text-sub); line-height:2.15; max-width:680px; }
+.values-list { display:grid; grid-template-columns:repeat(7,1fr); gap:1rem; margin-top:2.4rem; }
+.val-item { text-align:center; padding:1.4rem .6rem; background:var(--mist); border-radius:10px; border:1px solid var(--border-sage); }
+.val-letter { font-family:'Montserrat',sans-serif; font-size:1.6rem; font-weight:700; color:var(--terra); }
+.val-word { font-size:.7rem; letter-spacing:.04em; color:var(--sage); margin:.3rem 0 .2rem; }
+.val-ja { font-size:.78rem; color:var(--text-sub); }
+.about-definition { display:grid; grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr); gap:5rem; align-items:start; }
+.definition-lead { font-size:clamp(1.4rem,2.6vw,2.1rem); line-height:1.65; color:var(--green); font-weight:700; }
+.definition-copy { font-size:.95rem; line-height:2.15; color:var(--text-sub); }
+.approach-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; margin-top:3rem; }
+.approach-card { position:relative; display:flex; flex-direction:column; min-height:300px; padding:2rem; border:1px solid var(--border-sage); background:#fff; transition:transform .2s ease, box-shadow .2s ease; }
+.approach-card:hover { transform:translateY(-4px); box-shadow:0 16px 34px rgba(26,51,44,.1); }
+.approach-num { font-family:'Montserrat',sans-serif; font-size:.7rem; letter-spacing:.15em; color:var(--terra); font-weight:700; }
+.approach-card h3 { color:var(--green); font-size:1.35rem; margin:.7rem 0 .9rem; }
+.approach-card p { color:var(--text-sub); font-size:.89rem; line-height:1.95; }
+.approach-service { margin-top:auto; padding-top:1.3rem; color:var(--sage); font-size:.82rem; font-family:'Montserrat',sans-serif; font-weight:700; }
+.social-issue { position:relative; isolation:isolate; background:var(--green) url('images/08_custom/about-social-foundation.jpg') center/cover no-repeat; padding:5rem; margin:0; }
+.social-issue::before { content:''; position:absolute; inset:0; z-index:-1; background:rgba(26,51,44,.88); }
+.social-issue-inner { max-width:1120px; margin:0 auto; }
+.issue-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:3rem; }
+.issue-card { border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:2rem; }
+.issue-num { font-family:'Montserrat',sans-serif; font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:var(--terra); font-weight:600; margin-bottom:.6rem; }
+.issue-ttl { font-size:1rem; font-weight:700; color:#fff; margin-bottom:.6rem; }
+.issue-desc { font-size:.87rem; color:rgba(255,255,255,.55); line-height:1.95; }
+.our-style-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; margin-top:3rem; border:1px solid var(--border-sage); background:var(--border-sage); }
+.our-style-card { padding:2rem; background:#fff; }
+.our-style-card h3 { color:var(--green); font-size:1.05rem; margin-bottom:.7rem; }
+.our-style-card p { color:var(--text-sub); font-size:.88rem; line-height:1.95; }
+.about-visual { width:min(100%,1180px); margin:3rem auto 0; overflow:hidden; border:1px solid var(--border-sage); background:#fff; box-shadow:0 12px 28px rgba(26,51,44,.07); }
+.about-visual img { display:block; width:100%; height:auto; }
+.about-visual--dark { border-color:rgba(255,255,255,.2); box-shadow:none; }
+.about-visual--cta { width:min(100%,1240px); margin:0 auto 3rem; }
+@media(max-width:1024px){
+  .values-list { grid-template-columns:repeat(4,1fr); }
+  .social-issue { padding:4rem 3rem; }
+  .issue-grid { grid-template-columns:1fr; }
+  .about-definition { grid-template-columns:1fr; gap:1.7rem; }
+}
+@media(max-width:768px){
+  .values-list { grid-template-columns:repeat(2,1fr); }
+  .social-issue { padding:4rem 1.8rem; }
+  .approach-grid,.our-style-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav scrolled" id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo-header.png" alt="Base Craftas" class="nav-logo-img">
+  </a>
+  <ul class="nav-links">
+    <li><a href="about.html" style="color:var(--terra)">私たちについて</a></li>
+    <li class="dropdown">
+      <a href="services/index.html">サービス ▾</a>
+      <div class="dropdown-menu">
+        <a href="services/growth.html">採用ブランディング伴走</a>
+        <a href="services/visit.html">現場実装支援</a>
+        <a href="services/vital.html">健康資本支援</a>
+      </div>
+    </li>
+    <li><a href="profile.html">代表プロフィール</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="contact.html" class="nav-cta">お問い合わせ</a>
+    <button class="nav-burger" id="burger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<nav class="mob-drawer" id="drawer">
+  <span class="mob-sec">Menu</span>
+  <a href="about.html" class="mob-lnk">私たちについて</a>
+  <span class="mob-sec">Services</span>
+  <a href="services/growth.html" class="mob-lnk">採用ブランディング伴走</a>
+  <a href="services/visit.html" class="mob-lnk">現場実装支援</a>
+  <a href="services/vital.html" class="mob-lnk">健康資本支援</a>
+  <span class="mob-sec">More</span>
+  <a href="profile.html" class="mob-lnk">代表プロフィール</a>
+  <a href="contact.html" class="mob-cta-link mob-lnk">お問い合わせ</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="page-hero">
+  <div class="page-hero-bg">ABOUT</div>
+  <div style="position:relative;z-index:2" class="reveal">
+    <span class="page-hero-eyebrow">About</span>
+    <h1 class="page-hero-ttl">私たちについて</h1>
+    <p class="page-hero-sub">思想を伝えるだけで、終わらせない。<br>人と組織が本来持っている価値を見つけ、必要な人へ届き続ける土台を、一緒に整えます。</p>
+  </div>
+</section>
+
+<!-- ══ DEFINITION ══ -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="about-definition reveal">
+      <div><span class="sec-eyebrow">Definition</span><span class="sage-rule"></span><h2 class="sec-ttl">Base Craftasとは</h2><p class="definition-lead">人と組織が、本来の価値を発揮し続けるための土台を整える事業体です。</p></div>
+      <div class="definition-copy"><p>専門職が積み重ねてきた知識や経験。経営者が事業を通じて実現したい想い。組織の中に蓄積された技術やノウハウ。地域で長く育まれてきた信頼や関係性。</p><p>価値があることと、その価値が必要な人へ届いていることは、同じではありません。言葉になっていない、伝える手段が整っていない、日々の業務に追われている、働く人の心身に余裕がない。こうした理由で、本来ある価値が十分に発揮されていないことがあります。</p><p>Base Craftasは、すでにある価値を整理し、言葉、発信、導線、仕組み、健康、教育、現場支援へ変換します。価値を外から付け加えるのではなく、その人や組織が持つものを、社会へ届き続ける形に整えます。</p></div>
+    </div>
+    <figure class="about-visual reveal"><img src="images/08_custom/about-definition.jpg" alt="Base Craftasの基本定義。すでにある価値を見つけ、整え、必要な人へ届け続ける"></figure>
+  </div>
+</section>
+
+<!-- ══ THREE FOUNDATIONS ══ -->
+<section class="sec bg-section">
+  <div class="sec-inner">
+    <div class="reveal"><span class="sec-eyebrow">Our Approach</span><span class="sage-rule"></span><h2 class="sec-ttl">私たちが整える3つの土台</h2><p class="sec-desc">採用ブランド、現場実装、健康資本。3つの領域から、医療・介護組織の価値発揮を支えます。</p></div>
+    <div class="approach-grid">
+      <a href="services/growth.html" class="approach-card reveal"><div class="approach-num">01 / CRAFT GROWTH</div><h3>選ばれる採用の土台</h3><p>理念・文化・現場の専門性を整理し、院内スタッフが候補者へ自ら届けられる採用ブランドを育てます。</p><div class="approach-service">採用ブランディング伴走を見る →</div></a>
+      <a href="services/visit.html" class="approach-card reveal"><div class="approach-num">02 / CRAFT SHIFT</div><h3>人と現場を育む土台</h3><p>医療・介護現場に入り、臨床支援、研修、教育、業務改善を通じて、現場に学びと改善を残します。</p><div class="approach-service">現場実装支援を見る →</div></a>
+      <a href="services/vital.html" class="approach-card reveal"><div class="approach-num">03 / CRAFT VITAL</div><h3>健康に働く土台</h3><p>身体、睡眠、疲労、ストレスなどの小さな不調に気づき、従業員が本来の力を発揮し続けられる職場を支えます。</p><div class="approach-service">健康資本支援を見る →</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOCIAL BACKGROUND ══ -->
+<section class="social-issue">
+  <div class="social-issue-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow" style="color:rgba(232,240,237,.5)">Background</span>
+      <span class="sage-rule" style="background:rgba(214,106,69,.5)"></span>
+      <h2 class="sec-ttl" style="color:#fff">私たちが向き合う課題</h2>
+      <p style="font-size:.95rem;color:rgba(255,255,255,.7);line-height:2;max-width:650px">Base Craftasが向き合うのは、「価値がない」という問題ではありません。価値があるにもかかわらず、十分に発揮されていない状態です。</p>
+    </div>
+    <div class="issue-grid">
+      <div class="issue-card reveal">
+        <div class="issue-num">Value</div>
+        <div class="issue-ttl">専門性や想いが、伝わる形になっていない</div>
+        <div class="issue-desc">医療、健康、福祉、地域の事業には、積み重ねてきた専門性や信頼があります。その本質を保ったまま、必要な人へ伝わる言葉・発信・導線へ翻訳します。</div>
+      </div>
+      <div class="issue-card reveal">
+        <div class="issue-num">Focus</div>
+        <div class="issue-ttl">本来の仕事に使う時間が失われている</div>
+        <div class="issue-desc">転記、集計、二重入力、属人化、情報の分散。業務を見直すことは人を減らすことではなく、人にしかできない仕事へ時間と力を戻すことだと考えています。</div>
+      </div>
+      <div class="issue-card reveal">
+        <div class="issue-num">Health</div>
+        <div class="issue-ttl">働く人の不調が、個人の問題として扱われている</div>
+        <div class="issue-desc">腰痛、肩こり、睡眠不足、疲労、ストレス。小さな不調を本人だけの責任にせず、組織として健康な土台を支えられる環境を整えます。</div>
+      </div>
+      <div class="issue-card reveal">
+        <div class="issue-num">Learning</div>
+        <div class="issue-ttl">現場で人を育てる余白が不足している</div>
+        <div class="issue-desc">日々の業務に追われ、スタッフ教育や研修、新しい知識を取り入れる時間を確保できない現場へ、専門職による臨床・教育・業務改善の機会を届けます。</div>
+      </div>
+    </div>
+    <figure class="about-visual about-visual--dark reveal"><img src="images/08_custom/about-background-challenges.jpg" alt="Base Craftasが向き合う背景課題。価値が伝わらない、本業に集中できない、健康が見えない、人と現場を育てる余白がない"></figure>
+  </div>
+</section>
+
+<!-- ══ MISSION / VISION / VALUE ══ -->
+<section class="sec bg-section">
+  <div class="sec-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:2rem">
+      <span class="sec-eyebrow">Mission / Vision / Value</span>
+      <span class="sage-rule" style="margin:0 auto 0"></span>
+    </div>
+    <div class="mvv-full">
+      <div class="mvv-block reveal">
+        <div class="mvv-block-label">Mission</div>
+        <div class="mvv-block-ttl">人と組織が、本来の価値を発揮し続けられる土台を整える。</div>
+        <div class="mvv-block-desc">専門性、経験、想い、技術、地域性、関係性。すでに存在している価値に光を当て、必要な人へ届く形に変えていきます。一時的に伝わるだけではなく、仕組みや習慣、文化として根づく状態をつくります。</div>
+      </div>
+      <div class="mvv-block reveal">
+        <div class="mvv-block-label">Vision</div>
+        <div class="mvv-block-ttl">誰もが自分の選択に納得し、健康な土台の上で価値を発揮できる社会をつくる。</div>
+        <div class="mvv-block-desc">人は、自分に合った情報、環境、働き方、支援、専門家と出会うことで、本来の力を発揮しやすくなります。組織もまた、経営資源を適切に使い、働く人の健康を守り、人材が育つ環境を整えることで、本来の価値提供に集中できます。</div>
+      </div>
+      <div class="mvv-block reveal">
+        <div class="mvv-block-label">Value — CRAFTAs</div>
+        <div class="mvv-block-ttl">私たちの行動を導く7つの指針</div>
+        <div class="mvv-block-desc">すべての判断において、CRAFTAsの行動指針を体現します。</div>
+        <div class="values-list">
+          <div class="val-item"><div class="val-letter">C</div><div class="val-word">Center</div><div class="val-ja">自分の軸を持ち、<br>本質を見つめる</div></div>
+          <div class="val-item"><div class="val-letter">R</div><div class="val-word">Respect</div><div class="val-ja">相手の想いに耳を澄ませ、<br>敬意を持って関わる</div></div>
+          <div class="val-item"><div class="val-letter">A</div><div class="val-word">Act</div><div class="val-ja">小さな一歩から。<br>変化を率先する</div></div>
+          <div class="val-item"><div class="val-letter">F</div><div class="val-word">Feature</div><div class="val-ja">価値に光を当て、<br>社会に届ける</div></div>
+          <div class="val-item"><div class="val-letter">T</div><div class="val-word">Together</div><div class="val-ja">一人では生まれない<br>価値を共に編み出す</div></div>
+          <div class="val-item"><div class="val-letter">A</div><div class="val-word">Anchor</div><div class="val-ja">文化として<br>根づかせる</div></div>
+          <div class="val-item"><div class="val-letter">s</div><div class="val-word">Shared</div><div class="val-ja">CRAFTAsを体現し、<br>広げていく</div></div>
+        </div>
+        <figure class="about-visual reveal"><img src="images/08_custom/about-craftas-values.jpg" alt="CRAFTAsの7つの姿勢。Center、Respect、Act、Feature、Together、Anchor、Shared"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ OUR STYLE ══ -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal"><span class="sec-eyebrow">Our Style</span><span class="sage-rule"></span><h2 class="sec-ttl">私たちが大切にする支援のあり方</h2></div>
+    <div class="our-style-grid">
+      <article class="our-style-card reveal"><h3>答えを押しつけない</h3><p>その人や組織が何を大切にしているのか、どのような価値を社会へ届けたいのか。対話を通じて、一緒に整理します。</p></article>
+      <article class="our-style-card reveal"><h3>手段から考えない</h3><p>SNS、AI、業務改善、健康経営、研修はすべて手段です。まず「何を実現したいのか」から考え、必要な方法を選びます。</p></article>
+      <article class="our-style-card reveal"><h3>現場で使える形まで整える</h3><p>構想や提案だけで終わらせず、資料、発信、導線、業務フロー、研修、教育、実践まで落とし込みます。</p></article>
+      <article class="our-style-card reveal"><h3>一過性で終わらせない</h3><p>Base Craftasがいなくても、人と組織が自ら考え、動き、育ち続けられるよう、仕組みと学びが残る支援を目指します。</p></article>
+    </div>
+    <figure class="about-visual reveal"><img src="images/08_custom/about-support-style.jpg" alt="Base Craftasの支援スタイル。対話し、整理し、現場で動く形まで一緒につくる"></figure>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="sec-cta">
+  <figure class="about-visual about-visual--cta reveal"><img src="images/08_custom/about-consultation.jpg" alt="本来届けたい価値を聞かせてください。事業、組織・業務、人・現場の相談導線"></figure>
+  <div class="cta-inner reveal">
+    <span class="sec-eyebrow" style="display:block;text-align:center">Contact</span>
+    <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
+    <h2 class="cta-ttl">本来届けたい価値について、<em>聞かせてください。</em></h2>
+    <p class="cta-desc">
+      事業の方向性、業務改善、従業員の健康資本、現場の教育や成長。<br>
+      まだ課題が明確でなくても、組織の中で感じている違和感から一緒に整理します。
+    </p>
+    <div class="cta-acts">
+      <a href="contact.html" class="btn-primary">相談・問い合わせをする</a>
+      <a href="services/index.html" class="btn-secondary">サービスを見る</a>
+      <a href="profile.html" class="btn-secondary">代表プロフィールを見る</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="ft-top">
+    <div>
+      <img src="images/logo-header.png" alt="Base Craftas" class="ft-logo-img">
+      <p class="ft-tag">医療職の専門性と社会をつなぐ<br>土台となる。</p>
+    </div>
+    <div class="ft-nav">
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Services</span>
+        <a href="services/growth.html">採用ブランディング伴走</a>
+        <a href="services/visit.html">現場実装支援</a>
+        <a href="services/vital.html">健康資本支援</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Base Craftas</span>
+        <a href="about.html">私たちについて</a>
+        <a href="profile.html">代表プロフィール</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Policy</span>
+        <a href="privacy-policy.html">プライバシーポリシー</a>
+        <a href="cancellation-policy.html">キャンセルポリシー</a>
+        <a href="disclaimer.html">免責事項</a>
+      </div>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <p class="ft-copy">© 2025–2026 Base Craftas. All Rights Reserved.</p>
+    <div class="ft-legal-links">
+      <a href="privacy-policy.html">プライバシーポリシー</a>
+      <a href="cancellation-policy.html">キャンセルポリシー</a>
+      <a href="disclaimer.html">免責事項</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.body.classList.add("js-reveal");
+const mn = document.getElementById('mainNav');
+window.addEventListener('scroll', () => { mn.classList.toggle('scrolled', scrollY > 40); });
+const burger = document.getElementById('burger');
+const drawer = document.getElementById('drawer');
+burger.addEventListener('click', () => { burger.classList.toggle('open'); drawer.classList.toggle('open'); });
+document.querySelectorAll('.mob-lnk').forEach(a => a.addEventListener('click', () => { burger.classList.remove('open'); drawer.classList.remove('open'); }));
+const ro = new IntersectionObserver((entries) => {
+  entries.forEach((e,i) => { if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('visible'),i*80); ro.unobserve(e.target); } });
+},{ threshold:.07, rootMargin:'0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+<script src="js/site-motion.js"></script>
+</body>
+</html>
