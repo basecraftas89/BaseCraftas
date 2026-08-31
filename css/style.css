@@ -258,8 +258,8 @@ a { text-decoration:none; color:inherit; }
 }
 
 /* Reveal animation — starts visible; JS adds .js-reveal to body to enable a light fade. */
-.reveal { transition:opacity .42s var(--motion-ease), transform .42s var(--motion-ease); transition-delay:var(--reveal-delay,0ms); }
-.js-reveal .reveal { opacity:0; transform:translateY(10px); }
+.reveal { transition:opacity .22s ease, transform .22s ease; transition-delay:var(--reveal-delay,0ms); }
+.js-reveal .reveal { opacity:0; transform:translateY(5px); }
 .js-reveal .reveal.visible { opacity:1; transform:none; }
 
 /* ═══════════════════════════════════════════════
@@ -359,11 +359,13 @@ a { text-decoration:none; color:inherit; }
 .sec-cta {
   background:var(--mist); padding:7rem 5rem; text-align:center;
 }
-.cta-inner { max-width:640px; margin:0 auto; }
+.cta-inner { max-width:920px; margin:0 auto; }
 .cta-ttl {
   font-size:clamp(1.8rem,3vw,2.6rem); color:var(--green);
   margin-bottom:1.2rem; line-height:1.35;
 }
+.cta-ttl,
+.cta-desc { max-width:680px; margin-left:auto; margin-right:auto; }
 .cta-ttl em { font-style:normal; color:var(--terra); }
 .cta-desc {
   font-size:.95rem; color:var(--text-sub); line-height:2.1;
@@ -510,6 +512,90 @@ footer {
   margin-top:3rem; box-shadow:var(--shadow-card);
 }
 
+/* Consultation CTA: make the next step and its outcome clear before asking for contact. */
+.cta-clarity {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.8rem;
+  max-width:920px;
+  margin:1.8rem auto 2rem;
+  text-align:left;
+}
+.cta-clarity-item {
+  padding:1rem 1.1rem;
+  border:1px solid var(--border-sage);
+  background:var(--cream);
+  box-shadow:0 8px 20px rgba(26,51,44,.06);
+}
+.cta-clarity-item b { display:block; margin-bottom:.3rem; color:var(--green); font-size:.86rem; }
+.cta-clarity-item span { color:var(--text-sub); font-size:.78rem; line-height:1.7; }
+.cta-reassurance { margin-top:1rem; color:var(--text-sub); font-size:.78rem; line-height:1.8; }
+.mobile-service-cta { display:none; }
+
+.project-list-grid {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:1.4rem;
+}
+.project-card-feature {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:2rem;
+  align-items:end;
+  padding:2rem;
+  background:var(--cream);
+  border:1px solid var(--border-sage);
+  box-shadow:var(--shadow-card);
+}
+.project-status {
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  padding:.36rem .75rem;
+  margin-bottom:1rem;
+  border-radius:999px;
+  background:var(--mist);
+  color:var(--sage);
+  font-size:.74rem;
+  font-weight:700;
+}
+.project-card-feature h3 {
+  color:var(--green);
+  font-size:clamp(1.55rem,3vw,2.35rem);
+  line-height:1.25;
+  margin-bottom:.45rem;
+}
+.project-copy {
+  color:var(--terra);
+  font-weight:700;
+  margin-bottom:.8rem;
+}
+.project-card-feature p:not(.project-copy) {
+  color:var(--text-sub);
+  line-height:2;
+  max-width:760px;
+}
+.project-actions {
+  display:flex;
+  gap:.75rem;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.project-structure {
+  background:var(--cream);
+  border:1px solid var(--border-sage);
+  box-shadow:var(--shadow-card);
+  padding:1.5rem;
+  overflow:auto;
+}
+.project-structure pre {
+  margin:0;
+  color:var(--green);
+  font-size:.9rem;
+  line-height:1.85;
+  font-family:"SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
 .mvv-card,
 .reason-card,
 .future-card,
@@ -572,6 +658,16 @@ footer {
   .motion-parallax { transform:none; }
 }
 
+@media (max-width: 760px) {
+  .project-card-feature {
+    grid-template-columns:1fr;
+    padding:1.35rem;
+  }
+  .project-actions {
+    justify-content:flex-start;
+  }
+}
+
 /* ═══════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════ */
@@ -601,4 +697,12 @@ footer {
   .page-hero-split { padding:6rem 1.8rem 3.5rem; gap:1.8rem; }
   .hero-acts { flex-direction:column; align-items:flex-start; }
   .policy-body { padding:4rem 1.8rem; }
+  .cta-clarity { grid-template-columns:1fr; gap:.55rem; }
+  .cta-clarity-item { padding:.85rem 1rem; }
+  .mobile-service-cta {
+    position:fixed; right:1rem; bottom:1rem; left:1rem; z-index:80;
+    display:flex; align-items:center; justify-content:center; min-height:3.35rem;
+    padding:.75rem 1rem; background:var(--green); color:#fff; font-size:.86rem;
+    font-weight:700; box-shadow:0 12px 28px rgba(11,42,33,.24);
+  }
 }
