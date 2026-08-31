@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — Base Craftas</title>
+<meta name="description" content="Base Craftas代表が主体で関わるプロジェクト一覧。ToToNoE+をはじめ、事業・学習・Webアプリなどの実践を紹介します。">
+<link rel="icon" href="../images/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="nav scrolled" id="mainNav">
+  <a href="../index.html" class="nav-logo">
+    <img src="../images/logo-header.png" alt="Base Craftas" class="nav-logo-img">
+  </a>
+  <ul class="nav-links">
+    <li><a href="../about.html">私たちについて</a></li>
+    <li class="dropdown">
+      <a href="../services/index.html">サービス ▾</a>
+      <div class="dropdown-menu">
+        <a href="../services/growth.html">採用ブランディング伴走</a>
+        <a href="../services/visit.html">AI導入・業務改善</a>
+        <a href="../services/vital.html">健康資本支援</a>
+      </div>
+    </li>
+    <li><a href="index.html" style="color:var(--terra)">プロジェクト</a></li>
+    <li><a href="../profile.html">代表プロフィール</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="../contact.html" class="nav-cta">お問い合わせ</a>
+    <button class="nav-burger" id="burger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<nav class="mob-drawer" id="drawer">
+  <span class="mob-sec">Menu</span>
+  <a href="../about.html" class="mob-lnk">私たちについて</a>
+  <span class="mob-sec">Services</span>
+  <a href="../services/growth.html" class="mob-lnk">採用ブランディング伴走</a>
+  <a href="../services/visit.html" class="mob-lnk">AI導入・業務改善</a>
+  <a href="../services/vital.html" class="mob-lnk">健康資本支援</a>
+  <span class="mob-sec">Projects</span>
+  <a href="index.html" class="mob-lnk">プロジェクト一覧</a>
+  <a href="totonoe/index.html" class="mob-lnk">ToToNoE+</a>
+  <span class="mob-sec">More</span>
+  <a href="../profile.html" class="mob-lnk">代表プロフィール</a>
+  <a href="../contact.html" class="mob-cta-link mob-lnk">お問い合わせ</a>
+</nav>
+
+<main class="page-main">
+  <section class="page-hero" style="padding-bottom:3.6rem">
+    <div class="sec-inner">
+      <span class="page-hero-eyebrow">Projects</span>
+      <h1 class="page-hero-ttl">代表が主体で関わる、<br>実践とプロジェクト。</h1>
+      <p class="page-hero-sub">
+        Base Craftasの主要サービスとは別に、代表・神藤 俊希が主体的に関わる学習企画、事業構想、Webアプリをまとめています。<br>
+        ここでは商品一覧ではなく、思想から生まれた実践の広がりとして紹介します。
+      </p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Published Project</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">公開中のプロジェクト</h2>
+        <p class="sec-desc">現在、basecraftas.com配下で確認できるプロジェクトです。</p>
+      </div>
+
+      <div class="project-list-grid">
+        <article class="project-card-feature reveal">
+          <div>
+            <span class="project-status">公開中</span>
+            <h3>ToToNoE+</h3>
+            <p class="project-copy">本質に向き合い、整える習慣を。</p>
+            <p>
+              医療・介護を原点に、本質ではない仕事を減らして余白をつくる専門家チームです。
+              公開中の「週末のAI整え習慣」では、土曜朝6時にAI情報と実践知を整理します。
+            </p>
+          </div>
+          <div class="project-actions">
+            <a href="totonoe/index.html" class="btn-primary">ToToNoE+を見る</a>
+            <a href="totonoe/contents.html#podcast" class="btn-secondary">Podcastを見る</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="background:var(--mist)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Project Architecture</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">今後増やせるフォルダ構成</h2>
+        <p class="sec-desc">プロジェクト・Webアプリ・資料ページを、Base Craftas本体と混ざらない形で拡張していきます。</p>
+      </div>
+      <div class="project-structure reveal">
+        <pre><code>basecraftas.com/
+├─ services/                 Base Craftasの主要サービス
+├─ projects/                 代表が主体で関わるプロジェクト
+│  ├─ totonoe/            ToToNoE+ / 週末のAI整え習慣
+│  ├─ totonoe-plus/          ToToNoE+ 関連
+│  ├─ sleeport/              Sleeport 関連
+│  └─ meguri/                MEGURI 関連
+└─ apps/                     体験版・診断ツールなどのWebアプリ</code></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="ft-inner">
+    <div class="ft-brand">
+      <img src="../images/logo-header.png" alt="Base Craftas" class="ft-logo-img">
+      <p class="ft-tag">医療職の専門性と社会をつなぐ<br>土台となる。</p>
+    </div>
+    <div class="ft-nav">
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Services</span>
+        <a href="../services/growth.html">採用ブランディング伴走</a>
+        <a href="../services/visit.html">AI導入・業務改善</a>
+        <a href="../services/vital.html">健康資本支援</a>
+        <a href="../services/index.html">サービス一覧</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Base Craftas</span>
+        <a href="../about.html">私たちについて</a>
+        <a href="index.html">プロジェクト</a>
+        <a href="../profile.html">代表プロフィール</a>
+        <a href="../contact.html">お問い合わせ</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Policy</span>
+        <a href="../privacy-policy.html">プライバシーポリシー</a>
+        <a href="../cancellation-policy.html">キャンセルポリシー</a>
+        <a href="../disclaimer.html">免責事項</a>
+        <a href="../legal.html">特定商取引法に基づく表記</a>
+      </div>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <span>© 2026 Base Craftas. All rights reserved.</span>
+    <div class="ft-policy">
+      <a href="../privacy-policy.html">プライバシーポリシー</a>
+      <a href="../cancellation-policy.html">キャンセルポリシー</a>
+      <a href="../disclaimer.html">免責事項</a>
+      <a href="../legal.html">特定商取引法に基づく表記</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/site-motion.js"></script>
+</body>
+</html>
