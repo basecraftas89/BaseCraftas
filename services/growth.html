@@ -7,8 +7,15 @@
 <meta name="description" content="Craft Growthは、医療・介護施設の理念・文化・専門性を言葉にし、院内ブランド人材の育成、発信、AI活用、採用導線の内製化まで伴走する採用ブランディング支援です。">
 <link rel="icon" href="../images/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=20260817-cta2">
 <style>
+.growth-page-hero { min-height:760px; display:flex; align-items:center; text-align:left; background:#102d26; isolation:isolate; }
+.growth-page-hero::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(12,34,29,.92) 0%, rgba(12,34,29,.76) 36%, rgba(12,34,29,.36) 68%, rgba(12,34,29,.18) 100%); pointer-events:none; }
+.growth-page-hero::after { z-index:1; }
+.growth-hero-photo { position:absolute; inset:0; z-index:0; }
+.growth-hero-photo img { width:100%; height:100%; object-fit:cover; object-position:center; filter:saturate(.95) contrast(.96); }
+.growth-hero-content { position:relative; z-index:2; max-width:720px; }
+.growth-page-hero .page-hero-bg { left:auto; right:4%; transform:none; bottom:2rem; z-index:1; color:rgba(255,255,255,.045); }
 .problem-showcase { display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr); gap:2rem; align-items:stretch; margin-top:3rem; }
 .problem-tabs { display:grid; gap:.85rem; }
 .problem-tab { width:100%; text-align:left; border:1px solid var(--border-sage); border-radius:10px; background:#fff; padding:1.05rem 1.15rem; display:grid; grid-template-columns:auto 1fr; gap:.85rem; align-items:start; cursor:pointer; color:var(--text-main); transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
@@ -85,7 +92,7 @@
 .support-system-copy { color:var(--green); font-size:.84rem; font-weight:700; line-height:1.65; }
 @media(max-width:768px){.growth-visual{margin-top:2rem;border-radius:7px}.growth-process-grid{grid-template-columns:1fr;gap:1rem;}.growth-process-grid .growth-visual{margin:0;}}
 @media(max-width:1024px){.problem-showcase,.service-showcase{grid-template-columns:1fr;}.problem-preview img{min-height:440px}.support-grid{grid-template-columns:1fr 1fr;}.service-preview{position:relative;top:auto}.flow-steps{grid-template-columns:1fr 1fr;}.plan-timeline{grid-template-columns:1fr;}.plan-timeline-card{min-height:auto}.support-system{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:768px){.problem-tabs,.support-grid,.service-showcase .support-grid,.flow-steps{grid-template-columns:1fr;}.problem-preview img{min-height:340px}.problem-caption{padding:1.2rem}.support-system{grid-template-columns:1fr 1fr;}.plan-slider-tabs{overflow-x:auto}.plan-compare-table{display:block;overflow-x:auto;white-space:nowrap}}
+@media(max-width:768px){.growth-page-hero{min-height:720px;padding-top:7rem}.growth-page-hero::before{background:linear-gradient(180deg,rgba(12,34,29,.88),rgba(12,34,29,.72))}.growth-hero-photo img{object-position:63% center}.problem-tabs,.support-grid,.service-showcase .support-grid,.flow-steps{grid-template-columns:1fr;}.problem-preview img{min-height:340px}.problem-caption{padding:1.2rem}.support-system{grid-template-columns:1fr 1fr;}.plan-slider-tabs{overflow-x:auto}.plan-compare-table{display:block;overflow-x:auto;white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -98,14 +105,15 @@
       <a href="index.html" style="color:var(--terra)">サービス ▾</a>
       <div class="dropdown-menu">
         <a href="growth.html" style="color:var(--terra)">採用ブランディング伴走</a>
-        <a href="visit.html">現場実装支援</a>
+        <a href="visit.html">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
     </li>
+    <li><a href="../projects/index.html">プロジェクト</a></li>
     <li><a href="../profile.html">代表プロフィール</a></li>
   </ul>
   <div class="nav-right">
-    <a href="../contact.html" class="nav-cta">お問い合わせ</a>
+    <a href="../contact.html?service=growth" class="nav-cta">無料相談</a>
     <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -114,26 +122,25 @@
   <a href="../about.html" class="mob-lnk">私たちについて</a>
   <span class="mob-sec">Services</span>
   <a href="growth.html" class="mob-lnk">採用ブランディング伴走</a>
-  <a href="visit.html" class="mob-lnk">現場実装支援</a>
+  <a href="visit.html" class="mob-lnk">AI導入・業務改善</a>
   <a href="vital.html" class="mob-lnk">健康資本支援</a>
   <span class="mob-sec">More</span>
+  <a href="../projects/index.html" class="mob-lnk">プロジェクト</a>
   <a href="../profile.html" class="mob-lnk">代表プロフィール</a>
-  <a href="../contact.html" class="mob-cta-link mob-lnk">お問い合わせ</a>
+  <a href="../contact.html?service=growth" class="mob-cta-link mob-lnk">無料相談</a>
 </nav>
 
-<section class="page-hero page-hero-split">
+<section class="page-hero growth-page-hero">
+  <div class="growth-hero-photo" aria-hidden="true"><img src="../images/08_custom/growth-hero-image2.jpg" alt=""></div>
   <div class="page-hero-bg">GROWTH</div>
-  <div style="position:relative;z-index:2" class="reveal">
+  <div class="growth-hero-content reveal">
     <span class="page-hero-eyebrow">Craft Growth / 医療・介護特化型ブランディングコンサル</span>
     <h1 class="page-hero-ttl">紹介会社から選ばれる採用から、<br>ブランドで選ばれる採用へ。</h1>
     <p class="page-hero-sub">組織を整え、現場の価値を言葉にし、院内スタッフが自ら届けられる状態まで。医療・介護施設の自走する採用ブランドづくりに伴走します。</p>
     <div class="hero-acts">
-      <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary">30分無料相談を申し込む</a>
+      <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary">採用課題を30分で整理する</a>
       <a href="index.html" class="btn-ghost-white">サービス一覧へ</a>
     </div>
-  </div>
-  <div class="hero-visual hero-visual-light lp-hero-visual reveal">
-      <img src="../images/08_custom/growth-hero-image2.jpg" alt="医療・介護施設の採用ブランディングを伴走するCraft Growthのビジュアル">
   </div>
 </section>
 
@@ -260,35 +267,26 @@
   </div>
 </section>
 
-<!-- 院内ブランドチーム -->
+<!-- 院内ブランドチームと伴走体制 -->
 <section class="sec">
   <div class="sec-inner">
     <div class="reveal">
-      <span class="sec-eyebrow">Brand Team</span>
+      <span class="sec-eyebrow">Brand Team & Support</span>
       <span class="sage-rule"></span>
-      <h2 class="sec-ttl">SNS担当者ではなく、院内に<br>「ブランドチーム」をつくる。</h2>
-      <p class="sec-desc">医師・院長、PT・OT・ST・看護師、事務・採用担当など、多職種の視点をつなぐことで、施設のリアルを一方向ではなく立体的に伝えます。</p>
+      <h2 class="sec-ttl">院内にブランドチームをつくり、<br>外側から継続を支える。</h2>
+      <p class="sec-desc">Craft Growthでは、SNS担当者を一人置いて終わりにはしません。医師・院長、PT・OT・ST・看護師、事務・採用担当など、多職種の声を集め、施設のリアルと専門性を継続して届けられるチームを院内につくります。</p>
     </div>
     <figure class="growth-visual growth-visual--wide reveal">
       <img src="../images/08_custom/growth-brand-team.jpg" alt="院内ブランドチームの仕組み。医師、専門職、事務採用担当など多職種で施設の価値を発信する">
     </figure>
-    <p class="visual-note reveal">ブランド活動を善意の追加業務にしないため、担当者の役割・評価・手当設計も一緒に検討します。目安として、役割に応じた月額2万円程度からのブランド担当手当も選択肢として設計します。</p>
-  </div>
-</section>
-
-<!-- 伴走支援体制 -->
-<section class="sec" style="background:var(--mist)">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Support System</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">院内ブランドチームを、<br>外側から支える。</h2>
-      <p class="sec-desc">院内ブランド担当2〜3名を中心に、現地訪問・オンライン相談・動画教材・日々の壁打ちを組み合わせて伴走します。個人の発信スキルだけでなく、チームとして継続できる運用体制まで整えます。</p>
+    <div class="support-system reveal" aria-label="院内ブランドチームを支える伴走内容">
+      <div class="support-system-item"><span class="support-system-label">LISTEN</span><div class="support-system-copy">経営層と現場の声を集め、施設らしさを整理</div></div>
+      <div class="support-system-item"><span class="support-system-label">TEAM</span><div class="support-system-copy">院内ブランド担当2〜3名の役割を設計</div></div>
+      <div class="support-system-item"><span class="support-system-label">LEARN</span><div class="support-system-copy">発信・撮影・AI活用を実践しながら習得</div></div>
+      <div class="support-system-item"><span class="support-system-label">OPERATE</span><div class="support-system-copy">企画、確認、投稿、改善の運用フローを整備</div></div>
+      <div class="support-system-item"><span class="support-system-label">SUPPORT</span><div class="support-system-copy">訪問・Zoom・随時相談で外側から伴走</div></div>
     </div>
-    <figure class="growth-visual growth-visual--wide reveal">
-      <img src="../images/08_custom/growth-support-system.jpg" alt="Craft Growthの伴走支援体制。現地訪問、Zoom、動画教材、随時伴走で院内ブランドチームを支える">
-    </figure>
-    <p class="visual-note reveal">※基本支援人数は院内ブランド担当2〜3名まで。4人目以降の個別伴走は別途ご相談となります。</p>
+    <p class="visual-note reveal">ブランド活動を善意の追加業務にしないため、担当者の役割・評価・手当設計も一緒に検討します。基本支援人数は院内ブランド担当2〜3名まで。4人目以降の個別伴走や手当設計は、施設の体制に合わせてご相談となります。</p>
   </div>
 </section>
 
@@ -315,7 +313,7 @@
       <span class="sec-eyebrow">Plans</span>
       <span class="sage-rule"></span>
       <h2 class="sec-ttl">支援範囲に合わせて選べる、<br>3つの伴走プラン。</h2>
-      <p class="sec-desc">3か月で発信基盤を整え、6か月で採用接点をつくり、12か月で採用成果と事業展開まで育てます。費用は支援範囲・期間・訪問頻度に応じて、無料相談後に書面またはメールで個別にご案内します。</p>
+      <p class="sec-desc">3か月で発信基盤を整え、6か月で採用接点をつくり、12か月で採用成果につながる導線と事業展開の土台まで育てます。費用は支援範囲・期間・訪問頻度に応じて、無料相談後に書面またはメールで個別にご案内します。</p>
     </div>
     <div class="plan-slider reveal" data-plan-slider>
       <div class="plan-slider-tabs" role="tablist" aria-label="Craft Growthプラン比較">
@@ -342,7 +340,7 @@
         </div>
         <div class="plan-slide" data-plan-panel="twelve" role="tabpanel">
           <figure class="growth-visual growth-visual--wide">
-            <img src="../images/08_custom/growth-12month-expansion.jpg" alt="12か月プランで採用成果を最大化し、専門性を新しい事業や収益へつなげる流れ">
+            <img src="../images/08_custom/growth-12month-expansion.jpg" alt="12か月プランで採用成果につながる導線を整え、専門性を新しい事業や収益へつなげる流れ">
           </figure>
           <p class="visual-note">自費リハビリ、インソール、運動教室など、施設がすでに持つ専門性を活かしたサービスの導線設計まで支援することを想定しています。</p>
         </div>
@@ -353,8 +351,8 @@
           <table class="plan-compare-table" aria-label="Craft Growth 3・6・12か月プラン比較表">
             <thead><tr><th>比較項目</th><th>3か月</th><th>6か月</th><th>12か月</th></tr></thead>
             <tbody>
-              <tr><th>目的</th><td>院内で発信できる土台をつくる</td><td>学びの場をつくり、採用接点へつなげる</td><td>採用成果と事業展開まで育てる</td></tr>
-              <tr><th>主な支援</th><td>サーベイ、ブランド整理、担当育成、SNS内製化</td><td>3か月内容に加え、セミナー企画・運営導線を設計</td><td>年間改善、採用成果最大化、新しい価値提供の設計</td></tr>
+              <tr><th>目的</th><td>院内で発信できる土台をつくる</td><td>学びの場をつくり、採用接点へつなげる</td><td>採用成果につながる導線と事業展開の土台を育てる</td></tr>
+              <tr><th>主な支援</th><td>サーベイ、ブランド整理、担当育成、SNS内製化</td><td>3か月内容に加え、セミナー企画・運営導線を設計</td><td>年間改善、採用導線の強化、新しい価値提供の設計</td></tr>
               <tr><th>残るもの</th><td>発信できるチームと運用の型</td><td>人が集まる場と採用接点</td><td>続けられる組織体制と事業の種</td></tr>
             </tbody>
           </table>
@@ -455,13 +453,19 @@
     <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
     <h2 class="cta-ttl">採用の問題を、<em>求人を増やすだけで終わらせない。</em></h2>
     <p class="cta-desc">無料相談では、施設の採用状況、目指す姿、現場とのギャップを整理し、3か月・6か月・12か月のどこから始めるべきかを一緒に確認します。</p>
+    <div class="cta-clarity" aria-label="Craft Growthの無料相談で整理できること">
+      <div class="cta-clarity-item"><b>採用課題の現在地</b><span>応募・定着・発信のどこから見直すべきかを整理します。</span></div>
+      <div class="cta-clarity-item"><b>施設らしさの言語化</b><span>伝えるべき強みと、現場とのギャップを確認します。</span></div>
+      <div class="cta-clarity-item"><b>最初の3か月の設計</b><span>支援範囲と進め方の目安を個別にご案内します。</span></div>
+    </div>
     <div class="cta-acts">
       <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary">30分無料相談を申し込む</a>
-      <a href="../contact.html" class="btn-ghost">通常のお問い合わせ</a>
+      <a href="../contact.html?service=growth" class="btn-ghost">フォームで相談する</a>
     </div>
-    <p class="cta-note">相談後、必要な支援範囲とお見積りを個別にご案内します。通常3営業日以内にご連絡いたします。</p>
+    <p class="cta-note">無理な提案は行いません。相談後、必要な支援範囲とお見積りを個別にご案内します。</p>
   </div>
 </section>
+<a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="mobile-service-cta">30分無料相談を申し込む</a>
 
 <footer>
   <div class="ft-top">
@@ -473,12 +477,13 @@
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Services</span>
         <a href="growth.html">採用ブランディング伴走</a>
-        <a href="visit.html">現場実装支援</a>
+        <a href="visit.html">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Base Craftas</span>
         <a href="../about.html">私たちについて</a>
+        <a href="../projects/index.html">プロジェクト</a>
         <a href="../profile.html">代表プロフィール</a>
         <a href="../contact.html">お問い合わせ</a>
       </div>
@@ -487,6 +492,7 @@
         <a href="../privacy-policy.html">プライバシーポリシー</a>
         <a href="../cancellation-policy.html">キャンセルポリシー</a>
         <a href="../disclaimer.html">免責事項</a>
+        <a href="../legal.html">特定商取引法に基づく表記</a>
       </div>
     </div>
   </div>
@@ -496,6 +502,7 @@
       <a href="../privacy-policy.html">プライバシーポリシー</a>
       <a href="../cancellation-policy.html">キャンセルポリシー</a>
       <a href="../disclaimer.html">免責事項</a>
+      <a href="../legal.html">特定商取引法に基づく表記</a>
     </div>
   </div>
 </footer>

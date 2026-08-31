@@ -3,67 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>現場実装支援 Craft Shift — Base Craftas</title>
-<meta name="description" content="現場実装支援（Craft Shift）。医療・介護現場に入り、臨床支援・研修・業務改善を通じて、専門職の価値と学びを現場に残します。">
+<title>AI導入・業務改善・内製化支援 Craft Flow — Base Craftas</title>
+<meta name="description" content="Craft Flowは、AI導入・業務改善・内製化支援を通じて、AIに任せられる仕事を整理し、人が本来向き合うべき仕事へ集中できる状態をつくるサービスです。">
 <link rel="icon" href="../images/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=20260817-cta2">
 <style>
-.diff-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:3rem; }
-.diff-card { border-radius:12px; padding:2rem; }
-.diff-card.old { background:#f5f5f5; border:1px solid #ddd; }
-.diff-card.new-style { background:var(--mist); border:1px solid var(--border-sage); }
-.diff-label { font-family:'Montserrat',sans-serif; font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; font-weight:600; margin-bottom:1rem; }
-.diff-card.old .diff-label { color:#888; }
-.diff-card.new-style .diff-label { color:var(--terra); }
-.diff-list { list-style:none; }
-.diff-list li { font-size:.9rem; color:var(--text-sub); line-height:1.9; padding:.4rem 0; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:flex-start; gap:.6rem; }
-.diff-list li::before { content:''; flex-shrink:0; margin-top:.55rem; }
-.diff-card.old .diff-list li::before { content:'×'; color:#aaa; font-size:.85rem; margin-top:.3rem; }
-.diff-card.new-style .diff-list li::before { content:'○'; color:var(--terra); font-size:.85rem; margin-top:.3rem; }
-.support-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.8rem; margin-top:3rem; }
-.support-card { border:1px solid var(--border-sage); border-radius:12px; padding:1.8rem 1.6rem; }
-.support-icon { font-size:1.6rem; margin-bottom:.8rem; }
-.support-ttl { font-size:1rem; font-weight:700; color:var(--green); margin-bottom:.6rem; }
-.support-desc { font-size:.87rem; color:var(--text-sub); line-height:1.95; }
-.plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:3rem; }
-.plan-card { border:1px solid var(--border-sage); border-radius:12px; padding:2rem; }
-.plan-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; padding:.3rem .8rem; background:var(--green); color:#fff; border-radius:4px; font-weight:600; margin-bottom:.8rem; }
-.plan-ttl { font-size:1.1rem; font-weight:700; color:var(--green); margin-bottom:.5rem; }
-.plan-desc { font-size:.88rem; color:var(--text-sub); line-height:2; }
-.notice-box { background:var(--mist); border:1px solid var(--border-sage); border-radius:10px; padding:1.4rem 1.6rem; margin-top:2rem; }
-.notice-box p { font-size:.87rem; color:var(--text-sub); line-height:1.9; }
-.visit-about-grid { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
-.target-list { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:2rem; }
-.target-chip { padding:.4rem 1rem; background:var(--mist); border:1px solid var(--border-sage); border-radius:50px; font-size:.85rem; color:var(--sage); }
-.flow-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:1.2rem; margin-top:3rem; }
-.flow-step { text-align:center; padding:1.6rem 1.2rem; background:#fff; border:1px solid var(--border-sage); border-radius:12px; }
-.flow-step-num { font-family:'Montserrat',sans-serif; font-size:1.4rem; font-weight:700; color:var(--terra); margin-bottom:.5rem; }
-.flow-step-ttl { font-size:.9rem; font-weight:700; color:var(--green); margin-bottom:.4rem; }
-.flow-step-desc { font-size:.8rem; color:var(--text-sub); line-height:1.8; }
-.enterprise-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.6rem; margin-top:3rem; }
-.enterprise-card { background:#fff; border:1px solid var(--border-sage); border-radius:12px; padding:1.8rem 1.6rem; }
-.enterprise-kicker { font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--terra); font-weight:700; margin-bottom:.75rem; }
-.enterprise-ttl { font-size:1rem; font-weight:700; color:var(--green); margin-bottom:.65rem; }
-.enterprise-desc { font-size:.86rem; color:var(--text-sub); line-height:1.95; }
-.seminar-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:2.4rem; }
-.seminar-card { border:1px solid var(--border-sage); border-radius:12px; overflow:hidden; background:#fff; }
-.seminar-card img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
-.seminar-body { padding:1.2rem 1.25rem 1.35rem; }
-.seminar-label { font-family:'Montserrat',sans-serif; font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:var(--terra); font-weight:700; margin-bottom:.55rem; }
-.seminar-title { font-size:.94rem; color:var(--green); font-weight:700; line-height:1.65; }
-.weekly-ai { display:grid; grid-template-columns:1.18fr .82fr; gap:2.4rem; align-items:center; margin-top:3rem; padding:2rem; background:#fff; border:1px solid var(--border-sage); border-radius:14px; }
-.weekly-ai img { width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:10px; display:block; }
-.weekly-list { list-style:none; margin:1.2rem 0 1.4rem; }
-.weekly-list li { font-size:.88rem; color:var(--text-sub); line-height:1.9; padding:.35rem 0; border-bottom:1px solid rgba(42,74,61,.08); }
-.weekly-link { display:inline-flex; align-items:center; gap:.4rem; color:var(--terra); font-size:.9rem; font-weight:700; }
-.shift-visual { width:100%; display:block; border-radius:12px; border:1px solid var(--border-sage); box-shadow:0 16px 40px rgba(42,74,61,.08); background:#fff; }
-.shift-visual-wide { aspect-ratio:16/9; object-fit:cover; margin-top:2.4rem; }
-.shift-visual-compact { aspect-ratio:5/4; object-fit:cover; }
-.section-visual-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center; margin-top:3rem; }
-@media(max-width:1024px){.diff-grid,.support-grid,.plan-grid,.visit-about-grid,.enterprise-grid,.seminar-grid,.weekly-ai{grid-template-columns:1fr;}.flow-steps{grid-template-columns:1fr 1fr;}}
-@media(max-width:1024px){.section-visual-grid{grid-template-columns:1fr;}}
-@media(max-width:768px){.flow-steps{grid-template-columns:1fr;}}
+.flow-hero-note { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.4rem; }
+.flow-hero-note span { padding:.44rem .86rem; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.08); color:rgba(255,255,255,.82); font-size:.82rem; }
+.flow-page-hero { min-height:760px; display:flex; align-items:center; text-align:left; background:#102d26; isolation:isolate; }
+.flow-page-hero::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(12,34,29,.9) 0%, rgba(12,34,29,.74) 34%, rgba(12,34,29,.34) 68%, rgba(12,34,29,.18) 100%); pointer-events:none; }
+.flow-page-hero::after { z-index:1; }
+.flow-hero-photo { position:absolute; inset:0; z-index:0; }
+.flow-hero-photo img { width:100%; height:100%; object-fit:cover; object-position:center; filter:saturate(.95) contrast(.96); }
+.flow-hero-content { position:relative; z-index:2; max-width:690px; }
+.flow-page-hero .page-hero-bg { left:auto; right:4%; transform:none; bottom:2rem; z-index:1; color:rgba(255,255,255,.045); }
+.flow-slide { width:min(100%,1180px); margin:3rem auto 0; border:1px solid var(--border-sage); background:#fff; box-shadow:0 16px 38px rgba(42,74,61,.08); overflow:hidden; }
+.flow-slide img { display:block; width:100%; height:auto; }
+.flow-card-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:2.8rem; }
+.flow-card { padding:1.5rem 1.35rem; background:#fff; border:1px solid var(--border-sage); }
+.flow-card-kicker { color:var(--terra); font-family:'Montserrat',sans-serif; letter-spacing:.15em; font-size:.66rem; font-weight:700; margin-bottom:.55rem; }
+.flow-card h3 { color:var(--green); font-size:1rem; margin-bottom:.55rem; }
+.flow-card p { color:var(--text-sub); font-size:.84rem; line-height:1.85; }
+.flow-problem-showcase { display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr); gap:2rem; align-items:stretch; margin-top:3rem; }
+.flow-problem-tabs { display:grid; gap:.85rem; }
+.flow-problem-tab { width:100%; text-align:left; border:1px solid var(--border-sage); background:#fff; padding:1.05rem 1.15rem; display:grid; grid-template-columns:auto 1fr; gap:.85rem; align-items:start; cursor:pointer; color:var(--text-main); transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+.flow-problem-tab:hover,.flow-problem-tab:focus-visible,.flow-problem-tab.active { background:var(--cream); border-color:rgba(214,106,69,.55); box-shadow:0 14px 30px rgba(26,51,44,.08); transform:translateY(-2px); outline:none; }
+.flow-problem-num { font-family:'Montserrat',sans-serif; font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--terra); padding-top:.18rem; }
+.flow-problem-copy { font-size:.9rem; font-weight:700; color:var(--green); line-height:1.75; }
+.flow-problem-preview { position:relative; min-height:100%; border:1px solid var(--border-sage); overflow:hidden; background:#fff; box-shadow:0 18px 38px rgba(26,51,44,.09); }
+.flow-problem-preview::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(26,51,44,0) 36%,rgba(26,51,44,.78) 100%); pointer-events:none; }
+.flow-problem-preview img { display:block; width:100%; height:100%; min-height:500px; object-fit:cover; transition:opacity .2s ease,transform .28s ease; }
+.flow-problem-preview.is-changing img { opacity:.5; transform:scale(1.015); }
+.flow-problem-caption { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1.6rem; color:#fff; }
+.flow-problem-kicker { display:inline-flex; margin-bottom:.55rem; padding:.22rem .6rem; border:1px solid rgba(255,255,255,.55); border-radius:999px; font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.14em; font-weight:700; }
+.flow-problem-caption h3 { color:#fff; font-size:1.16rem; margin:0 0 .5rem; line-height:1.6; }
+.flow-problem-caption p { margin:0; color:rgba(255,255,255,.86); font-size:.86rem; line-height:1.9; }
+.flow-principle { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:4.5rem; align-items:center; }
+.flow-principle-copy { color:var(--text-sub); line-height:2.05; font-size:.94rem; }
+.flow-work-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.15rem; margin-top:2.8rem; }
+.flow-work { background:#fff; border:1px solid var(--border-sage); padding:1.45rem; }
+.flow-work h3 { color:var(--green); font-size:1rem; margin-bottom:.55rem; }
+.flow-work p { color:var(--text-sub); font-size:.84rem; line-height:1.8; }
+.flow-phase-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-top:2.8rem; }
+.flow-phase { background:#fff; border:1px solid var(--border-sage); padding:1.25rem 1rem; }
+.flow-phase b { display:block; color:var(--terra); font-family:'Montserrat',sans-serif; font-size:.74rem; letter-spacing:.12em; margin-bottom:.45rem; }
+.flow-phase h3 { color:var(--green); font-size:.96rem; margin-bottom:.45rem; }
+.flow-phase p { color:var(--text-sub); font-size:.8rem; line-height:1.75; }
+.pricing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; margin-top:2.8rem; }
+.price-card { background:#fff; border:1px solid var(--border-sage); padding:1.6rem 1.35rem; position:relative; }
+.price-card.featured { background:var(--green); border-color:var(--green); }
+.price-card.featured h3,.price-card.featured p,.price-card.featured .price { color:#fff; }
+.price-label { color:var(--terra); font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.15em; font-weight:700; margin-bottom:.65rem; }
+.price-card h3 { color:var(--green); font-size:1.02rem; margin-bottom:.5rem; }
+.price { color:var(--green); font-size:1.05rem; font-weight:700; margin-bottom:.75rem; }
+.price-card p { color:var(--text-sub); font-size:.82rem; line-height:1.8; }
+.implementation-flow { display:grid; grid-template-columns:repeat(7,1fr); gap:.7rem; margin-top:2.5rem; }
+.implementation-flow span { min-height:72px; display:flex; align-items:center; justify-content:center; text-align:center; padding:.8rem .5rem; background:#fff; border:1px solid var(--border-sage); color:var(--green); font-size:.82rem; font-weight:700; line-height:1.5; }
+.value-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:2.6rem; }
+.value-card { background:#fff; border:1px solid var(--border-sage); padding:1.55rem 1.35rem; }
+.value-card h3 { color:var(--green); font-size:1rem; margin-bottom:.55rem; }
+.value-card p { color:var(--text-sub); font-size:.84rem; line-height:1.8; }
+.retention-list { display:grid; grid-template-columns:repeat(4,1fr); gap:.9rem; margin-top:2.4rem; }
+.retention-list span { background:#fff; border:1px solid var(--border-sage); color:var(--sage); padding:.9rem 1rem; font-size:.85rem; text-align:center; }
+.proof-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.2rem; margin-top:2.5rem; }
+.proof-card { background:#fff; border:1px solid var(--border-sage); padding:1.5rem; }
+.proof-card h3 { color:var(--green); font-size:1rem; margin-bottom:.55rem; }
+.proof-card p { color:var(--text-sub); font-size:.84rem; line-height:1.85; }
+.target-chips { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:2rem; }
+.target-chip { padding:.45rem 1rem; color:var(--sage); background:var(--mist); border:1px solid var(--border-sage); font-size:.85rem; }
+.faq-list { margin-top:2.5rem; display:grid; gap:.75rem; }
+.faq-item { background:#fff; border:1px solid var(--border-sage); overflow:hidden; cursor:pointer; transition:background .22s ease, border-color .22s ease, box-shadow .22s ease; }
+.faq-item:hover,.faq-item:focus { background:#fffdf5; border-color:rgba(214,106,69,.42); box-shadow:0 12px 26px rgba(42,74,61,.08); outline:none; }
+.faq-question { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.15rem 1.25rem; color:var(--green); font-weight:700; }
+.faq-mark { flex:0 0 auto; width:1.7rem; height:1.7rem; display:grid; place-items:center; border:1px solid var(--border-sage); color:var(--terra); font-family:'Montserrat',sans-serif; transition:transform .22s ease, background .22s ease; }
+.faq-answer { max-height:0; opacity:0; overflow:hidden; color:var(--text-sub); font-size:.88rem; line-height:1.85; padding:0 1.25rem; transition:max-height .24s ease, opacity .18s ease, padding .24s ease; }
+.faq-item:hover .faq-answer,.faq-item:focus .faq-answer { max-height:220px; opacity:1; padding:0 1.25rem 1.2rem; }
+.faq-item:hover .faq-mark,.faq-item:focus .faq-mark { transform:rotate(45deg); background:var(--mist); }
+@media(max-width:1024px){.flow-problem-showcase{grid-template-columns:1fr}.flow-problem-preview img{min-height:420px}.flow-principle,.flow-card-grid,.pricing-grid,.value-grid,.proof-grid{grid-template-columns:1fr 1fr}.flow-phase-grid,.implementation-flow,.retention-list{grid-template-columns:1fr 1fr 1fr}.flow-work-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.flow-page-hero{min-height:720px;padding-top:7rem}.flow-page-hero::before{background:linear-gradient(180deg,rgba(12,34,29,.86),rgba(12,34,29,.72))}.flow-hero-photo img{object-position:64% center}.flow-problem-preview img{min-height:340px}.flow-problem-caption{padding:1.2rem}.flow-principle,.flow-card-grid,.flow-work-grid,.flow-phase-grid,.pricing-grid,.implementation-flow,.value-grid,.retention-list,.proof-grid{grid-template-columns:1fr}.flow-slide{margin-top:2rem}.implementation-flow span{min-height:auto}}
 </style>
 </head>
 <body>
@@ -76,15 +94,16 @@
       <a href="index.html" style="color:var(--terra)">サービス ▾</a>
       <div class="dropdown-menu">
         <a href="growth.html">採用ブランディング伴走</a>
-        <a href="visit.html" style="color:var(--terra)">現場実装支援</a>
+        <a href="visit.html" style="color:var(--terra)">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
     </li>
+    <li><a href="../projects/index.html">プロジェクト</a></li>
     <li><a href="../profile.html">代表プロフィール</a></li>
   </ul>
   <div class="nav-right">
-    <a href="../contact.html" class="nav-cta">お問い合わせ</a>
-    <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
+    <a href="../contact.html?service=flow" class="nav-cta">無料相談</a>
+    <button class="nav-burger" id="burger" aria-label="メニュー"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <nav class="mob-drawer" id="drawer">
@@ -92,255 +111,266 @@
   <a href="../about.html" class="mob-lnk">私たちについて</a>
   <span class="mob-sec">Services</span>
   <a href="growth.html" class="mob-lnk">採用ブランディング伴走</a>
-  <a href="visit.html" class="mob-lnk">現場実装支援</a>
+  <a href="visit.html" class="mob-lnk">AI導入・業務改善</a>
   <a href="vital.html" class="mob-lnk">健康資本支援</a>
   <span class="mob-sec">More</span>
+  <a href="../projects/index.html" class="mob-lnk">プロジェクト</a>
   <a href="../profile.html" class="mob-lnk">代表プロフィール</a>
-  <a href="../contact.html" class="mob-cta-link mob-lnk">お問い合わせ</a>
+  <a href="../contact.html?service=flow" class="mob-cta-link mob-lnk">無料相談</a>
 </nav>
 
-<section class="page-hero page-hero-split">
-  <div class="page-hero-bg">VISIT</div>
-  <div style="position:relative;z-index:2" class="reveal">
-    <span class="page-hero-eyebrow">Craft Shift / 現場実装支援</span>
-    <h1 class="page-hero-ttl">1回の訪問で、<br>臨床と学びを現場に残す。</h1>
-    <p class="page-hero-sub">1回の訪問で、臨床と学びを現場に残す。<br>医療・介護現場に入り、臨床支援・研修・AI活用・業務改善のきっかけを届けます。</p>
-    <div class="hero-acts">
-      <a href="../contact.html?service=visit" class="btn-primary">訪問を相談する</a>
-      <a href="index.html" class="btn-ghost-white">サービス一覧へ</a>
+<main>
+  <section class="page-hero flow-page-hero">
+    <div class="flow-hero-photo" aria-hidden="true"><img src="../images/08_custom/craft-flow/flow-hero-bg.jpg" alt=""></div>
+    <div class="page-hero-bg">FLOW</div>
+    <div class="flow-hero-content reveal">
+      <span class="page-hero-eyebrow">Craft Flow / AI導入・業務改善・内製化支援</span>
+      <h1 class="page-hero-ttl">AIで、<br>本質のための余白を。</h1>
+      <p class="page-hero-sub">生成AIを日常業務のベーススキルへ。AIに任せられる仕事を整理し、人が本来向き合うべき仕事と、届けたい価値に集中できる状態をつくります。</p>
+      <div class="flow-hero-note"><span>業務整理</span><span>AI研修</span><span>実装支援</span><span>内製化</span></div>
+      <div class="hero-acts">
+        <a href="../contact.html?service=flow" class="btn-primary">AI活用について相談する</a>
+        <a href="#service" class="btn-ghost-white">サービスを見る</a>
+      </div>
     </div>
-  </div>
-  <div class="hero-visual lp-hero-visual reveal">
-    <img src="../images/08_custom/craft-shift-overview.jpg" alt="Craft Shift 現場実装支援の概要ビジュアル">
-  </div>
-</section>
+  </section>
 
-<!-- 3つの柱 -->
-<section class="sec">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Three Pillars</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">Craft Shiftが現場に届けるもの</h2>
-    </div>
-    <div class="diff-grid">
-      <div class="diff-card new-style reveal">
-        <div class="support-icon">🏥</div>
-        <div class="support-ttl">臨床支援</div>
-        <p class="support-desc">理学療法士として実際に現場に入り、患者さんへのアプローチや評価・ケアプランの整理をサポートします。</p>
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Challenges</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIを使いたい。<br>でも、仕事はまだ変わっていない。</h2>
+        <p class="sec-desc">AIツールの情報は増えていても、自社のどの業務をどう変えるかまで整理できていないと、導入は日常業務の改善につながりません。</p>
       </div>
-      <div class="diff-card new-style reveal">
-        <div class="support-icon">📚</div>
-        <div class="support-ttl">スタッフ研修</div>
-        <p class="support-desc">AI活用・SNS発信・業務改善など、現場のニーズに合わせたカスタム研修を提供します。</p>
-      </div>
-      <div class="diff-card new-style reveal">
-        <div class="support-icon">⚙️</div>
-        <div class="support-ttl">業務改善支援</div>
-        <p class="support-desc">現場を直接見ながら、紙業務・情報共有・ツール活用の改善ポイントを整理し提案します。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- こんなお悩み -->
-<section class="sec" style="background:var(--mist)">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Problems</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">こんなお悩みはありませんか？</h2>
-    </div>
-    <img src="../images/08_custom/craft-shift-problems.jpg" alt="医療現場のAI活用に関するお悩み" class="shift-visual shift-visual-wide reveal">
-    <div class="support-grid">
-      <div class="support-card reveal"><p class="support-desc">従業員のAI活用を推進したいが、何から始めるべきかわからない</p></div>
-      <div class="support-card reveal"><p class="support-desc">職場全体でAIを活用し、情報共有や教育の仕組みを整えたい</p></div>
-      <div class="support-card reveal"><p class="support-desc">スタッフの学びや参加感を増やし、エンゲージメントを高めたい</p></div>
-      <div class="support-card reveal"><p class="support-desc">セラピストの診療報酬外でのマネタイズ導線をつくりたい</p></div>
-      <div class="support-card reveal"><p class="support-desc">外部の専門的な目線で現状を整理してほしい</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- Craft Shiftとは -->
-<section class="sec">
-  <div class="sec-inner visit-about-grid">
-    <div class="reveal">
-      <span class="sec-eyebrow">About Craft Shift</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">Craft Shiftとは</h2>
-      <p class="sec-desc">Craft Shiftは、理学療法士でもある神藤 俊希が医療・介護現場に直接訪問し、臨床支援・研修・業務改善を行うスポット型支援サービスです。単なる非常勤補充ではなく、現場に「変化のきっかけ」を残すことを目的としています。</p>
-    </div>
-    <div class="hero-visual reveal">
-      <img src="../images/08_custom/craft-shift-ai-support.jpg" alt="Craft ShiftのAI活用支援メニュー">
-    </div>
-  </div>
-</section>
-
-<!-- 企業向けAI・業務改善支援 -->
-<section class="sec" style="background:#fafcfb;border-top:1px solid var(--border)">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">AI / DX Support</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">企業・施設向けのAI活用と業務改善支援</h2>
-      <p class="sec-desc">Craft Shiftでは、現場訪問に加えて、Google Workspace・GAS・NotebookLMを活用した業務改善や教育システムづくり、発信設計・マネタイズ設計まで個別に支援します。</p>
-    </div>
-    <img src="../images/08_custom/craft-shift-ai-use-cases.jpg" alt="ChatGPT、NotebookLM、GASを活用した業務改善例" class="shift-visual shift-visual-wide reveal">
-    <div class="enterprise-grid">
-      <div class="enterprise-card reveal">
-        <div class="enterprise-kicker">Workspace / GAS</div>
-        <div class="enterprise-ttl">Google WorkspaceとGASによるWebアプリ作成</div>
-        <p class="enterprise-desc">スプレッドシート、フォーム、Gmail、カレンダーなどをつなぎ、現場の申請・管理・集計・通知を軽量なWebアプリとして整えます。</p>
-      </div>
-      <div class="enterprise-card reveal">
-        <div class="enterprise-kicker">NotebookLM</div>
-        <div class="enterprise-ttl">チャットボット・教育システムの構築</div>
-        <p class="enterprise-desc">マニュアル、研修資料、院内ルール、FAQをNotebookLMに整理し、スタッフが必要な情報へすぐアクセスできる学習環境をつくります。</p>
-      </div>
-      <div class="enterprise-card reveal">
-        <div class="enterprise-kicker">Design Support</div>
-        <div class="enterprise-ttl">発信設計・マネタイズ設計の個別支援</div>
-        <p class="enterprise-desc">専門性やサービス価値を言語化し、SNS・LP・導線・商品設計まで整理。単発相談から実行伴走まで、目的に合わせて設計します。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- AI研修・登壇実績 -->
-<section class="sec">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Proof</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">医療職に向けたAI活用研修の実績</h2>
-      <p class="sec-desc">医療職・セラピスト向けに、AI活用、NotebookLM、GASによるアプリ作成、キャリア設計などの実践型セミナーを行っています。</p>
-    </div>
-    <img src="../images/08_custom/craft-shift-seminar-topics.jpg" alt="NotebookLM、AIキャリア、GAS、週末AIを扱うセミナー登壇テーマ" class="shift-visual shift-visual-wide reveal">
-    <div class="seminar-grid">
-      <article class="seminar-card reveal">
-        <img src="../images/08_custom/seminar-notebooklm.jpg" alt="NotebookLMをテーマにしたAI活用セミナーのサムネイル">
-        <div class="seminar-body">
-          <div class="seminar-label">AI Seminar</div>
-          <h3 class="seminar-title">NotebookLMを活用した、嘘をつかないAIと情報整理</h3>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/01-challenges.jpg" alt="AIを使いたいが仕事はまだ変わっていない背景課題"></figure>
+      <div class="flow-problem-showcase reveal" data-flow-problem-showcase>
+        <div class="flow-problem-tabs" role="tablist" aria-label="Craft Flowで整理する4つの課題">
+          <button class="flow-problem-tab active" type="button" role="tab" aria-selected="true" data-image="../images/08_custom/craft-flow/flow-steps/01-organize.jpg" data-title="何から始めればいいかわからない" data-desc="AIの情報は増えているものの、自社で何から始めるべきか整理できていない。まずは業務を見える化し、着手点を決めます。">
+            <span class="flow-problem-num">01</span>
+            <span class="flow-problem-copy">何から始めればいいかわからない</span>
+          </button>
+          <button class="flow-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/craft-flow/flow-steps/02-use-ai.jpg" data-title="導入したが使われていない" data-desc="一部の社員だけが利用し、組織全体の業務改善につながっていない。日常業務で使える小さな実践から定着させます。">
+            <span class="flow-problem-num">02</span>
+            <span class="flow-problem-copy">導入したが使われていない</span>
+          </button>
+          <button class="flow-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/craft-flow/flow-steps/03-implement.jpg" data-title="定型業務に追われている" data-desc="資料、メール、会議、情報整理などに多くの時間を使っている。AIと自動化を実際の業務フローへ組み込みます。">
+            <span class="flow-problem-num">03</span>
+            <span class="flow-problem-copy">定型業務に追われている</span>
+          </button>
+          <button class="flow-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/craft-flow/flow-steps/04-margin.jpg" data-title="本質的な仕事に集中できない" data-desc="顧客との対話、判断、創造、専門性など、人が担うべき仕事の時間が足りない。AIで余白をつくり、本質へ戻します。">
+            <span class="flow-problem-num">04</span>
+            <span class="flow-problem-copy">本質的な仕事に集中できない</span>
+          </button>
         </div>
-      </article>
-      <article class="seminar-card reveal">
-        <img src="../images/08_custom/seminar-career-ai.jpg" alt="AIとキャリアデザイン実践会のサムネイル">
-        <div class="seminar-body">
-          <div class="seminar-label">Career Design</div>
-          <h3 class="seminar-title">AIと共に振り返り、次のキャリアを描く実践会</h3>
-        </div>
-      </article>
-      <article class="seminar-card reveal">
-        <img src="../images/08_custom/seminar-gas-app.jpg" alt="GASでアプリを作成する方法のセミナーサムネイル">
-        <div class="seminar-body">
-          <div class="seminar-label">GAS App</div>
-          <h3 class="seminar-title">GASで小さな業務課題を解決するWebアプリ作成</h3>
-        </div>
-      </article>
-    </div>
-    <div class="weekly-ai reveal">
-      <img src="../images/08_custom/weekend-ai-habit.jpg" alt="週末のAI整え習慣のサムネイル">
-      <div>
-        <span class="sec-eyebrow">Weekly Program</span>
-        <h3 class="sec-ttl" style="font-size:1.55rem;margin-top:.8rem">週末のAI整え習慣</h3>
-        <p class="enterprise-desc">毎週土曜日の朝6:00に、医療職向けのAI活用勉強会を開催。AIニュース、現場での活用方法、次週の仕事に活かす実践ポイントを整理しています。</p>
-        <ul class="weekly-list">
-          <li>医療職・セラピスト向けにAI活用をわかりやすく整理</li>
-          <li>情報源リンクやPDF資料を活用し、復習しやすい形で提供</li>
-          <li>AIを業務改善・教育・発信に活かす実践例を継続的に共有</li>
-        </ul>
-        <a href="https://daiyanoa1234-eng.github.io/weekend-ai/" class="weekly-link" target="_blank" rel="noopener">週末のAI整え習慣を見る →</a>
+        <figure class="flow-problem-preview" role="tabpanel" aria-live="polite">
+          <img src="../images/08_custom/craft-flow/flow-steps/01-organize.jpg" alt="何から始めればいいかわからない課題を業務整理で見える化する様子">
+          <figcaption class="flow-problem-caption">
+            <span class="flow-problem-kicker">Flow 01</span>
+            <h3>何から始めればいいかわからない</h3>
+            <p>AIの情報は増えているものの、自社で何から始めるべきか整理できていない。まずは業務を見える化し、着手点を決めます。</p>
+          </figcaption>
+        </figure>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- プランと注意事項 -->
-<section class="sec">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Plan</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">訪問プラン</h2>
-    </div>
-    <div class="section-visual-grid">
-      <img src="../images/08_custom/craft-shift-pricing.jpg" alt="Craft Shiftの半日・1日プラン料金" class="shift-visual shift-visual-wide reveal">
-      <div class="plan-grid" style="grid-template-columns:1fr">
-        <div class="plan-card reveal">
-          <div class="plan-badge">Half Day</div>
-          <div class="plan-ttl">半日プラン（臨床 + 研修）</div>
-          <div class="plan-desc">約3〜4時間。臨床サポート + ミニ研修 or 相談会を組み合わせて実施します。</div>
-        </div>
-        <div class="plan-card reveal">
-          <div class="plan-badge">Full Day</div>
-          <div class="plan-ttl">1日プラン（臨床 + 研修）</div>
-          <div class="plan-desc">約6〜8時間。臨床サポート + 研修 + 業務改善提案を組み合わせて実施します。</div>
-        </div>
+  <section class="sec" style="background:var(--mist)">
+    <div class="sec-inner flow-principle">
+      <div class="reveal">
+        <span class="sec-eyebrow">Philosophy</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIですべてを置き換えるのではなく、人の仕事を取り戻す。</h2>
+      </div>
+      <div class="reveal">
+        <p class="flow-principle-copy">Craft Flowは、AIが支援できる仕事を整理することで、時間の余白、思考の余白、心理的な余白をつくります。その余白を、顧客と向き合う、対話する、考える、判断する、創造する、専門性を発揮するといった本質的な仕事へ戻していきます。</p>
       </div>
     </div>
-    <div class="notice-box reveal" style="margin-top:2rem">
-      <p>交通費別途 / 料金は事前にお見積もりします。</p>
-      <p><strong style="color:var(--green)">【医療免責】</strong><br>
-      Craft Shiftは診療行為・医療行為を提供するサービスではありません。理学療法士の専門知識に基づく現場支援・研修・業務改善支援として提供されます。</p>
-    </div>
-  </div>
-</section>
+    <div class="sec-inner"><figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/02-philosophy.jpg" alt="Craft Flowの思想。AIで本質のための余白をつくる"></figure></div>
+  </section>
 
-<!-- 対象 -->
-<section class="sec" style="background:#fafcfb;border-top:1px solid var(--border)">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">For Whom</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">対象となる施設・事業所</h2>
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Work Areas</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIから考えるのではなく、<br>今の仕事から考える。</h2>
+        <p class="sec-desc">具体的なAIツール名に依存せず、会議、文書、ナレッジ、採用、広報、業務設計といった日常業務から改善ポイントを見つけます。</p>
+      </div>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/03-work-areas.jpg" alt="AIで整えられる6つの仕事"></figure>
+      <div class="flow-work-grid">
+        <article class="flow-work reveal"><h3>会議・情報整理</h3><p>議事録、要約、タスク整理、振り返り。</p></article>
+        <article class="flow-work reveal"><h3>文書・資料</h3><p>メール、報告書、企画書、プレゼン資料。</p></article>
+        <article class="flow-work reveal"><h3>情報・ナレッジ</h3><p>リサーチ、社内情報整理、FAQ、情報検索。</p></article>
+        <article class="flow-work reveal"><h3>採用・教育</h3><p>求人、研修、マニュアル、教育資料。</p></article>
+        <article class="flow-work reveal"><h3>営業・広報</h3><p>提案書、SNS、記事、顧客対応。</p></article>
+        <article class="flow-work reveal"><h3>業務設計</h3><p>プロンプト、AI環境、自動化、業務フロー改善。</p></article>
+      </div>
     </div>
-    <div class="target-list reveal">
-      <span class="target-chip">整形外科クリニック</span>
-      <span class="target-chip">外来リハビリテーション施設</span>
-      <span class="target-chip">運動器リハビリテーション施設</span>
-      <span class="target-chip">デイケア</span>
-      <span class="target-chip">デイサービス</span>
-      <span class="target-chip">介護施設</span>
-      <span class="target-chip">若手スタッフ教育に課題がある施設</span>
-      <span class="target-chip">AI活用・業務効率化に関心がある医療・介護事業所</span>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- 流れ -->
-<section class="sec" style="background:var(--mist)">
-  <div class="sec-inner">
-    <div class="reveal">
-      <span class="sec-eyebrow">Flow</span>
-      <span class="sage-rule"></span>
-      <h2 class="sec-ttl">ご利用の流れ</h2>
+  <section class="sec" style="background:var(--green)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow" style="color:var(--terra)">Introduction Flow</span>
+        <span class="sage-rule" style="background:var(--sage)"></span>
+        <h2 class="sec-ttl" style="color:#fff">必要なところから、一緒に進めます。</h2>
+        <p class="sec-desc" style="color:rgba(255,255,255,.74)">すべての企業が最初から同じステップで始める必要はありません。現在地に合わせて、必要なフェーズから支援します。</p>
+      </div>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/04-introduction-flow.jpg" alt="Craft Flowの導入フロー"></figure>
+      <div class="flow-phase-grid">
+        <article class="flow-phase reveal"><b>01</b><h3>知る</h3><p>AIセミナーで基本と可能性を理解する。</p></article>
+        <article class="flow-phase reveal"><b>02</b><h3>使う</h3><p>AI実践研修で実務に近い使い方を体験する。</p></article>
+        <article class="flow-phase reveal"><b>03</b><h3>見つける</h3><p>業務フロー訪問診断で改善余地を整理する。</p></article>
+        <article class="flow-phase reveal"><b>04</b><h3>変える</h3><p>実際の仕事にAI活用・自動化を実装する。</p></article>
+        <article class="flow-phase reveal"><b>05</b><h3>根づかせる</h3><p>内製化し、継続改善できる状態をつくる。</p></article>
+      </div>
     </div>
-    <img src="../images/08_custom/craft-shift-flow.jpg" alt="Craft Shiftの相談から振り返りまでのご利用の流れ" class="shift-visual shift-visual-wide reveal">
-    <div class="flow-steps">
-      <div class="flow-step reveal"><div class="flow-step-num">01</div><div class="flow-step-ttl">相談</div><div class="flow-step-desc">AI活用・研修・業務改善など、相談したい内容を共有いただきます</div></div>
-      <div class="flow-step reveal"><div class="flow-step-num">02</div><div class="flow-step-ttl">内容確認</div><div class="flow-step-desc">現場の状況、対象者、目的、必要な支援範囲を整理します</div></div>
-      <div class="flow-step reveal"><div class="flow-step-num">03</div><div class="flow-step-ttl">同意確認</div><div class="flow-step-desc">実施内容・条件・守秘義務・費用を確認し、双方で合意します</div></div>
-      <div class="flow-step reveal"><div class="flow-step-num">04</div><div class="flow-step-ttl">日程調整</div><div class="flow-step-desc">施設やチームの予定に合わせて、訪問・研修日程を調整します</div></div>
-      <div class="flow-step reveal"><div class="flow-step-num">05</div><div class="flow-step-ttl">現場支援・振り返り</div><div class="flow-step-desc">支援を実施し、終了後に次の改善点や活用方針を整理します</div></div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section class="sec-cta" style="background:var(--green)">
-  <div class="cta-inner reveal">
-    <span class="sec-eyebrow" style="display:block;text-align:center">Craft Shift</span>
-    <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
-    <h2 class="cta-ttl" style="color:#fff">まずは1回の訪問からご相談ください。</h2>
-    <p class="cta-desc" style="color:rgba(255,255,255,.68)">AI活用、業務改善、教育体制づくり、発信・マネタイズ設計まで、現場に合わせて整理します。</p>
-    <div class="cta-acts">
-      <a href="../contact.html?service=visit" class="btn-primary">現場支援を相談する</a>
-      <a href="index.html" class="btn-ghost-white">サービス一覧に戻る</a>
+  <section class="sec" id="service">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Service / Pricing</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">知るだけで終わらせず、<br>自社ならどこから始めるかまで。</h2>
+        <p class="sec-desc">まずは小さく始めたい企業にも、実装まで進めたい企業にも合わせて設計します。</p>
+      </div>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/05-service-pricing.jpg" alt="Craft Flowのサービス料金"></figure>
+      <div class="pricing-grid">
+        <article class="price-card reveal"><div class="price-label">SEMINAR</div><h3>AIセミナー</h3><div class="price">1時間 50,000円</div><p>AI活用の基本と、業務改善につなげる考え方を講義形式で整理します。</p></article>
+        <article class="price-card reveal"><div class="price-label">WORKSHOP</div><h3>AI実践研修</h3><div class="price">2時間 100,000円<br>3時間 150,000円</div><p>実務に近い題材で、生成AIを使う体験と社内展開の入口をつくります。</p></article>
+        <article class="price-card reveal"><div class="price-label">DIAGNOSIS</div><h3>業務フロー訪問診断</h3><div class="price">30,000円＋交通費</div><p>最大3時間、現場の仕事を聞きながらAIで整えられる業務を見つけます。</p></article>
+        <article class="price-card featured reveal"><div class="price-label">START PACK</div><h3>AI導入スタートパック</h3><div class="price">70,000円＋交通費</div><p>AIセミナー1時間と業務フロー確認2時間を組み合わせ、最初の一歩を明確にします。</p></article>
+      </div>
     </div>
-    <p class="cta-note">通常3営業日以内にご連絡いたします。</p>
-  </div>
-</section>
+  </section>
+
+  <section class="sec" style="background:var(--mist)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Implementation</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">見つけた改善ポイントを、実際の仕事へ。</h2>
+        <p class="sec-desc">診断で終わらせず、業務にどのような価値が期待できるかを見ながら、AI活用・自動化・運用ルールまで実装します。実装支援はROIと内容に応じて個別見積です。</p>
+      </div>
+      <div class="implementation-flow reveal">
+        <span>課題整理</span><span>現状工数</span><span>AI活用方法</span><span>期待効果</span><span>ROI算定</span><span>実装</span><span>効果検証</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">ROI</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIにいくら払うかではなく、<br>AIでどんな価値を目指すか。</h2>
+        <p class="sec-desc">Craft Flowでは、削減時間そのものではなく、その時間を何に使えるようにするかまで一緒に考えます。</p>
+      </div>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/06-roi.jpg" alt="AI導入のROI。AIでどのような価値を目指すかを考える"></figure>
+    </div>
+  </section>
+
+  <section class="sec" style="background:var(--mist)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Value</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIの価値は、時間削減だけではありません。</h2>
+      </div>
+      <figure class="flow-slide reveal"><img src="../images/08_custom/craft-flow/07-value.jpg" alt="AI導入で生まれる4つの価値"></figure>
+      <div class="value-grid">
+        <article class="value-card reveal"><h3>時間の創出</h3><p>ルーティン業務を減らし、本質的な仕事へ時間を戻す。</p></article>
+        <article class="value-card reveal"><h3>生産性向上の余地</h3><p>同じ時間で、よりよいアウトプットを目指せる余地を見つける。</p></article>
+        <article class="value-card reveal"><h3>事業の成長</h3><p>営業・採用・広報・顧客対応などを前へ進める。</p></article>
+        <article class="value-card reveal"><h3>リスクの低減</h3><p>属人化を減らし、情報や業務を組織に残す。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Retention</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">AIを使える人を増やすだけではなく、<br>AIを使い続けられる組織へ。</h2>
+        <p class="sec-desc">Craft Flowがいなくなったあとも、自分たちで改善を続けやすい状態を目指します。</p>
+      </div>
+      <div class="retention-list reveal">
+        <span>AI活用ルール</span><span>業務フロー</span><span>AI活用テンプレート</span><span>社内ナレッジ</span><span>操作マニュアル</span><span>担当者育成</span><span>改善PDCA</span><span>運用体制</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="background:var(--green)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow" style="color:var(--terra)">Practice</span>
+        <span class="sage-rule" style="background:var(--sage)"></span>
+        <h2 class="sec-ttl" style="color:#fff">私たち自身も、AIを毎週使い続けています。</h2>
+        <p class="sec-desc" style="color:rgba(255,255,255,.74)">最新情報を追うだけでなく、実際の仕事で使える形へ翻訳し続けています。</p>
+      </div>
+      <div class="proof-grid">
+        <article class="proof-card reveal"><h3>週末のAI整え習慣</h3><p>毎週土曜日 朝6:00に、AIニュースや新機能を整理し、実務への活かし方を共有しています。</p></article>
+        <article class="proof-card reveal"><h3>Instagram</h3><p>AI活用・業務改善・実践事例を、現場の目線で発信しています。</p></article>
+        <article class="proof-card reveal"><h3>stand.fm</h3><p>AIニュースや活用について、音声でわかりやすく解説しています。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Target</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">医療・介護から、地域の中小企業まで。</h2>
+        <p class="sec-desc">生成AIを中心とした日常業務の改善・内製化を支援します。高度なAI開発、独自LLM、大規模基幹システム開発などは原則対象外です。</p>
+      </div>
+      <div class="target-chips reveal">
+        <span class="target-chip">医療・介護</span><span class="target-chip">士業</span><span class="target-chip">人材</span><span class="target-chip">教育</span><span class="target-chip">不動産</span><span class="target-chip">地域サービス</span><span class="target-chip">小規模事業者</span><span class="target-chip">文書・会議業務が多い中小企業</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="background:var(--mist)">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">FAQ</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl">よくあるご質問</h2>
+      </div>
+      <div class="faq-list reveal">
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>AIに詳しくなくても大丈夫ですか？</span><span class="faq-mark">+</span></div><p class="faq-answer">大丈夫です。専門用語からではなく、今の仕事で時間がかかっていることを聞くところから始めます。</p></article>
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>どのAIを使えばいいかわかりません。</span><span class="faq-mark">+</span></div><p class="faq-answer">ツール選定も含めて整理します。特定ツールありきではなく、業務に合う使い方を一緒に考えます。</p></article>
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>医療・介護以外でも対応できますか？</span><span class="faq-mark">+</span></div><p class="faq-answer">対応できます。文書、会議、情報整理、教育、広報などの業務が多い中小企業にも対応します。</p></article>
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>訪問とオンラインの両方に対応できますか？</span><span class="faq-mark">+</span></div><p class="faq-answer">対応可能です。業務フロー確認や研修内容によって、訪問・オンラインを組み合わせます。</p></article>
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>セキュリティについて相談できますか？</span><span class="faq-mark">+</span></div><p class="faq-answer">AI利用ルールや情報の扱い方も整理します。機密情報や個人情報を扱う業務では、導入範囲を慎重に設計します。</p></article>
+        <article class="faq-item" tabindex="0"><div class="faq-question"><span>システム開発もできますか？</span><span class="faq-mark">+</span></div><p class="faq-answer">Google Workspace、GAS、軽量なWebアプリ、自動化の相談は可能です。大規模な基幹システム開発は対象外です。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec-cta">
+    <div class="cta-inner reveal">
+      <span class="sec-eyebrow" style="display:block;text-align:center">Craft Flow</span>
+      <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
+      <h2 class="cta-ttl">AIで何をするかより、<br><em>まず今の仕事を聞かせてください。</em></h2>
+      <p class="cta-desc">まだ課題が明確でなくても大丈夫です。今どこに時間がかかっているのか、一緒に整理するところから始めます。</p>
+      <div class="cta-clarity" aria-label="Craft Flowの無料相談で整理できること">
+        <div class="cta-clarity-item"><b>時間がかかる業務</b><span>会議・資料・情報整理など、優先して見直す仕事を確認します。</span></div>
+        <div class="cta-clarity-item"><b>AI活用の入口</b><span>研修・診断・実装のどこから始めるかを整理します。</span></div>
+        <div class="cta-clarity-item"><b>進め方の目安</b><span>現場に合わせた支援範囲と次の一手をご案内します。</span></div>
+      </div>
+      <div class="cta-acts">
+        <a href="../contact.html?service=flow" class="btn-primary">無料相談で業務を整理する</a>
+        <a href="index.html" class="btn-secondary">サービス一覧を見る</a>
+      </div>
+      <p class="cta-reassurance">ご相談内容をもとに、対応できる範囲と概算の進め方を個別にご案内します。</p>
+    </div>
+  </section>
+  <a href="../contact.html?service=flow" class="mobile-service-cta">無料相談で業務を整理する</a>
+</main>
 
 <footer>
   <div class="ft-top">
@@ -352,12 +382,13 @@
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Services</span>
         <a href="growth.html">採用ブランディング伴走</a>
-        <a href="visit.html">現場実装支援</a>
+        <a href="visit.html">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Base Craftas</span>
         <a href="../about.html">私たちについて</a>
+        <a href="../projects/index.html">プロジェクト</a>
         <a href="../profile.html">代表プロフィール</a>
         <a href="../contact.html">お問い合わせ</a>
       </div>
@@ -366,26 +397,48 @@
         <a href="../privacy-policy.html">プライバシーポリシー</a>
         <a href="../cancellation-policy.html">キャンセルポリシー</a>
         <a href="../disclaimer.html">免責事項</a>
+        <a href="../legal.html">特定商取引法に基づく表記</a>
       </div>
     </div>
   </div>
-  <div class="ft-bot">
-    <p class="ft-copy">© 2025–2026 Base Craftas. All Rights Reserved.</p>
-    <div class="ft-legal-links">
-      <a href="../privacy-policy.html">プライバシーポリシー</a>
-      <a href="../cancellation-policy.html">キャンセルポリシー</a>
-      <a href="../disclaimer.html">免責事項</a>
-    </div>
-  </div>
+  <div class="ft-bot"><p class="ft-copy">© 2025–2026 Base Craftas. All Rights Reserved.</p><div class="ft-legal-links"><a href="../privacy-policy.html">プライバシーポリシー</a><a href="../cancellation-policy.html">キャンセルポリシー</a><a href="../disclaimer.html">免責事項</a><a href="../legal.html">特定商取引法に基づく表記</a></div></div>
 </footer>
-
 <script>
-const mn=document.getElementById('mainNav');window.addEventListener('scroll',()=>{mn.classList.toggle('scrolled',scrollY>40);});
-const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
-burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
-document.querySelectorAll('.mob-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
-const ro=new IntersectionObserver((e)=>{e.forEach((x,i)=>{if(x.isIntersecting){setTimeout(()=>x.target.classList.add('visible'),i*80);ro.unobserve(x.target);}});},{threshold:.07,rootMargin:'0px 0px -30px 0px'});
+const mn=document.getElementById('mainNav');window.addEventListener('scroll',()=>mn.classList.toggle('scrolled',scrollY>40));
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open')});
+document.querySelectorAll('.mob-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open')}));
+const ro=new IntersectionObserver(es=>es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*55);ro.unobserve(e.target)}}),{threshold:.07,rootMargin:'0px 0px -30px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+const flowProblemShowcase=document.querySelector('[data-flow-problem-showcase]');
+if(flowProblemShowcase){
+  const tabs=[...flowProblemShowcase.querySelectorAll('.flow-problem-tab')];
+  const preview=flowProblemShowcase.querySelector('.flow-problem-preview');
+  const image=preview.querySelector('img');
+  const kicker=preview.querySelector('.flow-problem-kicker');
+  const title=preview.querySelector('.flow-problem-caption h3');
+  const desc=preview.querySelector('.flow-problem-caption p');
+  const activate=(tab)=>{
+    tabs.forEach((item,index)=>{
+      const active=item===tab;
+      item.classList.toggle('active',active);
+      item.setAttribute('aria-selected',active?'true':'false');
+      if(active) kicker.textContent=`Flow ${String(index+1).padStart(2,'0')}`;
+    });
+    preview.classList.add('is-changing');
+    window.setTimeout(()=>{
+      image.src=tab.dataset.image;
+      image.alt=tab.dataset.title;
+      title.textContent=tab.dataset.title;
+      desc.textContent=tab.dataset.desc;
+      preview.classList.remove('is-changing');
+    },100);
+  };
+  tabs.forEach(tab=>{
+    tab.addEventListener('mouseenter',()=>activate(tab));
+    tab.addEventListener('focus',()=>activate(tab));
+    tab.addEventListener('click',()=>activate(tab));
+  });
+}
 </script>
 <script src="../js/site-motion.js"></script>
 </body>

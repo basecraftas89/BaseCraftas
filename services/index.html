@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>サービス一覧 — Base Craftas</title>
-<meta name="description" content="Base Craftasの3つの主要事業。医療・介護の採用ブランディング伴走、現場実装、健康資本支援を通じて、人と組織の土台づくりを支援します。">
+<meta name="description" content="Base Craftasの3つの主要事業。医療・介護の採用ブランディング伴走、AI導入・業務改善、健康資本支援を通じて、人と組織の土台づくりを支援します。">
 <link rel="icon" href="../images/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
@@ -14,7 +14,7 @@
 .compare-table td { padding:1rem 1.4rem; border-bottom:1px solid var(--border); font-size:.9rem; color:var(--text-sub); line-height:1.8; vertical-align:top; }
 .compare-table tr:nth-child(even) td { background:var(--mist); }
 .compare-table .svc-name { font-weight:700; color:var(--green); }
-.svc-big-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2.4rem; margin-top:4rem; }
+.svc-big-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.5rem; margin-top:4rem; }
 .svc-big-card { border:1px solid var(--border-sage); border-radius:16px; overflow:hidden; transition:transform .25s, box-shadow .25s; }
 .svc-big-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(26,51,44,.12); }
 .svc-big-header { background:var(--green); padding:2rem 2rem 1.6rem; }
@@ -30,7 +30,8 @@
 .consult-band { background:var(--mist); border-radius:12px; padding:1.4rem 1.8rem; margin-top:2rem; }
 .consult-band-ttl { font-size:.88rem; font-weight:700; color:var(--green); margin-bottom:.4rem; }
 .consult-band-desc { font-size:.84rem; color:var(--text-sub); line-height:1.9; }
-@media(max-width:1024px){ .svc-big-grid{ grid-template-columns:1fr; max-width:560px; margin-left:auto; margin-right:auto; } .compare-table{ font-size:.82rem; } }
+@media(max-width:1024px){ .svc-big-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; } .compare-table{ font-size:.82rem; } }
+@media(max-width:680px){ .svc-big-grid{ grid-template-columns:1fr; max-width:560px; margin-left:auto; margin-right:auto; } }
 </style>
 </head>
 <body>
@@ -45,10 +46,11 @@
       <a href="index.html" style="color:var(--terra)">サービス ▾</a>
       <div class="dropdown-menu">
         <a href="growth.html">採用ブランディング伴走</a>
-        <a href="visit.html">現場実装支援</a>
+        <a href="visit.html">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
     </li>
+    <li><a href="../projects/index.html">プロジェクト</a></li>
     <li><a href="../profile.html">代表プロフィール</a></li>
   </ul>
   <div class="nav-right">
@@ -61,9 +63,10 @@
   <a href="../about.html" class="mob-lnk">私たちについて</a>
   <span class="mob-sec">Services</span>
   <a href="growth.html" class="mob-lnk">採用ブランディング伴走</a>
-  <a href="visit.html" class="mob-lnk">現場実装支援</a>
+  <a href="visit.html" class="mob-lnk">AI導入・業務改善</a>
   <a href="vital.html" class="mob-lnk">健康資本支援</a>
   <span class="mob-sec">More</span>
+  <a href="../projects/index.html" class="mob-lnk">プロジェクト</a>
   <a href="../profile.html" class="mob-lnk">代表プロフィール</a>
   <a href="../contact.html" class="mob-cta-link mob-lnk">お問い合わせ</a>
 </nav>
@@ -73,14 +76,14 @@
   <div style="position:relative;z-index:2" class="reveal">
     <span class="page-hero-eyebrow">Services</span>
     <h1 class="page-hero-ttl">サービス一覧</h1>
-    <p class="page-hero-sub">採用ブランドを育てる支援、現場に残す実装支援、働く人の健康を支える支援。<br>3つの事業で、医療・介護組織が本来の価値を発揮できる土台を整えます。</p>
+    <p class="page-hero-sub">採用ブランドを育てる支援、AIで業務に余白をつくる支援、働く人の健康を支える支援。<br>3つの事業で、人と組織が本来の価値を発揮できる土台を整えます。</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="sec-inner">
     <p style="font-size:.95rem;line-height:2.1;color:var(--text-sub);max-width:700px;margin-bottom:4rem" class="reveal">
-      Base Craftasでは、人と組織が本来の価値を発揮できるように、医療・介護施設の採用ブランディング、現場実装、健康資本支援を行っています。<br>
+      Base Craftasでは、人と組織が本来の価値を発揮できるように、採用ブランディング、AI導入・業務改善、健康資本支援を行っています。<br>
       どのサービスが合うか迷っている方は、「<a href="../contact.html" style="color:var(--terra);text-decoration:underline">どれが合うか相談したい</a>」でお問い合わせください。
     </p>
     <div class="svc-big-grid">
@@ -94,7 +97,7 @@
             理念・文化・専門性を言葉にし、院内ブランド人材の育成、発信、AI活用、採用導線の内製化まで伴走します。
           </p>
           <div class="svc-big-for">こんな方に</div>
-          <p style="font-size:.87rem;color:var(--text-sub);line-height:1.9">採用のミスマッチを減らしたい / 施設の魅力を伝えたい / 発信担当を育てたい / 自社採用力を高めたい</p>
+          <p style="font-size:.87rem;color:var(--text-sub);line-height:1.9">採用のミスマッチを減らす導線を整えたい / 施設の魅力を伝えたい / 発信担当を育てたい / 自社採用力の土台を整えたい</p>
           <div class="svc-big-topics">
             <span class="svc-big-topic">採用ブランディング</span><span class="svc-big-topic">院内人材育成</span>
             <span class="svc-big-topic">SNS内製化</span><span class="svc-big-topic">AI活用</span>
@@ -103,18 +106,18 @@
           <a href="growth.html" class="btn-primary" style="display:inline-block;width:100%;text-align:center">詳しく見る →</a>
         </div>
       </div>
-      <!-- Shift -->
+      <!-- Flow -->
       <div class="svc-big-card reveal">
         <div class="svc-big-header" style="padding:0;overflow:hidden;">
-          <img src="../images/08_custom/shift-service-thumb.jpg" alt="Craft Shift" style="width:100%;display:block;aspect-ratio:5/4;object-fit:cover;object-position:center;">
+          <img src="../images/08_custom/craft-flow/flow-service-thumb.jpg" alt="Craft Flow AI・業務改善支援の全体像" style="width:100%;display:block;aspect-ratio:5/4;object-fit:cover;object-position:center top;">
         </div>
         <div class="svc-big-body">
           <p style="font-size:.9rem;color:var(--text-sub);line-height:1.95;margin-bottom:1rem">
-            医療・介護現場に入り、臨床・研修・業務改善を通じて、専門職の価値が現場に残る実装を支援します。
+            AIに任せられる仕事を整理し、会議・文書・情報整理・教育・広報などの日常業務を改善。AI活用を組織に残る形で内製化します。
           </p>
           <div class="svc-big-for">こんな方に</div>
-          <p style="font-size:.87rem;color:var(--text-sub);line-height:1.9">現場に来てほしい / スタッフ研修をしたい / 臨床の視点がほしい / 専門職の実践を残したい</p>
-          <div class="svc-big-topics"><span class="svc-big-topic">臨床支援</span><span class="svc-big-topic">研修</span><span class="svc-big-topic">業務改善</span><span class="svc-big-topic">現場導入</span><span class="svc-big-topic">半日/1日プラン</span></div>
+          <p style="font-size:.87rem;color:var(--text-sub);line-height:1.9">AIを導入したい / 何から始めるか整理したい / 定型業務を減らしたい / 社内で使い続けられる仕組みを作りたい</p>
+          <div class="svc-big-topics"><span class="svc-big-topic">AIセミナー</span><span class="svc-big-topic">実践研修</span><span class="svc-big-topic">業務フロー診断</span><span class="svc-big-topic">GAS・自動化</span><span class="svc-big-topic">内製化支援</span></div>
           <a href="visit.html" class="btn-primary" style="display:inline-block;width:100%;text-align:center">詳しく見る →</a>
         </div>
       </div>
@@ -169,13 +172,13 @@
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Services</span>
         <a href="growth.html">採用ブランディング伴走</a>
-        <a href="growth.html">採用ブランディング伴走</a>
-        <a href="visit.html">現場実装支援</a>
+        <a href="visit.html">AI導入・業務改善</a>
         <a href="vital.html">健康資本支援</a>
       </div>
       <div class="ft-nav-col">
         <span class="ft-nav-ttl">Base Craftas</span>
         <a href="../about.html">私たちについて</a>
+        <a href="../projects/index.html">プロジェクト</a>
         <a href="../profile.html">代表プロフィール</a>
         <a href="../contact.html">お問い合わせ</a>
       </div>
@@ -184,6 +187,7 @@
         <a href="../privacy-policy.html">プライバシーポリシー</a>
         <a href="../cancellation-policy.html">キャンセルポリシー</a>
         <a href="../disclaimer.html">免責事項</a>
+        <a href="../legal.html">特定商取引法に基づく表記</a>
       </div>
     </div>
   </div>
@@ -193,6 +197,7 @@
       <a href="../privacy-policy.html">プライバシーポリシー</a>
       <a href="../cancellation-policy.html">キャンセルポリシー</a>
       <a href="../disclaimer.html">免責事項</a>
+      <a href="../legal.html">特定商取引法に基づく表記</a>
     </div>
   </div>
 </footer>
