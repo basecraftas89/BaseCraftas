@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健康資本支援 Craft Vital — Base Craftas</title>
+<meta name="description" content="Craft Vitalは、働く人の身体・睡眠・心を支え、従業員が本来の力を発揮し続けられる職場づくりを支援する法人向け健康資本支援サービスです。">
+<link rel="icon" href="../images/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css?v=20260817-cta2">
+<style>
+.vital-intro { display:grid; grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr); gap:5rem; align-items:center; }
+.vital-intro-statement { color:var(--green); font-size:clamp(1.55rem,2.8vw,2.4rem); font-weight:700; line-height:1.65; }
+.vital-intro-copy { color:var(--text-sub); font-size:.96rem; line-height:2.1; }
+.layer-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:3rem; }
+.layer-card { padding:2rem 1.8rem; border:1px solid var(--border-sage); background:#fff; }
+.layer-no { font-family:'Montserrat',sans-serif; color:var(--terra); letter-spacing:.16em; font-size:.75rem; font-weight:700; }
+.layer-card h3 { color:var(--green); font-size:1.08rem; margin:.7rem 0; }
+.layer-card p { color:var(--text-sub); font-size:.88rem; line-height:1.9; }
+.needs-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:2.6rem; }
+.need { border-left:3px solid var(--terra); padding:1.05rem 1.2rem; background:#fff; color:var(--text-sub); font-size:.9rem; line-height:1.75; }
+.vital-problem-showcase { display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr); gap:2rem; align-items:stretch; margin-top:3rem; }
+.vital-problem-tabs { display:grid; gap:.75rem; }
+.vital-problem-tab { width:100%; text-align:left; border:1px solid var(--border-sage); background:#fff; padding:1rem 1.1rem; display:grid; grid-template-columns:auto 1fr; gap:.85rem; align-items:start; cursor:pointer; color:var(--text-main); transition:background-color .14s ease,border-color .14s ease; }
+.vital-problem-tab:hover,.vital-problem-tab:focus-visible,.vital-problem-tab.active { background:var(--cream); border-color:rgba(214,106,69,.55); outline:none; }
+.vital-problem-num { font-family:'Montserrat',sans-serif; font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--terra); padding-top:.18rem; }
+.vital-problem-copy { font-size:.9rem; font-weight:700; color:var(--green); line-height:1.75; }
+.vital-problem-preview { position:relative; min-height:100%; border:1px solid var(--border-sage); overflow:hidden; background:#fff; box-shadow:0 12px 26px rgba(26,51,44,.08); }
+.vital-problem-preview::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(26,51,44,0) 36%,rgba(26,51,44,.78) 100%); pointer-events:none; }
+.vital-problem-preview img { display:block; width:100%; height:100%; min-height:520px; object-fit:cover; transition:opacity .12s ease; }
+.vital-problem-preview.is-changing img { opacity:.62; }
+.vital-problem-caption { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1.6rem; color:#fff; }
+.vital-problem-kicker { display:inline-flex; margin-bottom:.55rem; padding:.22rem .6rem; border:1px solid rgba(255,255,255,.55); border-radius:999px; font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.14em; font-weight:700; }
+.vital-problem-caption h3 { color:#fff; font-size:1.16rem; margin:0 0 .5rem; line-height:1.6; }
+.vital-problem-caption p { margin:0; color:rgba(255,255,255,.86); font-size:.86rem; line-height:1.9; }
+.value-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-top:3rem; }
+.value-step { border-top:2px solid var(--sage); padding:1.25rem .4rem 0; }
+.value-step-no { font-family:'Montserrat',sans-serif; font-size:.75rem; font-weight:700; color:var(--terra); letter-spacing:.12em; }
+.value-step h3 { color:var(--green); font-size:1rem; margin:.45rem 0; }
+.value-step p { color:var(--text-sub); font-size:.83rem; line-height:1.8; }
+.program-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
+.program-card { background:#fff; padding:2rem; border:1px solid var(--border-sage); }
+.program-card h3 { color:var(--green); font-size:1.1rem; margin-bottom:.8rem; }
+.program-card p { color:var(--text-sub); font-size:.88rem; line-height:1.9; }
+.target-chips { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:2rem; }
+.target-chip { padding:.45rem 1rem; color:var(--sage); background:var(--mist); border:1px solid var(--border-sage); font-size:.85rem; }
+.plan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
+.plan { padding:2rem; border:1px solid var(--border-sage); background:#fff; }
+.plan--featured { background:var(--green); border-color:var(--green); }
+.plan-label { color:var(--terra); font-family:'Montserrat',sans-serif; letter-spacing:.16em; font-size:.68rem; font-weight:700; }
+.plan h3 { color:var(--green); font-size:1.2rem; margin:.7rem 0 .45rem; }
+.plan--featured h3,.plan--featured p,.plan--featured li { color:#fff; }
+.plan-price { color:var(--text-sub); font-size:.9rem; margin-bottom:1.1rem; }
+.plan ul { margin:0; padding-left:1.2rem; color:var(--text-sub); font-size:.85rem; line-height:2; }
+.flow-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:1.2rem; margin-top:3rem; }
+.flow-step { padding:1.4rem 1.1rem; border:1px solid var(--border-sage); background:#fff; }
+.flow-step b { display:block; color:var(--terra); font-family:'Montserrat',sans-serif; font-size:.76rem; letter-spacing:.12em; margin-bottom:.5rem; }
+.flow-step h3 { font-size:.95rem; color:var(--green); margin-bottom:.5rem; }
+.flow-step p { font-size:.82rem; color:var(--text-sub); line-height:1.8; }
+.vital-visual { width:min(100%,1180px); margin:3rem auto 0; border:1px solid var(--border-sage); overflow:hidden; background:#fff; box-shadow:0 12px 28px rgba(26,51,44,.07); }
+.vital-visual img { display:block; width:100%; height:auto; }
+.vital-visual--dark { border-color:rgba(255,255,255,.18); }
+.vital-visual--cta { width:min(100%,1240px); margin:0 auto 3rem; }
+.vital-page-hero { min-height:680px; isolation:isolate; background:#102d26; grid-template-columns:minmax(0,760px); }
+.vital-page-hero::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(12,34,29,.92) 0%, rgba(12,34,29,.78) 38%, rgba(12,34,29,.52) 66%, rgba(12,34,29,.42) 100%); pointer-events:none; }
+.vital-page-hero::after { z-index:1; }
+.vital-hero-photo-bg { position:absolute; inset:0; z-index:0; overflow:hidden; opacity:1; pointer-events:none; }
+.vital-hero-photo-bg img { width:100%; height:100%; object-fit:cover; object-position:right center; filter:saturate(.92) contrast(.96); }
+.vital-page-hero .page-hero-bg { z-index:1; }
+@media(max-width:1024px){.vital-problem-showcase{grid-template-columns:1fr}.vital-problem-preview img{min-height:420px}.vital-intro{gap:2.5rem}.layer-grid,.program-grid,.plan-grid{grid-template-columns:1fr 1fr}.value-steps,.flow-steps{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.vital-page-hero{min-height:640px;padding-top:7rem}.vital-page-hero::before{background:linear-gradient(180deg,rgba(12,34,29,.88),rgba(12,34,29,.74))}.vital-problem-preview img{min-height:340px}.vital-problem-caption{padding:1.2rem}.vital-intro,.layer-grid,.needs-grid,.program-grid,.plan-grid,.value-steps,.flow-steps{grid-template-columns:1fr}.vital-intro{gap:1.5rem}.layer-card,.program-card,.plan{padding:1.5rem}.value-step{padding:1rem 0}.flow-step{padding:1.2rem}}
+</style>
+</head>
+<body>
+<nav class="nav hero-dark" id="mainNav">
+  <a href="../index.html" class="nav-logo"><img src="../images/logo-header.png" alt="Base Craftas" class="nav-logo-img"></a>
+  <ul class="nav-links">
+    <li><a href="../about.html">私たちについて</a></li>
+    <li class="dropdown"><a href="index.html" style="color:var(--terra)">サービス ▾</a><div class="dropdown-menu"><a href="growth.html">採用ブランディング伴走</a><a href="visit.html">AI導入・業務改善</a><a href="vital.html" style="color:var(--terra)">健康資本支援</a></div></li>
+    <li><a href="../projects/index.html">プロジェクト</a></li>
+    <li><a href="../profile.html">代表プロフィール</a></li>
+  </ul>
+  <div class="nav-right"><a href="../contact.html?service=vital" class="nav-cta">無料相談</a><button class="nav-burger" id="burger" aria-label="メニュー"><span></span><span></span><span></span></button></div>
+</nav>
+<nav class="mob-drawer" id="drawer"><span class="mob-sec">Menu</span><a href="../about.html" class="mob-lnk">私たちについて</a><span class="mob-sec">Services</span><a href="growth.html" class="mob-lnk">採用ブランディング伴走</a><a href="visit.html" class="mob-lnk">AI導入・業務改善</a><a href="vital.html" class="mob-lnk">健康資本支援</a><span class="mob-sec">More</span><a href="../projects/index.html" class="mob-lnk">プロジェクト</a>
+  <a href="../profile.html" class="mob-lnk">代表プロフィール</a><a href="../contact.html?service=vital" class="mob-cta-link mob-lnk">無料相談</a></nav>
+
+<main>
+  <section class="page-hero page-hero-split vital-page-hero">
+    <div class="page-hero-bg">VITAL</div>
+    <div class="vital-hero-photo-bg" aria-hidden="true"><img src="../images/08_custom/vital-hero.jpg" alt=""></div>
+    <div style="position:relative;z-index:2" class="reveal"><span class="page-hero-eyebrow">Craft Vital / 健康資本支援</span><h1 class="page-hero-ttl">あなたの想いを届けている人たちを、<br>健康の土台から支える。</h1><p class="page-hero-sub">身体・睡眠・心の小さな不調に気づき、従業員が本来の力を発揮しやすい職場づくりを支援します。</p><p class="page-hero-sub" style="font-size:.82rem;opacity:.78;margin-top:1rem">医療行為・診断・治療ではなく、職場の健康施策・教育・環境づくりを支援するサービスです。</p><div class="hero-acts"><a href="../contact.html?service=vital" class="btn-primary">健康資本支援を相談する</a><a href="index.html" class="btn-ghost-white">サービス一覧へ</a></div></div>
+  </section>
+
+  <section class="sec"><div class="sec-inner"><div class="vital-intro reveal"><div><span class="sec-eyebrow">What is Craft Vital</span><span class="sage-rule"></span><h2 class="vital-intro-statement">従業員の健康は、会社の理念を形に近づけるための経営資本です。</h2></div><p class="vital-intro-copy">会社の理念を、日々の仕事として顧客や地域へ届けているのは従業員です。Craft Vitalは、理学療法士としての身体理解と健康経営・産業保健の視点を掛け合わせ、働く人の身体・睡眠・疲労・心理的余白を支えます。福利厚生で終わらせず、会社の価値が届き続けやすい状態を一緒につくります。</p></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-overview.jpg" alt="Craft Vitalの全体像。経営者の理念、従業員の健康資本、顧客へ届く価値のつながり"></figure></div></section>
+
+  <section class="sec" style="background:var(--mist)"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow">Three Layers</span><span class="sage-rule"></span><h2 class="sec-ttl">理念、働く人、その先の顧客。<br>三つの価値を支えます。</h2></div><div class="layer-grid"><article class="layer-card reveal"><div class="layer-no">01 / LEADERSHIP</div><h3>経営者の理念</h3><p>従業員を大切にしたいという経営姿勢と、会社を通じて形にしたい想いを支えます。</p></article><article class="layer-card reveal"><div class="layer-no">02 / EMPLOYEES</div><h3>従業員の健康資本</h3><p>身体・睡眠・疲労・心の状態に気づき、専門性や技術を発揮しやすいコンディションづくりを支援します。</p></article><article class="layer-card reveal"><div class="layer-no">03 / CUSTOMERS</div><h3>顧客へ届く価値</h3><p>働く人の仕事を通じて届けられる、商品・サービス・ケア・接客の質を支えます。</p></article></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-three-layers.jpg" alt="Craft Vitalが支える3層。経営者、従業員、顧客・利用者の価値をつなぐ"></figure></div></section>
+
+  <section class="sec"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow">Challenges</span><span class="sage-rule"></span><h2 class="sec-ttl">こんなお悩みはありませんか？</h2><p class="sec-desc">小さな不調や働きにくさは、個人だけの問題ではありません。職場の状態を丁寧に見つめ、実行できる一歩へ変えていきます。</p></div><div class="vital-problem-showcase reveal" data-vital-problem-showcase><div class="vital-problem-tabs" role="tablist" aria-label="Craft Vitalで扱う職場の健康課題"><button class="vital-problem-tab active" type="button" role="tab" aria-selected="true" data-image="../images/08_custom/vital-problems/01-pain-fatigue.jpg" data-title="腰痛・肩こり・疲労を抱えながら働く人が多い" data-desc="小さな身体の不調が、集中力やパフォーマンスの低下につながっていないかを見つめます。"><span class="vital-problem-num">01</span><span class="vital-problem-copy">腰痛・肩こり・疲労を抱えながら働く人が多い</span></button><button class="vital-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/vital-problems/02-sleep-recovery.jpg" data-title="睡眠不足や回復感の低下が気になっている" data-desc="睡眠・疲労回復の課題を、本人任せにせず働き続ける土台として整理します。"><span class="vital-problem-num">02</span><span class="vital-problem-copy">睡眠不足や回復感の低下が気になっている</span></button><button class="vital-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/vital-problems/03-hard-to-consult.jpg" data-title="休憩や相談をしづらい職場の空気がある" data-desc="相談しづらさや休みづらさを個人の我慢にせず、職場の状態として言語化します。"><span class="vital-problem-num">03</span><span class="vital-problem-copy">休憩や相談をしづらい職場の空気がある</span></button><button class="vital-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/vital-problems/04-one-off.jpg" data-title="健康施策が単発で終わってしまう" data-desc="一度の研修で終わらせず、次の実践と振り返りにつながる形へ整えます。"><span class="vital-problem-num">04</span><span class="vital-problem-copy">健康施策が単発で終わってしまう</span></button><button class="vital-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/vital-problems/05-unorganized.jpg" data-title="従業員の健康課題を整理できていない" data-desc="従業員の声や現場の違和感を集め、優先して向き合う健康課題を見える化します。"><span class="vital-problem-num">05</span><span class="vital-problem-copy">従業員の健康課題を整理できていない</span></button><button class="vital-problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/vital-problems/06-investment.jpg" data-title="健康投資をどう始めるか迷っている" data-desc="感覚的な福利厚生ではなく、経営判断できる健康施策として最初の一手を設計します。"><span class="vital-problem-num">06</span><span class="vital-problem-copy">健康投資をどう始めるか迷っている</span></button></div><figure class="vital-problem-preview" role="tabpanel" aria-live="polite"><img src="../images/08_custom/vital-problems/01-pain-fatigue.jpg" alt="腰痛・肩こり・疲労を抱えながら働く人が多い課題"><figcaption class="vital-problem-caption"><span class="vital-problem-kicker">Vital 01</span><h3>腰痛・肩こり・疲労を抱えながら働く人が多い</h3><p>小さな身体の不調が、集中力やパフォーマンスの低下につながっていないかを見つめます。</p></figcaption></figure></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-problems.jpg" alt="小さな不調が、集中力や生産性、サービス品質に影響する職場の健康課題"></figure></div></section>
+
+  <section class="sec" style="background:var(--green)"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow" style="color:var(--terra)">How We Support</span><span class="sage-rule" style="background:var(--sage)"></span><h2 class="sec-ttl" style="color:#fff">気づきから、継続する仕組みへ。</h2><p class="sec-desc" style="color:rgba(255,255,255,.7)">一度の研修で終わらせず、職場の健康課題を見える化し、次の投資判断につなげます。</p></div><div class="value-steps"><article class="value-step reveal"><div class="value-step-no">01</div><h3 style="color:#fff">気づく</h3><p style="color:rgba(255,255,255,.7)">身体・睡眠・疲労・心のサインを認識する。</p></article><article class="value-step reveal"><div class="value-step-no">02</div><h3 style="color:#fff">実践する</h3><p style="color:rgba(255,255,255,.7)">職場で続けられるセルフケアを学ぶ。</p></article><article class="value-step reveal"><div class="value-step-no">03</div><h3 style="color:#fff">見える化する</h3><p style="color:rgba(255,255,255,.7)">個人の悩みを、職場の課題として整理する。</p></article><article class="value-step reveal"><div class="value-step-no">04</div><h3 style="color:#fff">投資判断する</h3><p style="color:rgba(255,255,255,.7)">健康課題と施策の優先順位を検討する。</p></article><article class="value-step reveal"><div class="value-step-no">05</div><h3 style="color:#fff">継続する</h3><p style="color:rgba(255,255,255,.7)">年間施策・健康経営・業務改善へつなげる。</p></article></div><figure class="vital-visual vital-visual--dark reveal"><img src="../images/08_custom/vital-support-steps.jpg" alt="Craft Vitalの5つの支援ステップ。気づく、実践する、見える化する、投資判断する、継続する"></figure></div></section>
+
+  <section class="sec"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow">Programs</span><span class="sage-rule"></span><h2 class="sec-ttl">職場に合わせて、健康の土台を整える。</h2></div><div class="program-grid"><article class="program-card reveal"><h3>訪問型健康セミナー</h3><p>腰痛対策の考え方、肩こり・首こり対策、睡眠・疲労回復の習慣づくり、ストレス・コンディション管理など、現場に合わせた60〜90分の研修を実施します。</p></article><article class="program-card reveal"><h3>職場健康課題の診断</h3><p>従業員アンケートと管理者ヒアリングを通じて、優先課題と実行しやすい施策を整理。必要に応じて健康投資の仮説づくりを支援します。</p></article><article class="program-card reveal"><h3>年間施策・健康経営支援</h3><p>継続研修、実施記録、年間計画の整理を通じ、健康施策が職場に根づきやすい状態を目指します。業務改善や発信設計にも接続できます。</p></article></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-themes.jpg" alt="Craft Vitalの代表的な4つの健康テーマ。腰痛対策の考え方、肩こり・首こり対策、睡眠・疲労回復の習慣づくり、ストレス・コンディション管理"></figure><div class="reveal" style="margin-top:3.5rem"><span class="sec-eyebrow">For Whom</span><h3 class="sec-ttl" style="font-size:1.5rem">対象となる企業・施設</h3><div class="target-chips"><span class="target-chip">医療・介護・福祉</span><span class="target-chip">製造・物流・現場職</span><span class="target-chip">保育・飲食・美容・販売</span><span class="target-chip">デスクワーク・士業・IT</span><span class="target-chip">健康経営に取り組みたい企業</span><span class="target-chip">従業員10〜100名程度の事業者</span></div></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-industries.jpg" alt="Craft Vitalの対象業種。医療・介護・IT・製造・小売・士業など幅広い業種に対応"></figure></div></section>
+
+  <section class="sec" style="background:var(--mist)"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow">Plans</span><span class="sage-rule"></span><h2 class="sec-ttl">まずは、職場に合う始め方から。</h2><p class="sec-desc">状況に応じて、内容と範囲をご提案します。表示価格はいずれも税別・交通費別です。</p></div><div class="plan-grid"><article class="plan reveal"><div class="plan-label">SEMINAR</div><h3>セミナープラン</h3><p class="plan-price">50,000円〜</p><ul><li>事前ヒアリング</li><li>60〜90分の訪問型研修</li><li>実技・セルフケア指導</li><li>簡易アンケート・次回提案</li></ul></article><article class="plan plan--featured reveal"><div class="plan-label">ASSESSMENT</div><h3>診断プラン</h3><p class="plan-price">150,000円〜</p><ul><li>訪問型健康セミナー</li><li>従業員アンケート</li><li>管理者ヒアリング</li><li>課題整理・簡易レポート</li><li>優先施策の提案</li></ul></article><article class="plan reveal"><div class="plan-label">ANNUAL</div><h3>年間プラン</h3><p class="plan-price">300,000円〜</p><ul><li>年4回以上の健康セミナー</li><li>テーマ別セルフケア資料</li><li>実施記録・フィードバック</li><li>年間施策・健康経営の整理</li></ul></article></div><figure class="vital-visual reveal"><img src="../images/08_custom/vital-assessment.jpg" alt="Craft Vital診断プラン。アンケート、管理者ヒアリング、課題の見える化、ROI仮説、診断レポートの流れ"></figure><p class="reveal" style="margin-top:1.3rem;color:var(--text-sub);font-size:.78rem;line-height:1.8">※健康上の不調に対する診断・治療を行うサービスではありません。必要に応じて、専門家や医療機関への相談をご案内します。</p></div></section>
+
+  <section class="sec"><div class="sec-inner"><div class="reveal"><span class="sec-eyebrow">Flow</span><span class="sage-rule"></span><h2 class="sec-ttl">導入までの流れ</h2></div><div class="flow-steps"><article class="flow-step reveal"><b>01</b><h3>お問い合わせ</h3><p>現在の状況や、ご相談したいテーマをお送りください。</p></article><article class="flow-step reveal"><b>02</b><h3>事前ヒアリング</h3><p>経営者・担当者の方から、目的と現場の状況を伺います。</p></article><article class="flow-step reveal"><b>03</b><h3>内容のご提案</h3><p>テーマ、対象者、実施内容、費用をご提案します。</p></article><article class="flow-step reveal"><b>04</b><h3>研修・診断の実施</h3><p>セミナー、実技、アンケートなどを実施します。</p></article><article class="flow-step reveal"><b>05</b><h3>振り返り・次期提案</h3><p>結果を整理し、次の施策や年間支援をご案内します。</p></article></div></div></section>
+
+  <section class="sec-cta"><figure class="vital-visual vital-visual--cta reveal"><img src="../images/08_custom/vital-cta.jpg" alt="さまざまな職場で働く人々の健康と価値提供を支えるCraft Vital"></figure><div class="cta-inner reveal"><span class="sec-eyebrow" style="display:block;text-align:center">Craft Vital</span><span class="sage-rule" style="margin:0 auto 1.2rem"></span><h2 class="cta-ttl">働く人の健康を、<em>価値を支える土台へ。</em></h2><p class="cta-desc">健康施策をどう始めるか迷っている段階から、ご相談いただけます。医療行為・診断・治療ではなく、職場の健康施策づくりを支援します。</p><div class="cta-clarity" aria-label="Craft Vitalの無料相談で整理できること"><div class="cta-clarity-item"><b>職場の健康課題</b><span>身体・睡眠・疲労・相談しづらさなど、現状を整理します。</span></div><div class="cta-clarity-item"><b>優先するテーマ</b><span>セミナー・診断・年間施策のどれが適するかを確認します。</span></div><div class="cta-clarity-item"><b>最初の進め方</b><span>対象者・実施内容・支援範囲の目安をご案内します。</span></div></div><div class="cta-acts"><a href="../contact.html?service=vital" class="btn-primary">無料相談で健康課題を整理する</a><a href="index.html" class="btn-secondary">サービス一覧を見る</a></div><p class="cta-reassurance">個別の診断・治療ではなく、職場の健康施策づくりについてご相談いただけます。</p></div></section>
+  <a href="../contact.html?service=vital" class="mobile-service-cta">無料相談で健康課題を整理する</a>
+</main>
+<footer><div class="ft-top"><div><img src="../images/logo-header.png" alt="Base Craftas" class="ft-logo-img"><p class="ft-tag">医療職の専門性と社会をつなぐ<br>土台となる。</p></div><div class="ft-nav"><div class="ft-nav-col"><span class="ft-nav-ttl">Services</span><a href="growth.html">採用ブランディング伴走</a><a href="visit.html">AI導入・業務改善</a><a href="vital.html">健康資本支援</a></div><div class="ft-nav-col"><span class="ft-nav-ttl">Base Craftas</span><a href="../about.html">私たちについて</a><a href="../profile.html">代表プロフィール</a><a href="../contact.html">お問い合わせ</a></div><div class="ft-nav-col"><span class="ft-nav-ttl">Policy</span><a href="../privacy-policy.html">プライバシーポリシー</a><a href="../cancellation-policy.html">キャンセルポリシー</a><a href="../disclaimer.html">免責事項</a><a href="../legal.html">特定商取引法に基づく表記</a></div></div></div><div class="ft-bot"><p class="ft-copy">© 2025–2026 Base Craftas. All Rights Reserved.</p><div class="ft-legal-links"><a href="../privacy-policy.html">プライバシーポリシー</a><a href="../cancellation-policy.html">キャンセルポリシー</a><a href="../disclaimer.html">免責事項</a><a href="../legal.html">特定商取引法に基づく表記</a></div></div></footer>
+<script>
+const mn=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>mn.classList.toggle('scrolled',scrollY>40));
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open')});
+document.querySelectorAll('.mob-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open')}));
+const ro=new IntersectionObserver(es=>es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*35);ro.unobserve(e.target)}}),{threshold:.07,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+const vitalProblemShowcase=document.querySelector('[data-vital-problem-showcase]');
+if(vitalProblemShowcase){
+  const tabs=[...vitalProblemShowcase.querySelectorAll('.vital-problem-tab')];
+  const preview=vitalProblemShowcase.querySelector('.vital-problem-preview');
+  const image=preview.querySelector('img');
+  const kicker=preview.querySelector('.vital-problem-kicker');
+  const title=preview.querySelector('.vital-problem-caption h3');
+  const desc=preview.querySelector('.vital-problem-caption p');
+  const activate=(tab)=>{
+    tabs.forEach((item,index)=>{
+      const active=item===tab;
+      item.classList.toggle('active',active);
+      item.setAttribute('aria-selected',active?'true':'false');
+      if(active) kicker.textContent=`Vital ${String(index+1).padStart(2,'0')}`;
+    });
+    preview.classList.add('is-changing');
+    window.setTimeout(()=>{
+      image.src=tab.dataset.image;
+      image.alt=tab.dataset.title;
+      title.textContent=tab.dataset.title;
+      desc.textContent=tab.dataset.desc;
+      preview.classList.remove('is-changing');
+    },80);
+  };
+  tabs.forEach(tab=>{
+    tab.addEventListener('mouseenter',()=>activate(tab));
+    tab.addEventListener('focus',()=>activate(tab));
+    tab.addEventListener('click',()=>activate(tab));
+  });
+}
+</script><script src="../js/site-motion.js"></script>
+</body>
+</html>

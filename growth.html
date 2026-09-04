@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>採用ブランディング伴走 Craft Growth — Base Craftas</title>
+<meta name="description" content="Craft Growthは、医療・介護施設の理念・文化・専門性を言葉にし、院内ブランド人材の育成、発信、AI活用、採用導線の内製化まで伴走する採用ブランディング支援です。">
+<link rel="icon" href="../images/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css?v=20260817-cta2">
+<style>
+.growth-page-hero { min-height:760px; display:flex; align-items:center; text-align:left; background:#102d26; isolation:isolate; }
+.growth-page-hero::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(12,34,29,.92) 0%, rgba(12,34,29,.76) 36%, rgba(12,34,29,.36) 68%, rgba(12,34,29,.18) 100%); pointer-events:none; }
+.growth-page-hero::after { z-index:1; }
+.growth-hero-photo { position:absolute; inset:0; z-index:0; }
+.growth-hero-photo img { width:100%; height:100%; object-fit:cover; object-position:center; filter:saturate(.95) contrast(.96); }
+.growth-hero-content { position:relative; z-index:2; max-width:720px; }
+.growth-page-hero .page-hero-bg { left:auto; right:4%; transform:none; bottom:2rem; z-index:1; color:rgba(255,255,255,.045); }
+.problem-showcase { display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr); gap:2rem; align-items:stretch; margin-top:3rem; }
+.problem-tabs { display:grid; gap:.85rem; }
+.problem-tab { width:100%; text-align:left; border:1px solid var(--border-sage); border-radius:10px; background:#fff; padding:1.05rem 1.15rem; display:grid; grid-template-columns:auto 1fr; gap:.85rem; align-items:start; cursor:pointer; color:var(--text-main); transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+.problem-tab:hover,.problem-tab:focus-visible,.problem-tab.active { background:var(--cream); border-color:rgba(214,106,69,.55); box-shadow:0 14px 30px rgba(26,51,44,.08); transform:translateY(-2px); outline:none; }
+.problem-tab-num { font-family:'Montserrat',sans-serif; font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--terra); padding-top:.18rem; }
+.problem-tab-copy { font-size:.9rem; font-weight:700; color:var(--green); line-height:1.75; }
+.problem-preview { position:relative; min-height:100%; border:1px solid var(--border-sage); border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 18px 38px rgba(26,51,44,.09); }
+.problem-preview::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(26,51,44,0) 38%,rgba(26,51,44,.76) 100%); pointer-events:none; }
+.problem-preview img { display:block; width:100%; height:100%; min-height:520px; object-fit:cover; transition:opacity .24s ease,transform .35s ease; }
+.problem-preview.is-changing img { opacity:.42; transform:scale(1.02); }
+.problem-caption { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1.6rem; color:#fff; }
+.problem-caption-kicker { display:inline-flex; margin-bottom:.55rem; padding:.22rem .6rem; border:1px solid rgba(255,255,255,.55); border-radius:999px; font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.14em; font-weight:700; }
+.problem-caption h3 { color:#fff; font-size:1.2rem; margin:0 0 .5rem; line-height:1.6; }
+.problem-caption p { margin:0; color:rgba(255,255,255,.86); font-size:.86rem; line-height:1.9; }
+.support-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.8rem; margin-top:3rem; }
+.service-showcase { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr); gap:2rem; align-items:start; margin-top:3rem; }
+.service-showcase .support-grid { margin-top:0; grid-template-columns:repeat(2,1fr); }
+.support-card { border:1px solid var(--border-sage); border-radius:12px; padding:1.8rem 1.6rem; }
+.support-option { width:100%; text-align:left; background:#fff; color:inherit; cursor:pointer; transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+.support-option:hover,.support-option:focus-visible,.support-option.active { background:var(--cream); border-color:rgba(214,106,69,.55); box-shadow:0 14px 28px rgba(26,51,44,.08); transform:translateY(-2px); outline:none; }
+.support-icon { font-size:1.6rem; margin-bottom:.8rem; }
+.support-ttl { font-size:1rem; font-weight:700; color:var(--green); margin-bottom:.6rem; }
+.support-desc { font-size:.87rem; color:var(--text-sub); line-height:1.95; }
+.service-preview { position:sticky; top:96px; border:1px solid var(--border-sage); border-radius:12px; background:#fff; padding:1.8rem; box-shadow:0 18px 38px rgba(26,51,44,.08); overflow:hidden; }
+.service-preview::before { content:''; position:absolute; width:160px; height:160px; right:-56px; top:-58px; border-radius:50%; background:rgba(185,211,198,.28); pointer-events:none; }
+.service-preview-kicker { position:relative; display:inline-flex; font-family:'Montserrat',sans-serif; font-size:.68rem; letter-spacing:.14em; font-weight:700; color:var(--terra); margin-bottom:.7rem; }
+.service-preview h3 { position:relative; color:var(--green); font-size:1.18rem; line-height:1.65; margin:0 0 .75rem; }
+.service-preview p { position:relative; color:var(--text-sub); font-size:.88rem; line-height:1.95; margin:0; }
+.service-preview-visual { position:relative; display:grid; gap:.75rem; margin-top:1.4rem; }
+.service-mini-node { display:grid; grid-template-columns:auto 1fr; gap:.75rem; align-items:center; padding:.75rem .85rem; border:1px solid var(--border); border-radius:10px; background:var(--mist); color:var(--green); font-size:.84rem; font-weight:700; line-height:1.55; }
+.service-mini-node span { display:grid; place-items:center; width:1.7rem; height:1.7rem; border-radius:50%; background:var(--green); color:#fff; font-family:'Montserrat',sans-serif; font-size:.72rem; }
+.target-list { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:2rem; }
+.target-chip { padding:.4rem 1rem; background:var(--mist); border:1px solid var(--border-sage); border-radius:50px; font-size:.85rem; color:var(--sage); }
+.flow-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; margin-top:3rem; position:relative; }
+.flow-step { position:relative; text-align:center; padding:1.6rem 1.2rem; background:#fff; border:1px solid var(--border-sage); border-radius:12px; overflow:hidden; transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+.flow-step::before { content:''; position:absolute; left:0; right:0; top:0; height:4px; background:transparent; transition:background-color .2s ease; }
+.flow-step:hover { background:var(--cream); border-color:rgba(214,106,69,.55); box-shadow:0 16px 32px rgba(26,51,44,.1); transform:translateY(-5px); }
+.flow-step:hover::before { background:var(--terra); }
+.flow-step-num { display:inline-grid; place-items:center; width:2.6rem; height:2.6rem; border-radius:50%; font-family:'Montserrat',sans-serif; font-size:1.15rem; font-weight:700; color:var(--terra); margin-bottom:.7rem; background:var(--mist); transition:background-color .2s ease,color .2s ease; }
+.flow-step:hover .flow-step-num { background:var(--green); color:#fff; }
+.flow-step-ttl { font-size:.9rem; font-weight:700; color:var(--green); margin-bottom:.4rem; }
+.flow-step-desc { font-size:.8rem; color:var(--text-sub); line-height:1.8; }
+.growth-visual { width:min(100%, 1040px); margin:3rem auto 0; border:1px solid var(--border-sage); border-radius:10px; overflow:hidden; background:#fff; box-shadow:0 12px 28px rgba(26,51,44,.07); }
+.growth-visual img { display:block; width:100%; height:auto; }
+.growth-visual--wide { width:min(100%, 1180px); }
+.visual-note { margin:1.1rem auto 0; width:min(100%, 1040px); color:var(--text-sub); font-size:.84rem; line-height:1.9; }
+.plan-slider { margin-top:3rem; border:1px solid var(--border-sage); border-radius:12px; background:#fff; overflow:hidden; box-shadow:0 14px 30px rgba(26,51,44,.08); }
+.plan-slider-tabs { display:flex; gap:.5rem; padding:.9rem; border-bottom:1px solid var(--border); background:var(--cream); }
+.plan-slider-tab { border:1px solid var(--border-sage); background:#fff; color:var(--green); border-radius:999px; padding:.55rem 1rem; font-size:.82rem; font-weight:700; cursor:pointer; transition:background-color .2s ease,color .2s ease,border-color .2s ease,transform .2s ease; }
+.plan-slider-tab:hover,.plan-slider-tab:focus-visible,.plan-slider-tab.active { background:var(--green); color:#fff; border-color:var(--green); transform:translateY(-1px); outline:none; }
+.plan-slide-stage { position:relative; }
+.plan-slide { display:none; padding:1rem; }
+.plan-slide.active { display:block; }
+.plan-slide .growth-visual { margin:0 auto; box-shadow:none; }
+.plan-compare-table { width:100%; border-collapse:collapse; margin:2rem 0 0; background:#fff; border:1px solid var(--border-sage); font-size:.86rem; }
+.plan-compare-table th,.plan-compare-table td { border:1px solid var(--border); padding:.9rem .8rem; text-align:left; vertical-align:top; line-height:1.75; }
+.plan-compare-table thead th { background:var(--green); color:#fff; font-weight:700; }
+.plan-compare-table tbody th { width:9rem; color:var(--green); background:var(--mist); font-weight:700; }
+.growth-process-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; margin-top:1.6rem; }
+.growth-process-grid .growth-visual { width:100%; margin:0; }
+.plan-timeline { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:3rem; }
+.plan-timeline-card { display:flex; flex-direction:column; min-height:370px; padding:2rem 1.7rem; border:1px solid var(--border-sage); border-top:4px solid var(--sage); background:#fff; }
+.plan-timeline-card--featured { border-top-color:var(--terra); box-shadow:0 14px 30px rgba(26,51,44,.08); }
+.plan-duration { font-family:'Montserrat',sans-serif; font-size:.72rem; letter-spacing:.16em; color:var(--terra); font-weight:700; }
+.plan-timeline-card h3 { margin:.6rem 0; font-size:1.15rem; color:var(--green); }
+.plan-theme { font-size:.9rem; color:var(--sage); font-weight:700; margin-bottom:1rem; }
+.plan-timeline-card ul { margin:0; padding:0; list-style:none; }
+.plan-timeline-card li { position:relative; padding:.42rem 0 .42rem 1rem; color:var(--text-sub); font-size:.84rem; line-height:1.65; border-bottom:1px solid var(--border); }
+.plan-timeline-card li::before { content:''; position:absolute; left:0; top:1.02rem; width:5px; height:5px; border-radius:50%; background:var(--terra); }
+.plan-outcome { margin-top:auto; padding-top:1.1rem; color:var(--green); font-size:.84rem; font-weight:700; line-height:1.75; }
+.support-system { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; margin-top:2.4rem; border:1px solid var(--border-sage); background:var(--border-sage); }
+.support-system-item { padding:1.35rem 1rem; background:var(--mist); }
+.support-system-label { display:block; font-family:'Montserrat',sans-serif; font-size:.66rem; letter-spacing:.1em; color:var(--terra); font-weight:700; margin-bottom:.45rem; }
+.support-system-copy { color:var(--green); font-size:.84rem; font-weight:700; line-height:1.65; }
+@media(max-width:768px){.growth-visual{margin-top:2rem;border-radius:7px}.growth-process-grid{grid-template-columns:1fr;gap:1rem;}.growth-process-grid .growth-visual{margin:0;}}
+@media(max-width:1024px){.problem-showcase,.service-showcase{grid-template-columns:1fr;}.problem-preview img{min-height:440px}.support-grid{grid-template-columns:1fr 1fr;}.service-preview{position:relative;top:auto}.flow-steps{grid-template-columns:1fr 1fr;}.plan-timeline{grid-template-columns:1fr;}.plan-timeline-card{min-height:auto}.support-system{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){.growth-page-hero{min-height:720px;padding-top:7rem}.growth-page-hero::before{background:linear-gradient(180deg,rgba(12,34,29,.88),rgba(12,34,29,.72))}.growth-hero-photo img{object-position:63% center}.problem-tabs,.support-grid,.service-showcase .support-grid,.flow-steps{grid-template-columns:1fr;}.problem-preview img{min-height:340px}.problem-caption{padding:1.2rem}.support-system{grid-template-columns:1fr 1fr;}.plan-slider-tabs{overflow-x:auto}.plan-compare-table{display:block;overflow-x:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+
+<nav class="nav hero-dark" id="mainNav">
+  <a href="../index.html" class="nav-logo"><img src="../images/logo-header.png" alt="Base Craftas" class="nav-logo-img"></a>
+  <ul class="nav-links">
+    <li><a href="../about.html">私たちについて</a></li>
+    <li class="dropdown">
+      <a href="index.html" style="color:var(--terra)">サービス ▾</a>
+      <div class="dropdown-menu">
+        <a href="growth.html" style="color:var(--terra)">採用ブランディング伴走</a>
+        <a href="visit.html">AI導入・業務改善</a>
+        <a href="vital.html">健康資本支援</a>
+      </div>
+    </li>
+    <li><a href="../projects/index.html">プロジェクト</a></li>
+    <li><a href="../profile.html">代表プロフィール</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="../contact.html?service=growth" class="nav-cta">無料相談</a>
+    <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<nav class="mob-drawer" id="drawer">
+  <span class="mob-sec">Menu</span>
+  <a href="../about.html" class="mob-lnk">私たちについて</a>
+  <span class="mob-sec">Services</span>
+  <a href="growth.html" class="mob-lnk">採用ブランディング伴走</a>
+  <a href="visit.html" class="mob-lnk">AI導入・業務改善</a>
+  <a href="vital.html" class="mob-lnk">健康資本支援</a>
+  <span class="mob-sec">More</span>
+  <a href="../projects/index.html" class="mob-lnk">プロジェクト</a>
+  <a href="../profile.html" class="mob-lnk">代表プロフィール</a>
+  <a href="../contact.html?service=growth" class="mob-cta-link mob-lnk">無料相談</a>
+</nav>
+
+<section class="page-hero growth-page-hero">
+  <div class="growth-hero-photo" aria-hidden="true"><img src="../images/08_custom/growth-hero-image2.jpg" alt=""></div>
+  <div class="page-hero-bg">GROWTH</div>
+  <div class="growth-hero-content reveal">
+    <span class="page-hero-eyebrow">Craft Growth / 医療・介護特化型ブランディングコンサル</span>
+    <h1 class="page-hero-ttl">紹介会社から選ばれる採用から、<br>ブランドで選ばれる採用へ。</h1>
+    <p class="page-hero-sub">組織を整え、現場の価値を言葉にし、院内スタッフが自ら届けられる状態まで。医療・介護施設の自走する採用ブランドづくりに伴走します。</p>
+    <div class="hero-acts">
+      <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary">採用課題を30分で整理する</a>
+      <a href="index.html" class="btn-ghost-white">サービス一覧へ</a>
+    </div>
+  </div>
+</section>
+
+<!-- 採用の転換 -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Recruitment Shift</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">「入ってから知る」採用から、<br>「知ってから入る」採用へ。</h2>
+      <p class="sec-desc">求人票や紹介会社から得られる条件だけでは、施設の文化や働く人までは十分に伝わりません。Craft Growthでは、院内を整え、日常や専門性を発信し、入職前に人と文化へ触れられる採用体験をつくります。</p>
+    </div>
+    <figure class="growth-visual growth-visual--wide reveal">
+      <img src="../images/08_custom/growth-recruitment-comparison.jpg" alt="紹介会社中心の採用とCraft Growthによる共感型採用の違い">
+    </figure>
+  </div>
+</section>
+
+<!-- こんな課題 -->
+<section class="sec" style="background:#fafcfb;border-top:1px solid var(--border)">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Problems</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">こんなお悩みはありませんか？</h2>
+    </div>
+    <div class="problem-showcase reveal" data-problem-showcase>
+      <div class="problem-tabs" role="tablist" aria-label="採用ブランディングのお悩み">
+        <button class="problem-tab active" type="button" role="tab" aria-selected="true" data-image="../images/08_custom/growth-problems/referral-gap.jpg" data-title="求人票だけでは、施設らしさが伝わらない" data-desc="条件や制度だけでは、現場の空気、教育文化、働く人の魅力までは伝わりません。">
+          <span class="problem-tab-num">01</span>
+          <span class="problem-tab-copy">求人票だけでは、施設らしさが伝わらない</span>
+        </button>
+        <button class="problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/growth-problems/expectation-gap.jpg" data-title="入職後に「思っていた職場と違う」が起きる" data-desc="採用前に伝える情報と、実際の働き方・人間関係・教育体制がつながっていない状態です。">
+          <span class="problem-tab-num">02</span>
+          <span class="problem-tab-copy">入職後に「思っていた職場と違う」が起きる</span>
+        </button>
+        <button class="problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/growth-problems/value-not-reaching-v2.jpg" data-title="医療・ケア・教育体制の良さが候補者へ届かない" data-desc="現場にある価値を言葉と写真・動画に変えることで、候補者が働く姿を想像しやすくなります。">
+          <span class="problem-tab-num">03</span>
+          <span class="problem-tab-copy">医療・ケア・教育体制の良さが候補者へ届かない</span>
+        </button>
+        <button class="problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/growth-problems/content-continuity.jpg" data-title="SNS担当が兼務になり、発信が続かない" data-desc="担当者の努力だけに頼らず、企画・撮影・確認・投稿の流れを院内に残す必要があります。">
+          <span class="problem-tab-num">04</span>
+          <span class="problem-tab-copy">SNS担当が兼務になり、発信が続かない</span>
+        </button>
+        <button class="problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/growth-problems/philosophy-staff-gap.jpg" data-title="現場の声と、経営者の理念がつながっていない" data-desc="理念を掲げるだけで終わらせず、現場の言葉に翻訳して採用ブランドへ落とし込みます。">
+          <span class="problem-tab-num">05</span>
+          <span class="problem-tab-copy">現場の声と、経営者の理念がつながっていない</span>
+        </button>
+        <button class="problem-tab" type="button" role="tab" aria-selected="false" data-image="../images/08_custom/growth-problems/ai-inhouse-v2.jpg" data-title="AI活用や情報整理を内製化したいが進め方がわからない" data-desc="AIを派手に導入するのではなく、日々の採用広報と情報整理を軽くする使い方から設計します。">
+          <span class="problem-tab-num">06</span>
+          <span class="problem-tab-copy">AI活用や情報整理を内製化したいが進め方がわからない</span>
+        </button>
+      </div>
+      <figure class="problem-preview" role="tabpanel" aria-live="polite">
+        <img src="../images/08_custom/growth-problems/referral-gap.jpg" alt="求人票だけでは施設らしさが伝わらない悩み">
+        <figcaption class="problem-caption">
+          <span class="problem-caption-kicker">Problem 01</span>
+          <h3>求人票だけでは、施設らしさが伝わらない</h3>
+          <p>条件や制度だけでは、現場の空気、教育文化、働く人の魅力までは伝わりません。</p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- サービス内容 -->
+<section class="sec" style="background:var(--mist)">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Service Contents</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">魅せる前に、整える。</h2>
+      <p class="sec-desc">SNSや採用サイトだけを整えても、実際の職場とのギャップがあればブランドにはなりません。経営と現場の声を整理し、採用ブランドを院内に残すところまで支援します。</p>
+    </div>
+    <div class="service-showcase reveal" data-service-showcase>
+      <div class="support-grid" role="tablist" aria-label="魅せる前に整える6つの支援">
+      <button class="support-card support-option active" type="button" role="tab" aria-selected="true" data-kicker="Step 01" data-title="採用・ブランド診断" data-desc="最初に、理念・現場の実態・既存の発信導線を同じテーブルに載せます。施設らしさが伝わらない理由を、感覚ではなく整理された課題として扱える状態にします。" data-points="院内サーベイ|経営層ヒアリング|現場スタッフの声|採用課題の整理">
+        <div class="support-icon">01</div>
+        <div class="support-ttl">採用・ブランド診断</div>
+        <div class="support-desc">経営者・現場スタッフへのヒアリングから、採用課題、施設の価値、既存の発信・導線を整理します。</div>
+      </button>
+      <button class="support-card support-option" type="button" role="tab" aria-selected="false" data-kicker="Step 02" data-title="採用ブランド設計" data-desc="誰に、どんな言葉で、何を伝えるのかを決めます。条件比較に埋もれないよう、理念・文化・専門性を候補者が理解できる採用メッセージへ翻訳します。" data-points="理念・文化|強みの言語化|採用ターゲット|メッセージ設計">
+        <div class="support-icon">02</div>
+        <div class="support-ttl">採用ブランド設計</div>
+        <div class="support-desc">理念・文化・強み・採用ターゲットを言葉にし、「来てほしい人」と出会うためのメッセージを設計します。</div>
+      </button>
+      <button class="support-card support-option" type="button" role="tab" aria-selected="false" data-kicker="Step 03" data-title="院内ブランド人材の育成" data-desc="外注任せにせず、院内でブランドを理解し、発信・採用・改善を担える人を育てます。多職種で担うことで、現場のリアルが候補者へ届きやすくなります。" data-points="担当2〜3名|役割設計|学習ロードマップ|継続する体制">
+        <div class="support-icon">03</div>
+        <div class="support-ttl">院内ブランド人材の育成</div>
+        <div class="support-desc">現場の専門性とリアルを、組織内外へ届ける橋渡し人材を選定し、役割・学び・運用を整えます。</div>
+      </button>
+      <button class="support-card support-option" type="button" role="tab" aria-selected="false" data-kicker="Step 04" data-title="SNS・コンテンツの内製化" data-desc="投稿担当者の頑張りだけに依存しないように、企画、撮影、確認、投稿、改善の流れを整えます。続く発信を、院内の運用として残します。" data-points="テーマ設計|撮影・編集|確認フロー|投稿・改善">
+        <div class="support-icon">04</div>
+        <div class="support-ttl">SNS・コンテンツの内製化</div>
+        <div class="support-desc">発信テーマ、企画、写真・動画、レビューの流れを整え、院内で安全に続けられる制作体制をつくります。</div>
+      </button>
+      <button class="support-card support-option" type="button" role="tab" aria-selected="false" data-kicker="Step 05" data-title="AI・業務内製化" data-desc="AIを目的にせず、採用広報や情報整理の負担を軽くする道具として設計します。議事録、初稿、企画整理、レポート化など、日常業務に入る使い方から始めます。" data-points="議事録|原稿初稿|企画整理|レポート化">
+        <div class="support-icon">05</div>
+        <div class="support-ttl">AI・業務内製化</div>
+        <div class="support-desc">文字起こし、原稿の初稿、会議記録、コンテンツ計画、レポートなどをAIで支え、担当者の負担を軽くします。</div>
+      </button>
+      <button class="support-card support-option" type="button" role="tab" aria-selected="false" data-kicker="Step 06" data-title="採用体験・KPI設計" data-desc="SNSやWebで見つけてもらうだけでなく、見学・面談・入職後の体験まで一つの導線として見直します。応募数だけではなく、ミスマッチや定着まで振り返ります。" data-points="SNS・Web|見学・面談|応募導線|定着の振り返り">
+        <div class="support-icon">06</div>
+        <div class="support-ttl">採用体験・KPI設計</div>
+        <div class="support-desc">SNS、Web、見学、スタッフとの対話を一つの導線として設計し、応募・見学・定着などを振り返ります。</div>
+      </button>
+      </div>
+      <aside class="service-preview" role="tabpanel" aria-live="polite">
+        <span class="service-preview-kicker">Step 01</span>
+        <h3>採用・ブランド診断</h3>
+        <p>最初に、理念・現場の実態・既存の発信導線を同じテーブルに載せます。施設らしさが伝わらない理由を、感覚ではなく整理された課題として扱える状態にします。</p>
+        <div class="service-preview-visual">
+          <div class="service-mini-node"><span>1</span>院内サーベイ</div>
+          <div class="service-mini-node"><span>2</span>経営層ヒアリング</div>
+          <div class="service-mini-node"><span>3</span>現場スタッフの声</div>
+          <div class="service-mini-node"><span>4</span>採用課題の整理</div>
+        </div>
+      </aside>
+    </div>
+    <p class="visual-note reveal">まず院長・経営層と現場スタッフの声を集め、目指す施設像と現場が感じている実態のギャップを整理します。</p>
+    <figure class="growth-visual growth-visual--wide reveal">
+      <img src="../images/08_custom/growth-inner-dialogue.jpg" alt="院長や管理者と現場スタッフの声を集め、施設の価値と採用課題を整理するCraft Growthの対話プロセス">
+    </figure>
+  </div>
+</section>
+
+<!-- 院内ブランドチームと伴走体制 -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Brand Team & Support</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">院内にブランドチームをつくり、<br>外側から継続を支える。</h2>
+      <p class="sec-desc">Craft Growthでは、SNS担当者を一人置いて終わりにはしません。医師・院長、PT・OT・ST・看護師、事務・採用担当など、多職種の声を集め、施設のリアルと専門性を継続して届けられるチームを院内につくります。</p>
+    </div>
+    <figure class="growth-visual growth-visual--wide reveal">
+      <img src="../images/08_custom/growth-brand-team.jpg" alt="院内ブランドチームの仕組み。医師、専門職、事務採用担当など多職種で施設の価値を発信する">
+    </figure>
+    <div class="support-system reveal" aria-label="院内ブランドチームを支える伴走内容">
+      <div class="support-system-item"><span class="support-system-label">LISTEN</span><div class="support-system-copy">経営層と現場の声を集め、施設らしさを整理</div></div>
+      <div class="support-system-item"><span class="support-system-label">TEAM</span><div class="support-system-copy">院内ブランド担当2〜3名の役割を設計</div></div>
+      <div class="support-system-item"><span class="support-system-label">LEARN</span><div class="support-system-copy">発信・撮影・AI活用を実践しながら習得</div></div>
+      <div class="support-system-item"><span class="support-system-label">OPERATE</span><div class="support-system-copy">企画、確認、投稿、改善の運用フローを整備</div></div>
+      <div class="support-system-item"><span class="support-system-label">SUPPORT</span><div class="support-system-copy">訪問・Zoom・随時相談で外側から伴走</div></div>
+    </div>
+    <p class="visual-note reveal">ブランド活動を善意の追加業務にしないため、担当者の役割・評価・手当設計も一緒に検討します。基本支援人数は院内ブランド担当2〜3名まで。4人目以降の個別伴走や手当設計は、施設の体制に合わせてご相談となります。</p>
+  </div>
+</section>
+
+<!-- 個人ブランディング -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Individual Growth</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">施設だけでなく、担当する<br>一人ひとりの成長まで。</h2>
+      <p class="sec-desc">SNS、動画編集、文章、AI、個人ブランディングを別々に学ぶのではなく、院内での実践を通じて一体的に学べることもCraft Growthの特徴です。</p>
+    </div>
+    <figure class="growth-visual growth-visual--wide reveal">
+      <img src="../images/08_custom/growth-individual-branding.jpg" alt="個別にSNS運用や動画編集を学ぶ場合と、Craft Growthで包括的に学び実践する場合の違い">
+    </figure>
+    <p class="visual-note reveal">※記載金額は個別講座・コンサルティングをそれぞれ利用した場合の一例です。実際の料金は提供者・内容により異なります。Craft Growthは「安さ」を目的とするのではなく、施設内での実践と人材育成を一体化することを重視しています。</p>
+  </div>
+</section>
+
+<!-- プラン比較 -->
+<section class="sec" style="background:#fafcfb;border-top:1px solid var(--border)">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Plans</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">支援範囲に合わせて選べる、<br>3つの伴走プラン。</h2>
+      <p class="sec-desc">3か月で発信基盤を整え、6か月で採用接点をつくり、12か月で採用成果につながる導線と事業展開の土台まで育てます。費用は支援範囲・期間・訪問頻度に応じて、無料相談後に書面またはメールで個別にご案内します。</p>
+    </div>
+    <div class="plan-slider reveal" data-plan-slider>
+      <div class="plan-slider-tabs" role="tablist" aria-label="Craft Growthプラン比較">
+        <button class="plan-slider-tab active" type="button" role="tab" aria-selected="true" data-plan="three">3か月プラン</button>
+        <button class="plan-slider-tab" type="button" role="tab" aria-selected="false" data-plan="six">6か月プラン</button>
+        <button class="plan-slider-tab" type="button" role="tab" aria-selected="false" data-plan="twelve">12か月プラン</button>
+        <button class="plan-slider-tab" type="button" role="tab" aria-selected="false" data-plan="compare">プラン比較</button>
+      </div>
+      <div class="plan-slide-stage">
+        <div class="plan-slide active" data-plan-panel="three" role="tabpanel">
+          <figure class="growth-visual growth-visual--wide">
+            <img src="../images/08_custom/growth-3month-process.jpg" alt="Craft Growthの3か月伴走プロセス。整える、作る、改善する流れ">
+          </figure>
+          <figure class="growth-visual growth-visual--wide">
+            <img src="../images/08_custom/growth-3month-assets.jpg" alt="3か月後に院内へ残る企画、運用、計画、判断の仕組み">
+          </figure>
+          <p class="visual-note">3か月プランでは、発信するだけでなく、企画・撮影・投稿・分析・改善を自分たちで続けられる状態を院内に残します。</p>
+        </div>
+        <div class="plan-slide" data-plan-panel="six" role="tabpanel">
+          <figure class="growth-visual growth-visual--wide">
+            <img src="../images/08_custom/growth-6month-seminar-recruitment.jpg" alt="6か月プランでセミナーを立ち上げ、施設体験と採用接点へつなげる導線">
+          </figure>
+          <p class="visual-note">自施設で開催することで、参加者は学びながら設備・雰囲気・スタッフ・医師との距離感に自然に触れることができます。</p>
+        </div>
+        <div class="plan-slide" data-plan-panel="twelve" role="tabpanel">
+          <figure class="growth-visual growth-visual--wide">
+            <img src="../images/08_custom/growth-12month-expansion.jpg" alt="12か月プランで採用成果につながる導線を整え、専門性を新しい事業や収益へつなげる流れ">
+          </figure>
+          <p class="visual-note">自費リハビリ、インソール、運動教室など、施設がすでに持つ専門性を活かしたサービスの導線設計まで支援することを想定しています。</p>
+        </div>
+        <div class="plan-slide" data-plan-panel="compare" role="tabpanel">
+          <figure class="growth-visual growth-visual--wide">
+            <img src="../images/08_custom/growth-plan-comparison.jpg" alt="Craft Growthの3か月、6か月、12か月プラン比較。期間に応じて発信基盤、採用接点、成果と自走体制を広げる">
+          </figure>
+          <table class="plan-compare-table" aria-label="Craft Growth 3・6・12か月プラン比較表">
+            <thead><tr><th>比較項目</th><th>3か月</th><th>6か月</th><th>12か月</th></tr></thead>
+            <tbody>
+              <tr><th>目的</th><td>院内で発信できる土台をつくる</td><td>学びの場をつくり、採用接点へつなげる</td><td>採用成果につながる導線と事業展開の土台を育てる</td></tr>
+              <tr><th>主な支援</th><td>サーベイ、ブランド整理、担当育成、SNS内製化</td><td>3か月内容に加え、セミナー企画・運営導線を設計</td><td>年間改善、採用導線の強化、新しい価値提供の設計</td></tr>
+              <tr><th>残るもの</th><td>発信できるチームと運用の型</td><td>人が集まる場と採用接点</td><td>続けられる組織体制と事業の種</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 院内に残る資産 -->
+<section class="sec" style="background:var(--mist)">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Assets</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">契約が終わったあとも、<br>院内に残るもの。</h2>
+      <p class="sec-desc">Craft Growthがつくるのは、一時的な投稿や制作物だけではありません。人材・ブランド・コンテンツ・運用の仕組みを院内に蓄積し、採用や新しい事業へ活用できる資産として残します。</p>
+    </div>
+    <figure class="growth-visual growth-visual--wide reveal">
+      <img src="../images/08_custom/growth-brand-assets.jpg" alt="Craft Growth導入後に院内へ残る人材、ブランド、コンテンツ、仕組み、採用接点、データ、事業の7つの資産">
+    </figure>
+  </div>
+</section>
+
+<!-- Craft Growthの違い -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Why Craft Growth</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">「代わりにやる」のではなく、<br>「できる組織をつくる」。</h2>
+      <p class="sec-desc">Craft Growthのゴールは、外部支援を使い続けることではありません。施設の中に、ブランドを理解し、発信し、改善し続けられる人と仕組みを残すことです。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 対象 -->
+<section class="sec" style="background:#fafcfb;border-top:1px solid var(--border)">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">For Whom</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">対象となる組織</h2>
+      <p class="sec-desc">経営者・管理者・現場スタッフが一緒に、採用と施設の価値を見直したい医療・介護組織を対象とします。</p>
+    </div>
+    <div class="target-list reveal">
+      <span class="target-chip">医療機関</span>
+      <span class="target-chip">クリニック</span>
+      <span class="target-chip">介護事業所</span>
+      <span class="target-chip">訪問看護ステーション</span>
+      <span class="target-chip">医療法人</span>
+      <span class="target-chip">訪問リハビリ</span>
+      <span class="target-chip">通所リハビリ・デイサービス</span>
+      <span class="target-chip">地域密着型介護法人</span>
+      <span class="target-chip">採用・人事責任者</span>
+      <span class="target-chip">リハビリ部門・現場管理者</span>
+    </div>
+  </div>
+</section>
+
+<!-- 導入の流れ -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-eyebrow">Flow</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">導入までの流れ</h2>
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step reveal">
+        <div class="flow-step-num">01</div>
+        <div class="flow-step-ttl">公式LINE</div>
+        <div class="flow-step-desc">公式LINEから30分無料相談をお申し込みください</div>
+      </div>
+      <div class="flow-step reveal">
+        <div class="flow-step-num">02</div>
+        <div class="flow-step-ttl">無料相談</div>
+        <div class="flow-step-desc">採用状況、施設が目指す姿、現在感じている課題を30分で整理します</div>
+      </div>
+      <div class="flow-step reveal">
+        <div class="flow-step-num">03</div>
+        <div class="flow-step-ttl">法人商談</div>
+        <div class="flow-step-desc">必要に応じて院長・経営層と、3・6・12か月の支援内容を相談します</div>
+      </div>
+      <div class="flow-step reveal">
+        <div class="flow-step-num">04</div>
+        <div class="flow-step-ttl">伴走開始</div>
+        <div class="flow-step-desc">契約後、院内サーベイとヒアリングからスタートします</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec-cta">
+  <div class="cta-inner reveal">
+    <span class="sec-eyebrow" style="display:block;text-align:center">Craft Growth</span>
+    <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
+    <h2 class="cta-ttl">採用の問題を、<em>求人を増やすだけで終わらせない。</em></h2>
+    <p class="cta-desc">無料相談では、施設の採用状況、目指す姿、現場とのギャップを整理し、3か月・6か月・12か月のどこから始めるべきかを一緒に確認します。</p>
+    <div class="cta-clarity" aria-label="Craft Growthの無料相談で整理できること">
+      <div class="cta-clarity-item"><b>採用課題の現在地</b><span>応募・定着・発信のどこから見直すべきかを整理します。</span></div>
+      <div class="cta-clarity-item"><b>施設らしさの言語化</b><span>伝えるべき強みと、現場とのギャップを確認します。</span></div>
+      <div class="cta-clarity-item"><b>最初の3か月の設計</b><span>支援範囲と進め方の目安を個別にご案内します。</span></div>
+    </div>
+    <div class="cta-acts">
+      <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary">30分無料相談を申し込む</a>
+      <a href="../contact.html?service=growth" class="btn-ghost">フォームで相談する</a>
+    </div>
+    <p class="cta-note">無理な提案は行いません。相談後、必要な支援範囲とお見積りを個別にご案内します。</p>
+  </div>
+</section>
+<a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="mobile-service-cta">30分無料相談を申し込む</a>
+
+<footer>
+  <div class="ft-top">
+    <div>
+      <img src="../images/logo-header.png" alt="Base Craftas" class="ft-logo-img">
+      <p class="ft-tag">医療職の専門性と社会をつなぐ<br>土台となる。</p>
+    </div>
+    <div class="ft-nav">
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Services</span>
+        <a href="growth.html">採用ブランディング伴走</a>
+        <a href="visit.html">AI導入・業務改善</a>
+        <a href="vital.html">健康資本支援</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Base Craftas</span>
+        <a href="../about.html">私たちについて</a>
+        <a href="../projects/index.html">プロジェクト</a>
+        <a href="../profile.html">代表プロフィール</a>
+        <a href="../contact.html">お問い合わせ</a>
+      </div>
+      <div class="ft-nav-col">
+        <span class="ft-nav-ttl">Policy</span>
+        <a href="../privacy-policy.html">プライバシーポリシー</a>
+        <a href="../cancellation-policy.html">キャンセルポリシー</a>
+        <a href="../disclaimer.html">免責事項</a>
+        <a href="../legal.html">特定商取引法に基づく表記</a>
+      </div>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <p class="ft-copy">© 2025–2026 Base Craftas. All Rights Reserved.</p>
+    <div class="ft-legal-links">
+      <a href="../privacy-policy.html">プライバシーポリシー</a>
+      <a href="../cancellation-policy.html">キャンセルポリシー</a>
+      <a href="../disclaimer.html">免責事項</a>
+      <a href="../legal.html">特定商取引法に基づく表記</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const mn=document.getElementById('mainNav');window.addEventListener('scroll',()=>{mn.classList.toggle('scrolled',scrollY>40);});
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
+document.querySelectorAll('.mob-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
+const ro=new IntersectionObserver((e)=>{e.forEach((x,i)=>{if(x.isIntersecting){setTimeout(()=>x.target.classList.add('visible'),i*80);ro.unobserve(x.target);}});},{threshold:.07,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+const problemShowcase=document.querySelector('[data-problem-showcase]');
+if(problemShowcase){
+  const tabs=[...problemShowcase.querySelectorAll('.problem-tab')];
+  const preview=problemShowcase.querySelector('.problem-preview');
+  const image=preview.querySelector('img');
+  const kicker=preview.querySelector('.problem-caption-kicker');
+  const title=preview.querySelector('.problem-caption h3');
+  const desc=preview.querySelector('.problem-caption p');
+  const activate=(tab)=>{
+    tabs.forEach((item,index)=>{
+      const active=item===tab;
+      item.classList.toggle('active',active);
+      item.setAttribute('aria-selected',active?'true':'false');
+      if(active) kicker.textContent=`Problem ${String(index+1).padStart(2,'0')}`;
+    });
+    preview.classList.add('is-changing');
+    window.setTimeout(()=>{
+      image.src=tab.dataset.image;
+      image.alt=tab.dataset.title;
+      title.textContent=tab.dataset.title;
+      desc.textContent=tab.dataset.desc;
+      preview.classList.remove('is-changing');
+    },120);
+  };
+  tabs.forEach(tab=>{
+    tab.addEventListener('mouseenter',()=>activate(tab));
+    tab.addEventListener('focus',()=>activate(tab));
+    tab.addEventListener('click',()=>activate(tab));
+  });
+}
+const serviceShowcase=document.querySelector('[data-service-showcase]');
+if(serviceShowcase){
+  const options=[...serviceShowcase.querySelectorAll('.support-option')];
+  const kicker=serviceShowcase.querySelector('.service-preview-kicker');
+  const title=serviceShowcase.querySelector('.service-preview h3');
+  const desc=serviceShowcase.querySelector('.service-preview p');
+  const visual=serviceShowcase.querySelector('.service-preview-visual');
+  const activateService=(option)=>{
+    options.forEach(item=>{
+      const active=item===option;
+      item.classList.toggle('active',active);
+      item.setAttribute('aria-selected',active?'true':'false');
+    });
+    kicker.textContent=option.dataset.kicker;
+    title.textContent=option.dataset.title;
+    desc.textContent=option.dataset.desc;
+    visual.innerHTML=(option.dataset.points||'').split('|').map((point,index)=>`<div class="service-mini-node"><span>${index+1}</span>${point}</div>`).join('');
+  };
+  options.forEach(option=>{
+    option.addEventListener('mouseenter',()=>activateService(option));
+    option.addEventListener('focus',()=>activateService(option));
+    option.addEventListener('click',()=>activateService(option));
+  });
+}
+const planSlider=document.querySelector('[data-plan-slider]');
+if(planSlider){
+  const tabs=[...planSlider.querySelectorAll('.plan-slider-tab')];
+  const panels=[...planSlider.querySelectorAll('.plan-slide')];
+  const activatePlan=(tab)=>{
+    const target=tab.dataset.plan;
+    tabs.forEach(item=>{
+      const active=item===tab;
+      item.classList.toggle('active',active);
+      item.setAttribute('aria-selected',active?'true':'false');
+    });
+    panels.forEach(panel=>panel.classList.toggle('active',panel.dataset.planPanel===target));
+  };
+  tabs.forEach(tab=>{
+    tab.addEventListener('click',()=>activatePlan(tab));
+    tab.addEventListener('focus',()=>activatePlan(tab));
+  });
+}
+</script>
+<script src="../js/site-motion.js"></script>
+</body>
+</html>
