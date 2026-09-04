@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1SK6NEFC8V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1SK6NEFC8V');
+</script>
+<title>よくある質問｜ToToNoE+ 週末のAI整え習慣</title>
+<meta name="description" content="ToToNoE+ 週末のAI整え習慣について、参加・内容・セミナー・資料に関するよくある質問をまとめました。AI初心者の方や、毎週参加できない方の疑問にもお答えします。">
+<meta property="og:title" content="よくある質問｜ToToNoE+ 週末のAI整え習慣">
+<meta property="og:description" content="参加・内容・セミナー・資料についてのよくある質問をまとめました。">
+<meta property="og:image" content="https://basecraftas.com/projects/totonoe/assets/og-image.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260831a">
+</head>
+<body>
+
+<!-- モバイル下部の固定CTA（860px以下で表示） -->
+<div class="sticky-cta" id="stickyCta">
+  <span class="sticky-info">
+    <span class="sticky-title">毎週土曜 朝6:00〜／参加無料</span>
+    <span class="sticky-sub" data-countdown="compact"></span>
+  </span>
+  <a href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" data-apply="faq-sticky" class="btn btn-cta">申し込む</a>
+</div>
+
+<!-- BGM再生ボタン（ブラウザの自動再生制限のため、初回のみクリックで再生開始） -->
+<audio id="bgmAudio" src="assets/bgm-shumatsu.mp3" loop preload="none"></audio>
+<button type="button" class="bgm-toggle" id="bgmToggle" aria-pressed="false" aria-label="テーマ曲を再生する">
+  <span class="bgm-icon" aria-hidden="true">♪</span>
+  <span class="bgm-label">曲を再生</span>
+</button>
+
+<!-- ===== Header ===== -->
+<header class="site-header scrolled" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="brand" aria-label="ToToNoE+ トップへ">
+      <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
+    </a>
+    <nav class="site-nav" id="siteNav">
+      <a href="index.html">TOP</a>
+      <div class="nav-dropdown">
+        <a href="service.html" class="nav-main">サービス</a>
+        <div class="nav-menu" aria-label="サービスメニュー">
+          <a href="weekend-ai.html">週末のAI整え習慣</a>
+          <a href="weekly.html">ウィークリー</a>
+          <a href="corporate.html">法人向け支援</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="contents.html#seminars" class="nav-main">コンテンツ</a>
+        <div class="nav-menu" aria-label="コンテンツメニュー">
+          <a href="contents.html#seminars">セミナー</a>
+          <a href="contents.html#podcast">ポッドキャスト</a>
+          <a href="contents.html#library">学習コンテンツ</a>
+          <a href="contents.html#archive">アーカイブ動画</a>
+        </div>
+      </div>
+      <a href="team.html">チーム</a>
+      <a href="faq.html" class="active">FAQ</a>
+    </nav>
+    <a href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" data-apply="faq-header" target="_blank" rel="noopener" class="btn btn-cta header-cta">無料で参加を申し込む</a>
+    <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== Page Hero ===== -->
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">FAQ</p>
+    <h1 class="page-hero-title">よくある<span class="accent">質問</span>。</h1>
+    <p class="page-hero-lead">参加前によくいただく質問をまとめました。ここに載っていない点は、朝活やセミナーの申込ページからお問い合わせください。</p>
+  </div>
+</section>
+
+<section class="section faq-tabs">
+  <div class="container container-narrow">
+    <div class="tab-group" role="tablist" aria-label="質問のカテゴリ">
+      <button type="button" class="tab-btn active" id="tab-join-q" data-target="join-q" role="tab" aria-selected="true" aria-controls="join-q">参加について</button>
+      <button type="button" class="tab-btn" id="tab-content-q" data-target="content-q" role="tab" aria-selected="false" aria-controls="content-q">内容について</button>
+      <button type="button" class="tab-btn" id="tab-seminar-q" data-target="seminar-q" role="tab" aria-selected="false" aria-controls="seminar-q">セミナーについて</button>
+      <button type="button" class="tab-btn" id="tab-material-q" data-target="material-q" role="tab" aria-selected="false" aria-controls="material-q">資料・コンテンツについて</button>
+    </div>
+  </div>
+</section>
+
+<div class="tab-panel faq-section" id="join-q" role="tabpanel" aria-labelledby="tab-join-q">
+  <div class="container container-narrow">
+    <p class="eyebrow">JOIN</p>
+    <h2 class="section-title">参加について</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>どうやって参加すればいいですか？</summary>
+        <p>土曜朝の勉強会は「無料で次回の朝活に申し込む」から登録してください。オンラインで参加できます。手順は<a href="weekend-ai.html#join">週末のAI整え習慣ページ</a>にまとめています。</p>
+      </details>
+      <details class="faq-item">
+        <summary>参加費はかかりますか？</summary>
+        <p>土曜朝の朝活、およびセミナーの参加費は無料です。</p>
+      </details>
+      <details class="faq-item">
+        <summary>AI初心者でも参加できますか？</summary>
+        <p>はい。専門知識がなくても参加できます。1週間のAI情報を実務目線で整理して共有するため、AIに詳しくない方でも無理なくキャッチアップできます。</p>
+      </details>
+      <details class="faq-item">
+        <summary>土曜朝6時に参加できない週があっても大丈夫ですか？</summary>
+        <p>はい。過去回はPodcastバックナンバーとして視聴できるため、後から学ぶことができます。毎週の参加を前提とした企画ではありません。</p>
+      </details>
+      <details class="faq-item">
+        <summary>平日に情報を追う時間がなくても大丈夫ですか？</summary>
+        <p>はい。土曜朝の勉強会とPodcastで、忙しい週もキャッチアップできます。火曜・金曜の中間共有はセラピストドットコムからも受け取れます。</p>
+      </details>
+      <details class="faq-item">
+        <summary>途中でやめることはできますか？</summary>
+        <p>はい。参加の継続は自由です。都合の合う週だけご参加いただいて構いません。</p>
+      </details>
+    </div>
+  </div>
+</div>
+<div class="tab-panel faq-section" id="content-q" role="tabpanel" aria-labelledby="tab-content-q" hidden>
+  <div class="container container-narrow">
+    <p class="eyebrow">CONTENT</p>
+    <h2 class="section-title">内容について</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>どんな内容を扱いますか？</summary>
+        <p>生成AIの最新ニュース、ツール活用、AIエージェント、資料作成、SNS活用、実務への落とし込みなどを扱います。</p>
+      </details>
+      <details class="faq-item">
+        <summary>参加すると何が得られますか？</summary>
+        <p>朝活では、AI情報を整理し、来週の仕事に活かす視点を得られます。日々の臨床に取り組む先生方との交流も、この場の大きな価値です。火曜・金曜の中間共有はセラピストドットコムからも受け取れます。</p>
+      </details>
+      <details class="faq-item">
+        <summary>医療・リハビリ以外の仕事でも役に立ちますか？</summary>
+        <p>はい。扱うのは生成AIの一般的な活用方法が中心です。参加者に医療職の方が多いため事例が現場寄りになることはありますが、資料作成や情報整理など職種を問わず使える内容を扱っています。</p>
+      </details>
+    </div>
+  </div>
+</div>
+<div class="tab-panel faq-section" id="seminar-q" role="tabpanel" aria-labelledby="tab-seminar-q" hidden>
+  <div class="container container-narrow">
+    <p class="eyebrow">SEMINARS</p>
+    <h2 class="section-title">セミナーについて</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>セミナーと朝活は何が違いますか？</summary>
+        <p>朝活は1週間のAI情報を整理して全体の流れをつかむ30分の場です。セミナーは、朝活で挙がった疑問をもとに1テーマを60分かけて深く扱う場です。詳しくは<a href="contents.html#seminars">セミナーページ</a>をご覧ください。</p>
+      </details>
+      <details class="faq-item">
+        <summary>朝活に参加していなくてもセミナーだけ申し込めますか？</summary>
+        <p>はい。セミナー単体でお申し込みいただけます。朝活への参加は必須ではありません。</p>
+      </details>
+      <details class="faq-item">
+        <summary>セミナー当日に参加できない場合はどうなりますか？</summary>
+        <p>アーカイブ配信がありますので、後からご視聴いただけます。ただし資料の配布はリアルタイム参加者向けのため、可能であれば当日のご参加をおすすめします。</p>
+      </details>
+      <details class="faq-item">
+        <summary>セミナーのテーマはどうやって決まりますか？</summary>
+        <p>土曜朝の朝活で繰り返し挙がった疑問・関心をもとに決めています。扱ってほしいテーマがあれば、朝活や申込時のコメントでお寄せください。</p>
+      </details>
+    </div>
+  </div>
+</div>
+<div class="tab-panel faq-section" id="material-q" role="tabpanel" aria-labelledby="tab-material-q" hidden>
+  <div class="container container-narrow">
+    <p class="eyebrow">MATERIALS</p>
+    <h2 class="section-title">資料・コンテンツについて</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>PDF資料はもらえますか？</summary>
+        <p>はい。参加後のアンケートにご回答いただいた方へ、情報源リンク付きのPDF振り返り資料をお渡しします。紹介したニュースやツールを後から見返し、自分の仕事や発信に活かせます。</p>
+      </details>
+      <details class="faq-item">
+        <summary>過去の資料はどこで見られますか？</summary>
+        <p><a href="contents.html">コンテンツ</a>ページに、これまでの学習資料をまとめています。順次追加していきます。</p>
+      </details>
+      <details class="faq-item">
+        <summary>Podcastだけ聴くことはできますか？</summary>
+        <p>はい。<a href="contents.html#podcast">Podcastバックナンバー</a>から、公開中の過去回をいつでも聴けます。まずは雰囲気を知りたい方にもおすすめです。</p>
+      </details>
+      <details class="faq-item">
+        <summary>資料を職場で共有してもいいですか？</summary>
+        <p>出典を確認したうえで、ご自身の職場での学習・検討にお使いいただく分には問題ありません。ただし資料の再配布や外部への公開はご遠慮ください。</p>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 最終CTA ===== -->
+<section class="section final-cta">
+  <div class="container">
+    <h2 class="final-title">まずは、土曜朝の30分から。</h2>
+    <p class="final-body">疑問が残っていても大丈夫です。実際に一度参加してみるのが、いちばん早く雰囲気がつかめます。</p>
+    <div class="section-cta">
+      <a href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" data-apply="faq-final" target="_blank" rel="noopener" class="btn btn-cta btn-lg">無料で次回の朝活に申し込む</a>
+      <a href="contents.html#seminars" class="btn btn-ghost btn-ghost-light">セミナーを見る</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
+        <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
+      </a>
+      <p>本質に向き合い、AI情報と来週の仕事、週末の時間を整える朝活プロジェクト。</p>
+    </div>
+    <nav class="footer-nav" aria-label="フッターナビゲーション">
+      <a href="index.html">TOP</a>
+      <a href="service.html">サービス</a>
+      <a href="contents.html#seminars">コンテンツ</a>
+      <a href="team.html">チーム</a>
+      <a href="faq.html">FAQ</a>
+    </nav>
+  </div>
+  <div class="footer-base">
+    <span>© 2026 ToToNoE+ / Base Craftas</span>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="legal.html">特定商取引法に基づく表記</a>
+    <a href="cancellation.html">キャンセル・解約ポリシー</a>
+  </div>
+</footer>
+
+<script src="config.js?v=20260815d"></script>
+<script src="common.js?v=20260815d"></script>
+<script src="tabs.js?v=20260815d"></script>
+<script src="bgm.js?v=20260815d"></script>
+</body>
+</html>

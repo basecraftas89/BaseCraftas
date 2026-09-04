@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1SK6NEFC8V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1SK6NEFC8V');
+</script>
+<title>コンテンツ｜ToToNoE+ 週末のAI整え習慣</title>
+<meta name="description" content="ToToNoE+ 週末のAI整え習慣のセミナー、Podcastバックナンバー、学習コンテンツ、アーカイブ動画をまとめた学習ライブラリ。">
+<meta property="og:title" content="コンテンツ｜ToToNoE+ 週末のAI整え習慣">
+<meta property="og:description" content="セミナー、Podcast、学習コンテンツ、アーカイブ動画をまとめたコンテンツページ。あとから何度でも学び直せます。">
+<meta property="og:image" content="https://basecraftas.com/projects/totonoe/assets/og-image.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260831d">
+</head>
+<body>
+
+<!-- モバイル下部の固定CTA（860px以下で表示） -->
+<div class="sticky-cta" id="stickyCta">
+  <span class="sticky-info">
+    <span class="sticky-title">毎週土曜 朝6:00〜／参加無料</span>
+    <span class="sticky-sub" data-countdown="compact"></span>
+  </span>
+  <a href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" data-apply="contents-sticky" class="btn btn-cta">申し込む</a>
+</div>
+
+<!-- BGM再生ボタン（ブラウザの自動再生制限のため、初回のみクリックで再生開始） -->
+<audio id="bgmAudio" src="assets/bgm-shumatsu.mp3" loop preload="none"></audio>
+<button type="button" class="bgm-toggle" id="bgmToggle" aria-pressed="false" aria-label="テーマ曲を再生する">
+  <span class="bgm-icon" aria-hidden="true">♪</span>
+  <span class="bgm-label">曲を再生</span>
+</button>
+
+<!-- ===== Header ===== -->
+<header class="site-header scrolled" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="brand" aria-label="ToToNoE+ トップへ">
+      <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
+    </a>
+    <nav class="site-nav" id="siteNav">
+      <a href="index.html">TOP</a>
+      <div class="nav-dropdown">
+        <a href="service.html" class="nav-main">サービス</a>
+        <div class="nav-menu" aria-label="サービスメニュー">
+          <a href="weekend-ai.html">週末のAI整え習慣</a>
+          <a href="weekly.html">ウィークリー</a>
+          <a href="corporate.html">法人向け支援</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="contents.html#seminars" class="nav-main active">コンテンツ</a>
+        <div class="nav-menu" aria-label="コンテンツメニュー">
+          <a href="contents.html#seminars">セミナー</a>
+          <a href="contents.html#podcast">ポッドキャスト</a>
+          <a href="contents.html#library">学習コンテンツ</a>
+          <a href="contents.html#archive">アーカイブ動画</a>
+        </div>
+      </div>
+      <a href="team.html">チーム</a>
+      <a href="faq.html">FAQ</a>
+    </nav>
+    <a href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" data-apply="contents-header" target="_blank" rel="noopener" class="btn btn-cta header-cta">無料で参加を申し込む</a>
+    <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== Page Hero ===== -->
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">CONTENTS</p>
+    <h1 class="page-hero-title">聞いて終わりに、しない。<br><span class="accent">あとから学び直せる</span>ライブラリ。</h1>
+    <p class="page-hero-lead">セミナー、Podcastバックナンバー、朝活・セミナーで扱った学習コンテンツ、参加者向けアーカイブ動画を1つにまとめています。その場では消化しきれなかった内容も、自分のペースで聴き直し・読み返せます。</p>
+  </div>
+</section>
+
+<!-- ===== タブ切替：セミナー / Podcast / 学習コンテンツ / アーカイブ動画 ===== -->
+<section class="section content-tabs">
+  <div class="container">
+    <div class="tab-group" role="tablist" aria-label="コンテンツの種類">
+      <button type="button" class="tab-btn active" id="tab-seminars" data-target="seminars" role="tab" aria-selected="true" aria-controls="seminars">セミナー</button>
+      <button type="button" class="tab-btn" id="tab-podcast" data-target="podcast" role="tab" aria-selected="false" aria-controls="podcast">ポッドキャスト</button>
+      <button type="button" class="tab-btn" id="tab-library" data-target="library" role="tab" aria-selected="false" aria-controls="library">学習コンテンツ</button>
+      <button type="button" class="tab-btn tab-btn-locked" id="tab-archive" data-target="archive" role="tab" aria-selected="false" aria-controls="archive">アーカイブ動画</button>
+    </div>
+
+    <!-- ----- セミナー パネル ----- -->
+    <div class="tab-panel" id="seminars" role="tabpanel" aria-labelledby="tab-seminars">
+      <p class="eyebrow">SEMINARS</p>
+      <h2 class="section-title">セミナー<span class="content-count" id="semCount"></span></h2>
+      <p class="section-lead">朝活で生まれた問いを、1テーマずつ深く扱う無料オンラインセミナーです。開催予定の回と、これまでに開催した回をまとめています。</p>
+
+      <div class="archive-toolbar">
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">並び替え</span>
+          <div class="sort-group">
+            <button type="button" class="sort-btn" data-sem-order="newest">新しい順（降順）</button>
+            <button type="button" class="sort-btn" data-sem-order="oldest">古い順（昇順）</button>
+          </div>
+        </div>
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">開催状況</span>
+          <div class="range-group" id="semStatusFilter"></div>
+        </div>
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">タグ</span>
+          <div class="content-filter sem-tag-filter" id="semTagFilter"></div>
+        </div>
+      </div>
+
+      <div class="sem-grid" id="semGrid"></div>
+      <p class="sem-empty" id="semEmpty" hidden>現在ご案内できるセミナーはありません。次回の開催が決まり次第、こちらに掲載します。</p>
+      <p class="sem-note">お申し込みと当日のご案内は、セラピストドットコムのセミナーページで行います。</p>
+    </div>
+
+    <!-- ----- Podcast パネル ----- -->
+    <div class="tab-panel" id="podcast" role="tabpanel" aria-labelledby="tab-podcast" hidden>
+      <p class="eyebrow">PODCAST</p>
+      <h2 class="section-title">Podcastバックナンバー<span class="content-count" id="podCount"></span></h2>
+      <p class="section-lead">リアルタイムで参加できなかった週も、過去回の音声をstand.fmのプレイヤーでそのまま聴けます。stand.fmアプリなら倍速再生にも対応しています。</p>
+
+      <!-- 並び替え＋回数レンジの切替（アーカイブ動画タブと同じ操作感にしています） -->
+      <div class="archive-toolbar">
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">並び替え</span>
+          <div class="sort-group">
+            <button type="button" class="sort-btn" data-order="newest">新しい順（降順）</button>
+            <button type="button" class="sort-btn" data-order="oldest">古い順（昇順）</button>
+          </div>
+        </div>
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">回で絞る</span>
+          <div class="range-group" id="podRanges"></div>
+        </div>
+      </div>
+
+      <!-- 横スライド式の一覧（アーカイブ動画タブと同じ構造） -->
+      <div class="archive-slider">
+        <button type="button" class="arc-nav arc-prev" id="podPrev" aria-label="前へスクロール">‹</button>
+        <div class="pod-list" id="podList" tabindex="0" role="list"></div>
+        <button type="button" class="arc-nav arc-next" id="podNext" aria-label="次へスクロール">›</button>
+      </div>
+      <p class="archive-hint" id="podHint">← 横にスワイプすると、他の回もご覧いただけます →</p>
+
+      <div class="tab-survey-cta">
+        <p class="tab-survey-cta-text"><strong>感想をお聞かせください。</strong>今後のテーマ・改善の参考にします。</p>
+        <a href="https://forms.gle/BhXcBDV6QHsiQw7o8" target="_blank" rel="noopener" class="btn btn-ghost">📝 アンケートに回答する</a>
+      </div>
+
+      <p class="pod-note">※ 各回の音声はstand.fmで配信しています。倍速再生はstand.fmのプレイヤー・アプリからご利用いただけます。「視聴済み」の状態はこのブラウザに保存されます。</p>
+    </div>
+
+    <!-- ----- 学習コンテンツ パネル ----- -->
+    <div class="tab-panel" id="library" role="tabpanel" aria-labelledby="tab-library" hidden>
+      <div class="content-toolbar">
+        <div>
+          <p class="eyebrow">LIBRARY</p>
+          <h2 class="section-title">学習コンテンツ<span class="content-count" id="contentCount"></span></h2>
+        </div>
+      </div>
+      <p class="section-lead">朝活やセミナーで扱った資料を、テーマごとにまとめています。資料は順次追加していきます。動画はYouTubeにアップロードした日付順に並びます。</p>
+
+      <div class="pod-toolbar">
+        <span class="pod-toolbar-label">並び替え</span>
+        <div class="sort-group">
+          <button type="button" class="sort-btn" data-lib-order="newest">新しい順（降順）</button>
+          <button type="button" class="sort-btn" data-lib-order="oldest">古い順（昇順）</button>
+        </div>
+      </div>
+
+      <div class="content-filter" id="contentFilter" hidden></div>
+
+      <div class="content-grid" id="contentGrid"></div>
+
+      <div class="content-empty" id="contentEmpty" hidden>
+        <p class="content-empty-title">資料を準備しています。</p>
+        <p class="content-empty-body">朝活やセミナーで扱った資料から順次公開していきます。<br>公開までは、Podcastで過去回の内容を聴いていただけます。</p>
+        <div class="section-cta">
+          <button type="button" class="btn btn-ghost" data-tab-switch="podcast">▶ Podcastを聴く</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----- アーカイブ動画 パネル（参加者向け） ----- -->
+    <div class="tab-panel" id="archive" role="tabpanel" aria-labelledby="tab-archive" hidden>
+
+      <!-- 限定である旨を大きく明示するバナー -->
+      <div class="members-only">
+        <div class="members-only-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="members-only-body">
+          <p class="members-only-label">MEMBERS ONLY</p>
+          <h3 class="members-only-title">ここから先は<br class="sp-br">参加者向けアーカイブです。</h3>
+          <p class="members-only-text">
+            朝活の録画アーカイブは、<strong>「週末のAI整え習慣」に参加登録いただいた方</strong>の学び直し用に公開しています。
+            Googleドライブ側で、対象のGoogleアカウントに閲覧権限を付与しています。
+          </p>
+          <p class="members-only-note">
+            ※ 参加登録だけではすぐに視聴できない場合があります。権限付与後にご確認ください。<br>
+            ※ 権限のあるGoogleアカウントでログインした状態でご覧ください。別のアカウントでログイン
+            していると「アクセス権が必要です」と表示されます。
+          </p>
+          <div class="members-only-cta">
+            <a href="weekend-ai.html#join" class="btn btn-ghost">参加方法を見る</a>
+          </div>
+        </div>
+      </div>
+
+      <p class="eyebrow">ARCHIVE</p>
+      <h2 class="section-title">朝活アーカイブ<span class="content-count" id="archiveCount"></span></h2>
+      <p class="section-lead">土曜朝の勉強会をそのまま録画したものです。当日参加できなかった週も、あとから同じ内容を追いかけられます。</p>
+
+      <!-- 並び替え＋回数レンジの切替 -->
+      <div class="archive-toolbar">
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">並び替え</span>
+          <div class="sort-group">
+            <button type="button" class="sort-btn" data-arc-order="newest">新しい順（降順）</button>
+            <button type="button" class="sort-btn" data-arc-order="oldest">古い順（昇順）</button>
+          </div>
+        </div>
+        <div class="archive-toolbar-row">
+          <span class="pod-toolbar-label">回で絞る</span>
+          <div class="range-group" id="archiveRanges"></div>
+        </div>
+      </div>
+
+      <!-- 横スライド式の一覧 -->
+      <div class="archive-slider">
+        <button type="button" class="arc-nav arc-prev" id="arcPrev" aria-label="前へスクロール">‹</button>
+        <div class="archive-track" id="archiveGrid" tabindex="0" role="list"></div>
+        <button type="button" class="arc-nav arc-next" id="arcNext" aria-label="次へスクロール">›</button>
+      </div>
+      <p class="archive-hint" id="archiveHint">← 横にスワイプすると、他の回もご覧いただけます →</p>
+
+      <div class="tab-survey-cta">
+        <p class="tab-survey-cta-text"><strong>感想をお聞かせください。</strong>今後のテーマ・改善の参考にします。</p>
+        <a href="https://forms.gle/BhXcBDV6QHsiQw7o8" target="_blank" rel="noopener" class="btn btn-ghost">📝 アンケートに回答する</a>
+      </div>
+
+      <p class="archive-note">
+        ※ 動画はGoogleドライブに保存しています。視聴にはメンバー登録済みのGoogleアカウントが必要です。<br>
+        ※ 権限がない場合、再生画面に「アクセス権が必要です」と表示されます。心当たりのない方は運営までご連絡ください。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
+        <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
+      </a>
+      <p>本質に向き合い、AI情報と来週の仕事、週末の時間を整える朝活プロジェクト。</p>
+    </div>
+    <nav class="footer-nav" aria-label="フッターナビゲーション">
+      <a href="index.html">TOP</a>
+      <a href="service.html">サービス</a>
+      <a href="contents.html#seminars">コンテンツ</a>
+      <a href="team.html">チーム</a>
+      <a href="faq.html">FAQ</a>
+    </nav>
+  </div>
+  <div class="footer-base">
+    <span>© 2026 ToToNoE+ / Base Craftas</span>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="legal.html">特定商取引法に基づく表記</a>
+    <a href="cancellation.html">キャンセル・解約ポリシー</a>
+  </div>
+</footer>
+
+<!-- ===== 学習コンテンツ：動画ポップアップ ===== -->
+<div class="cv-modal" id="cvModal" aria-hidden="true">
+  <div class="cv-modal-backdrop"></div>
+  <div class="cv-modal-box" role="dialog" aria-modal="true">
+    <button class="cv-modal-close" id="cvModalClose" aria-label="閉じる">×</button>
+    <div class="cv-modal-inner" id="cvModalBody"></div>
+  </div>
+</div>
+
+<!-- ===== Seminar detail modal ===== -->
+<div class="sem-modal" id="semModal" aria-hidden="true">
+  <div class="sem-modal-backdrop"></div>
+  <div class="sem-modal-box" role="dialog" aria-modal="true">
+    <button class="sem-modal-close" id="semModalClose" aria-label="閉じる">×</button>
+    <div class="sem-modal-inner" id="semModalBody"></div>
+  </div>
+</div>
+
+<script src="config.js?v=20260815d"></script>
+<script src="common.js?v=20260815d"></script>
+<script src="tabs.js?v=20260815d"></script>
+<script src="seminars.js?v=20260830a"></script>
+<script src="contents.js?v=20260831a"></script>
+<script src="bgm.js?v=20260815d"></script>
+</body>
+</html>
