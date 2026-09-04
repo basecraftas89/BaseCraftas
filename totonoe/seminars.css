@@ -1,0 +1,805 @@
+/* =========================================================
+   週末のAI整え習慣 — 派生セミナーページ 専用スタイル
+   夜明け前(HERO) → 夕方(ORIGIN) → 夜20:00(S01) → 深夜(S02) → 翌朝(RETURN以降)
+   既存 styles.css には一切手を加えず、このファイルで上書き拡張する
+   ========================================================= */
+
+/* ---------- 1. 時間帯トークン ---------- */
+:root{
+  --sm-bg:#F7FAF5;
+  --sm-bg-2:#E8F0ED;
+  --sm-head:#1A332C;
+  --sm-body:#3D6B5E;
+  --sm-acc:#3D6B5E;
+  --sm-acc-2:#9BB9AF;
+  --sm-sub:#D66A45;
+  --sm-glow:244,167,66;
+  --sm-surface:#FFFFFF;
+  --sm-surface-2:#E8F0ED;
+  --sm-line:#D7E2DD;
+  --sm-header:rgba(255,255,255,.92);
+  --sm-btn:linear-gradient(135deg,#D66A45 0%,#B85535 100%);
+  --sm-btn-sh:0 10px 24px rgba(19,115,160,.32);
+  --sm-shadow:0 14px 40px rgba(20,80,120,.13);
+  --sm-ghost-bd:#3D6B5E;
+  --sm-ghost-fg:#1A332C;
+  --sm-ghost-bg:#FFFFFF;
+  --sm-radius:18px;
+}
+
+/* 夜明け前 5:40 — ヒーロー。まだ暗いうちに、太陽が昇る */
+:root[data-sm-hour="predawn"]{
+  --sm-bg:#1A332C; --sm-bg-2:#12261F;
+  --sm-head:#FFFFFF; --sm-body:#B9CFE0;
+  --sm-acc:#D66A45; --sm-acc-2:#9BB9AF; --sm-sub:#D66A45;
+  --sm-glow:244,167,66;
+  --sm-surface:rgba(18,38,58,.62); --sm-surface-2:rgba(10,22,38,.6);
+  --sm-line:rgba(180,210,235,.22);
+  --sm-header:rgba(10,22,38,.86);
+  --sm-btn:linear-gradient(135deg,#F6B73C 0%,#EE8B3D 100%);
+  --sm-btn-sh:0 12px 32px rgba(244,167,66,.34);
+  --sm-shadow:0 22px 55px rgba(0,0,0,.45);
+  --sm-ghost-bd:rgba(200,222,234,.5); --sm-ghost-fg:#E8F0ED; --sm-ghost-bg:transparent;
+}
+
+/* 夕方 18:00 — 陽が傾く */
+:root[data-sm-hour="dusk"]{
+  --sm-bg:#274B41; --sm-bg-2:#1A332C;
+  --sm-head:#FFFFFF; --sm-body:#C8DEEA;
+  --sm-acc:#9BB9AF; --sm-acc-2:#D66A45; --sm-sub:#D66A45;
+  --sm-glow:244,167,66;
+  --sm-surface:rgba(22,55,79,.72); --sm-surface-2:rgba(11,38,56,.6);
+  --sm-line:rgba(174,214,235,.24);
+  --sm-header:rgba(20,58,82,.88);
+  --sm-btn:linear-gradient(135deg,#9BB9AF 0%,#3D6B5E 100%);
+  --sm-btn-sh:0 10px 30px rgba(70,190,220,.3);
+  --sm-shadow:0 20px 50px rgba(0,0,0,.35);
+  --sm-ghost-bd:rgba(200,222,234,.55); --sm-ghost-fg:#E8F0ED; --sm-ghost-bg:transparent;
+}
+
+/* 夜 20:00 — SEMINAR 01 梶原 / 守る */
+:root[data-sm-hour="s01"]{
+  --sm-bg:#1A332C; --sm-bg-2:#12261F;
+  --sm-head:#FFFFFF; --sm-body:#D7E2DD;
+  --sm-acc:#3D6B5E; --sm-acc-2:#9BB9AF; --sm-sub:#F5A623;
+  --sm-glow:58,155,255;
+  --sm-surface:rgba(10,27,49,.74); --sm-surface-2:rgba(6,20,38,.7);
+  --sm-line:rgba(90,140,200,.26);
+  --sm-header:rgba(6,20,38,.9);
+  --sm-btn:linear-gradient(135deg,#3D6B5E 0%,#1A332C 100%);
+  --sm-btn-sh:0 12px 34px rgba(46,123,232,.42);
+  --sm-shadow:0 24px 60px rgba(0,0,0,.5);
+  --sm-ghost-bd:rgba(159,190,220,.5); --sm-ghost-fg:#E8F0ED; --sm-ghost-bg:transparent;
+}
+
+/* 深夜 — SEMINAR 02 小島 / 広げる */
+:root[data-sm-hour="s02"]{
+  --sm-bg:#000000; --sm-bg-2:#050507;
+  --sm-head:#FFFFFF; --sm-body:#D7E2DD;
+  --sm-acc:#FFFFFF; --sm-acc-2:#D7E2DD; --sm-sub:#D66A45;
+  --sm-glow:255,255,255;
+  --sm-surface:rgba(12,12,15,.76); --sm-surface-2:rgba(6,6,8,.7);
+  --sm-line:rgba(200,210,230,.2);
+  --sm-header:rgba(0,0,0,.9);
+  --sm-btn:linear-gradient(135deg,#FFFFFF 0%,#E8F0ED 100%);
+  --sm-btn-sh:0 12px 34px rgba(255,255,255,.22);
+  --sm-shadow:0 24px 60px rgba(0,0,0,.66);
+  --sm-ghost-bd:rgba(255,255,255,.45); --sm-ghost-fg:#FFFFFF; --sm-ghost-bg:transparent;
+}
+
+/* 翌朝 6:00 — 朝へ戻る。既存サイトと同じ光 */
+:root[data-sm-hour="dawn"]{
+  --sm-bg:#F7FAF5; --sm-bg-2:#E8F0ED;
+  --sm-head:#1A332C; --sm-body:#3D6B5E;
+  --sm-acc:#3D6B5E; --sm-acc-2:#9BB9AF; --sm-sub:#D66A45;
+  --sm-glow:244,167,66;
+  --sm-surface:#FFFFFF; --sm-surface-2:#E8F0ED;
+  --sm-line:#D7E2DD;
+  --sm-header:rgba(255,255,255,.92);
+  --sm-btn:linear-gradient(135deg,#D66A45 0%,#B85535 100%);
+  --sm-btn-sh:0 10px 24px rgba(19,115,160,.32);
+  --sm-shadow:0 14px 40px rgba(20,80,120,.13);
+  --sm-ghost-bd:#3D6B5E; --sm-ghost-fg:#1A332C; --sm-ghost-bg:#FFFFFF;
+}
+
+/* ---------- 2. ページ基盤 ---------- */
+.sm-body{
+  background:var(--sm-bg);
+  color:var(--sm-body);
+  transition:background-color 1s cubic-bezier(.22,1,.36,1), color 1s cubic-bezier(.22,1,.36,1);
+}
+.sm-body ::selection{background:var(--sm-acc);color:#fff}
+
+.sm-sec{
+  position:relative;
+  padding:96px 0;
+  transition:background-color 1s cubic-bezier(.22,1,.36,1);
+}
+.sm-wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.sm-narrow{max-width:820px}
+
+.sm-eyebrow{
+  font-family:"Montserrat",sans-serif;font-weight:600;font-size:.78rem;
+  letter-spacing:.2em;color:var(--sm-acc);margin-bottom:14px;
+  transition:color .9s ease;
+}
+.sm-h2{
+  font-size:clamp(1.75rem,3.6vw,2.7rem);font-weight:900;line-height:1.34;
+  color:var(--sm-head);letter-spacing:.01em;margin-bottom:18px;
+  transition:color .9s ease;
+}
+.sm-h3{
+  font-size:clamp(1.1rem,1.7vw,1.32rem);font-weight:800;line-height:1.5;
+  color:var(--sm-head);margin-bottom:10px;transition:color .9s ease;
+}
+.sm-h2 em,.sm-h3 em{font-style:normal;color:var(--sm-acc);transition:color .9s ease}
+.sm-lead{font-size:1rem;line-height:1.95;max-width:46em;color:var(--sm-body);transition:color .9s ease}
+.sm-p{line-height:1.95;color:var(--sm-body);transition:color .9s ease}
+.sm-p+.sm-p{margin-top:1.1em}
+.sm-strong{color:var(--sm-head);font-weight:800}
+
+/* ボタン（既存 .btn を継承しつつテーマ化） */
+.sm-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.45em;
+  font-weight:700;font-size:1rem;line-height:1.3;text-align:center;
+  padding:16px 32px;border-radius:999px;border:2px solid transparent;cursor:pointer;
+  background:var(--sm-btn);color:#1A332C;box-shadow:var(--sm-btn-sh);
+  transition:transform .18s ease,box-shadow .18s ease,background .9s ease,color .9s ease;
+  position:relative;overflow:hidden;
+}
+:root[data-sm-hour="dawn"] .sm-btn,:root:not([data-sm-hour]) .sm-btn{color:#fff}
+:root[data-sm-hour="predawn"] .sm-btn{color:#1A332C}
+:root[data-sm-hour="dusk"] .sm-btn{color:#1A332C}
+:root[data-sm-hour="s01"] .sm-btn{color:#fff}
+:root[data-sm-hour="s02"] .sm-btn{color:#08090C}
+.sm-btn:hover{transform:translateY(-2px)}
+.sm-btn-lg{font-size:1.1rem;padding:19px 44px}
+.sm-btn-ghost{
+  background:var(--sm-ghost-bg);color:var(--sm-ghost-fg);
+  border-color:var(--sm-ghost-bd);box-shadow:none;
+}
+.sm-btn-ghost:hover{background:rgba(var(--sm-glow),.1)}
+.sm-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.sm-cta-center{justify-content:center}
+.sm-note{font-size:.84rem;opacity:.8;margin-top:14px}
+
+/* ヘッダーをテーマに追従させる */
+.sm-body .site-header{
+  background:var(--sm-header);
+  border-bottom-color:var(--sm-line);
+  transition:background-color 1s ease,border-color 1s ease,box-shadow .2s ease;
+}
+.sm-body .brand-text{color:var(--sm-head);transition:color .9s ease}
+.sm-body .site-nav a{color:var(--sm-head);transition:color .9s ease}
+.sm-body .site-nav a:hover{color:var(--sm-acc)}
+.sm-body .site-nav a::after{background:var(--sm-acc)}
+.sm-body .site-nav a.active{color:var(--sm-acc);font-weight:700}
+.sm-body .nav-toggle span{background:var(--sm-head)}
+.sm-body .header-cta{
+  background:var(--sm-btn);box-shadow:var(--sm-btn-sh);
+  padding:11px 22px;font-size:.9rem;
+}
+:root[data-sm-hour="s02"] .sm-body .header-cta{color:#08090C}
+
+/* reveal 初期状態 */
+.sm-rise{transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.sm-rise.is-in{opacity:1;transform:none}
+
+
+/* ---------- JS有効時のみ適用する初期状態（JS未実行でも内容が読めるようにする） ---------- */
+.sm-js .sm-rise{opacity:0;transform:translateY(26px)}
+.sm-js .sm-hero-title span i{transform:translateY(105%)}
+.sm-js .sm-hero-label,
+.sm-js .sm-hero-sub,
+.sm-js .sm-hero-meta,
+.sm-js .sm-hero-actions{opacity:0;transform:translateY(14px)}
+.sm-js .sm-scroll-hint{opacity:0}
+.sm-js .sm-worry-list li{opacity:0;transform:translateY(14px)}
+.sm-js .sm-perk{transform:scale(.9);opacity:0}
+.sm-js .sm-gain-ico path,.sm-js .sm-gain-ico circle,.sm-js .sm-gain-ico rect,
+.sm-js .sm-gain-ico line,.sm-js .sm-gain-ico polyline{stroke-dashoffset:var(--len,220)}
+.sm-js .sm-ag-d{max-height:0;opacity:0;margin-top:0}
+.sm-js .sm-agenda li.is-now .sm-ag-d{max-height:120px;opacity:1;margin-top:6px}
+
+/* =========================================================
+   3. HERO
+   ========================================================= */
+.sm-hero{
+  position:relative;min-height:100svh;display:flex;align-items:center;
+  overflow:hidden;padding:120px 0 80px;
+}
+#smHeroCanvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;
+  pointer-events:none;
+}
+.sm-hero-inner{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:0 24px;width:100%}
+.sm-hero-label{
+  font-family:"Montserrat",sans-serif;font-weight:600;font-size:.76rem;letter-spacing:.28em;
+  color:var(--sm-acc);margin-bottom:22px;
+}
+.sm-hero-title{
+  font-size:clamp(2.1rem,5.6vw,4.15rem);font-weight:900;line-height:1.22;
+  color:var(--sm-head);letter-spacing:.005em;margin-bottom:26px;
+}
+.sm-hero-title span{display:block;overflow:hidden}
+.sm-hero-title span i{display:block;font-style:normal}
+.sm-hero-sub{
+  font-size:clamp(.98rem,1.5vw,1.14rem);font-weight:700;color:var(--sm-acc);
+  margin-bottom:18px;
+}
+.sm-hero-meta{
+  display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px;
+}
+.sm-chip{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1.5px solid var(--sm-line);background:var(--sm-surface);
+  color:var(--sm-head);font-weight:700;font-size:.84rem;
+  padding:8px 16px;border-radius:999px;backdrop-filter:blur(8px);
+  transition:background-color .9s ease,border-color .9s ease,color .9s ease;
+}
+.sm-chip b{font-family:"Montserrat",sans-serif;color:var(--sm-acc)}
+.sm-hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+.sm-hero.is-ready .sm-hero-label,
+.sm-hero.is-ready .sm-hero-sub,
+.sm-hero.is-ready .sm-hero-meta,
+.sm-hero.is-ready .sm-hero-actions{
+  opacity:1;transform:none;transition:opacity .9s ease,transform .9s ease;
+}
+.sm-hero.is-ready .sm-hero-sub{transition-delay:.1s}
+.sm-hero.is-ready .sm-hero-meta{transition-delay:.2s}
+.sm-hero.is-ready .sm-hero-actions{transition-delay:.3s}
+.sm-hero.is-ready .sm-hero-title span i{
+  transform:none;transition:transform 1s cubic-bezier(.22,1,.36,1);
+}
+.sm-hero.is-ready .sm-hero-title span:nth-child(2) i{transition-delay:.09s}
+.sm-hero.is-ready .sm-hero-title span:nth-child(3) i{transition-delay:.18s}
+
+.sm-scroll-hint{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:"Montserrat",sans-serif;font-size:.66rem;letter-spacing:.24em;
+  color:var(--sm-body);opacity:.75;transition:opacity 1s ease .9s;
+}
+.sm-hero.is-ready .sm-scroll-hint{opacity:.75}
+.sm-scroll-hint span{display:block;width:1px;height:44px;background:linear-gradient(180deg,transparent,var(--sm-acc));animation:smDrop 2.1s ease-in-out infinite}
+@keyframes smDrop{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(.2);transform-origin:bottom}}
+
+/* =========================================================
+   4. ORIGIN — 派生ストーリー（時計）
+   ========================================================= */
+.sm-origin{overflow:hidden}
+.sm-origin-grid{display:grid;grid-template-columns:1fr 340px;gap:56px;align-items:start}
+.sm-clock{position:sticky;top:120px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.sm-clock svg{width:100%;max-width:300px;overflow:visible}
+.sm-clock-face{fill:none;stroke:var(--sm-line);stroke-width:1.5;transition:stroke .9s ease}
+.sm-clock-ring{fill:none;stroke:var(--sm-acc);stroke-width:2.5;stroke-linecap:round;transition:stroke .9s ease}
+.sm-clock-tick{stroke:var(--sm-line);stroke-width:1.5;stroke-linecap:round;transition:stroke .9s ease}
+.sm-clock-hand{stroke:var(--sm-head);stroke-width:3.5;stroke-linecap:round;transform-origin:150px 150px;transition:stroke .9s ease}
+.sm-clock-hand.min{stroke:var(--sm-acc);stroke-width:2.5}
+.sm-clock-hub{fill:var(--sm-acc);transition:fill .9s ease}
+.sm-clock-sun{fill:var(--sm-sub);transition:fill .9s ease,opacity .6s ease}
+.sm-clock-time{
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.9rem;
+  color:var(--sm-head);letter-spacing:.06em;transition:color .9s ease;
+}
+.sm-clock-cap{font-size:.8rem;letter-spacing:.12em;color:var(--sm-body);text-align:center;transition:color .9s ease}
+
+.sm-origin-body{max-width:40em}
+.sm-origin-body .sm-p{font-size:1.02rem}
+.sm-quote{
+  margin:30px 0;padding:22px 26px;border-left:3px solid var(--sm-acc);
+  background:var(--sm-surface);border-radius:0 14px 14px 0;
+  font-size:1.12rem;font-weight:800;color:var(--sm-head);line-height:1.7;
+  transition:background-color .9s ease,color .9s ease,border-color .9s ease;
+}
+.sm-quote small{display:block;font-size:.8rem;font-weight:500;color:var(--sm-body);margin-top:8px;letter-spacing:.04em}
+
+/* =========================================================
+   5. FORK — 2本の分岐カード
+   ========================================================= */
+.sm-fork-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:46px;perspective:1400px}
+.sm-fork-card{
+  position:relative;display:block;border-radius:22px;overflow:hidden;
+  background:var(--sm-surface);border:1px solid var(--sm-line);
+  box-shadow:var(--sm-shadow);
+  transform-style:preserve-3d;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),filter .45s ease,opacity .45s ease,box-shadow .35s ease,background-color .9s ease,border-color .9s ease;
+}
+.sm-fork-grid:hover .sm-fork-card{filter:saturate(.45) brightness(.72);opacity:.7}
+.sm-fork-grid:hover .sm-fork-card:hover{filter:none;opacity:1;box-shadow:0 30px 70px rgba(0,0,0,.42)}
+.sm-fork-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#050A12}
+.sm-fork-thumb img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.sm-fork-card:hover .sm-fork-thumb img{transform:scale(1.13)}
+.sm-fork-no{
+  position:absolute;top:14px;left:14px;z-index:2;
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.18em;
+  background:rgba(0,0,0,.55);color:#fff;padding:6px 13px;border-radius:999px;backdrop-filter:blur(6px);
+}
+.sm-fork-body{padding:24px 24px 26px}
+.sm-fork-date{
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:.9rem;
+  color:var(--sm-acc);letter-spacing:.06em;margin-bottom:10px;transition:color .9s ease;
+}
+.sm-fork-date b{font-size:1.45rem;margin-right:2px}
+.sm-fork-title{font-size:1.16rem;font-weight:900;line-height:1.52;color:var(--sm-head);margin-bottom:10px;transition:color .9s ease}
+.sm-fork-axis{
+  display:inline-block;font-size:.76rem;font-weight:800;letter-spacing:.16em;
+  padding:5px 13px;border-radius:999px;margin-bottom:12px;
+  border:1px solid var(--sm-line);color:var(--sm-body);
+}
+.sm-fork-desc{font-size:.92rem;line-height:1.8;color:var(--sm-body);margin-bottom:16px}
+.sm-fork-speaker{display:flex;align-items:center;gap:11px;font-size:.86rem;color:var(--sm-body)}
+.sm-fork-speaker img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none}
+.sm-fork-speaker b{display:block;color:var(--sm-head);font-size:.96rem}
+.sm-fork-go{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;
+  padding-top:16px;border-top:1px solid var(--sm-line);
+  font-weight:800;color:var(--sm-acc);font-size:.92rem;transition:color .9s ease,border-color .9s ease;
+}
+.sm-fork-go i{font-style:normal;transition:transform .3s ease}
+.sm-fork-card:hover .sm-fork-go i{transform:translateX(6px)}
+
+/* =========================================================
+   6. COUNTDOWN
+   ========================================================= */
+.sm-count{padding:64px 0}
+.sm-count-inner{
+  border:1px solid var(--sm-line);border-radius:22px;background:var(--sm-surface);
+  padding:32px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:26px;justify-content:space-between;
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-count-label{font-size:.9rem;color:var(--sm-body)}
+.sm-count-label b{display:block;color:var(--sm-head);font-size:1.06rem;font-weight:800;margin-top:5px}
+.sm-count-units{display:flex;gap:14px}
+.sm-unit{text-align:center;min-width:74px}
+.sm-unit-n{
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:clamp(1.7rem,3.4vw,2.5rem);
+  color:var(--sm-head);line-height:1;display:block;font-variant-numeric:tabular-nums;
+  transition:color .9s ease;
+}
+.sm-unit-k{font-size:.68rem;letter-spacing:.18em;color:var(--sm-body);margin-top:7px;display:block;font-family:"Montserrat",sans-serif}
+
+/* =========================================================
+   7. SEMINAR 詳細 共通
+   ========================================================= */
+.sm-seminar{position:relative;padding:110px 0 96px}
+.sm-seminar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(900px 520px at var(--gx,80%) 8%, rgba(var(--sm-glow),.14) 0%, transparent 62%);
+  transition:background .9s ease;
+}
+.sm-seminar>*{position:relative;z-index:1}
+.sm-s02 .sm-seminar-head{text-align:right}
+.sm-seminar-head{max-width:900px}
+.sm-s02 .sm-seminar-head{margin-left:auto}
+.sm-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.22em;
+  color:var(--sm-acc);border:1px solid var(--sm-line);border-radius:999px;padding:7px 16px;margin-bottom:20px;
+  transition:color .9s ease,border-color .9s ease;
+}
+.sm-date-big{
+  font-family:"Montserrat",sans-serif;font-weight:700;color:var(--sm-head);
+  font-size:clamp(2.4rem,6vw,4.4rem);line-height:1;letter-spacing:-.01em;margin-bottom:8px;
+  transition:color .9s ease;
+}
+.sm-date-big small{font-size:.36em;font-weight:600;letter-spacing:.06em;margin-left:.3em;color:var(--sm-acc)}
+.sm-date-sub{font-size:.94rem;color:var(--sm-body);margin-bottom:26px;letter-spacing:.04em}
+.sm-title{
+  font-size:clamp(1.6rem,3.5vw,2.65rem);font-weight:900;line-height:1.4;
+  color:var(--sm-head);margin-bottom:14px;transition:color .9s ease;
+}
+.sm-title-sub{font-size:clamp(1rem,1.6vw,1.16rem);font-weight:700;color:var(--sm-acc);margin-bottom:24px}
+
+/* 問いかけ（暗号化→復号 / タイプライター） */
+.sm-ask{
+  margin:56px 0 10px;padding:44px 0;text-align:center;
+  border-top:1px solid var(--sm-line);border-bottom:1px solid var(--sm-line);
+  transition:border-color .9s ease;
+}
+.sm-ask-t{
+  font-size:clamp(1.3rem,3.4vw,2.4rem);font-weight:900;line-height:1.5;color:var(--sm-head);
+  font-feature-settings:"palt";transition:color .9s ease;
+}
+.sm-ask-t .sm-cy{color:var(--sm-acc);opacity:.85}
+.sm-xbox{
+  max-width:560px;margin:0 auto;text-align:left;
+  border:1px solid var(--sm-line);border-radius:18px;padding:18px 20px;background:var(--sm-surface);
+  display:flex;gap:14px;transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-xbox-av{
+  width:44px;height:44px;border-radius:50%;flex:none;position:relative;
+  background:linear-gradient(150deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
+  border:1px solid var(--sm-line);
+}
+.sm-xbox-av::after{
+  content:"";position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50% 50% 45% 45%;
+  background:var(--sm-body);opacity:.55;
+  box-shadow:0 -11px 0 -3px var(--sm-body);
+}
+.sm-xbox-body{flex:1;min-width:0}
+.sm-xbox-name{font-size:.86rem;color:var(--sm-body);margin-bottom:6px}
+.sm-xbox-name b{color:var(--sm-head);font-weight:800;margin-right:6px}
+.sm-xbox-text{
+  font-size:clamp(1.05rem,2.2vw,1.4rem);font-weight:800;line-height:1.55;color:var(--sm-head);
+  min-height:2.6em;
+}
+.sm-xbox-text::after{content:"";display:inline-block;width:2px;height:1em;background:var(--sm-acc);margin-left:3px;vertical-align:-.12em;animation:smCaret 1s step-end infinite}
+.sm-xbox.is-done .sm-xbox-text::after{display:none}
+@keyframes smCaret{0%,100%{opacity:1}50%{opacity:0}}
+.sm-xbox-bar{display:flex;gap:16px;margin-top:14px;font-size:.82rem;color:var(--sm-body);opacity:.7}
+
+/* 不安リスト */
+.sm-worry{margin-top:66px}
+.sm-worry-list{list-style:none;display:grid;gap:12px;margin-top:26px;max-width:840px}
+.sm-worry-list li{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:16px 20px;border:1px solid var(--sm-line);border-radius:14px;
+  background:var(--sm-surface-2);color:var(--sm-body);line-height:1.7;
+  transition:opacity .55s ease,transform .55s ease,border-color .5s ease,background-color .9s ease,box-shadow .5s ease;
+}
+.sm-worry-list li.is-in{opacity:1;transform:none}
+.sm-worry-list li.is-lit{border-color:var(--sm-acc);box-shadow:0 0 0 1px rgba(var(--sm-glow),.35),0 10px 30px rgba(var(--sm-glow),.14)}
+.sm-tick{
+  flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--sm-line);
+  display:grid;place-items:center;margin-top:2px;
+  transition:border-color .4s ease,background-color .4s ease;
+}
+.sm-tick::after{content:"";width:10px;height:5px;border-left:2px solid var(--sm-acc);border-bottom:2px solid var(--sm-acc);transform:rotate(-45deg) scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.sm-worry-list li.is-lit .sm-tick{border-color:var(--sm-acc)}
+.sm-worry-list li.is-lit .sm-tick::after{transform:rotate(-45deg) scale(1)}
+/* S02 は X 風の吹き出し */
+.sm-s02 .sm-worry-list li{border-radius:20px 20px 20px 6px}
+
+.sm-worry-close{margin-top:26px;font-size:1.02rem;font-weight:700;color:var(--sm-head);line-height:1.85}
+
+/* 得られる3つ */
+.sm-gain{margin-top:86px}
+.sm-gain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:34px}
+.sm-gain-card{
+  position:relative;padding:32px 26px 30px;border-radius:20px;
+  background:var(--sm-surface);border:1px solid var(--sm-line);box-shadow:var(--sm-shadow);
+  transition:transform .45s cubic-bezier(.22,1,.36,1),background-color .9s ease,border-color .9s ease,box-shadow .35s ease;
+}
+.sm-gain-card:hover{transform:translateY(-7px)}
+.sm-gain-n{
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:.76rem;letter-spacing:.2em;
+  color:var(--sm-acc);margin-bottom:16px;display:block;
+}
+.sm-gain-ico{width:46px;height:46px;margin-bottom:16px;display:block}
+.sm-gain-ico path,.sm-gain-ico circle,.sm-gain-ico rect,.sm-gain-ico line,.sm-gain-ico polyline{
+  fill:none;stroke:var(--sm-acc);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:var(--len,220);stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1),stroke .9s ease;
+}
+.sm-gain-card.is-in .sm-gain-ico path,.sm-gain-card.is-in .sm-gain-ico circle,
+.sm-gain-card.is-in .sm-gain-ico rect,.sm-gain-card.is-in .sm-gain-ico line,
+.sm-gain-card.is-in .sm-gain-ico polyline{stroke-dashoffset:0}
+.sm-gain-card p{font-size:.92rem;line-height:1.85;color:var(--sm-body)}
+
+/* 目指さないこと */
+.sm-not{
+  margin-top:56px;padding:34px 36px;border-radius:20px;
+  border:1px dashed var(--sm-line);background:var(--sm-surface-2);
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-not h3{font-size:1.04rem;font-weight:800;color:var(--sm-head);margin-bottom:14px;letter-spacing:.02em}
+.sm-not p{line-height:1.95;color:var(--sm-body)}
+.sm-not p b{color:var(--sm-head)}
+
+/* =========================================================
+   8. 60分ダイヤル
+   ========================================================= */
+.sm-dial-sec{margin-top:96px}
+.sm-dial-scrub{position:relative;height:230vh}
+.sm-dial-sticky{position:sticky;top:96px}
+.sm-dial-grid{display:grid;grid-template-columns:340px 1fr;gap:52px;align-items:start;margin-top:34px}
+.sm-dial-wrap{position:relative;display:grid;place-items:center}
+.sm-dial{width:100%;max-width:320px;transform:rotate(-90deg)}
+.sm-dial-track{fill:none;stroke:var(--sm-line);stroke-width:10;transition:stroke .9s ease}
+.sm-dial-arc{
+  fill:none;stroke:var(--sm-acc);stroke-width:10;stroke-linecap:round;
+  stroke-dasharray:848;stroke-dashoffset:848;
+  filter:drop-shadow(0 0 10px rgba(var(--sm-glow),.55));
+  transition:stroke .9s ease;
+}
+.sm-dial-mark{stroke:var(--sm-line);stroke-width:2;transition:stroke .9s ease}
+.sm-dial-center{
+  position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:4px;
+}
+.sm-dial-clock{
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:2.1rem;color:var(--sm-head);
+  font-variant-numeric:tabular-nums;transition:color .9s ease;
+}
+.sm-dial-elapsed{font-size:.74rem;letter-spacing:.18em;color:var(--sm-acc);font-family:"Montserrat",sans-serif}
+.sm-dial-now{font-size:.86rem;color:var(--sm-body);max-width:180px;margin:6px auto 0;line-height:1.6}
+
+.sm-agenda{list-style:none;display:grid;gap:4px}
+.sm-agenda li{
+  display:grid;grid-template-columns:16px 84px 1fr;gap:16px;align-items:start;
+  padding:15px 16px;border-radius:14px;
+  transition:background-color .45s ease,opacity .45s ease,transform .45s ease;
+  opacity:.42;
+}
+.sm-agenda li.is-past{opacity:.62}
+.sm-agenda li.is-now{opacity:1;background:var(--sm-surface);transform:translateX(6px)}
+.sm-ag-dot{
+  width:11px;height:11px;border-radius:50%;margin-top:7px;
+  border:2px solid var(--sm-line);background:transparent;
+  transition:background-color .35s ease,border-color .35s ease,box-shadow .35s ease;
+}
+.sm-agenda li.is-past .sm-ag-dot{background:var(--sm-acc);border-color:var(--sm-acc)}
+.sm-agenda li.is-now .sm-ag-dot{background:var(--sm-acc);border-color:var(--sm-acc);box-shadow:0 0 0 5px rgba(var(--sm-glow),.22)}
+.sm-ag-time{font-family:"Montserrat",sans-serif;font-weight:600;font-size:.84rem;color:var(--sm-acc);padding-top:2px;letter-spacing:.02em}
+.sm-ag-t{font-weight:800;color:var(--sm-head);line-height:1.6;font-size:.98rem}
+.sm-ag-d{
+  font-size:.86rem;color:var(--sm-body);line-height:1.7;margin-top:6px;
+  overflow:hidden;
+  transition:max-height .5s ease,opacity .4s ease,margin .4s ease;
+}
+.sm-agenda li.is-now .sm-ag-d{max-height:120px;opacity:1;margin-top:6px}
+
+/* =========================================================
+   9. 講師 / 特典
+   ========================================================= */
+.sm-speaker{margin-top:96px}
+.sm-speaker-grid{display:grid;grid-template-columns:260px 1fr;gap:44px;align-items:center}
+.sm-s02 .sm-speaker-grid{grid-template-columns:1fr 260px}
+.sm-s02 .sm-speaker-media{order:2}
+.sm-speaker-media{position:relative;display:grid;place-items:center}
+.sm-speaker-media img{width:100%;max-width:240px;aspect-ratio:1;border-radius:50%;object-fit:cover;position:relative;z-index:1}
+.sm-halo{
+  position:absolute;width:min(100%,270px);aspect-ratio:1;border-radius:50%;
+  border:1px solid var(--sm-line);
+}
+.sm-halo::before{
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(var(--sm-glow),.55) 60deg, transparent 130deg);
+  animation:smSpin 7s linear infinite;
+}
+@keyframes smSpin{to{transform:rotate(360deg)}}
+#smStarCanvas{position:absolute;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);pointer-events:none;z-index:0}
+.sm-speaker-role{font-size:.82rem;letter-spacing:.2em;color:var(--sm-acc);font-family:"Montserrat",sans-serif;font-weight:600;margin-bottom:12px}
+.sm-speaker-name{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:900;color:var(--sm-head);margin-bottom:8px;letter-spacing:.04em}
+.sm-speaker-title{font-size:.96rem;color:var(--sm-acc);font-weight:700;margin-bottom:18px}
+.sm-speaker p{line-height:1.95;color:var(--sm-body)}
+
+.sm-perks{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:64px}
+.sm-perk{
+  text-align:center;padding:26px 16px;border-radius:18px;
+  border:1px solid var(--sm-line);background:var(--sm-surface-2);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease,background-color .9s ease,border-color .9s ease;
+}
+.sm-perk.is-in{transform:scale(1);opacity:1}
+.sm-perk-ico{font-size:1.7rem;display:block;margin-bottom:10px}
+.sm-perk b{display:block;color:var(--sm-head);font-size:.98rem;font-weight:800;margin-bottom:6px}
+.sm-perk span{font-size:.8rem;color:var(--sm-body);line-height:1.6;display:block}
+.sm-perk.is-key{border-color:var(--sm-acc);box-shadow:0 0 0 1px rgba(var(--sm-glow),.3)}
+
+/* CTA ブロック */
+.sm-cta-block{
+  margin-top:72px;padding:52px 40px;border-radius:26px;text-align:center;
+  border:1px solid var(--sm-line);background:var(--sm-surface);
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-cta-block h3{font-size:clamp(1.2rem,2.4vw,1.7rem);font-weight:900;color:var(--sm-head);line-height:1.6;margin-bottom:12px}
+.sm-cta-block p{color:var(--sm-body);margin-bottom:8px}
+
+/* =========================================================
+   10. プロンプトデッキ
+   ========================================================= */
+.sm-deck-sec{margin-top:90px}
+.sm-deck{
+  display:flex;gap:18px;overflow-x:auto;padding:26px 4px 30px;margin-top:30px;
+  scroll-snap-type:x mandatory;cursor:grab;
+  scrollbar-width:thin;scrollbar-color:var(--sm-acc) transparent;
+}
+.sm-deck.is-drag{cursor:grabbing;scroll-snap-type:none}
+.sm-deck::-webkit-scrollbar{height:6px}
+.sm-deck::-webkit-scrollbar-thumb{background:var(--sm-line);border-radius:99px}
+.sm-card{
+  flex:0 0 300px;scroll-snap-align:center;min-height:264px;
+  border-radius:20px;padding:26px 24px;border:1px solid var(--sm-line);
+  background:var(--sm-surface);display:flex;flex-direction:column;gap:12px;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),box-shadow .35s ease,background-color .9s ease,border-color .9s ease;
+  user-select:none;
+}
+.sm-card:hover{transform:translateY(-8px) rotate(-.6deg);box-shadow:0 26px 60px rgba(0,0,0,.4)}
+.sm-card-n{font-family:"Montserrat",sans-serif;font-weight:700;font-size:.74rem;letter-spacing:.2em;color:var(--sm-acc)}
+.sm-card-t{font-weight:800;color:var(--sm-head);font-size:1.02rem;line-height:1.55}
+.sm-card-p{
+  font-size:.82rem;line-height:1.75;color:var(--sm-body);
+  background:var(--sm-surface-2);border-radius:12px;padding:14px 15px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;flex:1;
+  transition:background-color .9s ease;
+}
+.sm-card-locked{align-items:center;justify-content:center;text-align:center;border-style:dashed;background:transparent}
+.sm-card-locked .sm-lock{font-size:2rem;margin-bottom:6px}
+.sm-card-locked b{color:var(--sm-head);font-size:1.05rem;display:block;margin-bottom:8px}
+.sm-card-locked span{font-size:.86rem;color:var(--sm-body);line-height:1.7}
+.sm-deck-hint{font-size:.82rem;color:var(--sm-body);opacity:.75;margin-top:2px}
+
+/* =========================================================
+   11. 2本セット比較
+   ========================================================= */
+.sm-both{position:relative;overflow:hidden}
+.sm-both-split{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:44px;
+  border-radius:24px;overflow:hidden;border:1px solid var(--sm-line);
+}
+.sm-both-col{padding:44px 36px;transition:background-color .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
+.sm-both-col:first-child{background:linear-gradient(160deg,rgba(46,123,232,.16),rgba(46,123,232,.04))}
+.sm-both-col:last-child{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));border-left:1px solid var(--sm-line)}
+.sm-both-axis{
+  font-family:"Montserrat",sans-serif;font-size:.72rem;letter-spacing:.24em;
+  color:var(--sm-body);margin-bottom:12px;
+}
+.sm-both-word{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:var(--sm-head);line-height:1.2;margin-bottom:8px;letter-spacing:.06em}
+.sm-both-when{font-family:"Montserrat",sans-serif;font-weight:600;color:var(--sm-acc);font-size:.94rem;margin-bottom:18px}
+.sm-both-col p{font-size:.94rem;line-height:1.85;color:var(--sm-body)}
+.sm-both-copy{text-align:center;margin-top:52px}
+.sm-both-copy p{font-size:clamp(1.05rem,2.2vw,1.4rem);font-weight:800;line-height:1.85;color:var(--sm-head)}
+.sm-both-copy p+p{margin-top:18px;font-size:1rem;font-weight:500;color:var(--sm-body)}
+
+/* =========================================================
+   12. 朝へ戻る
+   ========================================================= */
+.sm-return{position:relative;overflow:hidden;padding:120px 0}
+#smDawnCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.sm-return .sm-wrap{position:relative;z-index:1}
+.sm-return-inner{max-width:640px}
+.sm-motto{
+  margin-top:34px;padding:22px 26px;border-radius:16px;
+  border:1px solid var(--sm-line);background:var(--sm-surface);
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-motto-k{font-size:.72rem;letter-spacing:.22em;color:var(--sm-acc);font-family:"Montserrat",sans-serif;font-weight:600;margin-bottom:8px}
+.sm-motto-t{font-size:1.24rem;font-weight:900;color:var(--sm-head);letter-spacing:.04em}
+.sm-motto-s{font-size:.86rem;color:var(--sm-body);margin-top:6px}
+
+/* =========================================================
+   13. 流れ / FAQ / 最終CTA
+   ========================================================= */
+.sm-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px;position:relative}
+.sm-flow-step{
+  position:relative;padding:28px 22px;border-radius:18px;
+  border:1px solid var(--sm-line);background:var(--sm-surface);
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-flow-n{
+  width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  background:var(--sm-btn);color:#fff;font-family:"Montserrat",sans-serif;font-weight:700;
+  margin-bottom:14px;font-size:.94rem;
+}
+:root[data-sm-hour="s02"] .sm-flow-n{color:#08090C}
+.sm-flow-step h3{font-size:1rem;font-weight:800;color:var(--sm-head);margin-bottom:8px;line-height:1.5}
+.sm-flow-step p{font-size:.87rem;line-height:1.8;color:var(--sm-body)}
+
+.sm-faq-list{display:grid;gap:12px;margin-top:34px}
+.sm-faq-item{
+  border:1px solid var(--sm-line);border-radius:16px;overflow:hidden;background:var(--sm-surface);
+  transition:background-color .9s ease,border-color .9s ease;
+}
+.sm-faq-item summary{
+  list-style:none;cursor:pointer;padding:20px 54px 20px 22px;position:relative;
+  font-weight:800;color:var(--sm-head);line-height:1.65;font-size:.99rem;
+}
+.sm-faq-item summary::-webkit-details-marker{display:none}
+.sm-faq-item summary::before{content:"Q";font-family:"Montserrat",sans-serif;color:var(--sm-acc);margin-right:10px;font-weight:700}
+.sm-faq-item summary::after{
+  content:"";position:absolute;right:22px;top:50%;width:11px;height:11px;
+  border-right:2px solid var(--sm-acc);border-bottom:2px solid var(--sm-acc);
+  transform:translateY(-70%) rotate(45deg);transition:transform .3s ease;
+}
+.sm-faq-item[open] summary::after{transform:translateY(-20%) rotate(-135deg)}
+.sm-faq-item p{padding:0 22px 22px;line-height:1.9;color:var(--sm-body);font-size:.93rem}
+.sm-faq-item p a{color:var(--sm-acc);text-decoration:underline}
+
+.sm-final{text-align:center;padding:120px 0 130px}
+.sm-final h2{font-size:clamp(1.7rem,4vw,2.9rem);font-weight:900;color:var(--sm-head);line-height:1.45;margin-bottom:20px}
+.sm-final p{max-width:34em;margin:0 auto;line-height:1.95;color:var(--sm-body)}
+.sm-final-dates{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:34px}
+
+/* =========================================================
+   14. フローティングCTAバー
+   ========================================================= */
+.sm-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;
+  transform:translateY(110%);transition:transform .5s cubic-bezier(.22,1,.36,1);
+  padding:10px 16px 14px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.28) 40%);
+  pointer-events:none;
+}
+.sm-bar.is-on{transform:none}
+.sm-bar-inner{
+  pointer-events:auto;
+  max-width:960px;margin:0 auto;border-radius:999px;
+  background:var(--sm-header);border:1px solid var(--sm-line);
+  backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.3);
+  display:flex;align-items:center;gap:16px;padding:9px 10px 9px 22px;
+  transition:background-color .9s ease,border-color .9s ease;
+  overflow:hidden;
+}
+.sm-bar-txt{flex:1;min-width:0;line-height:1.4}
+.sm-bar-k{font-family:"Montserrat",sans-serif;font-size:.68rem;letter-spacing:.16em;color:var(--sm-acc);display:block}
+.sm-bar-t{
+  font-size:.92rem;font-weight:800;color:var(--sm-head);display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sm-bar-btn{
+  flex:none;padding:13px 26px;border-radius:999px;font-weight:800;font-size:.9rem;
+  background:var(--sm-btn);box-shadow:var(--sm-btn-sh);color:#fff;
+  transition:transform .18s ease,background .9s ease;
+}
+:root[data-sm-hour="s02"] .sm-bar-btn{color:#08090C}
+.sm-bar-btn:hover{transform:translateY(-2px)}
+.sm-bar-swap{animation:smSwap .45s cubic-bezier(.22,1,.36,1)}
+@keyframes smSwap{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* =========================================================
+   15. 区切りのグラデーション
+   ========================================================= */
+.sm-fade{height:120px;position:relative;margin:0;padding:0;pointer-events:none}
+.sm-fade::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.28))}
+
+/* =========================================================
+   16. レスポンシブ
+   ========================================================= */
+@media (max-width:1000px){
+  .sm-dial-grid{grid-template-columns:1fr;gap:30px}
+  .sm-dial-scrub{height:auto}
+  .sm-dial-sticky{position:static}
+  .sm-dial{max-width:260px}
+  .sm-origin-grid{grid-template-columns:1fr;gap:36px}
+  .sm-clock{position:static;order:-1}
+  .sm-clock svg{max-width:220px}
+  .sm-gain-grid{grid-template-columns:1fr;gap:16px}
+  .sm-perks{grid-template-columns:repeat(2,1fr)}
+  .sm-flow{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:860px){
+  .sm-sec{padding:76px 0}
+  .sm-seminar{padding:86px 0 76px}
+  .sm-fork-grid{grid-template-columns:1fr}
+  .sm-fork-grid:hover .sm-fork-card{filter:none;opacity:1}
+  .sm-speaker-grid,.sm-s02 .sm-speaker-grid{grid-template-columns:1fr;gap:26px;text-align:center}
+  .sm-s02 .sm-speaker-media{order:0}
+  .sm-speaker-media img{max-width:200px}
+  .sm-both-split{grid-template-columns:1fr}
+  .sm-both-col:last-child{border-left:none;border-top:1px solid var(--sm-line)}
+  .sm-s02 .sm-seminar-head{text-align:left;margin-left:0}
+}
+@media (max-width:680px){
+  .sm-hero{min-height:92svh;padding:108px 0 70px}
+  .sm-count-inner{flex-direction:column;align-items:flex-start;gap:20px}
+  .sm-count-units{width:100%;justify-content:space-between;gap:8px}
+  .sm-unit{min-width:0;flex:1}
+  .sm-flow{grid-template-columns:1fr}
+  .sm-cta-block{padding:36px 22px}
+  .sm-not{padding:26px 22px}
+  .sm-agenda li{grid-template-columns:14px 70px 1fr;gap:10px;padding:13px 10px}
+  .sm-bar-inner{padding:8px 8px 8px 16px;gap:10px}
+  .sm-bar-btn{padding:12px 18px;font-size:.84rem}
+  .sm-bar-t{font-size:.84rem}
+  .sm-card{flex:0 0 82vw}
+  .sm-ask{margin:40px 0 0;padding:34px 0}
+}
+@media (max-width:420px){
+  .sm-perks{grid-template-columns:1fr}
+  .sm-bar-k{display:none}
+}
+
+/* =========================================================
+   17. モーション低減
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:.01ms !important}
+  .sm-rise,.sm-worry-list li,.sm-perk{opacity:1 !important;transform:none !important}
+  .sm-hero-title span i{transform:none !important}
+  .sm-hero-label,.sm-hero-sub,.sm-hero-meta,.sm-hero-actions{opacity:1 !important;transform:none !important}
+  .sm-gain-ico path,.sm-gain-ico circle,.sm-gain-ico rect,.sm-gain-ico line,.sm-gain-ico polyline{stroke-dashoffset:0 !important}
+  #smHeroCanvas,#smStarCanvas,#smDawnCanvas{display:none}
+  .sm-agenda li{opacity:1}
+  .sm-ag-d{max-height:none;opacity:1;margin-top:6px}
+}
