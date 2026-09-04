@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260831f">
+<link rel="stylesheet" href="styles.css?v=20260904b">
 </head>
 <body>
 
@@ -48,6 +48,7 @@
           <a href="contents.html#seminars">セミナー</a>
           <a href="contents.html#podcast">ポッドキャスト</a>
           <a href="contents.html#library">学習コンテンツ</a>
+          <a href="contents.html#columns">コラム</a>
           <a href="contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -65,8 +66,8 @@
   <div class="hero-inner">
     <div class="hero-copy">
       <div class="hero-actions">
-        <a href="#philosophy" class="btn btn-cta">理念を見る</a>
-        <a href="team.html" class="btn btn-ghost">チームの背景を見る</a>
+        <a href="service.html" class="btn btn-cta">サービスを見る</a>
+        <a href="#latest" class="btn btn-ghost">最新情報を見る</a>
       </div>
     </div>
   </div>
@@ -87,6 +88,7 @@
         <button type="button" class="latest-tab active" id="latestTabSeminar" role="tab" aria-selected="true" aria-controls="latestPanelSeminar" data-latest-tab="seminar">セミナー</button>
         <button type="button" class="latest-tab" id="latestTabPodcast" role="tab" aria-selected="false" aria-controls="latestPanelPodcast" data-latest-tab="podcast">ポッドキャスト</button>
         <button type="button" class="latest-tab" id="latestTabLibrary" role="tab" aria-selected="false" aria-controls="latestPanelLibrary" data-latest-tab="library">学習コンテンツ</button>
+        <button type="button" class="latest-tab" id="latestTabColumns" role="tab" aria-selected="false" aria-controls="latestPanelColumns" data-latest-tab="columns">コラム</button>
       </div>
 
       <div class="latest-visual-groups">
@@ -173,114 +175,55 @@
             </a>
           </div>
         </section>
+
+        <section class="latest-visual-group" id="latestPanelColumns" role="tabpanel" aria-labelledby="latestTabColumns" data-latest-panel="columns" hidden>
+          <div class="latest-group-head">
+            <h3 id="latestColumnsTitle">コラム</h3>
+            <a href="contents.html#columns">一覧へ</a>
+          </div>
+          <div class="latest-card-grid" data-auto-scroll>
+            <a class="latest-visual-card latest-column-card" href="columns/ai-yohaku.html">
+              <span class="column-thumb-art column-thumb-art-01" aria-hidden="true">
+                <span>WORK</span>
+              </span>
+              <span class="peek-date">2026.09.04 / コラム</span>
+              <strong>道具を使う前に、仕事をほどく。</strong>
+            </a>
+            <a class="latest-visual-card latest-column-card" href="columns/weekend-cycle.html">
+              <span class="column-thumb-art column-thumb-art-02" aria-hidden="true">
+                <span>30min</span>
+              </span>
+              <span class="peek-date">2026.09.01 / コラム</span>
+              <strong>週末の30分を、次の一歩に変える。</strong>
+            </a>
+            <a class="latest-visual-card latest-column-card" href="columns/team-learning.html">
+              <span class="column-thumb-art column-thumb-art-03" aria-hidden="true">
+                <span>TEAM</span>
+              </span>
+              <span class="peek-date">2026.08.29 / コラム</span>
+              <strong>チームで整えると、学びは続きやすい。</strong>
+            </a>
+          </div>
+        </section>
       </div>
     </div>
   </section>
 
-  <section class="section why-section" id="why">
-    <div class="container container-narrow">
-      <p class="eyebrow">WHY TOTONOE+</p>
-      <h2 class="section-title">忙しいほど、<br><span class="accent">本当に大切なこと</span>から離れていく。</h2>
-      <p class="section-lead">専門職の仕事には、記録、資料作成、情報収集、調整、連絡、会議、繰り返し業務など、多くの仕事があります。それらを否定するのではなく、まず「誰に、何を届けたいのか」「本当に大切なことは何か」を問い直す。ToToNoE+は、もっと頑張る前に、一度整えることから始めます。</p>
-    </div>
-  </section>
-
-  <section class="section concept-story" id="concept">
-    <div class="container concept-wide">
-      <div class="split-copy">
-        <p class="eyebrow">WHAT IS TOTONOE+</p>
-        <h2 class="section-title">本当に大切なことへ戻るために、<br><span class="accent">整える</span>。</h2>
-      </div>
-      <figure class="split-visual feature-figure">
-        <img src="assets/totonoe-concept-map.jpg" alt="ToToNoE+の整える概念図" width="1672" height="941" loading="lazy" decoding="async">
-      </figure>
-    </div>
-  </section>
-
-  <section class="section field-section" id="field">
-    <div class="container">
-      <p class="eyebrow">OUR FIELD</p>
-      <h2 class="section-title">専門性を、<br><span class="accent">医療・介護の中だけに閉じない</span>。</h2>
-      <p class="section-lead">医療・介護で培った専門性を、働く人・企業・地域へ。そこで得た学びを、また専門領域へ。場所が変わっても、支えるのは同じ「人」です。</p>
-      <figure class="wide-figure">
-        <img src="assets/totonoe-ourai-map.jpg" alt="医療・介護、産業保健・企業、地域・社会の間で専門性を往来させる図" width="1672" height="941" loading="lazy" decoding="async">
-      </figure>
-      <div class="field-card-grid">
-        <article class="field-card">
-          <span>01</span>
-          <h3>医療・介護領域</h3>
-          <p>AI・DX・業務改善・教育・学びを通じて、現場が本質に向き合える時間を増やします。</p>
-        </article>
-        <article class="field-card">
-          <span>02</span>
-          <h3>産業保健・企業領域</h3>
-          <p>働く世代の健康と、よりよく働き続けられる環境づくりを支えます。</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section philosophy-section" id="philosophy">
-    <div class="container">
-      <p class="eyebrow">PHILOSOPHY</p>
-      <h2 class="section-title">理念</h2>
-      <p class="section-lead">ToToNoE+は、AIやDXを目的にせず、本質ではない仕事を減らし、専門職が大切にしたいことへ向き合える余白をつくるチームです。</p>
-
-      <div class="philosophy-core">
-        <article class="philosophy-card" tabindex="0">
-          <span class="principle-label">Mission</span>
-          <h3>本質ではない仕事を減らし、専門職が本来大切にしたいことに向き合える余白をつくる。</h3>
-          <p>AI・DXは、その余白を生み出すための手段。効率化だけをゴールにせず、患者・利用者への価値提供、臨床、研究、家族との時間、自分自身の回復へ戻していきます。</p>
-        </article>
-        <article class="philosophy-card" tabindex="0">
-          <span class="principle-label">Vision</span>
-          <h3>専門職が、専門性も人生も大切にしながら、自分らしく価値を発揮できる社会へ。</h3>
-          <p>専門職として成長することと、自分自身の人生を大切にすることを二者択一にしない。培ってきた専門性を、望む場所・働き方・生き方で活かせる状態を目指します。</p>
-        </article>
-        <article class="philosophy-card philosophy-card-dark" tabindex="0">
-          <span class="principle-label">Values</span>
-          <h3 class="shikko-title"><span>執行</span><small>SHIKKO</small></h3>
-          <p>考えるだけで終わらせず、価値が届くところまで執行するための6つの行動原則です。主体・本質・一歩・継続・還元・往来を、ToToNoE+の共通姿勢として大切にします。</p>
-        </article>
-      </div>
-
-      <figure class="wide-figure shikko-figure values-slide-popover">
-        <img src="assets/totonoe-shikko-values.jpg" alt="ToToNoE+の6つの行動原則 SHIKKO" width="1672" height="941" loading="lazy" decoding="async">
-      </figure>
-    </div>
-  </section>
-
-  <section class="section" id="products">
+  <section class="section home-service-priority" id="products">
     <div class="container">
       <p class="eyebrow">SERVICE</p>
-      <h2 class="section-title">ToToNoE+の実践を、<br><span class="accent">参加しやすい形</span>へ。</h2>
+      <h2 class="section-title">情報を、<br><span class="accent">現場で使える一歩</span>へ。</h2>
+      <p class="section-lead">週末の朝活、ウィークリー配信、法人向け支援まで。ToToNoE+のサービスは、知って終わらせず、実際の仕事や現場に使える形へ整えるための入口です。</p>
       <div class="totonoe-service-hub">
         <article class="totonoe-project-card service-hub-card">
-          <img src="assets/totonoe-service-overview.jpg" alt="ToToNoE+の整えるサービス全体像" width="1672" height="941" loading="lazy" decoding="async">
+          <img src="assets/totonoe-service-overview.jpg" alt="ToToNoE+のサービス全体像" width="1672" height="941" loading="lazy" decoding="async">
           <div>
             <span class="project-status">SERVICE</span>
-            <h3>整える入り口は、3つあります。</h3>
-            <p>週末のAI整え習慣、ToToNoE Weekly、法人向け支援。個人の学びから組織の実装まで、必要な深さに合わせて選べるサービスとして整理しています。</p>
-            <div class="service-mini-grid" aria-label="ToToNoE+のサービス一覧">
-              <span>週末のAI整え習慣</span>
-              <span>ToToNoE Weekly</span>
-              <span>法人向け支援</span>
-            </div>
-            <a href="service.html" class="btn btn-cta">サービスを見る</a>
+            <h3>必要な整え方を、サービスページで確認する。</h3>
+            <p>個人で学ぶ、毎週情報を受け取る、組織で業務改善に取り組む。目的に合わせたサービスの全体像を整理しています。</p>
+            <a href="service.html" class="btn btn-cta">サービスページへ</a>
           </div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section host message-hero" id="message">
-    <div class="container host-grid">
-      <div class="host-copy">
-        <p class="eyebrow">MESSAGE</p>
-        <h2 class="section-title">専門性を、もっと自由に活かすために。</h2>
-        <p>医療・介護の現場には、すでに多くの知識、経験、想いがあります。一方で、それが日々の忙しさや情報の多さの中に埋もれてしまうことも少なくありません。</p>
-        <p>ToToNoE+は、その価値を見つけ、言葉にし、実践へつなげるためのチームです。AIも、発信も、仕組み化も、すべては本質に向き合う余白をつくるために使います。</p>
-        <p class="host-sign">ToToNoE+ / Base Craftas</p>
       </div>
     </div>
   </section>
@@ -322,6 +265,6 @@
 </footer>
 
 <script src="common.js?v=20260815d"></script>
-<script src="home.js?v=20260831b"></script>
+<script src="home.js?v=20260904a"></script>
 </body>
 </html>

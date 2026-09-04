@@ -1,6 +1,6 @@
 /* =========================================================
    週末のAI整え習慣 — コンテンツページ
-   Podcast（stand.fm）／学習資料／アーカイブ動画を
+   Podcast（stand.fm）／学習資料／コラム／アーカイブ動画を
    1つのページにタブでまとめて表示します。
 
    ▼ Podcastを追加するとき
@@ -8,6 +8,9 @@
 
    ▼ 学習資料を追加するとき
    下の CONTENTS に1件追記するだけです（Googleドライブの共有リンクを貼る）。
+
+   ▼ コラムを追加するとき
+   columns/ に記事HTMLを作り、下の COLUMNS に1件追記します。
    ========================================================= */
 (function () {
   'use strict';
@@ -348,6 +351,133 @@
   var filterWrap = document.getElementById('contentFilter');
   var countEl = document.getElementById('contentCount');
   var currentTag = 'all';
+
+  /* =====================================================
+     コラム
+     ・columns/ に個別記事を置き、COLUMNS に1件追記します
+     ・image は未指定でもCSSの簡易サムネイルで表示されます
+     ===================================================== */
+  var COLUMNS = [
+    {
+      title: '道具を使う前に、仕事をほどく。',
+      desc: '新しい道具を取り入れる前に、本質ではない仕事を見つける視点を整理します。まず業務をほどくことで、本当に整えるべき場所が見えやすくなります。',
+      tags: ['AI活用', '業務整理'],
+      date: '2026-09-04',
+      url: 'columns/ai-yohaku.html',
+      thumb: 'WORK'
+    },
+    {
+      title: '週末の30分を、次の一歩に変える。',
+      desc: '情報を知るだけで終わらせず、整え、置き換え、試すところまで進めるための週末サイクルについてまとめます。',
+      tags: ['週末のAI整え習慣', '学び方'],
+      date: '2026-09-01',
+      url: 'columns/weekend-cycle.html',
+      thumb: '30min'
+    },
+    {
+      title: 'チームで整えると、学びは続きやすい。',
+      desc: '一人で追いかけるAI情報を、チームで見立て直す。専門職同士が学びを続けるための関係性を考えます。',
+      tags: ['チーム', '実践'],
+      date: '2026-08-29',
+      url: 'columns/team-learning.html',
+      thumb: 'TEAM'
+    }
+  ];
+
+  var COLUMN_ORDER_KEY = 'wa_column_order_v1';
+  var columnOrder = (function () {
+    try { return localStorage.getItem(COLUMN_ORDER_KEY) || 'newest'; } catch (e) { return 'newest'; }
+  })();
+  var columnGrid = document.getElementById('columnGrid');
+  var columnFilterWrap = document.getElementById('columnFilter');
+  var columnCountEl = document.getElementById('columnCount');
+  var currentColumnTag = 'all';
+
+  function collectColumnTags() {
+    var seen = {};
+    var list = [];
+    COLUMNS.forEach(function (c) {
+      (c.tags || []).forEach(function (t) {
+        if (!seen[t]) { seen[t] = true; list.push(t); }
+      });
+    });
+    return list;
+  }
+
+  function buildColumnFilter() {
+    if (!columnFilterWrap) return;
+    if (!COLUMNS.length) { columnFilterWrap.hidden = true; return; }
+    var tags = collectColumnTags();
+    if (!tags.length) { columnFilterWrap.hidden = true; return; }
+    columnFilterWrap.hidden = false;
+
+    var html = '<button type="button" class="filter-btn active" data-column-cat="all">すべて</button>';
+    tags.forEach(function (tag) {
+      html += '<button type="button" class="filter-btn" data-column-cat="' + esc(tag) + '">' + esc(tag) + '</button>';
+    });
+    columnFilterWrap.innerHTML = html;
+
+    columnFilterWrap.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
+      if (!btn) return;
+      currentColumnTag = btn.dataset.columnCat;
+      columnFilterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+      renderColumns();
+    });
+  }
+
+  function initColumnSort() {
+    var btns = document.querySelectorAll('[data-column-order]');
+    if (!btns.length) return;
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        columnOrder = b.dataset.columnOrder;
+        try { localStorage.setItem(COLUMN_ORDER_KEY, columnOrder); } catch (e) {}
+        renderColumns();
+      });
+    });
+  }
+
+  function renderColumns() {
+    if (!columnGrid) return;
+    document.querySelectorAll('[data-column-order]').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.columnOrder === columnOrder);
+    });
+
+    var list = COLUMNS.slice().sort(function (a, b) {
+      var diff = new Date(a.date) - new Date(b.date);
+      return columnOrder === 'oldest' ? diff : -diff;
+    });
+    if (currentColumnTag !== 'all') {
+      list = list.filter(function (c) { return (c.tags || []).indexOf(currentColumnTag) !== -1; });
+    }
+    if (columnCountEl) columnCountEl.textContent = '全' + list.length + '件';
+
+    columnGrid.innerHTML = '';
+    list.forEach(function (c, i) {
+      var tagChips = (c.tags || []).map(function (t) {
+        return '<span class="content-cat">' + esc(t) + '</span>';
+      }).join('');
+      var card = document.createElement('article');
+      card.className = 'content-card content-card-video column-card';
+      card.innerHTML =
+        '<a class="content-card-thumb column-thumb" href="' + esc(c.url) + '">' +
+          (c.image
+            ? '<img src="' + esc(c.image) + '" alt="' + esc(c.title) + '" loading="lazy" decoding="async">'
+            : '<span class="column-thumb-art column-thumb-art-0' + ((i % 3) + 1) + '"><span>' + esc(c.thumb || 'COLUMN') + '</span></span>') +
+        '</a>' +
+        '<div class="content-card-body">' +
+          '<div class="content-head">' + tagChips + '</div>' +
+          '<h3 class="content-title">' + esc(c.title) + '</h3>' +
+          '<p class="content-desc">' + esc(c.desc) + '</p>' +
+          '<p class="content-meta"><span>' + formatDate(c.date) + '</span></p>' +
+          '<a class="content-link" href="' + esc(c.url) + '">続きを読む</a>' +
+        '</div>';
+      columnGrid.appendChild(card);
+    });
+  }
 
   // 実際に CONTENTS で使われているタグだけを集めて、重複なく登場順に並べる
   function collectTags() {
@@ -805,6 +935,10 @@
   initLibrarySort();
   buildFilter();
   renderLibrary();
+
+  initColumnSort();
+  buildColumnFilter();
+  renderColumns();
 
   initArchiveRanges();
   setupArchiveSort();

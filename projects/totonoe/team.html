@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260831f">
+<link rel="stylesheet" href="styles.css?v=20260904b">
 </head>
 <body>
 
@@ -38,6 +38,7 @@
           <a href="contents.html#seminars">セミナー</a>
           <a href="contents.html#podcast">ポッドキャスト</a>
           <a href="contents.html#library">学習コンテンツ</a>
+          <a href="contents.html#columns">コラム</a>
           <a href="contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -60,27 +61,46 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section philosophy-section" id="philosophy">
     <div class="container">
-      <p class="eyebrow">WHAT WE DO</p>
-      <h2 class="section-title">専門職の知識と実践を、<br><span class="accent">必要な人へ届く形</span>に整える。</h2>
-      <div class="totonoe-principle-grid">
-        <article class="totonoe-principle">
-          <span class="principle-label">整理</span>
-          <h3>情報と課題を見える化する</h3>
-          <p>AIニュースや現場の困りごとを、専門職が判断しやすい単位へ整理します。</p>
-        </article>
-        <article class="totonoe-principle">
-          <span class="principle-label">実践</span>
-          <h3>小さく試して学ぶ</h3>
-          <p>完璧な知識を待つのではなく、実際に使い、振り返り、次の改善へつなげます。</p>
-        </article>
-        <article class="totonoe-principle">
-          <span class="principle-label">還元</span>
-          <h3>学びを共有する</h3>
-          <p>個人の学びで終わらせず、現場やチーム、次に学ぶ人へ還元します。</p>
-        </article>
+      <p class="eyebrow">PHILOSOPHY</p>
+      <h2 class="section-title">理念</h2>
+      <p class="section-lead">ToToNoE+は、AIやDXを目的にせず、本質ではない仕事を減らし、専門職が大切にしたいことへ向き合える余白をつくるチームです。</p>
+
+      <div class="philosophy-switcher" data-philosophy-switcher>
+        <div class="philosophy-tabs" role="tablist" aria-label="理念を選択">
+          <button class="philosophy-tab is-active" type="button" role="tab" aria-selected="true" data-philosophy-image="assets/philosophy/mission.jpg" data-philosophy-alt="ToToNoE+のミッション">
+            <span class="philosophy-tab-label">Mission</span>
+            <span class="philosophy-tab-copy">なぜ、ToToNoE+は存在するのか</span>
+          </button>
+          <button class="philosophy-tab" type="button" role="tab" aria-selected="false" data-philosophy-image="assets/philosophy/vision.jpg" data-philosophy-alt="ToToNoE+のビジョン">
+            <span class="philosophy-tab-label">Vision</span>
+            <span class="philosophy-tab-copy">どんな未来をつくるのか</span>
+          </button>
+          <button class="philosophy-tab" type="button" role="tab" aria-selected="false" data-philosophy-image="assets/philosophy/shikko.jpg" data-philosophy-alt="ToToNoE+の執行 SHIKKO">
+            <span class="philosophy-tab-label">Value</span>
+            <span class="philosophy-tab-copy">6つの行動原則 SHIKKO</span>
+          </button>
+        </div>
+        <figure class="philosophy-slide-frame" aria-live="polite">
+          <img data-philosophy-image-output src="assets/philosophy/mission.jpg" alt="ToToNoE+のミッション" width="1672" height="941" decoding="async">
+        </figure>
       </div>
+      <script>
+        (() => {
+          const root = document.querySelector('[data-philosophy-switcher]');
+          if (!root) return;
+          const image = root.querySelector('[data-philosophy-image-output]');
+          root.querySelectorAll('[data-philosophy-image]').forEach((button) => {
+            button.addEventListener('click', () => {
+              root.querySelectorAll('[data-philosophy-image]').forEach((item) => item.setAttribute('aria-selected', String(item === button)));
+              root.querySelectorAll('[data-philosophy-image]').forEach((item) => item.classList.toggle('is-active', item === button));
+              image.src = button.dataset.philosophyImage;
+              image.alt = button.dataset.philosophyAlt;
+            });
+          });
+        })();
+      </script>
     </div>
   </section>
 
@@ -92,98 +112,74 @@
 
       <div class="team-member-grid" aria-label="ToToNoE+ 運営メンバー一覧">
         <article class="team-member-card team-member-featured" tabindex="0">
-          <span class="member-initial">神</span>
+          <img class="member-avatar" src="assets/member-shindo-profile.jpg" alt="神藤俊希のプロフィール写真" width="1254" height="1254" loading="lazy" decoding="async">
           <h3>神藤 俊希</h3>
           <p class="member-role">代表</p>
           <p class="member-lead-ja">代表／事業・社会実装デザイン領域リード</p>
           <p class="member-lead-en">Representative / Business & Social Design Lead</p>
-          <div class="member-slide-preview">
-            <img src="assets/member-shindo-profile.jpg" alt="神藤俊希の代表プロフィール画像" width="1254" height="1254" loading="lazy" decoding="async">
-            <div>
-              <span>PROFILE</span>
-              <strong>代表プロフィール</strong>
-              <p>Base Craftas代表。事業設計、社会実装、医療・介護領域の学習企画を横断しながら、ToToNoE+全体の方向性を整えます。</p>
-            </div>
+          <div class="member-sns" aria-label="神藤俊希のSNS">
+            <a href="https://x.com/kanto_aipt_base" target="_blank" rel="noopener">X</a>
+            <a href="https://www.instagram.com/kanto_aipt_basecraftas/" target="_blank" rel="noopener">Instagram</a>
+            <span class="member-sns-pending">Facebook準備中</span>
+            <a href="https://note.com/kanto_okekawa89" target="_blank" rel="noopener">note</a>
+            <a href="https://stand.fm/channels/605bc3ca2b49b926c82491cc" target="_blank" rel="noopener">stand.fm</a>
+            <a href="https://open.spotify.com/show/3EFepIoDS1YHzamPxsMMua?si=01dd655cc74f4782" target="_blank" rel="noopener">Spotify</a>
           </div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">梶</span>
+          <span class="member-avatar member-avatar-placeholder">梶</span>
           <h3>梶原 祐輔</h3>
           <p class="member-role">AIガバナンス・リテラシー領域リード</p>
           <p class="member-lead-en">AI Governance & Literacy Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">海</span>
+          <span class="member-avatar member-avatar-placeholder">海</span>
           <h3>海藤 大将</h3>
           <p class="member-role">AI業務実装・教育・研修設計領域リード</p>
           <p class="member-lead-en">AI Operations & HR Design Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">中</span>
+          <span class="member-avatar member-avatar-placeholder">中</span>
           <h3>中川 理浩</h3>
           <p class="member-role">産業保健・体験設計領域リード</p>
           <p class="member-lead-en">Occupational Health & Experience Design Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">木</span>
+          <span class="member-avatar member-avatar-placeholder">木</span>
           <h3>木村 倖晴</h3>
           <p class="member-role">建設DX・データサイエンス領域リード</p>
           <p class="member-lead-en">Construction DX & Data Science Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">伊</span>
+          <span class="member-avatar member-avatar-placeholder">伊</span>
           <h3>伊東 雅也</h3>
           <p class="member-role">臨床実践・現場適合性領域リード</p>
           <p class="member-lead-en">Clinical Practice & Usability Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">綱</span>
+          <span class="member-avatar member-avatar-placeholder">綱</span>
           <h3>綱島 脩</h3>
           <p class="member-role">地域産業保健・啓発領域リード</p>
           <p class="member-lead-en">Regional Occupational Health & Work-Life Design Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">黒</span>
+          <span class="member-avatar member-avatar-placeholder">黒</span>
           <h3>黒石 涼太</h3>
           <p class="member-role">動作・パフォーマンス設計領域リード</p>
           <p class="member-lead-en">Movement & Performance Design Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">小</span>
+          <span class="member-avatar member-avatar-placeholder">小</span>
           <h3>小島 健</h3>
           <p class="member-role">ブランディング・マネジメント設計領域リード</p>
           <p class="member-lead-en">Branding & Management Design Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-initial">貝</span>
+          <span class="member-avatar member-avatar-placeholder">貝</span>
           <h3>貝ヶ石 祥吾</h3>
           <p class="member-role">脳卒中リハビリテーション・イノベーション領域リード</p>
           <p class="member-lead-en">Stroke Rehabilitation & Innovation Lead</p>
-          <div class="member-slide-preview placeholder"><span>PROFILE SLIDE</span><strong>準備中</strong><p>プロフィールスライドを後から差し替えられる枠です。</p></div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section host">
-    <div class="container host-grid">
-      <div class="host-visual">
-        <img src="assets/host-message.jpg" alt="ToToNoE+の運営イメージ" width="1672" height="941" loading="lazy" decoding="async">
-      </div>
-      <div class="host-copy">
-        <p class="eyebrow">PROFILE</p>
-        <h2 class="section-title">神藤 俊希</h2>
-        <p>Base Craftas代表。医療・介護領域を軸に、専門職の知識や経験が必要な人へ届くための土台づくりに取り組んでいます。</p>
-        <p>ToToNoE+では、AI情報の整理、学習企画、発信支援、業務改善の実践を通じて、専門職が本来大切にしたいことへ向き合える状態を目指します。</p>
-        <p class="host-sign">Base Craftas / ToToNoE+</p>
       </div>
     </div>
   </section>

@@ -13,15 +13,15 @@
   gtag('config', 'G-1SK6NEFC8V');
 </script>
 <title>コンテンツ｜ToToNoE+ 週末のAI整え習慣</title>
-<meta name="description" content="ToToNoE+ 週末のAI整え習慣のセミナー、Podcastバックナンバー、学習コンテンツ、アーカイブ動画をまとめた学習ライブラリ。">
+<meta name="description" content="ToToNoE+ 週末のAI整え習慣のセミナー、Podcastバックナンバー、学習コンテンツ、コラム、アーカイブ動画をまとめた学習ライブラリ。">
 <meta property="og:title" content="コンテンツ｜ToToNoE+ 週末のAI整え習慣">
-<meta property="og:description" content="セミナー、Podcast、学習コンテンツ、アーカイブ動画をまとめたコンテンツページ。あとから何度でも学び直せます。">
+<meta property="og:description" content="セミナー、Podcast、学習コンテンツ、コラム、アーカイブ動画をまとめたコンテンツページ。あとから何度でも学び直せます。">
 <meta property="og:image" content="https://basecraftas.com/projects/totonoe/assets/og-image.jpg">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260831d">
+<link rel="stylesheet" href="styles.css?v=20260904b">
 </head>
 <body>
 
@@ -63,6 +63,7 @@
           <a href="contents.html#seminars">セミナー</a>
           <a href="contents.html#podcast">ポッドキャスト</a>
           <a href="contents.html#library">学習コンテンツ</a>
+          <a href="contents.html#columns">コラム</a>
           <a href="contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -81,17 +82,18 @@
   <div class="container">
     <p class="eyebrow">CONTENTS</p>
     <h1 class="page-hero-title">聞いて終わりに、しない。<br><span class="accent">あとから学び直せる</span>ライブラリ。</h1>
-    <p class="page-hero-lead">セミナー、Podcastバックナンバー、朝活・セミナーで扱った学習コンテンツ、参加者向けアーカイブ動画を1つにまとめています。その場では消化しきれなかった内容も、自分のペースで聴き直し・読み返せます。</p>
+    <p class="page-hero-lead">セミナー、Podcastバックナンバー、朝活・セミナーで扱った学習コンテンツ、コラム、参加者向けアーカイブ動画を1つにまとめています。その場では消化しきれなかった内容も、自分のペースで聴き直し・読み返せます。</p>
   </div>
 </section>
 
-<!-- ===== タブ切替：セミナー / Podcast / 学習コンテンツ / アーカイブ動画 ===== -->
+<!-- ===== タブ切替：セミナー / Podcast / 学習コンテンツ / コラム / アーカイブ動画 ===== -->
 <section class="section content-tabs">
   <div class="container">
     <div class="tab-group" role="tablist" aria-label="コンテンツの種類">
       <button type="button" class="tab-btn active" id="tab-seminars" data-target="seminars" role="tab" aria-selected="true" aria-controls="seminars">セミナー</button>
       <button type="button" class="tab-btn" id="tab-podcast" data-target="podcast" role="tab" aria-selected="false" aria-controls="podcast">ポッドキャスト</button>
       <button type="button" class="tab-btn" id="tab-library" data-target="library" role="tab" aria-selected="false" aria-controls="library">学習コンテンツ</button>
+      <button type="button" class="tab-btn" id="tab-columns" data-target="columns" role="tab" aria-selected="false" aria-controls="columns">コラム</button>
       <button type="button" class="tab-btn tab-btn-locked" id="tab-archive" data-target="archive" role="tab" aria-selected="false" aria-controls="archive">アーカイブ動画</button>
     </div>
 
@@ -190,6 +192,28 @@
           <button type="button" class="btn btn-ghost" data-tab-switch="podcast">▶ Podcastを聴く</button>
         </div>
       </div>
+    </div>
+
+    <!-- ----- コラム パネル ----- -->
+    <div class="tab-panel" id="columns" role="tabpanel" aria-labelledby="tab-columns" hidden>
+      <div class="content-toolbar">
+        <div>
+          <p class="eyebrow">COLUMN</p>
+          <h2 class="section-title">最新のコラム<span class="content-count" id="columnCount"></span></h2>
+        </div>
+      </div>
+      <p class="section-lead">ToToNoE+の考え方、情報整理、専門職の働き方を短く読み直せる形で整理していきます。記事は新しい順に追加されます。</p>
+
+      <div class="pod-toolbar">
+        <span class="pod-toolbar-label">並び替え</span>
+        <div class="sort-group">
+          <button type="button" class="sort-btn" data-column-order="newest">新しい順（降順）</button>
+          <button type="button" class="sort-btn" data-column-order="oldest">古い順（昇順）</button>
+        </div>
+      </div>
+
+      <div class="content-filter" id="columnFilter" hidden></div>
+      <div class="content-grid column-grid" id="columnGrid"></div>
     </div>
 
     <!-- ----- アーカイブ動画 パネル（参加者向け） ----- -->
@@ -308,7 +332,7 @@
 <script src="common.js?v=20260815d"></script>
 <script src="tabs.js?v=20260815d"></script>
 <script src="seminars.js?v=20260830a"></script>
-<script src="contents.js?v=20260831a"></script>
+<script src="contents.js?v=20260904a"></script>
 <script src="bgm.js?v=20260815d"></script>
 </body>
 </html>
