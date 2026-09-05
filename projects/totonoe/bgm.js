@@ -19,6 +19,9 @@
 (function () {
   'use strict';
 
+  if (window.__TOTONOE_BGM_INIT) return;
+  window.__TOTONOE_BGM_INIT = true;
+
   var audio = document.getElementById('bgmAudio');
   var btn = document.getElementById('bgmToggle');
   if (!audio || !btn) return;

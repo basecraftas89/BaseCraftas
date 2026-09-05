@@ -18,6 +18,46 @@
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
+  function assetUrl(fileName) {
+    var script = document.currentScript || document.querySelector('script[src*="common.js"]');
+    try {
+      return new URL(fileName, script ? script.src : window.location.href).href;
+    } catch (e) {
+      return fileName;
+    }
+  }
+
+  function initBgmControls() {
+    if (!document.getElementById('bgmAudio')) {
+      var audio = document.createElement('audio');
+      audio.id = 'bgmAudio';
+      audio.src = assetUrl('assets/bgm-shumatsu.mp3');
+      audio.loop = true;
+      audio.preload = 'none';
+      document.body.appendChild(audio);
+    }
+
+    if (!document.getElementById('bgmToggle')) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'bgm-toggle';
+      btn.id = 'bgmToggle';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.setAttribute('aria-label', 'テーマ曲を再生する');
+      btn.innerHTML =
+        '<span class="bgm-icon" aria-hidden="true">♪</span>' +
+        '<span class="bgm-label">曲を再生</span>';
+      document.body.appendChild(btn);
+    }
+
+    if (!window.__TOTONOE_BGM_SCRIPT_LOADING && !document.querySelector('script[src*="bgm.js"]')) {
+      window.__TOTONOE_BGM_SCRIPT_LOADING = true;
+      var script = document.createElement('script');
+      script.src = assetUrl('bgm.js?v=20260905a');
+      document.body.appendChild(script);
+    }
+  }
+
   /* =====================================================
      1. ヘッダー：スクロール影 ＋ モバイルナビ
      ===================================================== */
@@ -275,6 +315,7 @@
      ===================================================== */
   function boot() {
     initHeader();
+    initBgmControls();
     initApplyLinks();
     initCountdown();
     initStickyCta();

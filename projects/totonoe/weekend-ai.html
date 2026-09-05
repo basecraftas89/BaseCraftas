@@ -24,9 +24,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260904b">
+<link rel="stylesheet" href="styles.css?v=20260905g">
 </head>
-<body>
+<body class="weekend-ai-page">
 
 <!-- モバイル下部の固定CTA（860px以下で表示） -->
 <div class="sticky-cta" id="stickyCta">
@@ -57,8 +57,8 @@
         <a href="service.html" class="nav-main active">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
           <a href="weekend-ai.html">週末のAI整え習慣</a>
-          <a href="weekly.html">ウィークリー</a>
-          <a href="corporate.html">法人向け支援</a>
+          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
+          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
         </div>
       </div>
       <div class="nav-dropdown">
@@ -246,11 +246,12 @@
         <h3>Podcastや学習コンテンツを、好きなタイミングで。</h3>
         <strong>無料コンテンツを見る →</strong>
       </a>
-      <a href="weekly.html" class="learning-card">
+      <article class="learning-card is-coming-soon">
         <span>ToToNoE Weekly</span>
         <h3>AIの変化や過去の学びを、継続的に追いたい方へ。</h3>
-        <strong>ToToNoE Weeklyを見る →</strong>
-      </a>
+        <p class="service-coming-note">現在、公開準備中です。内容が整い次第、ページを公開します。</p>
+        <strong>サービス準備中</strong>
+      </article>
     </div>
   </div>
 </section>
@@ -301,8 +302,8 @@
 </footer>
 
 <script src="config.js?v=20260831b"></script>
-<script src="common.js?v=20260815d"></script>
+<script src="common.js?v=20260905a"></script>
 <script src="voices.js?v=20260831b"></script>
-<script src="bgm.js?v=20260815d"></script>
+<script src="bgm.js?v=20260905a"></script>
 </body>
 </html>

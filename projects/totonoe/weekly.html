@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="index,follow">
+<meta name="robots" content="noindex,nofollow">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1SK6NEFC8V"></script>
 <script>
@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260905c">
+<link rel="stylesheet" href="styles.css?v=20260905g">
 </head>
 <body>
 
@@ -38,8 +38,8 @@
         <a href="service.html" class="nav-main active">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
           <a href="weekend-ai.html">週末のAI整え習慣</a>
-          <a href="weekly.html">ウィークリー</a>
-          <a href="corporate.html">法人向け支援</a>
+          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
+          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
         </div>
       </div>
       <div class="nav-dropdown">
@@ -150,7 +150,7 @@
             </table>
           </div>
           <p class="service-price-note">現時点の料金案です。表示価格は税込です。契約人数の範囲内で、利用したいメンバーだけ登録できます。</p>
-          <a href="corporate.html#consultation" class="btn btn-cta">法人で導入する</a>
+          <span class="btn btn-cta btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
         </article>
       </div>
     </div>
@@ -176,7 +176,7 @@
       <div class="section-cta">
         <a href="#pricing" class="btn btn-cta btn-lg">個人で購読する</a>
         <a href="#team-plan" class="btn btn-ghost btn-ghost-light">法人で導入する</a>
-        <a href="corporate.html#consultation" class="btn btn-ghost btn-ghost-light">法人向け支援について相談する →</a>
+        <span class="btn btn-ghost btn-ghost-light btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
       </div>
     </div>
   </section>
@@ -206,6 +206,6 @@
   </div>
 </footer>
 
-<script src="common.js?v=20260831a"></script>
+<script src="common.js?v=20260905a"></script>
 </body>
 </html>

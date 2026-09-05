@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260904b">
+<link rel="stylesheet" href="styles.css?v=20260905g">
 </head>
 <body>
 
@@ -38,8 +38,8 @@
         <a href="service.html" class="nav-main active">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
           <a href="weekend-ai.html">週末のAI整え習慣</a>
-          <a href="weekly.html">ウィークリー</a>
-          <a href="corporate.html">法人向け支援</a>
+          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
+          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
         </div>
       </div>
       <div class="nav-dropdown">
@@ -95,22 +95,24 @@
           <p class="service-meta">毎週土曜 朝6:00〜／30分</p>
           <a href="weekend-ai.html" class="btn btn-ghost">詳しく見る →</a>
         </article>
-        <article class="service-card">
+        <article class="service-card is-coming-soon">
           <img src="assets/totonoe-weekly-filter.jpg" alt="AI情報を整理して毎週届けるToToNoE Weeklyのイメージ" width="1254" height="1254" loading="lazy" decoding="async">
-          <span class="service-label">PERSONAL / TEAM</span>
+          <span class="service-label">COMING SOON</span>
           <h3>ToToNoE Weekly</h3>
           <strong>情報を整える。</strong>
           <p>毎日AIニュースを追わなくても、知っておきたい変化を毎週整理して受け取れる有料AI情報サービスです。</p>
           <p class="service-meta">医療・介護、産業保健など実務につながる視点で配信</p>
-          <a href="weekly.html" class="btn btn-ghost">ToToNoE Weeklyを見る →</a>
+          <p class="service-coming-note">現在、公開準備中です。内容が整い次第、ページを公開します。</p>
+          <span class="btn btn-ghost btn-disabled" aria-disabled="true">サービス準備中</span>
         </article>
-        <article class="service-card">
+        <article class="service-card is-coming-soon">
           <img src="assets/totonoe-service-corporate.jpg" alt="チームで業務改善を進める法人向け支援のイメージ" width="1254" height="1254" loading="lazy" decoding="async">
-          <span class="service-label">ORGANIZATION</span>
+          <span class="service-label">COMING SOON</span>
           <h3>法人向け支援</h3>
           <strong>仕事を整える。</strong>
           <p>AIを入れることからではなく、現場の課題を知ることから始めます。業務診断、研修、業務改善・実装、継続伴走を通じて、専門職が本質に向き合える状態をつくります。</p>
-          <a href="corporate.html" class="btn btn-ghost">法人向け支援を見る →</a>
+          <p class="service-coming-note">現在、公開準備中です。内容が整い次第、ページを公開します。</p>
+          <span class="btn btn-ghost btn-disabled" aria-disabled="true">サービス準備中</span>
         </article>
       </div>
     </div>
@@ -149,7 +151,7 @@
           <span>今週何を試すか</span>
         </div>
         <p class="service-price-note">個人プラン 月980円（税込） ／ 法人プラン 人数規模に応じて</p>
-        <a href="weekly.html" class="btn btn-cta">ToToNoE Weeklyについて詳しく見る →</a>
+        <span class="btn btn-cta btn-disabled" aria-disabled="true">ToToNoE Weeklyは準備中</span>
       </div>
     </div>
   </section>
@@ -161,7 +163,7 @@
         <h2 class="section-title">AIを入れる前に、<br><span class="accent">本当に解決したいこと</span>から考える。</h2>
         <p>ToToNoE+では、技術から始めません。現場 → 課題 → 必要な技術の順番で考えます。</p>
         <p>現場にある本質ではない仕事を見つけ、小さく改善し、効果を確認しながら、自分たちで整えられる状態まで支援します。</p>
-        <a href="corporate.html" class="btn btn-cta">法人向け支援の詳細を見る →</a>
+        <span class="btn btn-cta btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
       </div>
       <figure class="split-visual">
         <img src="assets/totonoe-service-corporate.jpg" alt="チームで業務改善を進める法人向け支援のイメージ" width="1254" height="1254" loading="lazy" decoding="async">
@@ -180,28 +182,6 @@
     </div>
   </section>
 
-  <section class="section final-cta service-final">
-    <div class="container">
-      <h2 class="final-title">あなたに合った「整える」から。</h2>
-      <div class="final-card-grid">
-        <a href="weekend-ai.html" class="final-card">
-          <span>無料で始める</span>
-          <strong>週末のAI整え習慣</strong>
-          <em>参加方法を見る →</em>
-        </a>
-        <a href="weekly.html" class="final-card">
-          <span>継続的に情報を受け取る</span>
-          <strong>ToToNoE Weekly</strong>
-          <em>詳しく見る →</em>
-        </a>
-        <a href="corporate.html" class="final-card">
-          <span>組織の仕事を整える</span>
-          <strong>法人向け支援</strong>
-          <em>相談先を選ぶ →</em>
-        </a>
-      </div>
-    </div>
-  </section>
 </main>
 
 <footer class="site-footer">
@@ -228,6 +208,6 @@
   </div>
 </footer>
 
-<script src="common.js?v=20260831a"></script>
+<script src="common.js?v=20260905a"></script>
 </body>
 </html>
