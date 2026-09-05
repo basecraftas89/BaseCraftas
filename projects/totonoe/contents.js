@@ -44,6 +44,7 @@
     { url: 'https://stand.fm/episodes/6a7f9d48836d14834bf080f7', no: 12, theme: 'スプレッドシートAI化からGrok自己分析まで', date: '8/15' },
     { url: 'https://stand.fm/episodes/6a88cf4935c40266c30d32ff', no: 13, theme: 'Geminiの画像、実は「あのマーク」消せます！秘密の設定大公開', date: '8/22' },
     { url: 'https://stand.fm/episodes/6a921025ce0a6c53375389d8', no: 14, theme: 'Claude公式講座が日本語対応！1日10分で学べる最新AI活用術', date: '8/29' },
+    { url: 'https://stand.fm/episodes/6a9b459df67f3111cf58409f', no: 15, theme: 'ChatGPT Workを活かすフォルダリング術！', date: '9/5' },
   ];
   // 既定の表示順： 'newest'（新しい回が上＝降順）/ 'oldest'（第1回が上＝昇順）
   var POD_ORDER = 'newest';
@@ -576,6 +577,8 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
+    { no: 15, date: '2026-09-05', driveId: '1Nes5adTlWH5A4EhdJ4Lb2BWRuVg-mj0C',
+      title: 'ChatGPT Workを活かすフォルダリング術！' },
     { no: 14, date: '2026-08-29', driveId: '1q895zrVq9EQ3qMaw8lBC6AVPOI2pWOiS',
       title: 'Claude公式講座が日本語対応！1日10分で学べる最新AI活用術' },
     { no: 13, date: '2026-08-22', driveId: '15iO7CRoYYqjM5LO76mhbjhOLH_9ieupD',

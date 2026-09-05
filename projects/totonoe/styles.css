@@ -1185,6 +1185,36 @@ body.sem-lock{overflow:hidden}
   box-shadow:none;border-radius:12px;
 }
 .weekly-lp .faq-item{border-radius:10px}
+.weekly-simple .weekly-lp-intro{padding:82px 0 72px}
+.weekly-simple .weekly-lp-message{
+  box-shadow:none;background:#fff;
+}
+.weekly-summary-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;
+}
+.weekly-summary-grid article{
+  padding:22px 18px;border:1px solid var(--line);border-radius:12px;background:#fff;
+}
+.weekly-summary-grid article span{
+  display:inline-grid;place-items:center;width:38px;height:38px;border-radius:999px;
+  background:var(--deep-grad);color:#fff;font:900 .84rem/1 var(--font-en);margin-bottom:14px;
+}
+.weekly-summary-grid h3{
+  font-size:1.18rem;color:var(--ink);line-height:1.5;margin-bottom:8px;
+}
+.weekly-summary-grid p{
+  font-size:.88rem;line-height:1.8;color:var(--ink-soft);margin:0;
+}
+.weekly-lp-slide{
+  background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.weekly-benefit-slide{
+  margin:30px auto 0;padding:12px;border:1px solid rgba(61,107,94,.16);
+  border-radius:18px;background:#fff;box-shadow:var(--shadow-sm);
+}
+.weekly-benefit-slide img{
+  display:block;width:100%;height:auto;border-radius:10px;background:#fff;
+}
 
 /* ===== Corporate support page ===== */
 .corporate-hero{
@@ -1550,6 +1580,7 @@ body.cv-lock{overflow:hidden}
   .corporate-hero::before{background-position:58% center;background-size:cover}
   .weekly-point-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .weekly-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weekly-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .weekly-plan-grid,.usage-scene-grid{grid-template-columns:1fr}
   .pricing-grid{grid-template-columns:1fr}
   .field-card-grid{grid-template-columns:1fr}
@@ -1562,7 +1593,7 @@ body.cv-lock{overflow:hidden}
   .join-steps-4{grid-template-columns:repeat(2,1fr)}
   .section-head-split{grid-template-columns:1fr;gap:10px}
   .program-module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  
+
   .timeline{grid-template-columns:repeat(4,1fr)}
 }
 @media (max-width:860px){
@@ -1622,9 +1653,13 @@ body.cv-lock{overflow:hidden}
   .latest-visual-group{padding:14px}
   .support-menu-grid,.weekly-point-grid,.compare-grid,.weekly-flow-grid{grid-template-columns:1fr}
   .weekly-feature-grid,.weekly-plan-grid,.usage-scene-grid{grid-template-columns:1fr}
+  .weekly-summary-grid{grid-template-columns:1fr}
   .weekly-lp .section{padding-top:64px;padding-bottom:64px}
   .weekly-lp-intro{padding:68px 0}
   .weekly-lp-message{padding:24px 22px}
+  .weekly-summary-grid{padding:20px}
+  .weekly-benefit-slide{padding:6px;border-radius:12px}
+  .weekly-benefit-slide img{border-radius:8px}
   .weekly-sample-body{padding:24px 20px}
   .weekly-sample-body li{grid-template-columns:1fr;gap:4px}
   .corporate-problem-grid,.domain-cta-grid,.consultation-choice,.program-track-grid{grid-template-columns:1fr}
@@ -1661,7 +1696,7 @@ body.cv-lock{overflow:hidden}
   .footer-grid{flex-direction:column}
   .btn{width:100%}
   .hero-actions .btn,.section-cta .btn{width:100%}
-  
+
   .pod-actions{margin-left:0;width:100%}
 }
 @media (max-width:420px){
