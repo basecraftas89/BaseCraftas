@@ -5,9 +5,15 @@ workers_dev = true
 
 [vars]
 ALLOW_DEV_AUTH = "false"
+GITHUB_REPOSITORY = "basecraftas89/BaseCraftas"
+GITHUB_BRANCH = "main"
 
 [[routes]]
 pattern = "basecraftas.com/api/column-studio/*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/column-media/*"
 zone_name = "basecraftas.com"
 
 [[d1_databases]]

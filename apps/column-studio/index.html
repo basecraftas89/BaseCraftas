@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Column Studio — Base Craftas</title>
-  <meta name="description" content="Base Craftasのコラムを感覚的に編集・管理するダッシュボード">
+  <title>Column Studio — ToToNoE+</title>
+  <meta name="description" content="ToToNoE+のコラムを感覚的に編集・管理するダッシュボード">
   <link rel="icon" href="../../images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <img src="../../images/logo-header.png" alt="Base Craftas">
+        <img src="../../projects/totonoe/assets/totonoe-logo.png" alt="ToToNoE+">
         <span>Column Studio</span>
       </div>
       <button class="new-post-button" type="button" data-action="new-post">
@@ -42,7 +42,7 @@
       </nav>
       <div class="sidebar-foot">
         <div class="workspace-mark">BC</div>
-        <div><strong>Base Craftas</strong><span>管理ワークスペース</span></div>
+        <div><strong>ToToNoE+</strong><span>管理ワークスペース</span></div>
       </div>
     </aside>
 
@@ -73,7 +73,7 @@
             <div>
               <p class="eyebrow">COLUMN STUDIO</p>
               <h1>言葉を、届くかたちに。</h1>
-              <p>文章を書いて、整えて、そのままサイトへ。むずかしい操作なしでコラムを育てられます。</p>
+              <p>文章を書いて、整えて、そのままToToNoE+へ。むずかしい操作なしでコラムを育てられます。</p>
             </div>
             <button class="primary-button" type="button" data-action="new-post">＋ コラムを書く</button>
           </div>
@@ -169,8 +169,9 @@
             <aside class="editor-settings">
               <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
               <div class="setting-content active" id="setting-post">
-                <label>公開先<select id="postDestination"><option>Base Craftas コラム</option><option>ToToNoE+ コラム</option></select></label>
+                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ コラム</option></select></label>
                 <label>カテゴリー<select id="postCategory"><option>ブランド</option><option>AI・業務改善</option><option>採用</option><option>健康資本</option><option>お知らせ</option></select></label>
+                <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
                 <label>タグ<input id="postTags" type="text" placeholder="AI, 組織づくり"></label>
                 <label>URL<input id="postSlug" type="text" placeholder="article-url"></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
@@ -199,7 +200,7 @@
         <div class="page-wrap narrow-wrap">
           <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コラムの公開先とURLのルールを設定します。</p></div></div>
           <section class="panel settings-panel">
-            <h2>公開サイト</h2><label>サイト名<input value="Base Craftas"></label><label>コラムのURL<input value="https://basecraftas.com/columns/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
+            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コラムのURL<input value="https://basecraftas.com/projects/totonoe/columns/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
           </section>
         </div>
       </section>
@@ -208,7 +209,7 @@
 
   <dialog class="preview-dialog" id="previewDialog">
     <div class="preview-bar"><div><span></span><b>記事プレビュー</b><small>公開前の見え方</small></div><button type="button" data-action="close-preview">×</button></div>
-    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Base Craftas 編集部　／　<span id="previewDate"></span></div><div class="preview-body" id="previewBody"></div></article>
+    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　<span id="previewDate"></span></div><div class="preview-body" id="previewBody"></div></article>
   </dialog>
 
   <dialog class="invite-dialog" id="inviteDialog">
