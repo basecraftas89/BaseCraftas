@@ -1,0 +1,20 @@
+name = "column-studio-api"
+main = "src/worker.js"
+compatibility_date = "2026-09-06"
+workers_dev = true
+
+[vars]
+ALLOW_DEV_AUTH = "false"
+
+[[routes]]
+pattern = "basecraftas.com/api/column-studio/*"
+zone_name = "basecraftas.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "column-studio-db"
+database_id = "67c5a478-7a5d-48af-9e81-c34da1362263"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "column-studio-media"
