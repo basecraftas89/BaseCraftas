@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コラム｜Base Craftas</title>
+<meta name="description" content="Base Craftasのコラム一覧です。">
+<link rel="icon" href="../images/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.columns-hero{padding:9rem 5rem 4rem;background:var(--cream);border-bottom:1px solid var(--border)}
+.columns-wrap{width:min(100% - 40px,1080px);margin:0 auto}
+.columns-hero .eyebrow{font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:.22em;color:var(--sage);font-weight:700}
+.columns-hero h1{margin-top:.8rem;font-size:clamp(2.2rem,4vw,3.5rem)}
+.columns-hero p{margin-top:1rem;max-width:680px;color:var(--text-sub)}
+.columns-list{padding:4rem 0 5rem}
+.columns-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.3rem}
+.column-card{display:flex;flex-direction:column;min-height:260px;padding:1.5rem;border:1px solid var(--border-sage);border-radius:14px;background:#fff;box-shadow:var(--shadow-card);transition:transform var(--motion-quick),box-shadow var(--motion-quick)}
+.column-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+.column-card img{width:100%;aspect-ratio:1.91/1;object-fit:cover;border-radius:10px;margin-bottom:1.1rem;background:var(--mist)}
+.column-card time{font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:.12em;color:var(--sage);font-weight:700}
+.column-card h2{margin-top:.55rem;font-size:1.12rem;line-height:1.55}
+.column-card p{margin-top:.6rem;color:var(--text-sub);font-size:.88rem;line-height:1.8}
+.column-card .tags{margin-top:auto;padding-top:1.2rem;display:flex;flex-wrap:wrap;gap:.45rem}
+.column-card .tags span{padding:.28rem .55rem;border-radius:999px;background:var(--mist);color:var(--sage);font-size:.72rem}
+.empty-columns{padding:2rem;border:1px solid var(--border-sage);border-radius:14px;background:#fff;color:var(--text-sub)}
+@media(max-width:900px){.columns-grid{grid-template-columns:1fr 1fr}.columns-hero{padding:7rem 2rem 3rem}}
+@media(max-width:640px){.columns-grid{grid-template-columns:1fr}.columns-wrap{width:min(100% - 32px,1080px)}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a href="../index.html" class="nav-logo"><img src="../images/logo-header.png" alt="Base Craftas" class="nav-logo-img"></a>
+  <nav class="nav-links" aria-label="メインナビゲーション"><li><a href="../index.html">Home</a></li><li><a href="../services/">Services</a></li><li><a href="../about.html">About</a></li><li><a href="../contact.html">Contact</a></li></nav>
+</header>
+<main>
+  <section class="columns-hero">
+    <div class="columns-wrap">
+      <p class="eyebrow">COLUMN</p>
+      <h1>コラム</h1>
+      <p>Base Craftasの考え方、AI活用、組織づくり、採用広報に関する記事をまとめています。</p>
+    </div>
+  </section>
+  <section class="columns-list">
+    <div class="columns-wrap">
+      <div class="columns-grid" id="columnsGrid"></div>
+    </div>
+  </section>
+</main>
+<script>
+(function(){
+  var grid=document.getElementById('columnsGrid');
+  function esc(v){var d=document.createElement('div');d.textContent=v||'';return d.innerHTML;}
+  fetch('../data/columns/index.json',{cache:'no-store'}).then(function(res){return res.json();}).then(function(data){
+    var articles=(data.articles||[]).filter(function(article){return article.status==='published';});
+    if(!articles.length){grid.innerHTML='<div class="empty-columns">公開中のコラムはまだありません。</div>';return;}
+    grid.innerHTML=articles.map(function(article){
+      var tags=(article.tags||[]).slice(0,3).map(function(tag){return '<span>'+esc(tag)+'</span>';}).join('');
+      return '<a class="column-card" href="'+esc(article.url)+'">'+
+        (article.hero_url?'<img src="'+esc(article.hero_url)+'" alt="">':'')+
+        '<time>'+esc(article.published_at||article.updated_at||'')+'</time>'+
+        '<h2>'+esc(article.title)+'</h2>'+
+        '<p>'+esc(article.excerpt)+'</p>'+
+        '<div class="tags">'+tags+'</div>'+
+      '</a>';
+    }).join('');
+  }).catch(function(){grid.innerHTML='<div class="empty-columns">コラム一覧を読み込めませんでした。</div>';});
+})();
+</script>
+</body>
+</html>
