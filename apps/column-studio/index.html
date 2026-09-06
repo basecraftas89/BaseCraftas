@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Column Studio — Base Craftas</title>
+  <meta name="description" content="Base Craftasのコラムを感覚的に編集・管理するダッシュボード">
+  <link rel="icon" href="../../images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="../../images/logo-header.png" alt="Base Craftas">
+        <span>Column Studio</span>
+      </div>
+      <button class="new-post-button" type="button" data-action="new-post">
+        <span aria-hidden="true">＋</span> 新しいコラム
+      </button>
+      <nav class="side-nav" aria-label="管理メニュー">
+        <button class="nav-item active" type="button" data-view="dashboard">
+          <span class="nav-icon" aria-hidden="true">⌂</span><span>ホーム</span>
+        </button>
+        <button class="nav-item" type="button" data-view="posts">
+          <span class="nav-icon" aria-hidden="true">▤</span><span>コラム</span><span class="nav-count" id="postNavCount">3</span>
+        </button>
+        <button class="nav-item" type="button" data-view="editor">
+          <span class="nav-icon" aria-hidden="true">✎</span><span>新規作成</span>
+        </button>
+        <div class="nav-label">管理</div>
+        <button class="nav-item admin-only" type="button" data-view="members">
+          <span class="nav-icon" aria-hidden="true">♙</span><span>メンバー・権限</span>
+        </button>
+        <button class="nav-item admin-only" type="button" data-view="settings">
+          <span class="nav-icon" aria-hidden="true">⚙</span><span>公開設定</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="workspace-mark">BC</div>
+        <div><strong>Base Craftas</strong><span>管理ワークスペース</span></div>
+      </div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" type="button" aria-label="メニューを開く">☰</button>
+        <div class="breadcrumb" id="breadcrumb"><span>Column Studio</span><b>/</b> ホーム</div>
+        <div class="top-actions">
+          <span class="save-state"><i></i><span id="saveState">すべて保存済み</span></span>
+          <button class="site-link" type="button" data-action="open-site">サイトを見る ↗</button>
+          <button class="account-button" id="accountButton" type="button" aria-haspopup="true" aria-expanded="false">
+            <span class="account-avatar">KS</span>
+            <span class="account-copy"><strong>管理者</strong><small id="currentRoleLabel">Administrator</small></span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="account-menu" id="accountMenu">
+            <p>権限表示を確認</p>
+            <button type="button" data-role-preview="admin">管理者として表示</button>
+            <button type="button" data-role-preview="editor">編集者として表示</button>
+            <button type="button" data-role-preview="viewer">閲覧者として表示</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-dashboard" data-title="ホーム">
+        <div class="page-wrap dashboard-wrap">
+          <div class="welcome-row">
+            <div>
+              <p class="eyebrow">COLUMN STUDIO</p>
+              <h1>言葉を、届くかたちに。</h1>
+              <p>文章を書いて、整えて、そのままサイトへ。むずかしい操作なしでコラムを育てられます。</p>
+            </div>
+            <button class="primary-button" type="button" data-action="new-post">＋ コラムを書く</button>
+          </div>
+          <div class="status-grid">
+            <article class="status-card"><span>公開中</span><strong id="publishedCount">1</strong><small>本の記事</small><i class="status-accent green"></i></article>
+            <article class="status-card"><span>下書き</span><strong id="draftCount">2</strong><small>本の記事</small><i class="status-accent terra"></i></article>
+            <article class="status-card"><span>今月の更新</span><strong id="monthCount">3</strong><small>本</small><i class="status-accent blue"></i></article>
+            <article class="status-card"><span>チーム</span><strong id="memberCount">3</strong><small>人</small><i class="status-accent gold"></i></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel recent-panel">
+              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコラム</h2></div><button type="button" class="text-button" data-view="posts">すべて見る →</button></div>
+              <div id="recentPosts" class="recent-list"></div>
+            </section>
+            <aside class="dashboard-aside">
+              <section class="panel quick-panel">
+                <p class="eyebrow">QUICK START</p><h2>何から始めますか？</h2>
+                <button type="button" data-action="new-post"><span>✎</span><div><strong>まっさらな記事を書く</strong><small>自由に文章を組み立てる</small></div><b>›</b></button>
+                <button type="button" data-action="new-template"><span>▦</span><div><strong>型から書き始める</strong><small>導入・本題・まとめを自動準備</small></div><b>›</b></button>
+              </section>
+              <section class="tip-card"><span>編集のヒント</span><p>文章を選択して、ツールバーの「マーカー」や「太字」を押すだけで装飾できます。</p></section>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-posts" data-title="コラム">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">COLUMNS</p><h1>コラム</h1><p>公開中の記事と下書きをまとめて管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコラム</button></div>
+          <div class="list-toolbar">
+            <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
+            <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button></div>
+          </div>
+          <div class="panel table-panel"><div class="post-table-head"><span>タイトル</span><span>カテゴリー</span><span>ステータス</span><span>更新日</span><span></span></div><div id="postTable"></div></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-editor" data-title="コラムを編集">
+        <div class="editor-shell">
+          <div class="editor-topline">
+            <button class="back-button" type="button" data-view="posts">← 一覧へ</button>
+            <div class="editor-actions">
+              <button class="secondary-button" type="button" data-action="preview">プレビュー</button>
+              <button class="secondary-button" type="button" data-action="save-draft">下書き保存</button>
+              <button class="primary-button" type="button" data-action="publish">公開する</button>
+            </div>
+          </div>
+          <div class="editor-layout">
+            <article class="editor-paper">
+              <input class="title-input" id="postTitle" type="text" placeholder="記事のタイトルを入力">
+              <input class="lead-input" id="postExcerpt" type="text" placeholder="この記事をひとことで紹介すると…">
+              <div class="format-toolbar" id="formatToolbar" role="toolbar" aria-label="文章の装飾">
+                <select id="blockFormat" aria-label="文字スタイル"><option value="p">本文</option><option value="h2">見出し2</option><option value="h3">見出し3</option></select>
+                <span class="tool-divider"></span>
+                <button type="button" data-command="bold" aria-label="太字"><b>B</b></button>
+                <button type="button" data-command="underline" aria-label="下線"><u>U</u></button>
+                <button type="button" data-command="marker" class="marker-button" aria-label="マーカー">M</button>
+                <span class="tool-divider"></span>
+                <button type="button" data-command="insertUnorderedList" aria-label="箇条書き">☷</button>
+                <button type="button" data-command="insertOrderedList" aria-label="番号付きリスト">☰</button>
+                <button type="button" data-command="blockquote" aria-label="引用">“</button>
+                <button type="button" data-command="link" aria-label="リンク">⌁</button>
+                <span class="tool-divider"></span>
+                <button type="button" class="bubble-tool" data-action="bubble-picker"><span>◉</span> 吹き出し</button>
+              </div>
+              <div class="bubble-picker" id="bubblePicker">
+                <div class="bubble-picker-head"><div><strong>キャラクターと表情を選ぶ</strong><small>選ぶと吹き出しが入ります</small></div><button type="button" data-action="close-bubble">×</button></div>
+                <div class="character-group"><p>ミオン</p><div class="reaction-grid">
+                  <button type="button" data-character="mion-standard"><img src="assets/characters/mion-standard.png" alt="ミオン 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="mion-question"><img src="assets/characters/mion-question.png" alt="ミオン 質問"><span>質問</span></button>
+                  <button type="button" data-character="mion-thinking"><img src="assets/characters/mion-thinking.png" alt="ミオン 考える"><span>考える</span></button>
+                  <button type="button" data-character="mion-insight"><img src="assets/characters/mion-insight.png" alt="ミオン 気づき"><span>気づき</span></button>
+                  <button type="button" data-character="mion-cautious"><img src="assets/characters/mion-cautious.png" alt="ミオン 慎重"><span>慎重</span></button>
+                </div></div>
+                <div class="character-group"><p>ツグモ</p><div class="reaction-grid">
+                  <button type="button" data-character="tsugumo-standard"><img src="assets/characters/tsugumo-standard.png" alt="ツグモ 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="tsugumo-question"><img src="assets/characters/tsugumo-question.png" alt="ツグモ 疑問"><span>疑問</span></button>
+                  <button type="button" data-character="tsugumo-organization"><img src="assets/characters/tsugumo-organization.png" alt="ツグモ 組織視点"><span>組織視点</span></button>
+                  <button type="button" data-character="tsugumo-proposal"><img src="assets/characters/tsugumo-proposal.png" alt="ツグモ 提案"><span>提案</span></button>
+                  <button type="button" data-character="tsugumo-discovery"><img src="assets/characters/tsugumo-discovery.png" alt="ツグモ 発見"><span>発見</span></button>
+                </div></div>
+                <div class="character-group"><p>ハクト</p><div class="reaction-grid">
+                  <button type="button" data-character="hakuto-standard"><img src="assets/characters/hakuto-standard.png" alt="ハクト 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="hakuto-thinking"><img src="assets/characters/hakuto-thinking.png" alt="ハクト 本質を探る"><span>本質を探る</span></button>
+                  <button type="button" data-character="hakuto-question"><img src="assets/characters/hakuto-question.png" alt="ハクト 問いかけ"><span>問いかけ</span></button>
+                  <button type="button" data-character="hakuto-insight"><img src="assets/characters/hakuto-insight.png" alt="ハクト まとめる"><span>まとめる</span></button>
+                  <button type="button" data-character="hakuto-watch"><img src="assets/characters/hakuto-watch.png" alt="ハクト 見守る"><span>見守る</span></button>
+                </div></div>
+              </div>
+              <div class="article-editor" id="articleEditor" contenteditable="true" spellcheck="true" data-placeholder="ここから本文を書き始めます。Enterで段落を追加できます。"></div>
+              <div class="word-count"><span id="wordCount">0文字</span><span>最終保存 <time id="lastSaved">—</time></span></div>
+            </article>
+            <aside class="editor-settings">
+              <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
+              <div class="setting-content active" id="setting-post">
+                <label>公開先<select id="postDestination"><option>Base Craftas コラム</option><option>ToToNoE+ コラム</option></select></label>
+                <label>カテゴリー<select id="postCategory"><option>ブランド</option><option>AI・業務改善</option><option>採用</option><option>健康資本</option><option>お知らせ</option></select></label>
+                <label>タグ<input id="postTags" type="text" placeholder="AI, 組織づくり"></label>
+                <label>URL<input id="postSlug" type="text" placeholder="article-url"></label>
+                <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
+                <div class="setting-block"><span>アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small>推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
+              </div>
+              <div class="setting-content" id="setting-style">
+                <label>マーカー色<select id="markerColor"><option value="#fff0a8">やわらかい黄</option><option value="#dcefe8">セージ</option><option value="#f8ddd3">テラコッタ</option><option value="#dfe8f7">ブルー</option></select></label>
+                <label>本文の幅<select><option>標準（読みやすい）</option><option>広め</option><option>コンパクト</option></select></label>
+                <p class="setting-note">公開ページではホームページのフォントと余白に自動で揃います。</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-members" data-title="メンバー・権限">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを招待</button></div>
+          <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事・メンバー・公開設定をすべて管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成、編集、公開ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
+          <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
+          <p class="security-note">🔒 本番運用では、ログイン認証とデータベース側のアクセス制御を接続して権限を保護します。</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings" data-title="公開設定">
+        <div class="page-wrap narrow-wrap">
+          <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コラムの公開先とURLのルールを設定します。</p></div></div>
+          <section class="panel settings-panel">
+            <h2>公開サイト</h2><label>サイト名<input value="Base Craftas"></label><label>コラムのURL<input value="https://basecraftas.com/columns/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="preview-dialog" id="previewDialog">
+    <div class="preview-bar"><div><span></span><b>記事プレビュー</b><small>公開前の見え方</small></div><button type="button" data-action="close-preview">×</button></div>
+    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Base Craftas 編集部　／　<span id="previewDate"></span></div><div class="preview-body" id="previewBody"></div></article>
+  </dialog>
+
+  <dialog class="invite-dialog" id="inviteDialog">
+    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">INVITE MEMBER</p><h2>メンバーを招待</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>招待した人は、自分のアカウントでログインして許可された操作だけを行えます。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">招待を送る</button></div></form>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>

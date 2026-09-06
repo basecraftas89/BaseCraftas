@@ -21,9 +21,9 @@
 .val-letter { font-family:'Montserrat',sans-serif; font-size:1.6rem; font-weight:700; color:var(--terra); }
 .val-word { font-size:.7rem; letter-spacing:.04em; color:var(--sage); margin:.3rem 0 .2rem; }
 .val-ja { font-size:.78rem; color:var(--text-sub); }
-.about-definition { display:grid; grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr); gap:5rem; align-items:start; }
+.about-definition { max-width:860px; }
 .definition-lead { font-size:clamp(1.4rem,2.6vw,2.1rem); line-height:1.65; color:var(--green); font-weight:700; }
-.definition-copy { font-size:.95rem; line-height:2.15; color:var(--text-sub); }
+.definition-copy { margin-top:1.8rem; font-size:.95rem; line-height:2.15; color:var(--text-sub); }
 .approach-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; margin-top:3rem; }
 .approach-card { position:relative; display:flex; flex-direction:column; min-height:300px; padding:2rem; border:1px solid var(--border-sage); background:#fff; transition:transform .2s ease, box-shadow .2s ease; }
 .approach-card:hover { transform:translateY(-4px); box-shadow:0 16px 34px rgba(26,51,44,.1); }
@@ -31,32 +31,24 @@
 .approach-card h3 { color:var(--green); font-size:1.35rem; margin:.7rem 0 .9rem; }
 .approach-card p { color:var(--text-sub); font-size:.89rem; line-height:1.95; }
 .approach-service { margin-top:auto; padding-top:1.3rem; color:var(--sage); font-size:.82rem; font-family:'Montserrat',sans-serif; font-weight:700; }
-.social-issue { position:relative; isolation:isolate; background:var(--green) url('images/08_custom/about-social-foundation.jpg') center/cover no-repeat; padding:5rem; margin:0; }
-.social-issue::before { content:''; position:absolute; inset:0; z-index:-1; background:rgba(26,51,44,.88); }
+.social-issue { position:relative; isolation:isolate; background:var(--green); padding:5rem; margin:0; }
+.social-issue .sec-eyebrow { color:rgba(255,255,255,.68)!important; }
+.social-issue .sec-ttl { color:#fff!important; }
+.social-issue p { color:rgba(255,255,255,.78)!important; }
 .social-issue-inner { max-width:1120px; margin:0 auto; }
-.issue-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:3rem; }
-.issue-card { border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:2rem; }
-.issue-num { font-family:'Montserrat',sans-serif; font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:var(--terra); font-weight:600; margin-bottom:.6rem; }
-.issue-ttl { font-size:1rem; font-weight:700; color:#fff; margin-bottom:.6rem; }
-.issue-desc { font-size:.87rem; color:rgba(255,255,255,.55); line-height:1.95; }
-.our-style-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; margin-top:3rem; border:1px solid var(--border-sage); background:var(--border-sage); }
-.our-style-card { padding:2rem; background:#fff; }
-.our-style-card h3 { color:var(--green); font-size:1.05rem; margin-bottom:.7rem; }
-.our-style-card p { color:var(--text-sub); font-size:.88rem; line-height:1.95; }
+.style-copy { max-width:720px; color:var(--text-sub); font-size:.95rem; line-height:2.05; }
 .about-visual { width:min(100%,1180px); margin:3rem auto 0; overflow:hidden; border:1px solid var(--border-sage); background:#fff; box-shadow:0 12px 28px rgba(26,51,44,.07); }
 .about-visual img { display:block; width:100%; height:auto; }
 .about-visual--dark { border-color:rgba(255,255,255,.2); box-shadow:none; }
-.about-visual--cta { width:min(100%,1240px); margin:0 auto 3rem; }
+.about-visual--cta { width:min(100%,1240px); margin:3.5rem auto 3rem; }
 @media(max-width:1024px){
   .values-list { grid-template-columns:repeat(4,1fr); }
   .social-issue { padding:4rem 3rem; }
-  .issue-grid { grid-template-columns:1fr; }
-  .about-definition { grid-template-columns:1fr; gap:1.7rem; }
 }
 @media(max-width:768px){
   .values-list { grid-template-columns:repeat(2,1fr); }
   .social-issue { padding:4rem 1.8rem; }
-  .approach-grid,.our-style-grid { grid-template-columns:1fr; }
+  .approach-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -114,8 +106,8 @@
 <section class="sec">
   <div class="sec-inner">
     <div class="about-definition reveal">
-      <div><span class="sec-eyebrow">Definition</span><span class="sage-rule"></span><h2 class="sec-ttl">Base Craftasとは</h2><p class="definition-lead">人と組織が、本来の価値を発揮し続けるための土台を整える事業体です。</p></div>
-      <div class="definition-copy"><p>専門職が積み重ねてきた知識や経験。経営者が事業を通じて実現したい想い。組織の中に蓄積された技術やノウハウ。地域で長く育まれてきた信頼や関係性。</p><p>価値があることと、その価値が必要な人へ届いていることは、同じではありません。言葉になっていない、伝える手段が整っていない、日々の業務に追われている、働く人の心身に余裕がない。こうした理由で、本来ある価値が十分に発揮されていないことがあります。</p><p>Base Craftasは、すでにある価値を整理し、言葉、発信、導線、仕組み、健康、教育、現場支援へ変換します。価値を外から付け加えるのではなく、その人や組織が持つものを、社会へ届き続ける形に整えます。</p></div>
+      <div><span class="sec-eyebrow">Definition</span><span class="sage-rule"></span><h2 class="sec-ttl">Base Craftasとは</h2><p class="definition-lead">技術やクラフトが、必要な人へきちんと届くための土台を整える事業体です。</p></div>
+      <div class="definition-copy"><p>専門職の知識、現場で磨かれた技術、事業に込めた想い。その価値が伝わり、続いていくためには、言葉・導線・仕組み・働く人の健康といった土台が必要です。</p><p>Base Craftasは、インナーブランディング、AI導入・業務改善、健康資本支援を通じて、人と組織が無理なく価値を届け続けられる状態を一緒に整えます。</p></div>
     </div>
     <figure class="about-visual reveal"><img src="images/08_custom/about-definition.jpg" alt="Base Craftasの基本定義。すでにある価値を見つけ、整え、必要な人へ届け続ける"></figure>
   </div>
@@ -126,7 +118,7 @@
   <div class="sec-inner">
     <div class="reveal"><span class="sec-eyebrow">Our Approach</span><span class="sage-rule"></span><h2 class="sec-ttl">私たちが整える3つの土台</h2><p class="sec-desc">採用ブランド、AI導入・業務改善、健康資本。3つの領域から、人と組織が本来の価値に集中しやすい状態を支えます。</p></div>
     <div class="approach-grid">
-      <a href="services/growth.html" class="approach-card reveal"><div class="approach-num">01 / CRAFT GROWTH</div><h3>選ばれる採用を目指す土台</h3><p>理念・文化・現場の専門性を整理し、院内スタッフが候補者へ自ら届けられる採用ブランドづくりを支援します。</p><div class="approach-service">採用ブランディング伴走を見る →</div></a>
+      <a href="services/growth.html" class="approach-card reveal"><div class="approach-num">01 / CRAFT GROWTH</div><h3>正しい医療・健康情報を届ける土台</h3><p>理念・文化・現場の専門性を整理し、施設や専門職が持つ価値を、必要な人へ誤解なく届く言葉と発信へ整えます。</p><div class="approach-service">採用ブランディング伴走を見る →</div></a>
       <a href="services/visit.html" class="approach-card reveal"><div class="approach-num">02 / CRAFT FLOW</div><h3>本質のための余白をつくる土台</h3><p>会議、文書、情報整理、教育、広報などの業務を整理し、AI活用・業務改善・内製化を通じて、人が本来向き合う仕事へ集中しやすい状態をつくります。</p><div class="approach-service">AI導入・業務改善を見る →</div></a>
       <a href="services/vital.html" class="approach-card reveal"><div class="approach-num">03 / CRAFT VITAL</div><h3>健康に働く土台</h3><p>身体、睡眠、疲労、ストレスなどの小さな不調に気づき、従業員が本来の力を発揮し続けられる職場を支えます。</p><div class="approach-service">健康資本支援を見る →</div></a>
     </div>
@@ -141,28 +133,6 @@
       <span class="sage-rule" style="background:rgba(214,106,69,.5)"></span>
       <h2 class="sec-ttl" style="color:#fff">私たちが向き合う課題</h2>
       <p style="font-size:.95rem;color:rgba(255,255,255,.7);line-height:2;max-width:650px">Base Craftasが向き合うのは、「価値がない」という問題ではありません。価値があるにもかかわらず、十分に発揮されていない状態です。</p>
-    </div>
-    <div class="issue-grid">
-      <div class="issue-card reveal">
-        <div class="issue-num">Value</div>
-        <div class="issue-ttl">専門性や想いが、伝わる形になっていない</div>
-        <div class="issue-desc">医療、健康、福祉、地域の事業には、積み重ねてきた専門性や信頼があります。その本質を保ったまま、必要な人へ伝わる言葉・発信・導線へ翻訳します。</div>
-      </div>
-      <div class="issue-card reveal">
-        <div class="issue-num">Focus</div>
-        <div class="issue-ttl">本来の仕事に使う時間が失われている</div>
-        <div class="issue-desc">転記、集計、二重入力、属人化、情報の分散。業務を見直すことは人を減らすことではなく、人にしかできない仕事へ時間と力を戻すことだと考えています。</div>
-      </div>
-      <div class="issue-card reveal">
-        <div class="issue-num">Health</div>
-        <div class="issue-ttl">働く人の不調が、個人の問題として扱われている</div>
-        <div class="issue-desc">腰痛、肩こり、睡眠不足、疲労、ストレス。小さな不調を本人だけの責任にせず、組織として健康な土台を支えられる環境を整えます。</div>
-      </div>
-      <div class="issue-card reveal">
-        <div class="issue-num">Learning</div>
-        <div class="issue-ttl">現場で人を育てる余白が不足している</div>
-        <div class="issue-desc">日々の業務に追われ、スタッフ教育や研修、新しい知識を取り入れる時間を確保できない現場へ、専門職による臨床・教育・業務改善の機会を届けます。</div>
-      </div>
     </div>
     <figure class="about-visual about-visual--dark reveal"><img src="images/08_custom/about-background-challenges.jpg" alt="Base Craftasが向き合う背景課題。価値が伝わらない、本業に集中できない、健康が見えない、人と現場を育てる余白がない"></figure>
   </div>
@@ -208,20 +178,13 @@
 <!-- ══ OUR STYLE ══ -->
 <section class="sec">
   <div class="sec-inner">
-    <div class="reveal"><span class="sec-eyebrow">Our Style</span><span class="sage-rule"></span><h2 class="sec-ttl">私たちが大切にする支援のあり方</h2></div>
-    <div class="our-style-grid">
-      <article class="our-style-card reveal"><h3>答えを押しつけない</h3><p>その人や組織が何を大切にしているのか、どのような価値を社会へ届けたいのか。対話を通じて、一緒に整理します。</p></article>
-      <article class="our-style-card reveal"><h3>手段から考えない</h3><p>SNS、AI、業務改善、健康経営、研修はすべて手段です。まず「何を実現したいのか」から考え、必要な方法を選びます。</p></article>
-      <article class="our-style-card reveal"><h3>現場で使える形まで整える</h3><p>構想や提案だけで終わらせず、資料、発信、導線、業務フロー、研修、教育、実践まで落とし込みます。</p></article>
-      <article class="our-style-card reveal"><h3>一過性で終わらせない</h3><p>Base Craftasがいなくても、人と組織が自ら考え、動き、育ち続けられるよう、仕組みと学びが残る支援を目指します。</p></article>
-    </div>
+    <div class="reveal"><span class="sec-eyebrow">Our Style</span><span class="sage-rule"></span><h2 class="sec-ttl">私たちが大切にする支援のあり方</h2><p class="style-copy">答えを押しつけず、相手が大切にしていることを聞きながら考える。SNS、AI、業務改善、健康経営、研修といった手段からではなく、本来届けたい価値と現場で続く形から一緒に整えます。</p></div>
     <figure class="about-visual reveal"><img src="images/08_custom/about-support-style.jpg" alt="Base Craftasの支援スタイル。対話し、整理し、現場で動く形まで一緒につくる"></figure>
   </div>
 </section>
 
 <!-- ══ CTA ══ -->
 <section class="sec-cta">
-  <figure class="about-visual about-visual--cta reveal"><img src="images/08_custom/about-consultation.jpg" alt="本来届けたい価値を聞かせてください。事業、組織・業務、人・現場の相談導線"></figure>
   <div class="cta-inner reveal">
     <span class="sec-eyebrow" style="display:block;text-align:center">Contact</span>
     <span class="sage-rule" style="margin:0 auto 1.2rem"></span>
@@ -236,6 +199,7 @@
       <a href="profile.html" class="btn-secondary">代表プロフィールを見る</a>
     </div>
   </div>
+  <figure class="about-visual about-visual--cta reveal"><img src="images/08_custom/about-consultation.jpg" alt="本来届けたい価値を聞かせてください。事業、組織・業務、人・現場の相談導線"></figure>
 </section>
 
 <!-- ══ FOOTER ══ -->

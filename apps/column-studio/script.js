@@ -1,0 +1,88 @@
+(function(){
+  'use strict';
+  var STORAGE_KEY='basecraftas_column_studio_v1';
+  var now=new Date();
+  var sampleBody='<p>専門性や経験には、すでに十分な価値があります。けれど、その価値が相手に届く言葉になっていなければ、存在していないのと同じように扱われてしまうことがあります。</p><h2>伝える前に、まず整える</h2><p>大切なのは、うまく見せることではありません。現場で大切にしていることを拾い上げ、相手が受け取りやすい順番に整えることです。</p><div class="editor-bubble" data-character="mion-standard"><div class="bubble-avatar" contenteditable="false"><img class="character-icon" src="assets/characters/mion-standard.png" alt="ミオン 標準会話"><img class="character-nameplate" src="assets/characters/mion-nameplate.png" alt="ミオン"></div><div class="bubble-copy"><p>書くことは、価値を足す作業ではなく、すでにある価値を見つけ直す作業だと考えています。</p></div></div><h2>小さく書き、育てていく</h2><p>最初から完璧な記事を目指さず、ひとつの気づきから始めます。公開した後も、現場の反応を見ながら言葉を育てていけば大丈夫です。</p>';
+  var defaults={
+    posts:[
+      {id:'p1',title:'専門性を、届く言葉へ整える。',excerpt:'現場にある価値を、伝わる言葉へ変えていくための考え方。',category:'ブランド',destination:'Base Craftas コラム',tags:'ブランド, 言語化',slug:'turn-expertise-into-words',status:'published',updated:'2026.09.05',body:sampleBody,hero:''},
+      {id:'p2',title:'AI導入の前に整えておきたい、3つのこと',excerpt:'ツール選びより先に、現場で共有しておきたい視点を整理します。',category:'AI・業務改善',destination:'Base Craftas コラム',tags:'AI, 業務改善',slug:'before-ai-adoption',status:'draft',updated:'2026.09.04',body:'<p>AIを導入するとき、最初に考えるべきことはツールの名前ではありません。</p><h2>目的をひとつに絞る</h2><p><mark>誰の、どんな時間を取り戻したいか</mark>を先に決めると、必要な仕組みが見えやすくなります。</p>',hero:''},
+      {id:'p3',title:'採用広報を「続けられる仕組み」に変える',excerpt:'担当者だけに頼らず、チームで発信を続けるための小さな設計。',category:'採用',destination:'Base Craftas コラム',tags:'採用, チーム',slug:'sustainable-recruitment-content',status:'draft',updated:'2026.09.01',body:'<p>採用広報が止まってしまう理由は、書く人のやる気だけではありません。</p><h2>素材が集まる場所をつくる</h2><p>日々の小さな出来事を、チームの誰もが残せるようにします。</p>',hero:''}
+    ],
+    members:[
+      {name:'神藤 和宏',email:'k.shindo@basecraftas.com',role:'admin',status:'参加中',initial:'KS'},
+      {name:'編集メンバー',email:'editor@basecraftas.com',role:'editor',status:'参加中',initial:'ED'},
+      {name:'確認メンバー',email:'viewer@basecraftas.com',role:'viewer',status:'招待中',initial:'VW'}
+    ],role:'admin',editingId:null
+  };
+  var state=load();
+  var currentFilter='all';
+  var els={
+    editor:document.getElementById('articleEditor'),title:document.getElementById('postTitle'),excerpt:document.getElementById('postExcerpt'),category:document.getElementById('postCategory'),destination:document.getElementById('postDestination'),tags:document.getElementById('postTags'),slug:document.getElementById('postSlug'),toast:document.getElementById('toast'),saveState:document.getElementById('saveState'),lastSaved:document.getElementById('lastSaved')
+  };
+  function clone(v){return JSON.parse(JSON.stringify(v));}
+  function load(){try{var saved=JSON.parse(localStorage.getItem(STORAGE_KEY));var merged=Object.assign(clone(defaults),saved);merged.posts.forEach(function(post){post.body=(post.body||'').replace(/data-character="shindo"/g,'data-character="mion-standard"').replace(/\.\.\/\.\.\/images\/x-profile-top\.jpg/g,'assets/characters/mion-standard.png').replace(/alt="新藤"/g,'alt="ミオン 標準会話"');post.body=ensureNameplates(post.body);});return merged;}catch(e){return clone(defaults);}}
+  function ensureNameplates(html){var host=document.createElement('div');host.innerHTML=html||'';host.querySelectorAll('.editor-bubble[data-character]').forEach(function(bubble){var avatar=bubble.querySelector('.bubble-avatar');if(!avatar||avatar.querySelector('.character-nameplate'))return;var prefix=(bubble.dataset.character||'mion').split('-')[0];var icon=avatar.querySelector('img');if(icon)icon.classList.add('character-icon');var plate=document.createElement('img');plate.className='character-nameplate';plate.src='assets/characters/'+prefix+'-nameplate.png';plate.alt=prefix==='mion'?'ミオン':prefix==='tsugumo'?'ツグモ':'ハクト';avatar.appendChild(plate);});return host.innerHTML;}
+  function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));els.saveState.textContent='すべて保存済み';els.lastSaved.textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
+  function esc(value){var d=document.createElement('div');d.textContent=value||'';return d.innerHTML;}
+  function toast(message){els.toast.textContent=message;els.toast.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(function(){els.toast.classList.remove('show');},2400);}
+  function roleName(role){return role==='admin'?'管理者':role==='editor'?'編集者':'閲覧者';}
+  function showView(name){
+    if(name==='editor'&&state.role==='viewer'){toast('閲覧者は記事を編集できません');return;}
+    if((name==='members'||name==='settings')&&state.role!=='admin'){toast('管理者だけが開ける画面です');return;}
+    document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.id==='view-'+name);});
+    document.querySelectorAll('.nav-item').forEach(function(b){b.classList.toggle('active',b.dataset.view===name);});
+    var active=document.getElementById('view-'+name);document.getElementById('breadcrumb').innerHTML='<span>Column Studio</span><b>/</b> '+active.dataset.title;
+    if(name==='posts')renderPosts();if(name==='dashboard')renderDashboard();if(name==='members')renderMembers();
+    document.getElementById('sidebar').classList.remove('open');window.scrollTo(0,0);
+  }
+  function dateLabel(){return now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');}
+  function renderDashboard(){
+    document.getElementById('publishedCount').textContent=state.posts.filter(function(p){return p.status==='published';}).length;
+    document.getElementById('draftCount').textContent=state.posts.filter(function(p){return p.status==='draft';}).length;
+    document.getElementById('monthCount').textContent=state.posts.filter(function(p){return p.updated.slice(0,7)===dateLabel().slice(0,7);}).length;
+    document.getElementById('memberCount').textContent=state.members.length;document.getElementById('postNavCount').textContent=state.posts.length;
+    document.getElementById('recentPosts').innerHTML=state.posts.slice().sort(function(a,b){return b.updated.localeCompare(a.updated);}).slice(0,4).map(function(p){return '<div class="recent-row"><button class="post-title-button" data-edit="'+p.id+'"><strong>'+esc(p.title)+'</strong><small>'+esc(p.category)+' ・ Base Craftas編集部</small></button><span class="badge '+p.status+'">'+(p.status==='published'?'公開中':'下書き')+'</span><span class="row-date">'+p.updated+'</span></div>';}).join('');
+  }
+  function filteredPosts(){var q=(document.getElementById('postSearch').value||'').toLowerCase();return state.posts.filter(function(p){return(currentFilter==='all'||p.status===currentFilter)&&(!q||(p.title+' '+p.tags+' '+p.category).toLowerCase().indexOf(q)>-1);});}
+  function renderPosts(){
+    var list=filteredPosts();document.getElementById('postTable').innerHTML=list.length?list.map(function(p){return '<div class="post-table-row"><button class="post-title-button" data-edit="'+p.id+'"><strong>'+esc(p.title)+'</strong><small>/'+esc(p.slug)+'</small></button><span>'+esc(p.category)+'</span><span class="badge '+p.status+'">'+(p.status==='published'?'公開中':'下書き')+'</span><span>'+p.updated+'</span><button class="row-menu" data-more="'+p.id+'" aria-label="その他">⋯</button></div>';}).join(''):'<div class="empty-state">該当するコラムはありません。</div>';
+  }
+  function renderMembers(){document.getElementById('memberList').innerHTML=state.members.map(function(m,i){return '<div class="member-row"><div class="member-identity"><span class="member-avatar">'+esc(m.initial)+'</span><div><strong>'+esc(m.name)+'</strong><small>'+esc(m.email)+'</small></div></div><select class="role-select" data-member-role="'+i+'" '+(i===0?'disabled':'')+'><option value="admin" '+(m.role==='admin'?'selected':'')+'>管理者</option><option value="editor" '+(m.role==='editor'?'selected':'')+'>編集者</option><option value="viewer" '+(m.role==='viewer'?'selected':'')+'>閲覧者</option></select><span class="member-status">● '+m.status+'</span><button class="row-menu">⋯</button></div>';}).join('');}
+  function applyRole(role){state.role=role;persist();document.body.classList.toggle('viewer-mode',role==='viewer');document.body.classList.toggle('editor-mode',role==='editor');document.getElementById('currentRoleLabel').textContent=role==='admin'?'Administrator':role==='editor'?'Editor':'Viewer';document.querySelector('.account-copy strong').textContent=roleName(role);document.getElementById('accountMenu').classList.remove('open');showView('dashboard');toast(roleName(role)+'の表示に切り替えました');}
+  function blankPost(template){state.editingId=null;els.title.value='';els.excerpt.value='';els.category.value='ブランド';els.destination.value='Base Craftas コラム';els.tags.value='';els.slug.value='';els.editor.innerHTML=template?'<p>この記事では、まず<strong>読者に伝えたい結論</strong>を置きます。</p><h2>いま起きていること</h2><p>背景や、現場で感じている課題を書きます。</p><h2>私たちが大切にしたいこと</h2><p>具体例や、読者に持ち帰ってほしい視点を書きます。</p><h2>まとめ</h2><p>次の一歩につながる言葉で締めくくります。</p>':'';updateEditorMeta();showView('editor');setTimeout(function(){els.title.focus();},50);}
+  function editPost(id){var p=state.posts.find(function(item){return item.id===id;});if(!p)return;state.editingId=id;els.title.value=p.title;els.excerpt.value=p.excerpt;els.category.value=p.category;els.destination.value=p.destination;els.tags.value=p.tags;els.slug.value=p.slug;els.editor.innerHTML=p.body;document.getElementById('visibilityTitle').textContent=p.status==='published'?'公開中':'下書き';document.getElementById('visibilityCopy').textContent=p.status==='published'?'サイトに表示されています':'サイトには表示されません';updateEditorMeta();showView('editor');}
+  function slugify(v){return v.toLowerCase().trim().replace(/[\s　]+/g,'-').replace(/[^a-z0-9\-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');}
+  function collect(status){var existing=state.posts.find(function(p){return p.id===state.editingId;});var p=existing||{id:'p'+Date.now(),hero:''};p.title=els.title.value.trim()||'無題のコラム';p.excerpt=els.excerpt.value.trim();p.category=els.category.value;p.destination=els.destination.value;p.tags=els.tags.value.trim();p.slug=els.slug.value.trim()||slugify(p.title)||'column-'+Date.now();p.body=els.editor.innerHTML;p.status=status||p.status||'draft';p.updated=dateLabel();if(!existing)state.posts.unshift(p);state.editingId=p.id;els.slug.value=p.slug;persist();renderDashboard();renderPosts();return p;}
+  function updateEditorMeta(){document.getElementById('wordCount').textContent=(els.editor.innerText||'').replace(/\s/g,'').length+'文字';if(!els.slug.value&&els.title.value)els.slug.value=slugify(els.title.value);}
+  function saveDraft(){var p=collect('draft');document.getElementById('visibilityTitle').textContent='下書き';document.getElementById('visibilityCopy').textContent='サイトには表示されません';toast('「'+p.title+'」を下書き保存しました');}
+  function publish(){if(!els.title.value.trim()){toast('先に記事のタイトルを入力してください');els.title.focus();return;}var p=collect('published');document.getElementById('visibilityTitle').textContent='公開中';document.getElementById('visibilityCopy').textContent='サイトに表示されています';toast('「'+p.title+'」を公開状態にしました');}
+  function preview(){document.getElementById('previewCategory').textContent=els.category.value.toUpperCase();document.getElementById('previewTitle').textContent=els.title.value||'無題のコラム';document.getElementById('previewLead').textContent=els.excerpt.value;document.getElementById('previewBody').innerHTML=els.editor.innerHTML||'<p>本文はまだありません。</p>';document.getElementById('previewDate').textContent=dateLabel();document.getElementById('previewDialog').showModal();}
+  function format(command){els.editor.focus();if(command==='marker'){document.execCommand('hiliteColor',false,document.getElementById('markerColor').value);}else if(command==='blockquote'){document.execCommand('formatBlock',false,'blockquote');}else if(command==='link'){var url=prompt('リンク先のURLを入力してください','https://');if(url)document.execCommand('createLink',false,url);}else{document.execCommand(command,false,null);}scheduleSave();}
+  function insertBubble(character){
+    var names={mion:'ミオン',tsugumo:'ツグモ',hakuto:'ハクト'};var parts=character.split('-');var name=names[parts[0]]||'キャラクター';var side=parts[0]==='tsugumo'?' right':'';var image='assets/characters/'+character+'.png';var plate='assets/characters/'+parts[0]+'-nameplate.png';var html='<div class="editor-bubble'+side+'" data-character="'+character+'"><div class="bubble-avatar" contenteditable="false"><img class="character-icon" src="'+image+'" alt="'+name+'"><img class="character-nameplate" src="'+plate+'" alt="'+name+'"></div><div class="bubble-copy"><p>ここに会話文を入力します。</p></div></div><p><br></p>';
+    els.editor.focus();document.execCommand('insertHTML',false,html);document.getElementById('bubblePicker').classList.remove('open');scheduleSave();
+  }
+  function scheduleSave(){els.saveState.textContent='保存中…';clearTimeout(scheduleSave.timer);scheduleSave.timer=setTimeout(function(){if(state.editingId)collect();else{els.saveState.textContent='未保存';}updateEditorMeta();},650);}
+  document.addEventListener('click',function(e){
+    var view=e.target.closest('[data-view]');if(view){showView(view.dataset.view);return;}
+    var edit=e.target.closest('[data-edit]');if(edit){editPost(edit.dataset.edit);return;}
+    var action=e.target.closest('[data-action]');if(action){var a=action.dataset.action;if(a==='new-post')blankPost(false);if(a==='new-template')blankPost(true);if(a==='save-draft')saveDraft();if(a==='publish')publish();if(a==='preview')preview();if(a==='close-preview')document.getElementById('previewDialog').close();if(a==='bubble-picker')document.getElementById('bubblePicker').classList.toggle('open');if(a==='close-bubble')document.getElementById('bubblePicker').classList.remove('open');if(a==='invite')document.getElementById('inviteDialog').showModal();if(a==='save-settings')toast('公開設定を保存しました');if(a==='open-site')window.open('../../index.html','_blank');return;}
+    var command=e.target.closest('[data-command]');if(command){format(command.dataset.command);return;}
+    var character=e.target.closest('[data-character]');if(character){insertBubble(character.dataset.character);return;}
+    var role=e.target.closest('[data-role-preview]');if(role){applyRole(role.dataset.rolePreview);return;}
+    if(!e.target.closest('#accountMenu')&&!e.target.closest('#accountButton'))document.getElementById('accountMenu').classList.remove('open');
+  });
+  document.getElementById('accountButton').addEventListener('click',function(){var menu=document.getElementById('accountMenu');menu.classList.toggle('open');this.setAttribute('aria-expanded',menu.classList.contains('open'));});
+  document.getElementById('mobileMenu').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open');});
+  document.getElementById('postSearch').addEventListener('input',renderPosts);
+  document.querySelectorAll('[data-filter]').forEach(function(btn){btn.addEventListener('click',function(){currentFilter=this.dataset.filter;document.querySelectorAll('[data-filter]').forEach(function(b){b.classList.toggle('active',b===btn);});renderPosts();});});
+  document.getElementById('blockFormat').addEventListener('change',function(){els.editor.focus();document.execCommand('formatBlock',false,this.value);});
+  [els.editor,els.title,els.excerpt,els.tags,els.slug].forEach(function(el){el.addEventListener('input',function(){updateEditorMeta();scheduleSave();});});
+  document.querySelectorAll('[data-setting-tab]').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('[data-setting-tab]').forEach(function(b){b.classList.toggle('active',b===btn);});document.querySelectorAll('.setting-content').forEach(function(c){c.classList.toggle('active',c.id==='setting-'+btn.dataset.settingTab);});});});
+  document.getElementById('imageDrop').addEventListener('click',function(){document.getElementById('imageInput').click();});
+  document.getElementById('imageInput').addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){var drop=document.getElementById('imageDrop');drop.style.backgroundImage='url('+reader.result+')';drop.classList.add('has-image');var p=state.posts.find(function(item){return item.id===state.editingId;});if(p){p.hero=reader.result;persist();}toast('アイキャッチ画像を設定しました');};reader.readAsDataURL(file);});
+  document.getElementById('memberList').addEventListener('change',function(e){if(!e.target.matches('[data-member-role]'))return;state.members[Number(e.target.dataset.memberRole)].role=e.target.value;persist();toast('メンバーの権限を変更しました');});
+  document.getElementById('inviteForm').addEventListener('submit',function(e){var email=document.getElementById('inviteEmail').value;if(!email)return;e.preventDefault();var initial=email.slice(0,2).toUpperCase();state.members.push({name:'招待メンバー',email:email,role:document.getElementById('inviteRole').value,status:'招待中',initial:initial});persist();renderMembers();renderDashboard();document.getElementById('inviteDialog').close();this.reset();toast(email+' を招待リストに追加しました');});
+  applyRole(state.role);renderDashboard();renderPosts();renderMembers();
+})();

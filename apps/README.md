@@ -15,3 +15,7 @@ apps/
 
 Keep primary service pages in `services/` and representative-led project sites
 in `projects/`.
+
+## Available apps
+
+- `column-studio/`: WordPress-like column editor and editorial dashboard prototype
