@@ -1,0 +1,21 @@
+{
+  "id": "article_13596ebf-edd8-4927-9247-d1961ed315e5",
+  "slug": "t",
+  "title": "テスト",
+  "excerpt": "",
+  "category": "ブランド",
+  "destination": "totonoe",
+  "tags": [],
+  "main_actor_id": "shindo-toshiki",
+  "main_actor": {
+    "id": "shindo-toshiki",
+    "name": "神藤 俊希"
+  },
+  "hero_url": "",
+  "body_html": "テスト<div>テスト</div><div><br></div>",
+  "status": "published",
+  "url": "columns/t.html",
+  "absolute_url": "https://basecraftas.com/projects/totonoe/columns/t.html",
+  "published_at": "2026-09-06",
+  "updated_at": "2026-09-06T12:08:01.818Z"
+}
