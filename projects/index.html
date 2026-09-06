@@ -8,6 +8,81 @@
 <link rel="icon" href="../images/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
+<style>
+.project-totonoe-logo {
+  display:block;
+  width:min(100%, 320px);
+  height:auto;
+  max-height:124px;
+  object-fit:contain;
+  object-position:center;
+  margin:0;
+}
+.project-card-feature {
+  grid-template-columns:minmax(240px,.72fr) minmax(0,1fr);
+  align-items:center;
+}
+.project-logo-side {
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:1.25rem;
+  padding:1.4rem;
+  background:#fff;
+  border:1px solid var(--border-sage);
+}
+.project-logo-caption .project-copy {
+  margin-bottom:0;
+}
+.project-text-side {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.project-text-side .project-actions {
+  margin-top:1.25rem;
+  justify-content:flex-start;
+}
+.project-coming-grid {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:1rem;
+  margin-top:1.35rem;
+}
+.project-coming-card {
+  padding:1.4rem 1.5rem;
+  background:var(--cream);
+  border:1px solid var(--border-sage);
+  box-shadow:0 10px 26px rgba(26,51,44,.06);
+}
+.project-coming-card h3 {
+  color:var(--green);
+  font-size:1.35rem;
+  line-height:1.35;
+  margin-bottom:.75rem;
+}
+.project-coming-card .project-status {
+  margin-bottom:0;
+  color:var(--text-sub);
+}
+@media (max-width:760px) {
+  .project-totonoe-logo {
+    width:min(100%, 300px);
+    max-height:108px;
+  }
+  .project-card-feature {
+    grid-template-columns:1fr;
+  }
+  .project-coming-grid {
+    grid-template-columns:1fr;
+  }
+  .project-logo-side {
+    padding:1rem .85rem;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -69,46 +144,48 @@
         <span class="sec-eyebrow">Published Project</span>
         <span class="sage-rule"></span>
         <h2 class="sec-ttl">公開中のプロジェクト</h2>
-        <p class="sec-desc">現在、basecraftas.com配下で確認できるプロジェクトです。</p>
       </div>
 
       <div class="project-list-grid">
         <article class="project-card-feature reveal">
-          <div>
+          <div class="project-logo-side">
             <span class="project-status">公開中</span>
-            <h3>ToToNoE+</h3>
-            <p class="project-copy">本質に向き合い、整える習慣を。</p>
-            <p>
-              医療・介護を原点に、本質ではない仕事を減らして余白をつくる専門家チームです。
-              公開中の「週末のAI整え習慣」では、土曜朝6時にAI情報と実践知を整理します。
-            </p>
+            <img src="totonoe/assets/totonoe-logo.png" alt="ToToNoE+" class="project-totonoe-logo">
+            <div class="project-logo-caption">
+              <p class="project-copy">本質に向き合い、整える習慣を。</p>
+            </div>
           </div>
-          <div class="project-actions">
-            <a href="totonoe/index.html" class="btn-primary">ToToNoE+を見る</a>
-            <a href="totonoe/contents.html#podcast" class="btn-secondary">Podcastを見る</a>
+          <div class="project-text-side">
+            <p>
+              医療・介護を原点に、本質ではない仕事を減らして余白をつくる専門家チームです。公開中の「週末のAI整え習慣」では、毎週土曜朝6時にAI情報や現場での活用知を整理する勉強会を行っています。
+              Podcastやアーカイブ記事、実践メモなど、後からでも学び続けられるコンテンツも少しずつ増やしています。
+            </p>
+            <div class="project-actions">
+              <a href="totonoe/index.html" class="btn-primary">ToToNoE+を見る</a>
+              <a href="totonoe/contents.html#podcast" class="btn-secondary">Podcastを見る</a>
+            </div>
           </div>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="sec" style="background:var(--mist)">
+  <section class="sec" style="padding-top:0">
     <div class="sec-inner">
       <div class="reveal">
-        <span class="sec-eyebrow">Project Architecture</span>
+        <span class="sec-eyebrow">Coming Soon</span>
         <span class="sage-rule"></span>
-        <h2 class="sec-ttl">今後増やせるフォルダ構成</h2>
-        <p class="sec-desc">プロジェクト・Webアプリ・資料ページを、Base Craftas本体と混ざらない形で拡張していきます。</p>
+        <h2 class="sec-ttl">準備中のプロジェクト</h2>
       </div>
-      <div class="project-structure reveal">
-        <pre><code>basecraftas.com/
-├─ services/                 Base Craftasの主要サービス
-├─ projects/                 代表が主体で関わるプロジェクト
-│  ├─ totonoe/            ToToNoE+ / 週末のAI整え習慣
-│  ├─ totonoe-plus/          ToToNoE+ 関連
-│  ├─ sleeport/              Sleeport 関連
-│  └─ meguri/                MEGURI 関連
-└─ apps/                     体験版・診断ツールなどのWebアプリ</code></pre>
+      <div class="project-coming-grid">
+        <article class="project-coming-card reveal">
+          <h3>Sleeport</h3>
+          <span class="project-status">準備中</span>
+        </article>
+        <article class="project-coming-card reveal">
+          <h3>DASSEN</h3>
+          <span class="project-status">準備中</span>
+        </article>
       </div>
     </div>
   </section>
