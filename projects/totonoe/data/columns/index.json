@@ -1,23 +1,4 @@
 {
-  "updated_at": "2026-09-06T12:08:05.540Z",
-  "articles": [
-    {
-      "id": "article_13596ebf-edd8-4927-9247-d1961ed315e5",
-      "slug": "t",
-      "title": "テスト",
-      "excerpt": "",
-      "category": "ブランド",
-      "tags": [],
-      "main_actor_id": "shindo-toshiki",
-      "main_actor": {
-        "id": "shindo-toshiki",
-        "name": "神藤 俊希"
-      },
-      "hero_url": "",
-      "status": "published",
-      "url": "columns/t.html",
-      "published_at": "2026-09-06",
-      "updated_at": "2026-09-06T12:08:01.818Z"
-    }
-  ]
+  "updated_at": null,
+  "articles": []
 }
