@@ -9,14 +9,22 @@ CREATE TABLE IF NOT EXISTS members (
 );
 
 CREATE TABLE IF NOT EXISTS articles (
+  revision INTEGER NOT NULL DEFAULT 1,
   id TEXT PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
   excerpt TEXT NOT NULL DEFAULT '',
   category TEXT NOT NULL DEFAULT 'brand',
   destination TEXT NOT NULL DEFAULT 'totonoe',
+  content_type TEXT NOT NULL DEFAULT 'column',
   tags TEXT NOT NULL DEFAULT '[]',
   main_actor_id TEXT NOT NULL DEFAULT 'shindo-toshiki',
+  speaker_ids TEXT NOT NULL DEFAULT '[]',
+  media_url TEXT NOT NULL DEFAULT '',
+  episode_no INTEGER,
+  source_published_at TEXT NOT NULL DEFAULT '',
+  source_type TEXT NOT NULL DEFAULT '',
+  source_id TEXT NOT NULL DEFAULT '',
   hero_url TEXT NOT NULL DEFAULT '',
   body_html TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'review', 'published', 'archived')),
@@ -28,14 +36,22 @@ CREATE TABLE IF NOT EXISTS articles (
 );
 
 CREATE TABLE IF NOT EXISTS article_versions (
+  revision INTEGER NOT NULL DEFAULT 1,
   id TEXT PRIMARY KEY,
   article_id TEXT NOT NULL,
   title TEXT NOT NULL,
   excerpt TEXT NOT NULL DEFAULT '',
   category TEXT NOT NULL DEFAULT 'brand',
   destination TEXT NOT NULL DEFAULT 'totonoe',
+  content_type TEXT NOT NULL DEFAULT 'column',
   tags TEXT NOT NULL DEFAULT '[]',
   main_actor_id TEXT NOT NULL DEFAULT 'shindo-toshiki',
+  speaker_ids TEXT NOT NULL DEFAULT '[]',
+  media_url TEXT NOT NULL DEFAULT '',
+  episode_no INTEGER,
+  source_published_at TEXT NOT NULL DEFAULT '',
+  source_type TEXT NOT NULL DEFAULT '',
+  source_id TEXT NOT NULL DEFAULT '',
   hero_url TEXT NOT NULL DEFAULT '',
   body_html TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL,
@@ -58,6 +74,7 @@ CREATE TABLE IF NOT EXISTS article_assets (
 );
 
 CREATE TABLE IF NOT EXISTS publish_jobs (
+  article_revision INTEGER,
   id TEXT PRIMARY KEY,
   article_id TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'published', 'failed')),
@@ -86,3 +103,5 @@ CREATE INDEX IF NOT EXISTS idx_article_versions_article ON article_versions(arti
 CREATE INDEX IF NOT EXISTS idx_article_assets_article ON article_assets(article_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_publish_jobs_article ON publish_jobs(article_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_events_entity ON audit_events(entity_type, entity_id, created_at);
+
+CREATE TABLE IF NOT EXISTS article_publish_locks (article_id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL);

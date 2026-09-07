@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260909">
 </head>
 <body>
   <div class="app-shell">
@@ -20,7 +20,7 @@
         <span>Column Studio</span>
       </div>
       <button class="new-post-button" type="button" data-action="new-post">
-        <span aria-hidden="true">＋</span> 新しいコラム
+        <span aria-hidden="true">＋</span> 新しいコンテンツ
       </button>
       <nav class="side-nav" aria-label="管理メニュー">
         <button class="nav-item active" type="button" data-view="dashboard">
@@ -73,9 +73,9 @@
             <div>
               <p class="eyebrow">COLUMN STUDIO</p>
               <h1>言葉を、届くかたちに。</h1>
-              <p>文章を書いて、整えて、そのままToToNoE+へ。むずかしい操作なしでコラムを育てられます。</p>
+              <p>文章・Podcast・動画リンクを整えて、そのままToToNoE+へ。むずかしい操作なしでコンテンツを育てられます。</p>
             </div>
-            <button class="primary-button" type="button" data-action="new-post">＋ コラムを書く</button>
+            <button class="primary-button" type="button" data-action="new-post">＋ 作成する</button>
           </div>
           <div class="status-grid">
             <article class="status-card"><span>公開中</span><strong id="publishedCount">1</strong><small>本の記事</small><i class="status-accent green"></i></article>
@@ -85,7 +85,7 @@
           </div>
           <div class="dashboard-grid">
             <section class="panel recent-panel">
-              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコラム</h2></div><button type="button" class="text-button" data-view="posts">すべて見る →</button></div>
+              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコンテンツ</h2></div><button type="button" class="text-button" data-view="posts">すべて見る →</button></div>
               <div id="recentPosts" class="recent-list"></div>
             </section>
             <aside class="dashboard-aside">
@@ -102,12 +102,21 @@
 
       <section class="view" id="view-posts" data-title="コラム">
         <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">COLUMNS</p><h1>コラム</h1><p>公開中の記事と下書きをまとめて管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコラム</button></div>
+          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1>コンテンツ</h1><p>コラム・Podcast・動画コンテンツをまとめて管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
           <div class="list-toolbar">
             <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
             <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button></div>
           </div>
-          <div class="panel table-panel"><div class="post-table-head"><span>タイトル</span><span>カテゴリー</span><span>ステータス</span><span>更新日</span><span></span></div><div id="postTable"></div></div>
+          <div class="content-type-tabs" role="tablist" aria-label="コンテンツ種別">
+            <button type="button" class="active" data-type-filter="all">すべて</button>
+            <button type="button" data-type-filter="column">コラム</button>
+            <button type="button" data-type-filter="podcast">Podcast</button>
+            <button type="button" data-type-filter="video">動画</button>
+            <button type="button" data-type-filter="archive">アーカイブ</button>
+            <button type="button" data-type-filter="seminar">セミナー</button>
+            <button type="button" data-type-filter="learning">学習</button>
+          </div>
+          <div class="panel table-panel"><div class="post-table-head"><span>タイトル</span><span>コンテンツ種別</span><span>ステータス</span><span>更新日</span><span></span></div><div id="postTable"></div></div>
         </div>
       </section>
 
@@ -123,6 +132,25 @@
           </div>
           <div class="editor-layout">
             <article class="editor-paper">
+              <section class="link-intake" aria-labelledby="linkIntakeTitle">
+                <div class="link-intake-copy">
+                  <span class="link-step">STEP 1</span>
+                  <div><strong id="linkIntakeTitle">元コンテンツのURLを貼り付け</strong><small>note・stand.fm・YouTube・Google Drive・セミナーURLを自動判定します。</small></div>
+                </div>
+                <div class="link-input-row">
+                  <input id="postMediaUrl" type="url" inputmode="url" autocomplete="url" aria-label="元コンテンツURL" placeholder="https://note.com/... / https://stand.fm/...">
+                  <button class="secondary-button" id="analyzeLinkButton" type="button" data-action="analyze-link">情報を取得</button>
+                </div>
+                <p class="link-status" id="linkStatus" role="status">本文を直接書く場合は、URLなしでも作成できます。</p>
+                <article class="link-preview-card" id="linkPreviewCard" hidden>
+                  <div class="link-preview-image" id="linkPreviewImage" aria-hidden="true"></div>
+                  <div class="link-preview-copy">
+                    <div class="link-preview-meta"><span id="linkPreviewProvider"></span><span id="linkPreviewTarget"></span></div>
+                    <strong id="linkPreviewTitle"></strong>
+                    <p id="linkPreviewDescription"></p>
+                  </div>
+                </article>
+              </section>
               <input class="title-input" id="postTitle" type="text" placeholder="記事のタイトルを入力">
               <input class="lead-input" id="postExcerpt" type="text" placeholder="この記事をひとことで紹介すると…">
               <div class="format-toolbar" id="formatToolbar" role="toolbar" aria-label="文章の装飾">
@@ -137,10 +165,11 @@
                 <button type="button" data-command="blockquote" aria-label="引用">“</button>
                 <button type="button" data-command="link" aria-label="リンク">⌁</button>
                 <span class="tool-divider"></span>
-                <button type="button" class="bubble-tool" data-action="bubble-picker"><span>◉</span> 吹き出し</button>
+                <button type="button" class="bubble-tool" data-action="bubble-picker" aria-controls="bubblePicker" aria-expanded="false"><span class="bubble-tool-icon">💬</span><span>キャラクター会話</span></button>
               </div>
               <div class="bubble-picker" id="bubblePicker">
-                <div class="bubble-picker-head"><div><strong>キャラクターと表情を選ぶ</strong><small>選ぶと吹き出しが入ります</small></div><button type="button" data-action="close-bubble">×</button></div>
+                <div class="bubble-picker-head"><div><strong>会話ブロックを追加</strong><small>話すキャラクターと表情を選びます</small></div><button type="button" data-action="close-bubble" aria-label="閉じる">×</button></div>
+                <p class="bubble-picker-guide">① 本文の挿入したい位置をクリック　② 下から表情を選択　③ 挿入後に会話文を編集</p>
                 <div class="character-group"><p>ミオン</p><div class="reaction-grid">
                   <button type="button" data-character="mion-standard"><img src="assets/characters/mion-standard.png" alt="ミオン 標準会話"><span>標準会話</span></button>
                   <button type="button" data-character="mion-question"><img src="assets/characters/mion-question.png" alt="ミオン 質問"><span>質問</span></button>
@@ -169,11 +198,15 @@
             <aside class="editor-settings">
               <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
               <div class="setting-content active" id="setting-post">
-                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ コラム</option></select></label>
-                <label>カテゴリー<select id="postCategory"><option>ブランド</option><option>AI・業務改善</option><option>採用</option><option>健康資本</option><option>お知らせ</option></select></label>
+                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ コンテンツ</option></select></label>
+                <label>コンテンツ種別<select id="postContentType"><option value="column">コラム</option><option value="podcast">Podcast</option><option value="video">動画コンテンツ</option><option value="archive">アーカイブ動画</option><option value="seminar">セミナー</option><option value="learning">学習コンテンツ</option><option value="weekend">週末のAI整え習慣</option></select></label>
+                <input id="postCategory" type="hidden" value="content">
                 <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
-                <label>タグ<input id="postTags" type="text" placeholder="AI, 組織づくり"></label>
-                <label>URL<input id="postSlug" type="text" placeholder="article-url"></label>
+                <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">Podcast・動画の登壇者や対話者を複数選択できます。</small></div>
+                <div class="setting-field topic-tag-field"><label for="postTags">Topic Tag</label><input id="postTags" type="text" placeholder="候補を選ぶか、カンマ区切りで入力"><small class="field-help">現在のToToNoE+で使用中のタグから選べます。独自タグも入力でき、更新履歴に残ります。</small><div class="topic-tag-suggestions" id="topicTagSuggestions" aria-label="使用中のトピックタグ"></div></div>
+                <div class="source-detail-grid" id="sourceDetailFields" hidden><label>第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="15"></label><label>元コンテンツの公開日<input id="postSourceDate" type="date"></label></div>
+                <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
+                <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
                 <div class="setting-block"><span>アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small>推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
               </div>
@@ -189,18 +222,18 @@
 
       <section class="view" id="view-members" data-title="メンバー・権限">
         <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを招待</button></div>
-          <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事・メンバー・公開設定をすべて管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成、編集、公開ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
+          <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを登録</button></div>
+          <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事の公開、メンバー、公開設定を管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成・編集ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
           <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
-          <p class="security-note">🔒 本番運用では、ログイン認証とデータベース側のアクセス制御を接続して権限を保護します。</p>
+          <p class="security-note">🔒 ここではColumn Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
         </div>
       </section>
 
       <section class="view" id="view-settings" data-title="公開設定">
         <div class="page-wrap narrow-wrap">
-          <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コラムの公開先とURLのルールを設定します。</p></div></div>
+          <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コンテンツの公開先とURLのルールを設定します。</p></div></div>
           <section class="panel settings-panel">
-            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コラムのURL<input value="https://basecraftas.com/projects/totonoe/columns/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
+            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コンテンツのURL<input value="https://basecraftas.com/projects/totonoe/contents/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
           </section>
         </div>
       </section>
@@ -209,13 +242,13 @@
 
   <dialog class="preview-dialog" id="previewDialog">
     <div class="preview-bar"><div><span></span><b>記事プレビュー</b><small>公開前の見え方</small></div><button type="button" data-action="close-preview">×</button></div>
-    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　<span id="previewDate"></span></div><div class="preview-body" id="previewBody"></div></article>
+    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　Speaker：<span id="previewSpeakers">—</span>　／　<span id="previewDate"></span></div><p class="preview-media" id="previewMediaUrl"></p><div class="preview-body" id="previewBody"></div></article>
   </dialog>
 
   <dialog class="invite-dialog" id="inviteDialog">
-    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">INVITE MEMBER</p><h2>メンバーを招待</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>招待した人は、自分のアカウントでログインして許可された操作だけを行えます。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">招待を送る</button></div></form>
+    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>登録後、Cloudflare Accessでも同じメールアドレスを許可するとログインできます。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
-  <script src="script.js"></script>
+  <script src="script.js?v=20260909"></script>
 </body>
 </html>

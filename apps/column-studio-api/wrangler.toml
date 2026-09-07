@@ -1,7 +1,7 @@
 name = "column-studio-api"
 main = "src/worker.js"
 compatibility_date = "2026-09-06"
-workers_dev = true
+workers_dev = false
 
 [vars]
 ALLOW_DEV_AUTH = "false"
