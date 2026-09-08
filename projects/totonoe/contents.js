@@ -10,7 +10,8 @@
    下の CONTENTS に1件追記するだけです（Googleドライブの共有リンクを貼る）。
 
    ▼ コラムを追加するとき
-   columns/ に記事HTMLを作り、下の COLUMNS に1件追記します。
+   手動追加分は COLUMNS に残し、Column Studio 公開分は
+   data/contents/index.json から自動で追加します。
    ========================================================= */
 (function () {
   'use strict';
@@ -355,7 +356,7 @@
 
   /* =====================================================
      コラム
-     ・columns/ に個別記事を置き、COLUMNS に1件追記します
+     ・手動追加分は COLUMNS に残し、Column Studio 公開分は data/contents/index.json から自動で読み込みます
      ・image は未指定でもCSSの簡易サムネイルで表示されます
      ===================================================== */
   var COLUMNS = [
@@ -384,6 +385,135 @@
       thumb: 'TEAM'
     }
   ];
+
+  function mergeGeneratedColumns(items) {
+    var existing = {};
+    COLUMNS.forEach(function (c) { existing[c.url] = true; });
+    (items || [])
+      .filter(function (item) {
+        return item.status === 'published' && (item.content_type || 'column') === 'column';
+      })
+      .forEach(function (item) {
+        var url = item.url || ('contents/' + item.slug + '.html');
+        if (existing[url]) return;
+        existing[url] = true;
+        COLUMNS.push({
+          title: item.title,
+          desc: item.excerpt || item.summary || '',
+          tags: item.topic_tags || item.tags || [],
+          date: item.published_at || String(item.updated_at || '').slice(0, 10),
+          url: url,
+          image: item.hero_url || '',
+          thumb: 'COLUMN',
+          mainActor: item.main_actor && item.main_actor.name ? item.main_actor.name : '',
+          speakers: (item.speakers || []).map(function (person) { return person.name; })
+        });
+      });
+  }
+
+  function generatedDate(item) {
+    return item.source_published_at || item.published_at || String(item.updated_at || '').slice(0, 10);
+  }
+
+  function titleEpisodeNo(title) {
+    var match = String(title || '').match(/(?:^#|第)\s*(\d+)\s*(?:回)?/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+
+  function nextNumber(list) {
+    return list.reduce(function (max, item) { return Math.max(max, Number(item.no) || 0); }, 0) + 1;
+  }
+
+  function mergeGeneratedPodcast(items) {
+    var existing = {};
+    EPISODES.forEach(function (ep) { if (ep.url) existing[ep.url] = true; if (ep.id) existing[ep.id] = true; });
+    var next = nextNumber(EPISODES);
+    (items || []).filter(function (item) {
+      return item.status === 'published' && item.content_type === 'podcast' && item.media_url;
+    }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
+      var id = item.source_id || episodeId({ url: item.media_url });
+      if (existing[item.media_url] || (id && existing[id])) return;
+      existing[item.media_url] = true;
+      if (id) existing[id] = true;
+      var no = Number(item.episode_no) || titleEpisodeNo(item.title) || next++;
+      EPISODES.push({
+        url: item.media_url,
+        id: id,
+        no: no,
+        theme: String(item.title || '').replace(/^(?:#|第)\s*\d+\s*(?:回)?\s*/, ''),
+        date: generatedDate(item),
+        embed: id ? 'https://stand.fm/embed/episodes/' + id : '',
+        link: item.media_url
+      });
+    });
+  }
+
+  function mergeGeneratedLibrary(items) {
+    var existing = {};
+    CONTENTS.forEach(function (content) { if (content.youtubeId) existing[content.youtubeId] = true; if (content.url) existing[content.url] = true; });
+    (items || []).filter(function (item) {
+      return item.status === 'published' && ['video', 'learning'].indexOf(item.content_type) > -1 && item.media_url;
+    }).forEach(function (item) {
+      var sourceId = item.source_id || '';
+      if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
+      if (sourceId) existing[sourceId] = true;
+      existing[item.media_url] = true;
+      var content = {
+        title: item.title,
+        desc: item.excerpt || '',
+        tags: item.topic_tags || item.tags || [],
+        date: generatedDate(item),
+        type: item.content_type === 'video' ? '動画' : (item.content_type_label || '学習コンテンツ'),
+        url: item.media_url,
+        source: item.external_link && item.external_link.provider ? item.external_link.provider : ''
+      };
+      if (item.source_type === 'video' && sourceId) content.youtubeId = sourceId;
+      CONTENTS.push(content);
+    });
+  }
+
+  function mergeGeneratedArchives(items) {
+    var existing = {};
+    ARCHIVES.forEach(function (archive) { if (archive.driveId) existing[archive.driveId] = true; if (archive.folderId) existing[archive.folderId] = true; if (archive.url) existing[archive.url] = true; });
+    var next = nextNumber(ARCHIVES);
+    (items || []).filter(function (item) {
+      return item.status === 'published' && item.content_type === 'archive' && item.media_url;
+    }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
+      var sourceId = item.source_id || '';
+      if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
+      if (sourceId) existing[sourceId] = true;
+      existing[item.media_url] = true;
+      ARCHIVES.push({
+        no: Number(item.episode_no) || titleEpisodeNo(item.title) || next++,
+        date: generatedDate(item),
+        driveId: item.source_type === 'archive' ? sourceId : '',
+        url: item.media_url,
+        title: item.title
+      });
+    });
+  }
+
+  function loadGeneratedContent() {
+    if (!window.fetch) return;
+    fetch('data/contents/index.json', { cache: 'no-store' })
+      .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
+      .then(function (data) {
+        var items = data.articles || [];
+        mergeGeneratedColumns(items);
+        mergeGeneratedPodcast(items);
+        mergeGeneratedLibrary(items);
+        mergeGeneratedArchives(items);
+        buildColumnFilter();
+        renderColumns();
+        renderPodcastRangeButtons();
+        renderPodcast();
+        buildFilter();
+        renderLibrary();
+        renderArchiveRangeButtons();
+        renderArchive();
+      })
+      .catch(function () {});
+  }
 
   var COLUMN_ORDER_KEY = 'wa_column_order_v1';
   var columnOrder = (function () {
@@ -418,15 +548,18 @@
     });
     columnFilterWrap.innerHTML = html;
 
-    columnFilterWrap.addEventListener('click', function (e) {
-      var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
-      if (!btn) return;
-      currentColumnTag = btn.dataset.columnCat;
-      columnFilterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
-        b.classList.toggle('active', b === btn);
+    if (!columnFilterWrap.dataset.ready) {
+      columnFilterWrap.dataset.ready = 'true';
+      columnFilterWrap.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
+        if (!btn) return;
+        currentColumnTag = btn.dataset.columnCat;
+        columnFilterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        renderColumns();
       });
-      renderColumns();
-    });
+    }
   }
 
   function initColumnSort() {
@@ -612,7 +745,7 @@
   function driveEmbedUrl(id) { return 'https://drive.google.com/file/d/' + id + '/preview'; }
   function driveViewUrl(id)  { return 'https://drive.google.com/file/d/' + id + '/view'; }
   function driveFolderUrl(id) { return 'https://drive.google.com/drive/folders/' + id; }
-  function archiveUrl(a) { return a.driveId ? driveViewUrl(a.driveId) : driveFolderUrl(a.folderId); }
+  function archiveUrl(a) { return a.url || (a.driveId ? driveViewUrl(a.driveId) : driveFolderUrl(a.folderId)); }
 
   /* ---------- 並び替え・回数レンジ・横スライド ---------- */
   var ARC_ORDER_KEY = 'wa_archive_order_v1';
@@ -823,6 +956,10 @@
 
   function openArchiveModal(a) {
     if (!cvModal || !cvModalBody) return;
+    if (!a.driveId && !a.folderId && a.url) {
+      window.open(a.url, '_blank', 'noopener');
+      return;
+    }
     if (!a.driveId && a.folderId) {
       cvModalBody.innerHTML =
         '<div class="cv-modal-content">' +
@@ -942,6 +1079,7 @@
   initColumnSort();
   buildColumnFilter();
   renderColumns();
+  loadGeneratedContent();
 
   initArchiveRanges();
   setupArchiveSort();

@@ -95,6 +95,58 @@
     });
   }
 
+  function generatedDate(item) {
+    return String(item.source_published_at || item.published_at || item.updated_at || '').slice(0, 10);
+  }
+
+  function dateLabel(dateStr) {
+    var parts = String(dateStr || '').split('-');
+    if (parts.length !== 3) return dateStr || '日付未設定';
+    return Number(parts[0]) + '年' + Number(parts[1]) + '月' + Number(parts[2]) + '日';
+  }
+
+  function speakerLabel(item) {
+    var speakers = Array.isArray(item.speakers) ? item.speakers : [];
+    var people = speakers.length ? speakers : (item.main_actor ? [item.main_actor] : []);
+    return people.map(function (person) {
+      return person.display_name || person.name || person.id || '';
+    }).filter(Boolean).join('・');
+  }
+
+  function mergeGeneratedSeminars(items) {
+    var existing = {};
+    SEMINARS.forEach(function (seminar) { if (seminar.url) existing[seminar.url] = true; });
+    (items || []).filter(function (item) {
+      return item.status === 'published' && item.content_type === 'seminar' && item.media_url;
+    }).forEach(function (item) {
+      if (existing[item.media_url]) return;
+      existing[item.media_url] = true;
+      var date = generatedDate(item);
+      SEMINARS.push({
+        date: date || '2099-12-31',
+        dateLabel: dateLabel(date),
+        time: '',
+        title: item.title || 'セミナー',
+        subtitle: '',
+        speakerName: speakerLabel(item) || 'ToToNoE+',
+        speakerTitle: 'ToToNoE+',
+        price: '',
+        thumb: item.hero_url || (item.external_link && item.external_link.image) || 'assets/og-image.jpg',
+        summary: item.excerpt || item.summary || '',
+        url: item.media_url,
+        tags: item.topic_tags || item.tags || []
+      });
+    });
+  }
+
+  function loadGeneratedSeminars() {
+    if (!window.fetch) return Promise.resolve();
+    return fetch('data/contents/index.json', { cache: 'no-store' })
+      .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
+      .then(function (data) { mergeGeneratedSeminars(data.articles || []); })
+      .catch(function () {});
+  }
+
   function isPast(dateStr) {
     var d = new Date(dateStr + 'T23:59:59');
     return d.getTime() < Date.now();
@@ -320,6 +372,8 @@
     });
   }
 
-  initSemToolbar();
-  render();
+  loadGeneratedSeminars().then(function () {
+    initSemToolbar();
+    render();
+  });
 })();
