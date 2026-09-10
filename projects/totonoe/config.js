@@ -40,9 +40,9 @@ window.WA_CONFIG = {
      5. 演出のオン/オフ
      --------------------------------------------------------- */
   FEATURES: {
-    countdown: true,      // 次回開催までのカウントダウン
-    stickyCta: true,      // モバイル下部の固定CTA
+    countdown: true,      // 次回開催までをコンパクトに表示
+    stickyCta: false,     // 領域別の申込ボタンへ案内
     timelineToday: true,  // 週間サイクルの「今日ここ」ハイライト
-    voicesAutoplay: true  // 参加者の声の自動スライド（6.5秒ごと）
+    voicesAutoplay: false // 参加者の声は手動で切り替え
   }
 };
