@@ -26,11 +26,24 @@
         <button class="nav-item active" type="button" data-view="dashboard">
           <span class="nav-icon" aria-hidden="true">⌂</span><span>ホーム</span>
         </button>
-        <button class="nav-item" type="button" data-view="posts">
-          <span class="nav-icon" aria-hidden="true">▤</span><span>コラム</span><span class="nav-count" id="postNavCount">3</span>
+        <div class="nav-label">コンテンツ</div>
+        <button class="nav-item" type="button" data-content-view="all">
+          <span class="nav-icon" aria-hidden="true">▤</span><span>すべて</span><span class="nav-count" id="postNavCount">3</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="column">
+          <span class="nav-icon" aria-hidden="true">✎</span><span>コラム</span><span class="nav-count" id="columnNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="podcast">
+          <span class="nav-icon" aria-hidden="true">◉</span><span>Podcast</span><span class="nav-count" id="podcastNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="video">
+          <span class="nav-icon" aria-hidden="true">▶</span><span>動画</span><span class="nav-count" id="videoNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="archive">
+          <span class="nav-icon" aria-hidden="true">▣</span><span>アーカイブ</span><span class="nav-count" id="archiveNavCount">0</span>
         </button>
         <button class="nav-item" type="button" data-view="editor">
-          <span class="nav-icon" aria-hidden="true">✎</span><span>新規作成</span>
+          <span class="nav-icon" aria-hidden="true">＋</span><span>新規作成</span>
         </button>
         <div class="nav-label">管理</div>
         <button class="nav-item admin-only" type="button" data-view="members">
@@ -85,7 +98,7 @@
           </div>
           <div class="dashboard-grid">
             <section class="panel recent-panel">
-              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコンテンツ</h2></div><button type="button" class="text-button" data-view="posts">すべて見る →</button></div>
+              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコンテンツ</h2></div><button type="button" class="text-button" data-content-view="all">すべて見る →</button></div>
               <div id="recentPosts" class="recent-list"></div>
             </section>
             <aside class="dashboard-aside">
@@ -102,20 +115,20 @@
 
       <section class="view" id="view-posts" data-title="コラム">
         <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1>コンテンツ</h1><p>コラム・Podcast・動画コンテンツをまとめて管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
+          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">コラム・Podcast・動画・アーカイブをまとめて管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
+          <section class="archive-sync-panel" id="archiveSyncPanel" hidden>
+            <div class="archive-sync-head">
+              <div><p class="eyebrow">GOOGLE DRIVE SYNC</p><h2>アーカイブ動画を確認</h2><p>毎週土曜日 09:00（日本時間）に自動確認します。検出した動画は確認後に下書きへ取り込みます。</p></div>
+              <button class="secondary-button" type="button" data-action="scan-archives">今すぐ確認</button>
+            </div>
+            <p class="archive-sync-status" id="archiveSyncStatus">接続状況を確認しています…</p>
+            <div class="archive-candidates" id="archiveCandidateList"></div>
+          </section>
           <div class="list-toolbar">
             <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
-            <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button></div>
+            <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button><button type="button" data-filter="archived">非公開</button><button type="button" data-filter="trash">ゴミ箱</button></div>
           </div>
-          <div class="content-type-tabs" role="tablist" aria-label="コンテンツ種別">
-            <button type="button" class="active" data-type-filter="all">すべて</button>
-            <button type="button" data-type-filter="column">コラム</button>
-            <button type="button" data-type-filter="podcast">Podcast</button>
-            <button type="button" data-type-filter="video">動画</button>
-            <button type="button" data-type-filter="archive">アーカイブ</button>
-            <button type="button" data-type-filter="seminar">セミナー</button>
-            <button type="button" data-type-filter="learning">学習</button>
-          </div>
+          <p class="trash-retention-note" id="trashRetentionNote" hidden>ゴミ箱の記事は30日間保存され、期限後に記事・履歴・画像が完全削除されます。</p>
           <div class="panel table-panel"><div class="post-table-head"><span>タイトル</span><span>コンテンツ種別</span><span>ステータス</span><span>更新日</span><span></span></div><div id="postTable"></div></div>
         </div>
       </section>

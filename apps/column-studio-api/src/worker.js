@@ -14,6 +14,8 @@ const ALLOWED_IMAGE_TYPES = new Set([
 
 const DEFAULT_REPOSITORY = "basecraftas89/BaseCraftas";
 const DEFAULT_BRANCH = "main";
+const TRASH_RETENTION_DAYS = 30;
+const TRASH_PURGE_BATCH_SIZE = 50;
 const TOTONOE_MEMBERS = [
   { id: "shindo-toshiki", name: "神藤 俊希" },
   { id: "kajiwara-yusuke", name: "梶原 祐輔" },
@@ -706,6 +708,7 @@ async function fetchGitHubFile(env, path, ref = env.GITHUB_BRANCH || DEFAULT_BRA
 async function commitGitHubFiles(env, files, message, baseSha) {
   const baseCommit = await githubRequest(env, `/git/commits/${encodeURIComponent(baseSha)}`);
   const blobs = await Promise.all(files.map(async (file) => {
+    if (file.delete) return { path: file.path, mode: "100644", type: "blob", sha: null };
     const blob = await githubRequest(env, "/git/blobs", {
       method: "POST",
       body: JSON.stringify({ content: encodeContent(file.content), encoding: "base64" }),
@@ -818,6 +821,46 @@ async function publishArticleToGitHub(env, article) {
     }
   }
   throw new Error("github_publish_conflict");
+}
+
+async function removeArticleFromGitHub(env, article) {
+  const articleJsonPath = `projects/totonoe/data/contents/${article.slug}.json`;
+  const articleHtmlPath = `projects/totonoe/contents/${article.slug}.html`;
+  const indexPath = "projects/totonoe/data/contents/index.json";
+  const message = `Unpublish content: ${article.title}`;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const branchName = env.GITHUB_BRANCH || DEFAULT_BRANCH;
+    const branch = branchName.split("/").map(encodeURIComponent).join("/");
+    const ref = await githubRequest(env, `/git/ref/heads/${branch}`);
+    const baseSha = ref.object.sha;
+    const [currentIndex, currentJson, currentHtml] = await Promise.all([
+      fetchGitHubFile(env, indexPath, baseSha),
+      fetchGitHubFile(env, articleJsonPath, baseSha),
+      fetchGitHubFile(env, articleHtmlPath, baseSha),
+    ]);
+    let index = { updated_at: null, articles: [] };
+    if (currentIndex?.content) {
+      try {
+        index = JSON.parse(decodeContent(currentIndex.content));
+      } catch (_error) {
+        throw new Error("published_index_invalid");
+      }
+    }
+    const previous = Array.isArray(index.articles) ? index.articles : [];
+    index.articles = previous.filter((item) => item.id !== article.id && item.slug !== article.slug);
+    index.updated_at = new Date().toISOString();
+    const files = [{ path: indexPath, content: `${JSON.stringify(index, null, 2)}\n` }];
+    if (currentJson) files.push({ path: articleJsonPath, delete: true });
+    if (currentHtml) files.push({ path: articleHtmlPath, delete: true });
+    try {
+      const commitSha = await commitGitHubFiles(env, files, message, baseSha);
+      return { commitSha, removed: { index: previous.length !== index.articles.length, json: Boolean(currentJson), html: Boolean(currentHtml) } };
+    } catch (error) {
+      if (error.status !== 422 || attempt === 1) throw error;
+    }
+  }
+  throw new Error("github_unpublish_conflict");
 }
 
 async function getMember(env, email) {
@@ -946,13 +989,14 @@ function normalizeArticle(input, fallback = {}) {
 async function recordVersion(env, article, actorEmail) {
   await env.DB.prepare(
     `INSERT INTO article_versions
-      (id, article_id, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
+      (id, article_id, revision, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
        episode_no, source_published_at, source_type, source_id, hero_url, body_html, status, actor_email)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       uid("ver"),
       article.id,
+      article.revision || 1,
       article.title,
       article.excerpt,
       article.category,
@@ -986,7 +1030,7 @@ async function listArticles(env) {
   const result = await env.DB.prepare(
     `SELECT id, revision, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
             episode_no, source_published_at, source_type, source_id, hero_url, body_html, status,
-            author_email, editor_email, published_at, created_at, updated_at
+            author_email, editor_email, published_at, deleted_at, created_at, updated_at
        FROM articles
       ORDER BY updated_at DESC`
   ).all();
@@ -1060,6 +1104,7 @@ async function updateArticle(request, env, id) {
   if (auth.error) return auth.error;
   const current = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
   if (!current) return json({ error: "not_found" }, { status: 404 });
+  if (current.deleted_at) return json({ error: "article_in_trash", message: "ゴミ箱の記事は復元してから編集してください。" }, { status: 409 });
   const payload = await readJson(request);
   if (!payload) return json({ error: "invalid_json" }, { status: 400 });
   if (Number(payload.expected_revision) !== current.revision) {
@@ -1086,6 +1131,59 @@ async function updateArticle(request, env, id) {
   return json({ article: serializeArticle(updated) });
 }
 
+async function changeArticleLifecycle(request, env, id) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const current = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
+  if (!current) return json({ error: "not_found" }, { status: 404 });
+  const payload = await readJson(request);
+  const action = String(payload?.action || "");
+  if (!["unpublish", "trash", "restore"].includes(action)) {
+    return json({ error: "invalid_action", message: "操作を確認してください。" }, { status: 400 });
+  }
+  if (Number(payload?.expected_revision) !== current.revision) {
+    return json({ error: "edit_conflict", message: "別の更新があります。最新の内容を確認してください。", article: serializeArticle(current) }, { status: 409 });
+  }
+  if (action === "restore" && !current.deleted_at) {
+    return json({ error: "not_in_trash", message: "この記事はゴミ箱にありません。" }, { status: 409 });
+  }
+  if (action !== "restore" && current.deleted_at) {
+    return json({ error: "article_in_trash", message: "先に記事を復元してください。" }, { status: 409 });
+  }
+
+  const lease = Date.now() + 300000;
+  const lock = await env.DB.prepare("INSERT INTO article_publish_locks (article_id, expires_at) SELECT id, ? FROM articles WHERE id = ? AND revision = ? ON CONFLICT(article_id) DO UPDATE SET expires_at = excluded.expires_at WHERE article_publish_locks.expires_at < ?")
+    .bind(lease, id, current.revision, Date.now()).run();
+  if (!lock.meta.changes) return json({ error: "edit_conflict", message: "別の更新または公開処理が進行中です。" }, { status: 409 });
+
+  try {
+    let githubResult = null;
+    if ((action === "unpublish" || action === "trash") && current.status === "published") {
+      githubResult = await removeArticleFromGitHub(env, current);
+    }
+    const nextStatus = action === "restore" ? "draft" : "archived";
+    const deletedAtSql = action === "trash" ? "CURRENT_TIMESTAMP" : "NULL";
+    const update = await env.DB.prepare(
+      `UPDATE articles
+          SET status = ?, deleted_at = ${deletedAtSql}, revision = revision + 1,
+              editor_email = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND revision = ?`
+    ).bind(nextStatus, auth.email, id, current.revision).run();
+    if (!update.meta.changes) {
+      return json({ error: "edit_conflict", message: "別の更新があります。最新の内容を確認してください。" }, { status: 409 });
+    }
+    const updated = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
+    await recordVersion(env, updated, auth.email);
+    await audit(env, auth.email, `article.${action}`, "article", id, githubResult || {});
+    return json({ article: serializeArticle(updated), github: githubResult });
+  } catch (error) {
+    await audit(env, auth.email, `article.${action}.failed`, "article", id, { error: String(error.message || error) });
+    return json({ error: "lifecycle_failed", message: String(error.message || error) }, { status: 500 });
+  } finally {
+    await env.DB.prepare("DELETE FROM article_publish_locks WHERE article_id = ? AND expires_at = ?").bind(id, lease).run();
+  }
+}
+
 async function articleHistory(request, env, id, versionId) {
   const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
   if (auth.error) return auth.error;
@@ -1110,6 +1208,8 @@ async function publicationStatus(request, env, id) {
   if (auth.error) return auth.error;
   const article = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
   if (!article) return json({ error: "not_found" }, { status: 404 });
+  if (article.deleted_at) return json({ stage: "trash", has_unpublished_changes: false });
+  if (article.status === "archived") return json({ stage: "archived", has_unpublished_changes: false });
   const job = await env.DB.prepare("SELECT * FROM publish_jobs WHERE article_id = ? ORDER BY rowid DESC LIMIT 1").bind(id).first();
   if (!job || job.status !== "published") return json({ stage: job ? job.status : "draft", job });
   const publishedRevision = job.article_revision;
@@ -1136,6 +1236,7 @@ async function enqueuePublish(request, env, id) {
 
   const article = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
   if (!article) return json({ error: "not_found" }, { status: 404 });
+  if (article.deleted_at) return json({ error: "article_in_trash", message: "ゴミ箱の記事は復元してから公開してください。" }, { status: 409 });
   const payload = await readJson(request);
   if (Number(payload && payload.expected_revision) !== article.revision) return json({ error: "edit_conflict", message: "更新があります。保存してから公開してください。" }, { status: 409 });
   if (!normalizeMainActorId(article.main_actor_id)) {
@@ -1194,6 +1295,220 @@ async function enqueuePublish(request, env, id) {
   } finally {
     await env.DB.prepare("DELETE FROM article_publish_locks WHERE article_id = ? AND expires_at = ?").bind(id, lease).run();
   }
+}
+
+
+function archiveFolderId(env) {
+  return String(env.DRIVE_ARCHIVE_FOLDER_ID || "").trim();
+}
+
+
+function encodeBase64Url(value) {
+  const bytes = typeof value === "string" ? new TextEncoder().encode(value) : new Uint8Array(value);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function pemPrivateKey(value) {
+  const base64 = String(value || "").replace(/\\n/g, "\n").replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, "");
+  if (!base64) throw new Error("google_drive_credentials_missing");
+  const binary = atob(base64);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+let driveTokenCache = null;
+async function driveAccessToken(env) {
+  if (env.GOOGLE_DRIVE_ACCESS_TOKEN) return env.GOOGLE_DRIVE_ACCESS_TOKEN;
+  if (driveTokenCache && driveTokenCache.expiresAt > Date.now() + 60000) return driveTokenCache.token;
+  const email = String(env.GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL || "").trim();
+  if (!email || !env.GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY) throw new Error("google_drive_credentials_missing");
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const header = encodeBase64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claim = encodeBase64Url(JSON.stringify({
+    iss: email,
+    scope: "https://www.googleapis.com/auth/drive.metadata.readonly",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: issuedAt,
+    exp: issuedAt + 3600,
+  }));
+  const key = await crypto.subtle.importKey("pkcs8", pemPrivateKey(env.GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(header + "." + claim));
+  const assertion = header + "." + claim + "." + encodeBase64Url(signature);
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    signal: AbortSignal.timeout(10000),
+    headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion }),
+  });
+  const payload = JSON.parse(await readTextLimit(response, 256 * 1024) || "{}");
+  if (!response.ok || !payload.access_token) throw new Error(payload.error_description || payload.error || "google_drive_token_failed");
+  driveTokenCache = { token: payload.access_token, expiresAt: Date.now() + Number(payload.expires_in || 3600) * 1000 };
+  return driveTokenCache.token;
+}
+
+async function fetchDriveArchiveFiles(env) {
+  const folderId = archiveFolderId(env);
+  if (!folderId) throw new Error("drive_archive_folder_missing");
+  const accessToken = await driveAccessToken(env);
+  const files = [];
+  let pageToken = "";
+  for (let page = 0; page < 5; page += 1) {
+    const params = new URLSearchParams({
+      q: "'" + folderId.replace(/'/g, "\\'") + "' in parents and trashed = false",
+      spaces: "drive",
+      orderBy: "createdTime desc",
+      pageSize: "1000",
+      fields: "nextPageToken,files(id,name,mimeType,createdTime,modifiedTime,webViewLink,thumbnailLink)",
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+    const response = await fetch("https://www.googleapis.com/drive/v3/files?" + params.toString(), {
+      signal: AbortSignal.timeout(10000),
+      headers: { accept: "application/json", authorization: "Bearer " + accessToken },
+    });
+    const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
+    if (!response.ok) throw new Error(payload?.error?.message || "google_drive_list_failed");
+    files.push(...(payload.files || []).filter((file) =>
+      String(file.mimeType || "").startsWith("video/") || String(file.mimeType || "").startsWith("audio/")
+    ));
+    pageToken = payload.nextPageToken || "";
+    if (!pageToken) break;
+  }
+  return files;
+}
+
+async function saveArchiveSyncState(env, values) {
+  await env.DB.prepare("INSERT INTO archive_sync_state (id, last_checked_at, last_success_at, last_error, file_count, new_count) VALUES ('drive', CURRENT_TIMESTAMP, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET last_checked_at = CURRENT_TIMESTAMP, last_success_at = excluded.last_success_at, last_error = excluded.last_error, file_count = excluded.file_count, new_count = excluded.new_count")
+    .bind(values.success ? new Date().toISOString() : null, values.error || "", values.fileCount || 0, values.newCount || 0).run();
+}
+
+async function scanDriveArchives(env, actorEmail = "system@column-studio") {
+  try {
+    const files = await fetchDriveArchiveFiles(env);
+    let newCount = 0;
+    for (const file of files) {
+      const existing = await env.DB.prepare("SELECT id FROM archive_candidates WHERE drive_file_id = ?").bind(file.id).first();
+      if (!existing) newCount += 1;
+      const viewUrl = file.webViewLink || ("https://drive.google.com/file/d/" + encodeURIComponent(file.id) + "/view");
+      await env.DB.prepare("INSERT INTO archive_candidates (id, drive_file_id, name, mime_type, web_view_link, thumbnail_link, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(drive_file_id) DO UPDATE SET name = excluded.name, mime_type = excluded.mime_type, web_view_link = excluded.web_view_link, thumbnail_link = excluded.thumbnail_link, created_time = excluded.created_time, modified_time = excluded.modified_time")
+        .bind(existing?.id || uid("archive"), file.id, String(file.name || "名称未設定").slice(0, 300), String(file.mimeType || "").slice(0, 100), viewUrl, String(file.thumbnailLink || ""), String(file.createdTime || ""), String(file.modifiedTime || "")).run();
+    }
+    await saveArchiveSyncState(env, { success: true, fileCount: files.length, newCount });
+    await audit(env, actorEmail, "archive.scan", "drive_folder", archiveFolderId(env), { file_count: files.length, new_count: newCount });
+    return { file_count: files.length, new_count: newCount };
+  } catch (error) {
+    await saveArchiveSyncState(env, { success: false, error: String(error.message || error) });
+    throw error;
+  }
+}
+
+async function listArchiveCandidates(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+  if (auth.error) return auth.error;
+  const [candidates, sync] = await Promise.all([
+    env.DB.prepare("SELECT id, drive_file_id, name, mime_type, web_view_link, thumbnail_link, created_time, modified_time, status, article_id, detected_at, imported_at FROM archive_candidates ORDER BY CASE status WHEN 'new' THEN 0 WHEN 'imported' THEN 1 ELSE 2 END, created_time DESC, detected_at DESC").all(),
+    env.DB.prepare("SELECT * FROM archive_sync_state WHERE id = 'drive'").first(),
+  ]);
+  return json({ candidates: candidates.results || [], sync: sync || null, schedule: "毎週土曜日 09:00（日本時間）" });
+}
+
+async function scanArchiveCandidates(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  try {
+    const result = await scanDriveArchives(env, auth.email);
+    return json(result);
+  } catch (error) {
+    return json({ error: "archive_scan_failed", message: String(error.message || error) }, { status: 502 });
+  }
+}
+
+function archiveSlug(fileId) {
+  const safe = String(fileId || "").toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+  return "archive-" + (safe || crypto.randomUUID());
+}
+
+function archiveTitle(name) {
+  return String(name || "アーカイブ動画").replace(/\.(mp4|mov|m4v|webm|mkv|mp3|m4a|wav)$/i, "").trim() || "アーカイブ動画";
+}
+
+async function importArchiveCandidate(request, env, id) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const candidate = await env.DB.prepare("SELECT * FROM archive_candidates WHERE id = ?").bind(id).first();
+  if (!candidate) return json({ error: "archive_candidate_not_found" }, { status: 404 });
+  if (candidate.article_id) {
+    const existing = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(candidate.article_id).first();
+    if (existing) return json({ article: serializeArticle(existing), candidate });
+  }
+  const sourceArticle = await env.DB.prepare("SELECT * FROM articles WHERE source_type = 'archive' AND source_id = ?").bind(candidate.drive_file_id).first();
+  if (sourceArticle) {
+    await env.DB.prepare("UPDATE archive_candidates SET status = 'imported', article_id = ?, imported_at = CURRENT_TIMESTAMP WHERE id = ?").bind(sourceArticle.id, id).run();
+    return json({ article: serializeArticle(sourceArticle), candidate: { ...candidate, status: "imported", article_id: sourceArticle.id } });
+  }
+  const articleId = uid("article");
+  let slug = archiveSlug(candidate.drive_file_id);
+  const collision = await env.DB.prepare("SELECT id FROM articles WHERE slug = ?").bind(slug).first();
+  if (collision) slug += "-" + crypto.randomUUID().slice(0, 8);
+  const title = archiveTitle(candidate.name);
+  const sourceDate = String(candidate.created_time || "").slice(0, 10);
+  const statements = [
+    env.DB.prepare("INSERT INTO articles (id, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url, source_published_at, source_type, source_id, hero_url, body_html, status, author_email, editor_email) VALUES (?, ?, ?, ?, 'content', 'totonoe', 'archive', '[]', '', '[]', ?, ?, 'archive', ?, ?, '', 'draft', ?, ?)")
+      .bind(articleId, slug, title, "Google Driveのアーカイブ候補から作成した下書きです。", candidate.web_view_link, sourceDate, candidate.drive_file_id, "", auth.email, auth.email),
+    env.DB.prepare("UPDATE archive_candidates SET status = 'imported', article_id = ?, imported_at = CURRENT_TIMESTAMP WHERE id = ?").bind(articleId, id),
+  ];
+  const results = await env.DB.batch(statements);
+  if (!results[0].meta.changes) return json({ error: "archive_import_failed" }, { status: 409 });
+  const article = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(articleId).first();
+  await recordVersion(env, article, auth.email);
+  await audit(env, auth.email, "archive.import", "archive_candidate", id, { article_id: articleId, drive_file_id: candidate.drive_file_id });
+  return json({ article: serializeArticle(article), candidate: { ...candidate, status: "imported", article_id: articleId } }, { status: 201 });
+}
+
+async function purgeExpiredTrash(env) {
+  const expired = await env.DB.prepare(
+    `SELECT id FROM articles
+      WHERE deleted_at IS NOT NULL
+        AND deleted_at <= datetime('now', '-${TRASH_RETENTION_DAYS} days')
+      ORDER BY deleted_at
+      LIMIT ?`
+  ).bind(TRASH_PURGE_BATCH_SIZE).all();
+  let purged = 0;
+  for (const article of expired.results || []) {
+    const lease = Date.now() + 300000;
+    const lock = await env.DB.prepare(
+      `INSERT INTO article_publish_locks (article_id, expires_at)
+       SELECT id, ? FROM articles
+        WHERE id = ? AND deleted_at IS NOT NULL
+          AND deleted_at <= datetime('now', '-${TRASH_RETENTION_DAYS} days')
+       ON CONFLICT(article_id) DO UPDATE SET expires_at = excluded.expires_at
+        WHERE article_publish_locks.expires_at < ?`
+    ).bind(lease, article.id, Date.now()).run();
+    if (!lock.meta.changes) continue;
+    try {
+      const assets = await env.DB.prepare("SELECT r2_key FROM article_assets WHERE article_id = ?").bind(article.id).all();
+      const keys = (assets.results || []).map((asset) => asset.r2_key).filter(Boolean);
+      if (keys.length && env.MEDIA) {
+        for (let offset = 0; offset < keys.length; offset += 1000) {
+          await env.MEDIA.delete(keys.slice(offset, offset + 1000));
+        }
+      }
+      const auditId = uid("audit");
+      const results = await env.DB.batch([
+        env.DB.prepare("DELETE FROM article_assets WHERE article_id = ?").bind(article.id),
+        env.DB.prepare("DELETE FROM article_versions WHERE article_id = ?").bind(article.id),
+        env.DB.prepare("DELETE FROM publish_jobs WHERE article_id = ?").bind(article.id),
+        env.DB.prepare("DELETE FROM article_publish_locks WHERE article_id = ? AND expires_at = ?").bind(article.id, lease),
+        env.DB.prepare("DELETE FROM articles WHERE id = ? AND deleted_at IS NOT NULL AND deleted_at <= datetime('now', '-30 days')").bind(article.id),
+        env.DB.prepare("INSERT INTO audit_events (id, actor_email, action, entity_type, entity_id, metadata) SELECT ?, ?, ?, ?, ?, ? WHERE changes() = 1")
+          .bind(auditId, "system@column-studio", "article.purge", "article", article.id, JSON.stringify({ retention_days: TRASH_RETENTION_DAYS, asset_count: keys.length })),
+      ]);
+      if (results[4].meta.changes) purged += 1;
+    } finally {
+      await env.DB.prepare("DELETE FROM article_publish_locks WHERE article_id = ? AND expires_at = ?").bind(article.id, lease).run();
+    }
+  }
+  return { purged, retention_days: TRASH_RETENTION_DAYS };
 }
 
 async function uploadAsset(request, env) {
@@ -1258,6 +1573,21 @@ async function serveMedia(request, env, key) {
 }
 
 export default {
+  async scheduled(controller, env) {
+    try {
+      if (controller.cron === "0 0 * * 6") {
+        const result = await scanDriveArchives(env);
+        console.log(JSON.stringify({ event: "archive.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, ...result }));
+        return;
+      }
+      const result = await purgeExpiredTrash(env);
+      console.log(JSON.stringify({ event: "trash.purge", cron: controller.cron, scheduled_time: controller.scheduledTime, ...result }));
+    } catch (error) {
+      console.error(JSON.stringify({ event: "scheduled.error", cron: controller.cron, scheduled_time: controller.scheduledTime, error: String(error.message || error) }));
+      throw error;
+    }
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = normalizePath(url.pathname);
@@ -1286,6 +1616,17 @@ export default {
       return createArticle(request, env);
     }
 
+    if (path === "/api/archive-candidates" && request.method === "GET") {
+      return listArchiveCandidates(request, env);
+    }
+    if (path === "/api/archive-candidates/scan" && request.method === "POST") {
+      return scanArchiveCandidates(request, env);
+    }
+    const archiveImportMatch = path.match(/^\/api\/archive-candidates\/([^/]+)\/import$/);
+    if (archiveImportMatch && request.method === "POST") {
+      return importArchiveCandidate(request, env, archiveImportMatch[1]);
+    }
+
     if (path === "/api/link-preview" && request.method === "POST") {
       return previewLink(request, env);
     }
@@ -1302,6 +1643,11 @@ export default {
     const articleMatch = path.match(/^\/api\/articles\/([^/]+)$/);
     if (articleMatch && request.method === "PATCH") {
       return updateArticle(request, env, articleMatch[1]);
+    }
+
+    const lifecycleMatch = path.match(/^\/api\/articles\/([^/]+)\/lifecycle$/);
+    if (lifecycleMatch && request.method === "POST") {
+      return changeArticleLifecycle(request, env, lifecycleMatch[1]);
     }
 
     const publishMatch = path.match(/^\/api\/articles\/([^/]+)\/publish$/);

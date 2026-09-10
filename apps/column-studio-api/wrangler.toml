@@ -3,10 +3,16 @@ main = "src/worker.js"
 compatibility_date = "2026-09-06"
 workers_dev = false
 
+[triggers]
+crons = [ "15 18 * * *", "0 0 * * 6" ]
+
 [vars]
 ALLOW_DEV_AUTH = "false"
+TEAM_DOMAIN = "https://royal-bird-2fb2.cloudflareaccess.com"
+POLICY_AUD = "bc858ed892e89c942df1e54dd631b77a6bdb6c7f8d8d0aa97462f2b968ae4a03"
 GITHUB_REPOSITORY = "basecraftas89/BaseCraftas"
 GITHUB_BRANCH = "main"
+DRIVE_ARCHIVE_FOLDER_ID = "12YHtKFODi75v_W08xFACzm97DjFIUCjg"
 
 [[routes]]
 pattern = "basecraftas.com/api/column-studio/*"

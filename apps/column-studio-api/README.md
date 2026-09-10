@@ -77,6 +77,21 @@ Worker の環境変数に次を設定してください。
 
 `GITHUB_TOKEN` はリポジトリやフロントエンドには置かないでください。Cloudflare Worker の secret としてのみ登録します。
 
+## 非公開・ゴミ箱・復元
+
+管理者はコンテンツ一覧から次の操作を行えます。
+
+- 非公開: 公開中の記事をGitHubの一覧JSONと個別HTML/JSONから取り除き、D1では `archived` として保持します。
+- ゴミ箱: 必要なら同じ公開ファイル削除を行い、D1の `deleted_at` を記録します。移動直後から30日間は記事本文、編集履歴、R2画像を保持します。
+- 復元: 30日以内のゴミ箱記事を `draft` に戻します。自動公開はせず、確認後に公開ボタンを押します。
+- 期限切れ削除: 毎日03:15（日本時間）のCron Triggerで、移動から30日を過ぎた記事・編集履歴・公開履歴・R2画像を完全削除します。処理は1回50記事までです。
+
+APIは `POST /api/articles/:id/lifecycle` で、`action` に `unpublish` / `trash` / `restore`、`expected_revision` に現在のリビジョンを送ります。完全削除は実装していません。
+
+既存D1には `migrations/20260908_article_lifecycle.sql` を一度だけ適用してください。Cron Triggerは `wrangler.toml` の `15 18 * * *`（UTC）を使用します。
+
+ダッシュボードの左側メニューは「すべて・コラム・Podcast・動画・アーカイブ」に分けています。Podcastなどの一覧から新規作成すると、その種別が最初から選択されます。
+
 ## 本番反映前の確認
 
 1. `TEAM_DOMAIN` と `POLICY_AUD` をWorkerに設定する。
@@ -86,3 +101,13 @@ Worker の環境変数に次を設定してください。
 5. 管理者・編集者・閲覧者の別アカウントで保存、競合、履歴、公開を確認する。
 
 GitHub App の秘密鍵やトークンは、リポジトリやフロントエンドに置かず、Cloudflare Worker の secret として登録してください。
+
+## Google Drive アーカイブ確認
+
+- 対象フォルダ: `12YHtKFODi75v_W08xFACzm97DjFIUCjg`
+- 自動確認: 毎週土曜日 09:00（日本時間。CronはUTCの `0 0 * * 6`）
+- 手動確認: アーカイブ画面の「今すぐ確認」
+- 反映方法: 新着を候補として保存し、「下書きに取り込む」で記事化します。Main Actorなどを確認してから公開します。
+- 必須Secret: `GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL` と `GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- Google CloudでDrive APIを有効化し、対象フォルダをサービスアカウントのメールへ「閲覧者」で共有します。
+- 公開済み記事と同じ `source_id` のDriveファイルは重複作成しません。

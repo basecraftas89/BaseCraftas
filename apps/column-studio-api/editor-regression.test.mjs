@@ -19,8 +19,8 @@ function prepare(query){
  async run(){return {meta:{changes:Number(sql.prepare(query).run(...args).changes)}}}};
 }
 const env={ALLOW_DEV_AUTH:'true',DB:{prepare,async batch(statements){sql.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());sql.exec('COMMIT');return results;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
-async function call(path,method='GET',body){
- return worker.fetch(new Request('https://test.local'+path,{method,headers:{'x-column-studio-dev-email':'test@example.com','content-type':'application/json'},body:body?JSON.stringify(body):undefined}),env);
+async function call(path,method='GET',body,email='test@example.com'){
+ return worker.fetch(new Request('https://test.local'+path,{method,headers:{'x-column-studio-dev-email':email,'content-type':'application/json'},body:body?JSON.stringify(body):undefined}),env);
 }
 let res=await call('/api/members');assert.equal(res.status,200);assert.equal((await res.json()).members.length,1);
 res=await call('/api/members/test','PATCH',{role:'editor',status:'active'});assert.equal(res.status,409);
@@ -73,17 +73,76 @@ res=await call('/api/articles/'+id+'/publication');publication=await res.json();
 globalThis.fetch=originalFetch;
 console.log('PASS: revision conflict, publishing lock, history restore, tag history, exact publication state');
 
+const lifecycleId='article_22345678-1234-1234-1234-123456789abc';
+res=await call('/api/articles','POST',{id:lifecycleId,slug:'lifecycle-test',title:'lifecycle',main_actor_id:'shindo-toshiki'});assert.equal(res.status,201);
+res=await call('/api/articles/'+lifecycleId+'/lifecycle','POST',{action:'trash',expected_revision:1},'editor@example.com');assert.equal(res.status,403);
+res=await call('/api/articles/'+lifecycleId+'/lifecycle','POST',{action:'trash',expected_revision:1});assert.equal(res.status,200);
+article=(await res.json()).article;assert.equal(article.status,'archived');assert.ok(article.deleted_at);assert.equal(article.revision,2);
+res=await call('/api/articles/'+lifecycleId,'PATCH',{expected_revision:2,title:'blocked'});assert.equal(res.status,409);
+res=await call('/api/articles');assert.ok((await res.json()).articles.find(item=>item.id===lifecycleId).deleted_at);
+res=await call('/api/articles/'+lifecycleId+'/lifecycle','POST',{action:'restore',expected_revision:2});assert.equal(res.status,200);
+article=(await res.json()).article;assert.equal(article.status,'draft');assert.equal(article.deleted_at,null);assert.equal(article.revision,3);
+sql.prepare("UPDATE articles SET status='published' WHERE id=?").run(lifecycleId);
+env.GITHUB_TOKEN='test-token';env.GITHUB_REPOSITORY='owner/repo';env.GITHUB_BRANCH='main';
+const deletionRequests=[];globalThis.fetch=async(url,options={})=>{
+ const pathname=new URL(String(url)).pathname;const body=options.body?JSON.parse(options.body):null;
+ deletionRequests.push({pathname,method:options.method||'GET',body});
+ if(pathname.endsWith('/git/ref/heads/main'))return new Response(JSON.stringify({object:{sha:'base-sha'}}),{status:200});
+ if(pathname.endsWith('/git/commits/base-sha'))return new Response(JSON.stringify({tree:{sha:'base-tree'}}),{status:200});
+ if(pathname.includes('/contents/projects/totonoe/data/contents/index.json'))return new Response(JSON.stringify({sha:'index-sha',content:Buffer.from(JSON.stringify({articles:[{id:lifecycleId,slug:'lifecycle-test'},{id:'keep',slug:'keep'}]})).toString('base64')}),{status:200});
+ if(pathname.includes('/contents/projects/totonoe/data/contents/lifecycle-test.json'))return new Response(JSON.stringify({sha:'json-sha'}),{status:200});
+ if(pathname.includes('/contents/projects/totonoe/contents/lifecycle-test.html'))return new Response(JSON.stringify({sha:'html-sha'}),{status:200});
+ if(pathname.endsWith('/git/blobs'))return new Response(JSON.stringify({sha:'index-blob'}),{status:201});
+ if(pathname.endsWith('/git/trees'))return new Response(JSON.stringify({sha:'new-tree'}),{status:201});
+ if(pathname.endsWith('/git/commits'))return new Response(JSON.stringify({sha:'new-commit'}),{status:201});
+ if(pathname.endsWith('/git/refs/heads/main'))return new Response(JSON.stringify({}),{status:200});
+ return new Response(JSON.stringify({message:'unexpected '+pathname}),{status:404});
+};
+res=await call('/api/articles/'+lifecycleId+'/lifecycle','POST',{action:'unpublish',expected_revision:3});assert.equal(res.status,200);
+const treeRequest=deletionRequests.find(item=>item.pathname.endsWith('/git/trees'));assert.ok(treeRequest);
+const deletedPaths=treeRequest.body.tree.filter(item=>item.sha===null).map(item=>item.path).sort();
+assert.deepEqual(deletedPaths,['projects/totonoe/contents/lifecycle-test.html','projects/totonoe/data/contents/lifecycle-test.json']);
+const indexBlobRequest=deletionRequests.find(item=>item.pathname.endsWith('/git/blobs'));
+const nextIndex=JSON.parse(Buffer.from(indexBlobRequest.body.content,'base64').toString('utf8'));assert.deepEqual(nextIndex.articles.map(item=>item.id),['keep']);
+globalThis.fetch=originalFetch;delete env.GITHUB_TOKEN;delete env.GITHUB_REPOSITORY;delete env.GITHUB_BRANCH;
+env.GOOGLE_DRIVE_ACCESS_TOKEN='drive-test-token';env.DRIVE_ARCHIVE_FOLDER_ID='folder-test';
+const driveRequests=[];globalThis.fetch=async url=>{driveRequests.push(String(url));return new Response(JSON.stringify({files:[{id:'drive_video_1',name:'週末のAI整え習慣 EP99.mp4',mimeType:'video/mp4',createdTime:'2026-09-10T01:00:00Z',modifiedTime:'2026-09-10T02:00:00Z',webViewLink:'https://drive.google.com/file/d/drive_video_1/view'}]}),{status:200});};
+res=await call('/api/archive-candidates/scan','POST',{});assert.equal(res.status,200);assert.equal((await res.json()).new_count,1);
+res=await call('/api/archive-candidates');let archiveData=await res.json();assert.equal(archiveData.candidates.length,1);assert.equal(archiveData.candidates[0].status,'new');assert.match(archiveData.schedule,/土曜日 09:00/);
+res=await call('/api/archive-candidates/'+archiveData.candidates[0].id+'/import','POST',{});assert.equal(res.status,201);let archiveArticle=(await res.json()).article;assert.equal(archiveArticle.content_type,'archive');assert.equal(archiveArticle.status,'draft');assert.equal(archiveArticle.source_id,'drive_video_1');assert.equal(archiveArticle.main_actor_id,'');
+await worker.scheduled({cron:'0 0 * * 6',scheduledTime:Date.now()},env);
+assert.ok(driveRequests.some(url=>url.includes("'folder-test'+in+parents")||url.includes('%27folder-test%27+in+parents')));
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM archive_candidates').get().n,1);
+globalThis.fetch=originalFetch;delete env.GOOGLE_DRIVE_ACCESS_TOKEN;delete env.DRIVE_ARCHIVE_FOLDER_ID;
+console.log('PASS: weekly Drive scan detects candidates and imports a reviewable archive draft');
+sql.prepare("UPDATE articles SET deleted_at='2026-07-01 00:00:00', status='archived' WHERE id=?").run(lifecycleId);
+sql.prepare("INSERT INTO article_assets(id,article_id,r2_key,url) VALUES('asset_old',?,'contents/old.png','https://test.local/old.png')").run(lifecycleId);
+const removedKeys=[];env.MEDIA={delete:async keys=>removedKeys.push(...(Array.isArray(keys)?keys:[keys]))};
+await worker.scheduled({cron:'15 18 * * *',scheduledTime:Date.now()},env);
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM articles WHERE id=?').get(lifecycleId).n,0);
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM article_versions WHERE article_id=?').get(lifecycleId).n,0);
+assert.deepEqual(removedKeys,['contents/old.png']);
+assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE entity_id=? AND action='article.purge'").get(lifecycleId).n,1);
+delete env.MEDIA;
+console.log('PASS: admin-only trash, restore, atomic GitHub unpublish, and 30-day purge');
+
 const html=readFileSync(resolve(root,'apps/column-studio/index.html'),'utf8');
 const js=readFileSync(resolve(root,'apps/column-studio/script.js'),'utf8');
 const dom=new JSDOM(html,{url:'https://local.test/apps/column-studio/',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window;
-w.scrollTo=()=>{};w.fetch=async()=>({ok:false,json:async()=>({})});
+w.scrollTo=()=>{};w.confirm=()=>true;w.fetch=async()=>({ok:false,json:async()=>({})});
 w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
 w.HTMLDialogElement.prototype.close=function(){this.open=false;};
 w.document.execCommand=(command,_,value)=>{if(command==='insertHTML')w.document.getElementById('articleEditor').insertAdjacentHTML('beforeend',value);};
-w.eval(js.replace(/\}\)\(\);\s*$/, 'window.editorTest={state,els,blankPost,collect,editPost,scheduleSave,syncRemoteArticle,sourceFromUrl,analyzeLink,setHeroPreview,showHistory,publish,insertBubble,checkpoint,api,openLatest,setCloud:(value)=>{cloudReady=value;},setApi:(value)=>{API_BASE=value;}};})();'));
+w.eval(js.replace(/\}\)\(\);\s*$/, 'window.editorTest={state,els,blankPost,collect,editPost,scheduleSave,syncRemoteArticle,sourceFromUrl,analyzeLink,setHeroPreview,showHistory,publish,insertBubble,checkpoint,api,openLatest,changeLifecycle,openContentView,setCloud:(value)=>{cloudReady=value;},setApi:(value)=>{API_BASE=value;}};})();'));
 const t=w.editorTest;
-t.blankPost(false);t.els.title.value='new draft';t.els.title.dispatchEvent(new w.Event('input',{bubbles:true}));
+assert.ok(w.document.querySelector('[data-content-view="column"]'));
+assert.ok(w.document.querySelector('[data-content-view="podcast"]'));
+assert.ok(w.document.querySelector('[data-content-view="video"]'));
+w.document.querySelector('[data-content-view="archive"]').click();assert.equal(w.document.getElementById('archiveSyncPanel').hidden,false);assert.match(w.document.getElementById('archiveSyncStatus').textContent,/端末版/);
+w.document.querySelector('[data-content-view="podcast"]').click();
+assert.equal(w.document.getElementById('contentListTitle').textContent,'Podcast');
+t.blankPost(false);assert.equal(t.els.contentType.value,'podcast');assert.ok(w.document.getElementById('view-editor').classList.contains('source-only-editor'));assert.equal(w.document.getElementById('linkIntakeTitle').textContent,'stand.fmのURLを貼り付け');assert.ok(w.document.getElementById('formatToolbar').offsetParent===null||w.getComputedStyle(w.document.getElementById('formatToolbar')).display==='none');assert.equal(t.els.mainActor.value,'shindo-toshiki');t.els.title.value='new draft';t.els.title.dispatchEvent(new w.Event('input',{bubbles:true}));
 assert.ok(t.state.editingId);assert.equal(t.state.posts[0].title,'new draft');
 assert.match(w.document.getElementById('saveState').textContent,/この端末/);
 t.setHeroPreview('https://test.local/hero.png');t.scheduleSave();assert.equal(t.state.posts[0].hero,'https://test.local/hero.png');
@@ -98,6 +157,10 @@ w.document.getElementById('flipBubble').click();assert.ok(bubble.classList.conta
 w.document.getElementById('removeBubble').click();assert.equal(t.els.editor.querySelectorAll('.editor-bubble').length,0);
 assert.ok(t.state.posts[0].history.some(v=>v.post.body.includes('keep words')));
 console.log('PASS: new draft autosave, hero persistence, tags, Speaker, bubble change/flip/delete without duplication');
+const lifecyclePost=t.state.posts[0];await t.changeLifecycle(lifecyclePost.id,'trash');assert.ok(lifecyclePost.deleted_at);assert.equal(lifecyclePost.status,'archived');
+assert.equal(w.document.querySelector('[data-filter="trash"]').classList.contains('active'),true);assert.match(w.document.getElementById('postTable').textContent,/あと30日/);
+await t.changeLifecycle(lifecyclePost.id,'restore');assert.equal(lifecyclePost.deleted_at,'');assert.equal(lifecyclePost.status,'draft');
+console.log('PASS: sidebar content navigation, visible trash action, automatic trash view, retention display, and restore');
 
 // While save A is in flight, type B. Response A must not erase B.
 t.setApi('/api/column-studio');t.setCloud(true);
