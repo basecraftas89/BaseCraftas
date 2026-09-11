@@ -1,5 +1,20 @@
 import {articleHtml} from './public-render.js';
 import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
+import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
+import {
+  normalizeCustomerEmail,
+  generateOtpCode,
+  generateSessionToken,
+  hashAuthValue,
+  timingSafeTextEqual,
+  sendOtpWithResend,
+  customerSessionCookie,
+  clearCustomerSessionCookie,
+  readCookie,
+  buildStripeCheckoutParams,
+  createStripeCheckoutSession,
+  createStripePortalSession,
+} from './customer-auth.js';
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
@@ -19,6 +34,9 @@ const DEFAULT_BRANCH = "main";
 const TRASH_RETENTION_DAYS = 30;
 const TRASH_PURGE_BATCH_SIZE = 50;
 const GOOGLE_API_SCOPES = "https://www.googleapis.com/auth/drive.readonly";
+const CUSTOMER_OTP_TTL_MINUTES = 10;
+const CUSTOMER_SESSION_DAYS = 30;
+const AUTH_RATE_BUCKET_MINUTES = 10;
 const TOTONOE_MEMBERS = [
   { id: "shindo-toshiki", name: "神藤 俊希" },
   { id: "kajiwara-yusuke", name: "梶原 祐輔" },
@@ -97,16 +115,48 @@ function uid(prefix) {
 
 function normalizePath(pathname) {
   const rawPath = pathname.replace(/\/+$/, "") || "/";
-  const basePath = "/api/column-studio";
+  const basePaths = ["/api/column-studio", "/api/totonoe-member"];
   const mediaBasePath = "/column-media";
-  if (rawPath === basePath) return "/";
-  if (rawPath.startsWith(`${basePath}/`)) {
-    return rawPath.slice(basePath.length).replace(/\/+$/, "") || "/";
+  for (const basePath of basePaths) {
+    if (rawPath === basePath) return "/";
+    if (rawPath.startsWith(`${basePath}/`)) {
+      return rawPath.slice(basePath.length).replace(/\/+$/, "") || "/";
+    }
   }
   if (rawPath.startsWith(`${mediaBasePath}/`)) {
     return `/media/${rawPath.slice(mediaBasePath.length).replace(/^\/+/, "")}`;
   }
   return rawPath;
+}
+
+function isPublicMemberRequest(rawPath, normalizedPath, method) {
+  const memberBasePath = "/api/totonoe-member";
+  if (rawPath !== memberBasePath && !rawPath.startsWith(`${memberBasePath}/`)) return true;
+  const allowed = new Set([
+    "GET /api/health",
+    "POST /api/customer/auth/request-code",
+    "POST /api/customer/auth/verify-code",
+    "GET /api/customer/auth/status",
+    "POST /api/customer/auth/logout",
+    "POST /api/customer/billing/checkout",
+    "POST /api/customer/billing/portal",
+    "POST /api/stripe/webhook",
+    "GET /api/customer/profile",
+    "PATCH /api/customer/profile",
+    "GET /api/weekly/me",
+    "GET /api/weekly/materials",
+    "GET /api/weekly/priority-question",
+    "POST /api/weekly/priority-question",
+    "GET /api/weekly/answer-videos",
+  ]);
+  const key = `${method} ${normalizedPath}`;
+  if (allowed.has(key)) return true;
+  if (method === "GET" && /^\/api\/weekly\/materials\/[^/]+\/open$/.test(normalizedPath)) return true;
+  if (method === "GET" && /^\/api\/weekly\/answer-videos\/[^/]+\/stream$/.test(normalizedPath)) return true;
+  if (method === "OPTIONS") {
+    return isPublicMemberRequest(rawPath, normalizedPath, "GET") || isPublicMemberRequest(rawPath, normalizedPath, "POST") || isPublicMemberRequest(rawPath, normalizedPath, "PATCH");
+  }
+  return false;
 }
 
 function safeFilename(name) {
@@ -467,7 +517,7 @@ function contentIndexHtml() {
         <a href="../service.html" class="nav-main">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
           <a href="../weekend-ai.html">週末のAI整え習慣</a>
-          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
+          <span class="nav-disabled" aria-disabled="true">TAYORI <small>準備中</small></span>
           <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
         </div>
       </div>
@@ -1365,11 +1415,11 @@ async function importArchiveCandidate(request, env, id) {
 }
 
 function weeklyMaterialTitle(fileName) {
-  return String(fileName || "ToToNoE Weekly")
+  return String(fileName || "ToToNoE+ TAYORI")
     .replace(/\.pdf$/i, "")
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
-    .trim() || "ToToNoE Weekly";
+    .trim() || "ToToNoE+ TAYORI";
 }
 
 async function fetchDriveWeeklyFiles(env) {
@@ -1457,11 +1507,11 @@ async function syncWeeklyMaterials(env, actorEmail = "system@column-studio") {
 }
 
 function weeklyAnswerVideoTitle(fileName) {
-  return String(fileName || "Weekly回答動画")
+  return String(fileName || "TAYORI回答動画")
     .replace(/\.(mp4|mov|m4v|webm)$/i, "")
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
-    .trim() || "Weekly回答動画";
+    .trim() || "TAYORI回答動画";
 }
 
 async function fetchDriveWeeklyAnswerVideos(env) {
@@ -1532,9 +1582,10 @@ async function syncWeeklyAnswerVideos(env, actorEmail = "system@column-studio") 
 }
 
 async function getCustomerAccess(request, env) {
-  const email = await getActorEmail(request, env);
+  const sessionAuth = await getCustomerIdentity(request, env);
+  const email = sessionAuth?.customer?.email || await getActorEmail(request, env);
   if (!email) return { error: json({ error: "authentication_required" }, { status: 401 }) };
-  const customer = await env.DB.prepare(
+  const customer = sessionAuth?.customer || await env.DB.prepare(
     "SELECT id, email, display_name, status FROM customer_accounts WHERE lower(email) = ? AND status = 'active'"
   ).bind(email).first();
   if (!customer) return { error: json({ error: "customer_not_found" }, { status: 403 }) };
@@ -1577,6 +1628,480 @@ async function getCustomerAccess(request, env) {
       has_curriculum_access: hasCurriculumAccess,
     },
   };
+}
+
+async function getCustomerIdentity(request, env) {
+  const token = readCookie(request, "totonoe_session");
+  if (!token || token.length > 256) return null;
+  if (!env.CUSTOMER_AUTH_SECRET) return null;
+  const tokenHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "session", token);
+  const customer = await env.DB.prepare(
+    `SELECT ca.id, ca.email, ca.display_name, ca.status, ca.email_verified_at,
+            ca.therapist_status, ca.stripe_customer_id, cs.id AS session_id
+       FROM customer_sessions cs
+       JOIN customer_accounts ca ON ca.id = cs.customer_id
+      WHERE cs.token_hash = ?
+        AND cs.revoked_at IS NULL
+        AND datetime(cs.expires_at) > datetime('now')
+        AND ca.status = 'active'
+        AND ca.email_verified_at IS NOT NULL
+      LIMIT 1`
+  ).bind(tokenHash).first();
+  return customer ? { customer } : null;
+}
+
+async function requireCustomerIdentity(request, env) {
+  const auth = await getCustomerIdentity(request, env);
+  if (!auth) return { error: json({ error: "authentication_required" }, { status: 401 }) };
+  return auth;
+}
+
+async function incrementCustomerAuthLimit(env, scopeKey, limit) {
+  const bucket = Math.floor(Date.now() / (AUTH_RATE_BUCKET_MINUTES * 60 * 1000));
+  const row = await env.DB.prepare(
+    `INSERT INTO customer_auth_rate_limits(scope_key, bucket, count)
+     VALUES (?, ?, 1)
+     ON CONFLICT(scope_key, bucket) DO UPDATE SET count = count + 1
+     RETURNING count`
+  ).bind(scopeKey, bucket).first();
+  if (Number(row?.count || 0) > limit) throw Object.assign(new Error("too_many_requests"), { status: 429 });
+}
+
+function isLocalDevelopmentRequest(request, env) {
+  return env.ALLOW_DEV_AUTH === "true" && ["localhost", "127.0.0.1", "test.local"].includes(new URL(request.url).hostname);
+}
+
+async function requestCustomerAuthCode(request, env) {
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const email = normalizeCustomerEmail(payload.email);
+  const ip = String(request.headers.get("cf-connecting-ip") || "unknown").slice(0, 80);
+  const requestKey = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "auth-request", ip);
+  const emailKey = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "auth-email", email);
+  await Promise.all([
+    incrementCustomerAuthLimit(env, `ip:${requestKey}`, 10),
+    incrementCustomerAuthLimit(env, `email:${emailKey}`, 3),
+  ]);
+
+  const code = generateOtpCode();
+  const challengeId = uid("auth_challenge");
+  const codeHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, `otp:${challengeId}`, code);
+  await env.DB.prepare(
+    `INSERT INTO customer_auth_challenges
+      (id, email, code_hash, request_key, status, expires_at)
+     VALUES (?, ?, ?, ?, 'pending', datetime('now', ?))`
+  ).bind(challengeId, email, codeHash, requestKey, `+${CUSTOMER_OTP_TTL_MINUTES} minutes`).run();
+
+  try {
+    let messageId = "local-development";
+    if (!isLocalDevelopmentRequest(request, env)) {
+      const result = await sendOtpWithResend(env, { email, code, challengeId });
+      messageId = result.messageId;
+    }
+    await env.DB.prepare(
+      "UPDATE customer_auth_challenges SET status = 'sent', resend_message_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(messageId, challengeId).run();
+    const response = { ok: true, expires_in_seconds: CUSTOMER_OTP_TTL_MINUTES * 60 };
+    if (isLocalDevelopmentRequest(request, env)) response.dev_code = code;
+    return json(response, { status: 202 });
+  } catch (error) {
+    await env.DB.prepare(
+      "UPDATE customer_auth_challenges SET status = 'failed', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(challengeId).run();
+    throw error;
+  }
+}
+
+async function verifyCustomerAuthCode(request, env) {
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const email = normalizeCustomerEmail(payload.email);
+  const code = String(payload.code || "").trim();
+  if (!/^\d{6}$/.test(code)) return json({ error: "invalid_auth_code" }, { status: 400 });
+  const challenge = await env.DB.prepare(
+    `SELECT id, code_hash, attempts_remaining
+       FROM customer_auth_challenges
+      WHERE email = ? AND status = 'sent' AND consumed_at IS NULL
+        AND datetime(expires_at) > datetime('now')
+      ORDER BY datetime(created_at) DESC LIMIT 1`
+  ).bind(email).first();
+  if (!challenge) return json({ error: "auth_code_expired" }, { status: 400 });
+  const candidateHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, `otp:${challenge.id}`, code);
+  if (!timingSafeTextEqual(candidateHash, challenge.code_hash)) {
+    await env.DB.prepare(
+      `UPDATE customer_auth_challenges
+          SET attempts_remaining = MAX(0, attempts_remaining - 1),
+              status = CASE WHEN attempts_remaining <= 1 THEN 'expired' ELSE status END,
+              updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND consumed_at IS NULL`
+    ).bind(challenge.id).run();
+    return json({ error: "invalid_auth_code", attempts_remaining: Math.max(0, Number(challenge.attempts_remaining) - 1) }, { status: 400 });
+  }
+
+  const consumed = await env.DB.prepare(
+    `UPDATE customer_auth_challenges
+        SET status = 'consumed', consumed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND consumed_at IS NULL AND attempts_remaining > 0`
+  ).bind(challenge.id).run();
+  if (!Number(consumed.meta?.changes || 0)) return json({ error: "auth_code_already_used" }, { status: 409 });
+
+  const newCustomerId = uid("customer");
+  await env.DB.prepare(
+    `INSERT INTO customer_accounts(id, email, status, email_verified_at)
+     VALUES (?, ?, 'active', CURRENT_TIMESTAMP)
+     ON CONFLICT(email) DO UPDATE SET
+       status = CASE WHEN status = 'deleted' THEN status ELSE 'active' END,
+       email_verified_at = CURRENT_TIMESTAMP,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(newCustomerId, email).run();
+  const customer = await env.DB.prepare(
+    "SELECT id, email, display_name, status, email_verified_at, therapist_status, stripe_customer_id FROM customer_accounts WHERE email = ?"
+  ).bind(email).first();
+  if (!customer || customer.status !== "active") return json({ error: "customer_account_unavailable" }, { status: 403 });
+
+  const token = generateSessionToken();
+  const tokenHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "session", token);
+  const sessionId = uid("customer_session");
+  await env.DB.prepare(
+    `INSERT INTO customer_sessions(id, customer_id, token_hash, expires_at)
+     VALUES (?, ?, ?, datetime('now', ?))`
+  ).bind(sessionId, customer.id, tokenHash, `+${CUSTOMER_SESSION_DAYS} days`).run();
+  return json({
+    ok: true,
+    customer: {
+      email: customer.email,
+      display_name: customer.display_name || "",
+      therapist_status: customer.therapist_status,
+    },
+  }, { headers: { "set-cookie": customerSessionCookie(token) } });
+}
+
+async function customerAuthStatus(request, env) {
+  const auth = await getCustomerIdentity(request, env);
+  if (!auth) return json({ authenticated: false });
+  return json({
+    authenticated: true,
+    customer: {
+      email: auth.customer.email,
+      display_name: auth.customer.display_name || "",
+      therapist_status: auth.customer.therapist_status,
+    },
+  });
+}
+
+async function logoutCustomer(request, env) {
+  const token = readCookie(request, "totonoe_session");
+  if (token && token.length <= 256) {
+    const tokenHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "session", token);
+    await env.DB.prepare(
+      "UPDATE customer_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = ? AND revoked_at IS NULL"
+    ).bind(tokenHash).run();
+  }
+  return json({ ok: true }, { headers: { "set-cookie": clearCustomerSessionCookie() } });
+}
+
+function checkoutSiteOrigin(request, env) {
+  const configured = String(env.PUBLIC_SITE_ORIGIN || "https://basecraftas.com").replace(/\/$/, "");
+  if (!/^https:\/\/[^/]+$/.test(configured)) throw Object.assign(new Error("invalid_public_site_origin"), { status: 503 });
+  if (isLocalDevelopmentRequest(request, env)) return new URL(request.url).origin;
+  return configured;
+}
+
+async function createCustomerCheckout(request, env) {
+  if (env.STRIPE_CHECKOUT_ENABLED !== "true") return json({ error: "stripe_checkout_not_enabled" }, { status: 503 });
+  const auth = await requireCustomerIdentity(request, env);
+  if (auth.error) return auth.error;
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const planCode = String(payload.plan_code || "");
+  if (!["weekly_monthly", "curriculum_monthly", "curriculum_annual"].includes(planCode)) {
+    return json({ error: "invalid_plan" }, { status: 400 });
+  }
+  const audienceType = payload.audience_type === "therapist" ? "therapist" : "general";
+  if (audienceType === "therapist" && auth.customer.therapist_status !== "verified") {
+    return json({ error: "therapist_verification_required" }, { status: 409 });
+  }
+  const requestId = String(payload.request_id || "");
+  if (!/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "invalid_request_id" }, { status: 400 });
+  const idempotencyKey = `checkout:${auth.customer.id}:${requestId}`;
+  const previous = await env.DB.prepare(
+    "SELECT stripe_checkout_session_id, checkout_url, status FROM stripe_checkout_attempts WHERE idempotency_key = ?"
+  ).bind(idempotencyKey).first();
+  if (previous?.checkout_url && previous.status === "pending") {
+    return json({ checkout_url: previous.checkout_url, session_id: previous.stripe_checkout_session_id, reused: true });
+  }
+
+  const active = await env.DB.prepare(
+    `SELECT id FROM customer_subscriptions
+      WHERE customer_id = ? AND product_code = ?
+        AND status IN ('incomplete', 'trialing', 'active', 'past_due', 'paused')
+      LIMIT 1`
+  ).bind(auth.customer.id, planCode === "weekly_monthly" ? "weekly" : "curriculum").first();
+  if (active) return json({ error: "subscription_already_exists" }, { status: 409 });
+  const history = await env.DB.prepare(
+    "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND product_code = 'curriculum' LIMIT 1"
+  ).bind(auth.customer.id).first();
+  const feeType = planCode === "weekly_monthly" ? "none" : (history ? "rejoin" : "first");
+  const campaignCode = feeType === "first" && planCode === "curriculum_monthly" && audienceType === "therapist"
+    ? String(env.STRIPE_CAMPAIGN_CODE || "none")
+    : "none";
+  const quote = resolveBillingQuote({ planCode, audienceType, feeType, campaignCode });
+  const attemptId = uid("checkout_attempt");
+  await env.DB.prepare(
+    `INSERT INTO stripe_checkout_attempts
+      (id, customer_id, idempotency_key, plan_code, audience_type, fee_type, campaign_code,
+       trial_days, recurring_amount_yen, entry_fee_yen, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')`
+  ).bind(attemptId, auth.customer.id, idempotencyKey, quote.planCode, quote.audienceType, quote.feeType,
+    quote.campaignCode, quote.trialPeriodDays, quote.recurringAmountYen, quote.entryFeeAmountYen).run();
+
+  const origin = checkoutSiteOrigin(request, env);
+  const isWeeklyPlan = quote.planCode === "weekly_monthly";
+  const params = buildStripeCheckoutParams({
+    quote,
+    env,
+    customer: auth.customer,
+    attemptId,
+    successUrl: isWeeklyPlan
+      ? `${origin}/projects/totonoe/weekly/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/projects/totonoe/curriculum/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: isWeeklyPlan
+      ? `${origin}/projects/totonoe/weekly.html?checkout=cancelled#pricing`
+      : `${origin}/projects/totonoe/curriculum/index.html?checkout=cancelled#pricing`,
+  });
+  try {
+    const session = await createStripeCheckoutSession(env, params, idempotencyKey);
+    await env.DB.prepare(
+      `UPDATE stripe_checkout_attempts
+          SET status = 'pending', stripe_checkout_session_id = ?, checkout_url = ?, stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?`
+    ).bind(session.id, session.url, session.customerId, attemptId).run();
+    return json({
+      checkout_url: session.url,
+      session_id: session.id,
+      quote: {
+        plan_code: quote.planCode,
+        first_charge_yen: quote.firstChargeAmountYen,
+        recurring_amount_yen: quote.recurringAmountYen,
+        trial_days: quote.trialPeriodDays,
+        campaign_code: quote.campaignCode,
+      },
+    }, { status: 201 });
+  } catch (error) {
+    await env.DB.prepare(
+      "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(String(error.detail || error.message || "stripe_error").slice(0, 200), attemptId).run();
+    throw error;
+  }
+}
+
+async function createCustomerPortal(request, env) {
+  const auth = await requireCustomerIdentity(request, env);
+  if (auth.error) return auth.error;
+  if (!/^cus_[A-Za-z0-9_]+$/.test(String(auth.customer.stripe_customer_id || ""))) {
+    return json({ error: "stripe_customer_missing" }, { status: 409 });
+  }
+  const subscription = await env.DB.prepare(
+    "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND provider = 'stripe' ORDER BY created_at DESC LIMIT 1"
+  ).bind(auth.customer.id).first();
+  if (!subscription) return json({ error: "subscription_not_found" }, { status: 409 });
+  const origin = checkoutSiteOrigin(request, env);
+  const session = await createStripePortalSession(env, {
+    customerId: auth.customer.stripe_customer_id,
+    returnUrl: `${origin}/projects/totonoe/curriculum/mypage.html?billing=returned`,
+  });
+  return json({ portal_url: session.url }, { status: 201 });
+}
+
+function stripeTimestamp(value) {
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds > 0 ? new Date(seconds * 1000).toISOString() : null;
+}
+
+function stripeSubscriptionStatus(value, deleted = false) {
+  if (deleted) return "canceled";
+  const status = String(value || "");
+  if (["incomplete", "trialing", "active", "past_due", "paused", "canceled", "unpaid"].includes(status)) return status;
+  return status === "incomplete_expired" ? "unpaid" : "incomplete";
+}
+
+function stripeObjectId(event) {
+  return String(event?.data?.object?.id || "").slice(0, 255);
+}
+
+function stripeMetadata(object) {
+  const source = object?.metadata && typeof object.metadata === "object" ? object.metadata : {};
+  return {
+    attemptId: String(source.attempt_id || ""),
+    customerId: String(source.customer_id || ""),
+    planCode: String(source.plan_code || ""),
+  };
+}
+
+function planDetails(planCode) {
+  if (planCode === "weekly_monthly") return { productCode: "weekly", billingInterval: "monthly", entitlements: ["weekly_access"] };
+  if (planCode === "curriculum_monthly") return { productCode: "curriculum", billingInterval: "monthly", entitlements: ["curriculum_all_access", "weekly_access"] };
+  if (planCode === "curriculum_annual") return { productCode: "curriculum", billingInterval: "annual", entitlements: ["curriculum_all_access", "weekly_access"] };
+  return null;
+}
+
+async function setSubscriptionEntitlements(env, subscription, status) {
+  const details = planDetails(subscription.plan_code);
+  if (!details) return;
+  const entitlementStatus = ["trialing", "active"].includes(status) ? "active" : "revoked";
+  for (const entitlementCode of details.entitlements) {
+    await env.DB.prepare(
+      `INSERT INTO customer_entitlements
+        (id, customer_id, entitlement_code, source_subscription_id, status, starts_at, ends_at)
+       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+       ON CONFLICT(customer_id, entitlement_code, source_subscription_id) DO UPDATE SET
+         status = excluded.status,
+         ends_at = excluded.ends_at,
+         updated_at = CURRENT_TIMESTAMP`
+    ).bind(
+      `entitlement_${subscription.id}_${entitlementCode}`,
+      subscription.customer_id,
+      entitlementCode,
+      subscription.id,
+      entitlementStatus,
+      entitlementStatus === "active" ? null : new Date().toISOString()
+    ).run();
+  }
+}
+
+async function findStripeAttempt(env, metadata, subscriptionId = "") {
+  if (metadata.attemptId) {
+    const attempt = await env.DB.prepare("SELECT * FROM stripe_checkout_attempts WHERE id = ?").bind(metadata.attemptId).first();
+    if (attempt) return attempt;
+  }
+  if (subscriptionId) {
+    return env.DB.prepare("SELECT * FROM stripe_checkout_attempts WHERE stripe_subscription_id = ? ORDER BY created_at DESC LIMIT 1").bind(subscriptionId).first();
+  }
+  return null;
+}
+
+async function upsertStripeSubscription(env, attempt, object, forcedStatus = "") {
+  const details = planDetails(attempt.plan_code);
+  if (!details) throw Object.assign(new Error("invalid_checkout_plan"), { status: 400 });
+  const providerSubscriptionId = String(object.subscription || object.id || "");
+  if (!/^sub_[A-Za-z0-9_]+$/.test(providerSubscriptionId)) throw Object.assign(new Error("invalid_stripe_subscription"), { status: 400 });
+  const existing = await env.DB.prepare("SELECT id FROM customer_subscriptions WHERE provider_subscription_id = ?").bind(providerSubscriptionId).first();
+  const subscriptionId = existing?.id || `subscription_${attempt.id}`;
+  const status = forcedStatus || stripeSubscriptionStatus(object.status);
+  const customerId = typeof object.customer === "string" ? object.customer : String(object.customer?.id || "");
+  const priceId = String(object.items?.data?.[0]?.price?.id || "");
+  const currentPeriodStart = stripeTimestamp(object.current_period_start);
+  const currentPeriodEnd = stripeTimestamp(object.current_period_end);
+  const canceledAt = stripeTimestamp(object.canceled_at);
+  await env.DB.prepare(
+    `INSERT INTO customer_subscriptions
+      (id, customer_id, product_code, billing_interval, audience_type, status, provider_subscription_id,
+       provider_price_id, recurring_amount_yen, entry_fee_yen, fee_type, current_period_start,
+       current_period_end, cancel_at_period_end, canceled_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(provider_subscription_id) DO UPDATE SET
+       status = excluded.status,
+       provider_price_id = CASE WHEN excluded.provider_price_id = '' THEN customer_subscriptions.provider_price_id ELSE excluded.provider_price_id END,
+       current_period_start = COALESCE(excluded.current_period_start, customer_subscriptions.current_period_start),
+       current_period_end = COALESCE(excluded.current_period_end, customer_subscriptions.current_period_end),
+       cancel_at_period_end = excluded.cancel_at_period_end,
+       canceled_at = COALESCE(excluded.canceled_at, customer_subscriptions.canceled_at),
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(
+    subscriptionId, attempt.customer_id, details.productCode, details.billingInterval, attempt.audience_type,
+    status, providerSubscriptionId, priceId, attempt.recurring_amount_yen, attempt.entry_fee_yen,
+    attempt.fee_type, currentPeriodStart, currentPeriodEnd, object.cancel_at_period_end ? 1 : 0, canceledAt
+  ).run();
+  if (/^cus_[A-Za-z0-9_]+$/.test(customerId)) {
+    await env.DB.prepare("UPDATE customer_accounts SET stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(customerId, attempt.customer_id).run();
+  }
+  await setSubscriptionEntitlements(env, { ...attempt, id: subscriptionId }, status);
+  return { subscriptionId, status, customerId };
+}
+
+async function processStripeEvent(env, event) {
+  const object = event.data?.object || {};
+  const metadata = stripeMetadata(object);
+  if (event.type === "checkout.session.expired") {
+    if (metadata.attemptId) {
+      await env.DB.prepare("UPDATE stripe_checkout_attempts SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(metadata.attemptId).run();
+    }
+    return "processed";
+  }
+  if (event.type === "checkout.session.completed") {
+    if (!/^cs_test_[A-Za-z0-9_]+$/.test(String(object.id || "")) || object.mode !== "subscription" || object.status !== "complete") {
+      throw Object.assign(new Error("invalid_checkout_session"), { status: 400 });
+    }
+    const attempt = await findStripeAttempt(env, metadata);
+    if (!attempt) return "ignored";
+    if (metadata.customerId !== attempt.customer_id || metadata.planCode !== attempt.plan_code || Number(attempt.livemode) !== Number(event.livemode)) {
+      throw Object.assign(new Error("checkout_metadata_mismatch"), { status: 400 });
+    }
+    const subscription = await upsertStripeSubscription(env, attempt, object, Number(attempt.trial_days || 0) > 0 ? "trialing" : "active");
+    await env.DB.prepare(
+      `UPDATE stripe_checkout_attempts SET status = 'completed', stripe_checkout_session_id = ?,
+       stripe_customer_id = ?, stripe_subscription_id = ?, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+    ).bind(object.id, subscription.customerId, subscription.subscriptionId ? String(object.subscription || "") : "", attempt.id).run();
+    return "processed";
+  }
+  if (["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
+    const subscriptionStripeId = String(object.id || "");
+    const attempt = await findStripeAttempt(env, metadata, subscriptionStripeId);
+    if (!attempt) return "ignored";
+    if (metadata.customerId && metadata.customerId !== attempt.customer_id) throw Object.assign(new Error("subscription_metadata_mismatch"), { status: 400 });
+    await upsertStripeSubscription(env, attempt, object, stripeSubscriptionStatus(object.status, event.type.endsWith(".deleted")));
+    await env.DB.prepare("UPDATE stripe_checkout_attempts SET stripe_subscription_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(subscriptionStripeId, attempt.id).run();
+    return "processed";
+  }
+  if (["invoice.paid", "invoice.payment_failed"].includes(event.type)) {
+    const subscriptionStripeId = typeof object.subscription === "string" ? object.subscription : String(object.subscription?.id || "");
+    if (!subscriptionStripeId) return "ignored";
+    const row = await env.DB.prepare(
+      `SELECT cs.id AS local_subscription_id, sca.* FROM customer_subscriptions cs
+       JOIN stripe_checkout_attempts sca ON sca.stripe_subscription_id = cs.provider_subscription_id
+       WHERE cs.provider_subscription_id = ? LIMIT 1`
+    ).bind(subscriptionStripeId).first();
+    if (!row) return "ignored";
+    const status = event.type === "invoice.paid" ? "active" : "past_due";
+    await env.DB.prepare("UPDATE customer_subscriptions SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE provider_subscription_id = ?").bind(status, subscriptionStripeId).run();
+    await setSubscriptionEntitlements(env, { ...row, id: row.local_subscription_id }, status);
+    return "processed";
+  }
+  return "ignored";
+}
+
+async function handleStripeWebhook(request, env) {
+  if (request.method !== "POST") return json({ error: "not_found" }, { status: 404 });
+  if (!/^application\/json(?:;|$)/i.test(request.headers.get("content-type") || "")) return json({ error: "unsupported_content_type" }, { status: 415 });
+  if (env.STRIPE_MODE !== "test") return json({ error: "stripe_test_mode_required" }, { status: 503 });
+  const rawBody = new TextDecoder().decode(await readBytes(request, 256 * 1024));
+  const { event } = await verifyStripeWebhook(rawBody, request.headers.get("stripe-signature"), env.STRIPE_WEBHOOK_SECRET);
+  if (event.livemode) return json({ error: "stripe_livemode_event_rejected" }, { status: 400 });
+  const inserted = await env.DB.prepare(
+    `INSERT OR IGNORE INTO stripe_webhook_events
+      (event_id, event_type, livemode, api_version, object_id, stripe_created_at, status)
+     VALUES (?, ?, ?, ?, ?, ?, 'processing')`
+  ).bind(event.id, event.type.slice(0, 120), 0, String(event.api_version || "").slice(0, 40), stripeObjectId(event), Number(event.created || 0) || null).run();
+  if (!Number(inserted.meta?.changes || 0)) {
+    const previous = await env.DB.prepare("SELECT status FROM stripe_webhook_events WHERE event_id = ?").bind(event.id).first();
+    if (previous?.status !== "failed") return json({ received: true, duplicate: true });
+    await env.DB.prepare(
+      "UPDATE stripe_webhook_events SET status = 'processing', attempt_count = attempt_count + 1, last_error = '', updated_at = CURRENT_TIMESTAMP WHERE event_id = ? AND status = 'failed'"
+    ).bind(event.id).run();
+  }
+  try {
+    const status = await processStripeEvent(env, event);
+    await env.DB.prepare(
+      "UPDATE stripe_webhook_events SET status = ?, processed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE event_id = ?"
+    ).bind(status, event.id).run();
+    console.log(JSON.stringify({ event: "stripe.webhook", stripe_event_id: event.id, stripe_event_type: event.type, status }));
+    return json({ received: true, status });
+  } catch (error) {
+    await env.DB.prepare(
+      "UPDATE stripe_webhook_events SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE event_id = ?"
+    ).bind(String(error.message || "webhook_processing_failed").slice(0, 200), event.id).run();
+    throw error;
+  }
 }
 
 async function requireWeeklyAccess(request, env) {
@@ -2021,6 +2546,15 @@ const worker = {
   async scheduled(controller, env) {
     await env.DB.prepare("DELETE FROM api_write_limits WHERE bucket < ?").bind(Math.floor(Date.now() / 60000) - 60).run();
     try {
+      await env.DB.prepare("DELETE FROM customer_auth_rate_limits WHERE bucket < ?").bind(Math.floor(Date.now() / (AUTH_RATE_BUCKET_MINUTES * 60 * 1000)) - 6).run();
+      await env.DB.prepare("DELETE FROM customer_auth_challenges WHERE datetime(created_at) <= datetime('now', '-1 day')").run();
+      await env.DB.prepare("DELETE FROM customer_sessions WHERE datetime(expires_at) <= datetime('now') OR datetime(COALESCE(revoked_at, '9999-12-31')) <= datetime('now', '-7 days')").run();
+    } catch (error) {
+      // During a staged release, existing scheduled jobs may run before the new migration is applied.
+      if (!String(error.message || error).includes("no such table")) throw error;
+      console.log(JSON.stringify({ event: "customer_auth.cleanup.skipped", reason: "migration_pending" }));
+    }
+    try {
       if (controller.cron === "0 * * * *") {
         const materials = await syncWeeklyMaterials(env);
         const answerVideos = await syncWeeklyAnswerVideos(env);
@@ -2051,6 +2585,28 @@ const worker = {
       const email = await getActorEmail(request, env);
       const member = await getMember(env, email);
       return json({ email, member });
+    }
+
+    if (path === "/api/customer/auth/request-code" && request.method === "POST") {
+      return requestCustomerAuthCode(request, env);
+    }
+    if (path === "/api/customer/auth/verify-code" && request.method === "POST") {
+      return verifyCustomerAuthCode(request, env);
+    }
+    if (path === "/api/customer/auth/status" && request.method === "GET") {
+      return customerAuthStatus(request, env);
+    }
+    if (path === "/api/customer/auth/logout" && request.method === "POST") {
+      return logoutCustomer(request, env);
+    }
+    if (path === "/api/customer/billing/checkout" && request.method === "POST") {
+      return createCustomerCheckout(request, env);
+    }
+    if (path === "/api/customer/billing/portal" && request.method === "POST") {
+      return createCustomerPortal(request, env);
+    }
+    if (path === "/api/stripe/webhook" && request.method === "POST") {
+      return handleStripeWebhook(request, env);
     }
 
     if (path === "/api/weekly/me" && request.method === "GET") {
@@ -2156,8 +2712,12 @@ export default {
   scheduled: worker.scheduled,
   async fetch(request, env) {
     try {
-      const path = normalizePath(new URL(request.url).pathname);
-      requestGuard(request, env, path);
+      const rawPath = new URL(request.url).pathname.replace(/\/+$/, "") || "/";
+      const path = normalizePath(rawPath);
+      if (!isPublicMemberRequest(rawPath, path, request.method)) {
+        return secureResponse(json({ error: "not_found" }, { status: 404 }));
+      }
+      if (path !== "/api/stripe/webhook") requestGuard(request, env, path);
       return secureResponse(await worker.fetch(request, env), path.startsWith('/media/'));
     } catch (error) {
       return secureResponse(json({error: error.status ? error.message : 'internal_error'}, {status: error.status || 500}));

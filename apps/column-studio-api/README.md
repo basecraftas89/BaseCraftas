@@ -119,10 +119,10 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 `/column-media/<key>` は公開操作で確定した画像だけを返します。既存画像の移行が必要です。
 詳しい反映順序と未実施項目は `../../docs/SECURITY_RELEASE_2026-09-11.md` を参照してください。
 
-## Weekly・カリキュラム会員画面
+## TAYORI・IROHA会員画面
 
-- `weekly_access`: Weekly単体会員。Weeklyとマイページを利用でき、カリキュラムはロック表示になります。
-- `curriculum_all_access`: カリキュラム会員。カリキュラムに加えてWeeklyも利用できます。
+- `weekly_access`: TAYORI単体会員。TAYORIとマイページを利用でき、IROHAはロック表示になります。
+- `curriculum_all_access`: IROHA会員。IROHAに加えてTAYORIも利用できます。
 - マイページの職種、勤務環境、役職、生成AI利用状況、関心テーマは `customer_profiles` に保存します。
 
 既存D1には次の順で一度だけ適用してください。
@@ -132,15 +132,67 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 3. `migrations/20260913_customer_profiles.sql`
 4. `migrations/20260914_weekly_priority_questions.sql`
 5. `migrations/20260915_weekly_delivery.sql`
+6. `migrations/20260916_stripe_foundation.sql`
 
-Weeklyの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、1時間ごとに動画メタデータを確認します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
+## Stripe連携（第2段階：メール認証とCheckout作成）
 
-運営用の質問管理表 `ToToNoE Weekly｜優先質問管理` はWeekly資料フォルダに作成済みです。管理表では、類似質問グループ、対応状況、回答動画タイトル・URL、運営メモまで追跡できます。現時点の質問データの正本はD1です。自動転記用の送信先ID・列定義・D1同期状態は準備済みですが、会員メール・プロフィール・質問本文を外部送信する処理は明示承認まで無効です。
+料金表、顧客用メール認証、Checkout Session作成、Checkout試行履歴、Webhookの重複防止テーブル、Stripe署名検証をローカル実装しています。
+Stripe DashboardのサンドボックスにTAYORI、IROHAに対応する商品（外部保存名もTAYORI・IROHAへ変更済み）および入会・再登録費の商品とPriceを作成し、Price IDを非秘密設定へ登録しています。Webhookによる権限更新はローカル実装・自動テスト済みですが、本番課金はまだ有効化していません。
+
+料金はブラウザから送られた金額を使用せず、`src/billing.js` のサーバー定義とD1の会員履歴・資格確認結果から決定します。
+StripeのシークレットキーとWebhook署名シークレットは、リポジトリや `wrangler.toml` に書かず、次段階でWorker Secretsへ登録します。
+
+- Secret: `CUSTOMER_AUTH_SECRET`（32文字以上のランダム値）
+- Secret: `RESEND_API_KEY`（送信専用権限）
+- Secret: `STRIPE_SECRET_KEY`
+- Secret: `STRIPE_WEBHOOK_SECRET`
+- 非秘密設定: `STRIPE_MODE=test`
+- 非秘密設定: `RESEND_FROM_EMAIL`（Resendで検証済みの送信元）
+
+初回入会ではIROHA料金を30日間無料にし、初回決済は入会費だけです。`trial_entry_5000` キャンペーンでは入会費5,000円だけを請求し、30日後から月額2,980円を開始します。再登録には無料期間を付けません。
+
+顧客認証はスタッフ用Cloudflare Accessと分離しています。6桁コードは10分有効・最大5回、ログインセッションは30日です。D1にはコードとCookieの原文ではなく、`CUSTOMER_AUTH_SECRET`を使った用途別HMACだけを保存します。既存D1には `migrations/20260917_stripe_trial_campaign.sql` の後に `migrations/20260918_customer_email_auth.sql` を一度だけ適用してください。
+
+会員向けCheckout APIは `/api/totonoe-member/api/customer/billing/checkout` です。料金・初回／再登録・キャンペーン・資格割引はWorkerがD1と環境変数から確定し、ブラウザから金額やStripe Price IDは受け取りません。誤課金を防ぐため、Stripeテスト環境でのE2E確認が終わるまでは `STRIPE_CHECKOUT_ENABLED = "false"` のままにします。
+
+TAYORIの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、1時間ごとに動画メタデータを確認します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
+
+運営用の質問管理表 `ToToNoE+ TAYORI｜優先質問管理` はTAYORI資料フォルダに作成済みです。管理表では、類似質問グループ、対応状況、回答動画タイトル・URL、運営メモまで追跡できます。現時点の質問データの正本はD1です。自動転記用の送信先ID・列定義・D1同期状態は準備済みですが、会員メール・プロフィール・質問本文を外部送信する処理は明示承認まで無効です。
 
 管理表の列順は `weekly-question-sheet-schema.json` を正とします。フォーム回答列は `situation → goal → use_by → attempts → blocker → question → answer_format → privacy_confirmed → video_consent` の順で、運営用の列はその後ろへ配置します。
 
-回答動画は `/api/weekly/answer-videos/:id/stream` でWeekly会員権限を確認し、DriveファイルIDをブラウザへ出さず、Rangeリクエスト対応でストリーミングします。本番ではサービスアカウントのOAuthスコープに `drive.readonly` を使用し、回答動画フォルダはそのサービスアカウントだけへ「閲覧者」で共有してください。コードと自動テストは実装済みですが、Worker再反映後の実ファイル再生確認は別途必要です。
+回答動画は `/api/weekly/answer-videos/:id/stream` でTAYORI会員権限を確認し、DriveファイルIDをブラウザへ出さず、Rangeリクエスト対応でストリーミングします。本番ではサービスアカウントのOAuthスコープに `drive.readonly` を使用し、回答動画フォルダはそのサービスアカウントだけへ「閲覧者」で共有してください。コードと自動テストは実装済みですが、Worker再反映後の実ファイル再生確認は別途必要です。
 
 質問管理表の自動転記を有効にする場合は、同じサービスアカウントへ対象スプレッドシートだけを「編集者」で共有し、OAuthスコープへ `spreadsheets` を追加します。Driveフォルダ全体への編集権限は付けません。
 
 静的画面のロックは会員向けの案内表示です。教材ファイル自体を有料会員だけに限定する本番運用では、教材URLを静的JSへ直接置かず、`curriculum_all_access` を検証するWorker API経由で返してください。
+# TAYORI Stripeテスト決済
+
+TAYORI個人プランは `weekly_monthly`（月額980円・入会金なし）として、メール認証後にStripe Checkoutへ進みます。決済完了画面への遷移だけでは権限を付与せず、署名検証済みWebhookを受信してから `weekly_access` を有効化します。
+
+本番公開前は、次の順番を崩さないでください。
+
+1. Stripeをテストモードにして、Webhookエンドポイントを `https://basecraftas.com/api/totonoe-member/api/stripe/webhook` で作成する。
+2. 受信イベントを `checkout.session.completed`、`checkout.session.expired`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.paid`、`invoice.payment_failed` に限定する。
+3. Workerシークレット `STRIPE_SECRET_KEY` と `STRIPE_WEBHOOK_SECRET` を設定する。値はGit・HTML・READMEへ保存しない。
+4. `STRIPE_MODE=test` と `STRIPE_CHECKOUT_ENABLED=false` のままWorkerと静的サイトを反映する。
+5. Stripeのテストカードで、申込み・権限付与・重複通知・支払失敗・解約を確認する。
+6. 確認後にだけ `STRIPE_CHECKOUT_ENABLED=true` へ変更する。本番キーへの切替は別工程とする。
+
+Webhookは生のリクエスト本文、`Stripe-Signature`、5分以内の時刻差、テストイベントであることを検証します。イベントIDはD1の `stripe_webhook_events` に最小限だけ保存し、同じ通知で契約や権限を二重作成しません。処理失敗として記録された通知はStripe再送時に再処理します。
+
+## Stripe Customer Portal
+
+会員はマイページの「支払い・解約を管理」から、本人のStripe Customer IDに紐づく短時間有効のPortal Sessionを作成します。Portal URLを固定保存したり、別会員のCustomer IDをブラウザから指定したりはしません。
+
+Stripe Dashboardのテスト環境でCustomer Portalを有効化し、次を設定してください。
+
+- 支払い方法の更新: 有効
+- 請求書履歴の表示・ダウンロード: 有効
+- サブスクリプション解約: 有効
+- 解約時期: 現在の請求期間の終了時
+- 解約理由の収集: 有効
+- プラン変更・数量変更: TAYORI個人プランでは無効
+- デフォルトの戻り先: `https://basecraftas.com/projects/totonoe/curriculum/mypage.html`
+
+Portal Session作成APIは `/api/totonoe-member/api/customer/billing/portal` です。メール認証済みCookie、D1のStripe Customer ID、Stripe契約履歴がすべて揃う場合だけ作成します。解約結果は `customer.subscription.updated` と `customer.subscription.deleted` のWebhookでD1へ反映します。

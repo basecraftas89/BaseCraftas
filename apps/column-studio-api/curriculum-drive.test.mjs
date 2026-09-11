@@ -54,6 +54,26 @@ test("curriculum pages expose the management and learner flows", async () => {
   assert.match(dashboardHtml, /curriculum-store\.js/);
 });
 
+test("curriculum LP shows the therapist-only regular entry fee before the campaign price", async () => {
+  const [html, script] = await Promise.all([
+    fs.readFile(path.join(curriculumDir, "index.html"), "utf8"),
+    fs.readFile(path.join(curriculumDir, "curriculum.js"), "utf8")
+  ]);
+  assert.match(html, /id="priceOriginal">30,000/);
+  assert.match(html, /id="priceDiscount">83% OFF/);
+  assert.match(html, /資格確認済みセラピストだけの特別価格/);
+  assert.match(html, /id="recurringPrice">2,980/);
+  assert.match(html, /class="rejoin-prices"/);
+  assert.match(html, /30,000<small>円<\/small>/);
+  assert.match(html, /10,000<small>円<\/small>/);
+  assert.match(html, /初月のサブスク料金はかかりません/);
+  assert.match(html, /30日後から/);
+  assert.match(script, /audience === config\.campaign\.audience/);
+  assert.match(script, /recurringUnit/);
+  assert.match(script, /config\.entryFees\.first\[audience\]/);
+  assert.match(script, /Math\.round\(\(1 - entry \/ originalEntry\) \* 100\)/);
+});
+
 
 test("weekly progress separates goal and overachievement visually", async () => {
   const window = await loadStore();

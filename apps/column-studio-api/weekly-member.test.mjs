@@ -231,7 +231,7 @@ test("Weekly画面は優先質問を小分けで入力し、会員限定の回�
   assert.match(html, /name="video_consent"/);
   assert.match(html, /id="answerVideoList"/);
   assert.match(html, /類似質問/);
-  assert.match(html, /Weekly会員全員/);
+  assert.match(html, /TAYORI会員全員/);
   assert.match(html, /個別回答ではありません/);
   assert.match(script, /priority-question/);
   assert.match(script, /answer-videos/);

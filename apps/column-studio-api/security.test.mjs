@@ -86,6 +86,15 @@ test('cross-origin/missing-origin requests blocked and body type enforced',()=>{
  assert.doesNotThrow(()=>requestGuard(new Request(url,{method:'POST',headers:{origin:'https://basecraftas.com','content-type':'application/json'}}),{},'/api/articles'));
 });
 
+test('public member route exposes only customer-scoped endpoints',async()=>{
+ const f=fixture();
+ assert.equal((await f.call('/api/totonoe-member/api/health')).status,200);
+ assert.equal((await f.call('/api/totonoe-member/api/customer/auth/status','GET',undefined,'')).status,200);
+ for(const path of ['/api/me','/api/members','/api/articles','/api/weekly/admin/questions','/api/archive-candidates']) {
+  assert.equal((await f.call('/api/totonoe-member'+path,'GET',undefined,'admin@example.com')).status,404,path);
+ }
+});
+
 test('JSON body bounded without relying on content-length; per-account write limit',async()=>{
  const f=fixture();assert.equal((await f.call('/api/articles','POST',{slug:'large',body_html:'a'.repeat(513*1024)})).status,413);
  for(let i=0;i<59;i++)await f.call('/api/articles','POST',{});

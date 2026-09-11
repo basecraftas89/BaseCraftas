@@ -46,6 +46,17 @@
 .faq-item:hover,.faq-item:focus-within,.faq-item[open] { background:#fffdf5; border-color:rgba(214,106,69,.42); box-shadow:0 12px 26px rgba(42,74,61,.08); }
 .faq-item[open] summary::after { transform:rotate(45deg); background:var(--mist); }
 .faq-answer { color:var(--text-sub); font-size:.88rem; line-height:1.85; padding:0 1.25rem 1.2rem; }
+.flow-case-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; margin-top:2.5rem; }
+.flow-case { padding:2rem; border:1px solid var(--border-sage); background:#fff; }
+.flow-case-label { display:block; color:var(--terra); font-size:.75rem; font-weight:700; letter-spacing:.08em; margin-bottom:1rem; }
+.flow-case h3 { color:var(--green); font-size:1.45rem; margin-bottom:1rem; }
+.flow-case p,.flow-handover p { color:var(--text-sub); font-size:.9rem; line-height:1.9; }
+.flow-case-tech { margin-top:1.3rem; font-size:.78rem!important; }
+.flow-handover { margin-top:1.5rem; padding:2rem; border-left:3px solid var(--terra); background:var(--mist); }
+.flow-handover h3 { color:var(--green); font-size:1.12rem; margin-bottom:.65rem; }
+.flow-case-actions { margin-top:2rem; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; }
+.flow-case-note { margin-top:1rem; color:var(--text-sub); font-size:.8rem; line-height:1.8; }
+@media(max-width:680px){.flow-case-grid{grid-template-columns:1fr}.flow-case,.flow-handover{padding:1.4rem}.flow-case-actions .btn-primary{white-space:normal;text-align:center}}
 .flow-inline-cta { margin-top:5rem; padding:4rem 3rem; background:#fff; border:1px solid var(--border-sage); text-align:center; }
 @media(max-width:1024px){.flow-approach{grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.flow-page-hero{min-height:720px;padding-top:7rem}.flow-page-hero::before{background:linear-gradient(180deg,rgba(12,34,29,.86),rgba(12,34,29,.72))}.flow-hero-photo img{object-position:64% center}.flow-approach,.flow-service-list{grid-template-columns:1fr}.flow-slide{margin-top:2rem}.flow-inline-cta{margin-top:3.5rem;padding:3rem 1.25rem}.flow-text-details summary{align-items:flex-start}.flow-text-details summary small{padding-top:.16rem}}
@@ -98,6 +109,7 @@
       <div class="hero-acts">
         <a href="../contact.html?service=flow" class="btn-primary">AI活用について相談する</a>
         <a href="#service" class="btn-ghost-white">サービスを見る</a>
+        <a href="#development-cases" class="btn-ghost-white">アプリ導入実績を見る</a>
       </div>
     </div>
   </section>
@@ -164,6 +176,39 @@
     </div>
   </section>
 
+  <section class="sec" id="development-cases" aria-labelledby="flow-cases-title">
+    <div class="sec-inner">
+      <div class="reveal">
+        <span class="sec-eyebrow">Development / Cases</span>
+        <span class="sage-rule"></span>
+        <h2 class="sec-ttl" id="flow-cases-title">業務で使うアプリをつくり、<br>仕組みを共有する。</h2>
+        <p class="sec-desc">勤怠システムとシフト作成ツールを、自ら開発・導入してきました。業務で使うWebアプリの開発から、マニュアルの整備まで取り組んでいます。</p>
+      </div>
+      <div class="flow-case-grid">
+        <article class="flow-case reveal">
+          <span class="flow-case-label">開発・導入実績 / 勤怠管理</span>
+          <h3>勤怠システム</h3>
+          <p>Google Apps Script（GAS）を活用した勤怠管理のWebアプリを開発し、導入しました。</p>
+          <p class="flow-case-tech">対応内容：Webアプリ開発・導入・マニュアル作成</p>
+        </article>
+        <article class="flow-case reveal">
+          <span class="flow-case-label">開発・導入実績 / シフト作成</span>
+          <h3>シフト作成ツール</h3>
+          <p>Google Apps Script（GAS）を活用したシフト作成のWebアプリを開発し、導入しました。</p>
+          <p class="flow-case-tech">対応内容：Webアプリ開発・導入・マニュアル作成</p>
+        </article>
+      </div>
+      <div class="flow-handover reveal">
+        <h3>マニュアルを整え、ブラックボックス化を防ぐ。</h3>
+        <p>アプリの開発・導入とあわせてマニュアルも作成。仕組みがブラックボックス化しないよう取り組んでいます。開発時には、生成AIと対話しながらコードを組み立てる「バイブコーディング」を活用しています。</p>
+      </div>
+      <div class="reveal">
+        <div class="flow-case-actions"><a href="../contact.html?service=flow&amp;topic=app-development" class="btn-primary">自社の業務に合うアプリ開発を相談する</a></div>
+        <p class="flow-case-note">開発・導入の内容に応じて個別にお見積もりします。マニュアル・引継ぎ、保守・追加改修の対応範囲は、ご提案時に確認します。</p>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" style="background:var(--mist)">
     <div class="sec-inner">
       <div class="reveal">
@@ -189,7 +234,8 @@
         <details class="faq-item"><summary>医療・介護以外でも対応できますか？</summary><p class="faq-answer">対応できます。文書、会議、情報整理、教育、広報などの業務が多い中小企業にも対応します。</p></details>
         <details class="faq-item"><summary>訪問とオンラインの両方に対応できますか？</summary><p class="faq-answer">対応可能です。業務フロー確認や研修内容によって、訪問・オンラインを組み合わせます。</p></details>
         <details class="faq-item"><summary>セキュリティについて相談できますか？</summary><p class="faq-answer">AI利用ルールや情報の扱い方も整理します。機密情報や個人情報を扱う業務では、導入範囲を慎重に設計します。</p></details>
-        <details class="faq-item"><summary>システム開発もできますか？</summary><p class="faq-answer">Google Workspace、GAS、軽量なWebアプリ、自動化の相談は可能です。大規模な基幹システム開発は対象外です。</p></details>
+        <details class="faq-item"><summary>システム開発もできますか？</summary><p class="faq-answer">GASを活用した勤怠システム・シフト作成ツールの開発・導入実績があります。軽量なWebアプリや自動化について、今の業務を伺いながら対応範囲を整理します。大規模な基幹システム開発は対象外です。</p></details>
+        <details class="faq-item"><summary>アプリ開発の費用はスタートパックに含まれますか？</summary><p class="faq-answer">AI導入スタートパックは、AIセミナーと業務フロー確認のメニューです。アプリ開発は内容に応じた個別見積もりとなります。導入・引継ぎや、その後の保守・追加改修についても範囲を確認してご案内します。</p></details>
       </div>
       <div class="flow-inline-cta cta-inner reveal">
         <span class="sec-eyebrow" style="display:block;text-align:center">Craft Flow</span>
