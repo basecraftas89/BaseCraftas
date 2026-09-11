@@ -1,0 +1,129 @@
+{
+  "version": 3,
+  "rootName": "カリキュラム",
+  "rootId": "1VhRIwnuJaNr3ATLyWpqbm2oLxS3_aX5T",
+  "rootUrl": "https://drive.google.com/drive/folders/1VhRIwnuJaNr3ATLyWpqbm2oLxS3_aX5T",
+  "visibilityWarning": "現在のルートには「リンクを知っている全員・閲覧者」が設定されています。有料教材アップロード前に解除してください。",
+  "folders": [
+    {
+      "key": "management",
+      "name": "00_運用管理",
+      "driveFolderId": "1QwZa-4jUdVaeqsVXimFnrZrP_hNXKt01",
+      "audience": "admin",
+      "purpose": "台帳・運用ルール・権限管理"
+    },
+    {
+      "key": "literacy",
+      "name": "01_生成AIリテラシー",
+      "driveFolderId": "14yi_6o-lV0DLlOruZonhk-tm3DRiIYwm",
+      "audience": "curriculum_member",
+      "purpose": "生成AI全体の基礎、安全、倫理、情報管理",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "chatgpt",
+      "name": "02_ChatGPT",
+      "driveFolderId": "15J0s9USIKRmVxoZo2CQCke5Y5xII6_wL",
+      "audience": "curriculum_member",
+      "purpose": "ChatGPTの基礎から実務活用",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "claude",
+      "name": "02_Claude",
+      "driveFolderId": "16hlnn3nsHI7cVi0OV0gXGSlHB4ffnOY_",
+      "audience": "curriculum_member",
+      "purpose": "Claudeの基礎から長文・資料活用",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "gemini",
+      "name": "02_Gemini",
+      "driveFolderId": "1mdvX3ptE6UmpO_w0r755gOpIdAeXs7qj",
+      "audience": "curriculum_member",
+      "purpose": "GeminiとGoogleサービスの実務活用",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "excel_macro",
+      "name": "02_Excel・マクロ",
+      "driveFolderId": "1-tQzECnVzB1MqsyVCIsRcX4bM4FUezdU",
+      "audience": "curriculum_member",
+      "purpose": "Excel・VBA・マクロの基礎と自動化",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "other_ai",
+      "name": "02_その他AIツール",
+      "driveFolderId": "1LEFsUJpNIbgHQglPrYsbQG3wliiXKUhF",
+      "audience": "curriculum_member",
+      "purpose": "今後追加するAIツール別カリキュラム",
+      "children": [
+        "00_講座管理",
+        "01_基礎",
+        "02_実務活用",
+        "03_演習・理解度確認"
+      ]
+    },
+    {
+      "key": "working",
+      "name": "90_制作・確認中",
+      "driveFolderId": "1epBL3tgq-dhr1W74hRp5PrwQNFjz8_Gu",
+      "audience": "creator",
+      "purpose": "制作・レビュー中の非公開教材"
+    },
+    {
+      "key": "previous",
+      "name": "91_差し替え前",
+      "driveFolderId": "13E0z7r4Ov1CY1lFowJ0Te_t1Pi41nlUV",
+      "audience": "admin",
+      "purpose": "公開差し替え前の退避版"
+    },
+    {
+      "key": "trash",
+      "name": "99_削除予定",
+      "driveFolderId": "1T_wgOLZJXxAymsNpCgyXh4vpB0COOdUe",
+      "audience": "admin",
+      "purpose": "削除前の一時保管"
+    }
+  ],
+  "lessonFolderPattern": "{curriculum}/{section}/{sectionNo}_{lessonNo}_{lessonTitle}",
+  "lessonExample": "02_ChatGPT/01_基礎/01_01_ChatGPTとは何か",
+  "lessonFiles": [
+    "01_動画.mp4",
+    "02_文字起こし.pdf",
+    "03_ワークシート.pdf"
+  ],
+  "numberingRule": {
+    "00": "運用管理",
+    "01": "ツール横断の基礎・生成AIリテラシー",
+    "02": "ChatGPT・Claude・Geminiなどツール別カリキュラム",
+    "03": "業務別・職種別カリキュラム用に予約",
+    "90-99": "制作・差し替え・削除の運用領域"
+  }
+}

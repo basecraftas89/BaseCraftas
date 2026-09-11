@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ToToNoE+ IROHA｜料金・お申し込み</title>
+  <meta name="description" content="ToToNoE+ IROHAの料金と学習体験、お申し込み方法をご案内します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="curriculum.css?v=20260911a">
+</head>
+<body class="curriculum-site">
+  <header class="curriculum-header">
+    <a class="curriculum-brand" href="../index.html" aria-label="ToToNoE+ トップへ">
+      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566">
+    </a>
+    <nav aria-label="IROHAページ">
+      <a href="#experience">学習体験</a>
+      <a href="#pricing">料金</a>
+      <a href="dashboard.html" class="text-link">画面プレビュー</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="curriculum-hero">
+      <div class="curriculum-hero-copy">
+        <p class="eyebrow">ToToNoE+ IROHA</p>
+        <h1>基礎から学び、<br>自分らしく活かす力へ。</h1>
+        <p class="hero-lead">AIリテラシー、AI別の活用、動画編集・情報発信を学ぶ会員制サービス「IROHA｜いろは」。TAYORIの全特典も含まれます。</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#pricing">料金を確認する</a>
+          <a class="secondary-button" href="dashboard.html">学習画面を見る</a>
+        </div>
+        <p class="preview-note"><span class="material-symbols-rounded" aria-hidden="true">verified_user</span>メール認証後、安全なStripe決済画面へ移動します。</p>
+      </div>
+      <img class="curriculum-hero-image" src="../assets/totonoe-weekly-hero.jpg" alt="仕事の合間に学習する医療専門職" width="1663" height="941">
+    </section>
+
+    <section class="section-shell" aria-label="IROHAで学べること">
+      <img src="../assets/totonoe-iroha-banner-v1.jpg" alt="IROHA｜いろは。AIリテラシー、AI別の活用、副収入のスキル（動画編集・情報発信）。TAYORIの全特典を含む。" width="1672" height="941" loading="lazy" style="display:block;width:100%;height:auto;border-radius:16px">
+    </section>
+
+    <section class="section-shell" id="experience">
+      <p class="eyebrow">LEARNING EXPERIENCE</p>
+      <h2>学びを続けやすくする、3つの仕組み</h2>
+      <div class="feature-list">
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">calendar_month</span>
+          <div><h3>日曜から始まる週間プラン</h3><p>今週取り組む2〜3件を自分で選び、未完了分は次週へ移せます。</p></div>
+        </article>
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">route</span>
+          <div><h3>目的とツールから選ぶ</h3><p>ChatGPT、Claude、Excel・マクロなどを、必要な順番で学べます。</p></div>
+        </article>
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+          <div><h3>学びを相談につなげる</h3><p>最初のカリキュラムを修了すると、30分相談を1回利用できます。</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="pricing-section" id="pricing">
+      <div class="pricing-intro">
+        <p class="eyebrow">PRICING</p>
+        <h2>月額または年額を選べます。</h2>
+        <p>月額料金は原則固定。年額は2か月分お得です。</p>
+      </div>
+
+      <div class="billing-toggle" role="group" aria-label="支払い周期">
+        <button type="button" data-billing="monthly" aria-pressed="true" class="is-active">月額</button>
+        <button type="button" data-billing="annual" aria-pressed="false">年額 <small>2か月分お得</small></button>
+      </div>
+
+      <div class="audience-toggle" role="group" aria-label="申込区分">
+        <button type="button" data-audience="general" aria-pressed="false">一般</button>
+        <button type="button" data-audience="therapist" aria-pressed="true" class="is-active">セラピスト</button>
+      </div>
+
+      <article class="price-panel" aria-live="polite">
+        <div class="price-summary">
+          <p class="price-kicker" id="priceAudienceLabel">セラピスト初回限定キャンペーン</p>
+          <div class="campaign-price" id="campaignPrice">
+            <span>通常の初回入会金</span>
+            <del><span id="priceOriginal">30,000</span>円</del>
+            <strong id="priceDiscount">83% OFF</strong>
+          </div>
+          <p class="special-price-label" id="specialPriceLabel">資格確認済みセラピストだけの特別価格</p>
+
+          <div class="payment-schedule" aria-label="お支払いの流れ">
+            <div class="payment-step is-today">
+              <span class="payment-timing">今日</span>
+              <div>
+                <p class="payment-label">初回入会費</p>
+                <p class="price-total"><span id="priceTotal">5,000</span><small>円（税込）</small></p>
+                <p class="payment-note" id="entryFeeNote">通常30,000円から25,000円割引</p>
+              </div>
+            </div>
+            <span class="material-symbols-rounded payment-arrow" aria-hidden="true">arrow_forward</span>
+            <div class="payment-step is-later">
+              <span class="payment-timing">30日後から</span>
+              <div>
+                <p class="payment-label">サブスク料金</p>
+                <p class="recurring-price"><span id="recurringPrice">2,980</span><small id="recurringUnit">円／月（税込）</small></p>
+                <p class="payment-note" id="subscriptionStartNote">申込日から30日間は月額料金0円</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="payment-explanation" id="priceBreakdown"><strong>初月のサブスク料金はかかりません。</strong>資格確認後、本日は入会費5,000円のみお支払いいただき、月額2,980円は30日後から始まります。</p>
+        </div>
+        <ul>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>公開中の全カリキュラム</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>ToToNoE+ TAYORI</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>理解度チェック・学習履歴</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>条件達成で30分相談1回</li>
+        </ul>
+        <button type="button" class="primary-button preview-checkout" data-preview-action>メール認証して申し込む</button>
+      </article>
+
+      <div class="price-details">
+        <article><h3>セラピスト割引</h3><p>資格確認後、初回入会金と再登録費の両方から20,000円を割り引きます。</p></article>
+        <article class="rejoin-card">
+          <div class="price-detail-heading">
+            <span class="material-symbols-rounded" aria-hidden="true">restart_alt</span>
+            <div>
+              <h3>退会後の再登録</h3>
+              <p>再開時に必要となる登録費です。</p>
+            </div>
+          </div>
+          <div class="rejoin-prices" aria-label="再登録費">
+            <div class="rejoin-price-item">
+              <span>一般</span>
+              <strong>30,000<small>円</small></strong>
+            </div>
+            <div class="rejoin-price-item is-therapist">
+              <span>資格確認済み<br>セラピスト</span>
+              <strong>10,000<small>円</small></strong>
+            </div>
+          </div>
+          <p class="rejoin-note"><span class="material-symbols-rounded" aria-hidden="true">mail</span>前回と同じ認証済みメールアドレスが必要です。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="preview-dialog auth-dialog" id="checkoutPreview">
+    <div class="auth-dialog-body">
+      <button type="button" class="dialog-close" aria-label="閉じる" data-dialog-close><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
+      <p class="eyebrow">SECURE APPLICATION</p>
+      <h2>メールアドレスを確認します</h2>
+      <p id="checkoutSummary">初回限定・月額プランのお申し込みです。</p>
+
+      <form id="emailAuthForm" class="auth-step">
+        <label for="authEmail">メールアドレス</label>
+        <input id="authEmail" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+        <p class="field-help">再登録判定にも使用します。今後も確認できるメールアドレスをご入力ください。</p>
+        <button class="primary-button" type="submit">認証コードを送る</button>
+      </form>
+
+      <form id="codeAuthForm" class="auth-step" hidden>
+        <label for="authCode">6桁の認証コード</label>
+        <input id="authCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" required minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
+        <p class="field-help">コードは10分間有効です。メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>
+        <button class="primary-button" type="submit">認証してStripeへ進む</button>
+        <button class="auth-back" type="button" data-auth-back>メールアドレスを変更</button>
+      </form>
+      <p class="form-error" id="authError" role="alert" aria-live="polite"></p>
+      <p class="dialog-note">決済情報はStripeで安全に入力します。このサイトではカード番号を保存しません。</p>
+    </div>
+  </dialog>
+
+  <script src="curriculum-config.js?v=20260911b"></script>
+  <script src="curriculum.js?v=20260911b"></script>
+</body>
+</html>

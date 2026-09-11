@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>教材管理｜ToToNoE+ IROHA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="curriculum.css?v=20260911f">
+  <link rel="stylesheet" href="curriculum-admin.css?v=20260911a">
+</head>
+<body class="admin-app">
+  <header class="admin-header">
+    <a class="admin-brand" href="dashboard.html"><img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566"></a>
+    <nav aria-label="教材管理ナビゲーション"><a href="dashboard.html">受講画面</a><a class="is-active" href="admin.html">教材管理</a></nav>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-hero">
+      <div><p class="eyebrow">CURRICULUM CONTENTS</p><h1>Google Drive 教材管理</h1><p>DriveのファイルIDを登録し、制作・レビュー・公開をひとつの台帳で管理します。</p></div>
+      <span class="local-badge"><span class="material-symbols-rounded" aria-hidden="true">science</span>ローカル確認版</span>
+    </section>
+
+    <aside class="boundary-note"><span class="material-symbols-rounded" aria-hidden="true">verified_user</span><div><strong>有料教材のアップロード前に共有設定の変更が必要です</strong><p>現在のルートには「リンクを知っている全員・閲覧者」が設定されています。フォルダ構造は作成済みですが、有料教材を入れる前にこの権限を外してください。この画面は共有権限自体を変更しません。</p></div></aside>
+
+    <div class="admin-layout">
+      <div class="admin-primary">
+        <section class="admin-panel" aria-labelledby="driveSettingsTitle">
+          <div class="admin-panel-heading"><div><p class="step-label">STEP 1</p><h2 id="driveSettingsTitle">Driveの起点を登録</h2></div><span id="driveConnectionStatus" class="status-chip is-pending">未設定</span></div>
+          <form id="driveSettingsForm" class="settings-form">
+            <label><span>ルートフォルダURL / ID</span><input name="rootFolder" autocomplete="off" placeholder="https://drive.google.com/drive/folders/..."><small>作成済みの「IROHA｜いろは」フォルダを起点にします。</small></label>
+            <label><span>閲覧メンバー用Googleグループ</span><input name="memberGroupEmail" type="email" autocomplete="off" placeholder="curriculum-members@example.com"><small>任意。本番の権限付与先として使用します。</small></label>
+            <label><span>共有方式</span><select name="accessMode"><option value="restricted">制限付き（推奨）</option></select></label>
+            <p class="form-error" id="settingsError" role="alert"></p>
+            <button class="primary-button" type="submit">設定をこの端末に保存</button>
+          </form>
+        </section>
+
+        <section class="admin-panel" aria-labelledby="lessonFormTitle">
+          <div class="admin-panel-heading"><div><p class="step-label">STEP 2</p><h2 id="lessonFormTitle">教材を登録</h2></div><span class="status-chip">Drive ID方式</span></div>
+          <form id="lessonForm" class="lesson-form">
+            <label class="wide"><span>動画ファイルのGoogle Drive URL / ID</span><input name="videoUrl" autocomplete="off" placeholder="https://drive.google.com/file/d/.../view"><small id="videoIdHelp">URLからファイルIDだけを保存します。フォルダURLは登録できません。</small></label>
+            <label><span>ツール</span><select name="tool"><option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>Excel・マクロ</option><option>その他AIツール</option></select></label>
+            <label><span>レベル</span><select name="level"><option>基礎</option><option>実践</option><option>応用</option></select></label>
+            <label><span>教材コード</span><input name="code" required placeholder="GPT-BAS-02"></label>
+            <label><span>モジュール</span><input name="module" required placeholder="基本操作と安全"></label>
+            <label class="wide"><span>レッスン名</span><input name="title" required placeholder="安全に使うための基本"></label>
+            <label><span>目安時間（分）</span><input name="estimatedMinutes" type="number" min="1" max="600" value="12" required></label>
+            <label><span>公開範囲</span><select name="accessTier"><option value="curriculum_all_access">IROHA有料会員</option><option value="free_preview">無料体験</option></select></label>
+            <label><span>配置先</span><select name="folderStage"><option value="working">90_制作・確認中</option><option value="delivery">01_配信用コンテンツ</option><option value="free_preview">02_無料体験コンテンツ</option><option value="previous">91_差し替え前</option><option value="trash">99_削除予定</option></select></label>
+            <label><span>状態</span><select name="workflowStatus"><option value="draft">下書き</option><option value="review">レビュー待ち</option><option value="published">公開</option><option value="archived">アーカイブ</option></select></label>
+            <label class="wide"><span>文字起こしPDF（任意）</span><input name="transcriptUrl" autocomplete="off" placeholder="Google DriveのファイルURL / ID"></label>
+            <label class="wide"><span>ワークシートPDF（任意）</span><input name="worksheetUrl" autocomplete="off" placeholder="Google DriveのファイルURL / ID"></label>
+            <div class="publish-checks wide">
+              <strong>公開前チェック</strong>
+              <label><input type="checkbox" name="rightsChecked">動画・資料の公開権利を確認した</label>
+              <label><input type="checkbox" name="permissionChecked">対象会員でDriveを開けることを確認した</label>
+            </div>
+            <p class="form-error wide" id="lessonError" role="alert"></p>
+            <div class="form-actions wide"><button class="secondary-button" type="button" data-preview-video>埋め込みを確認</button><button class="primary-button" type="submit">教材を保存</button></div>
+          </form>
+          <div id="videoPreview" class="drive-preview" hidden></div>
+        </section>
+
+        <section class="admin-panel" aria-labelledby="lessonListTitle">
+          <div class="admin-panel-heading"><div><p class="step-label">STEP 3</p><h2 id="lessonListTitle">教材台帳</h2></div><span id="lessonCount" class="status-chip">0件</span></div>
+          <div class="lesson-filters"><select id="toolFilter" aria-label="ツールで絞り込み"><option value="">すべてのツール</option><option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>Excel・マクロ</option><option>その他AIツール</option></select><select id="statusFilter" aria-label="状態で絞り込み"><option value="">すべての状態</option><option value="draft">下書き</option><option value="review">レビュー待ち</option><option value="published">公開</option><option value="archived">アーカイブ</option></select></div>
+          <div class="lesson-list" id="lessonList"></div>
+        </section>
+      </div>
+
+      <aside class="admin-secondary">
+        <section class="admin-panel folder-panel"><p class="step-label">FOLDER RULE</p><h2>Driveフォルダ構成</h2><p>以下を運用上の固定構造として扱います。</p><div id="folderBlueprint" class="folder-tree"></div></section>
+        <section class="admin-panel permission-panel"><p class="step-label">ACCESS RULE</p><h2>権限の原則</h2><ul><li><b>管理者</b>：すべて管理</li><li><b>制作者</b>：90_制作・確認中のみ編集</li><li><b>有料会員</b>：01_生成AIリテラシーと02_ツール系を閲覧</li><li><b>無料ユーザー</b>：公開指定した体験教材のみ</li><li><b>TAYORI会員</b>：IROHA権限なし</li></ul></section>
+      </aside>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="curriculum-store.js?v=20260911a"></script>
+  <script src="curriculum-admin.js?v=20260911a"></script>
+</body>
+</html>
