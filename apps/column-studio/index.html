@@ -262,6 +262,9 @@
     <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>登録後、Cloudflare Accessでも同じメールアドレスを許可するとログインできます。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
-  <script src="script.js?v=20260909"></script>
+  <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
+  <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
+  <script src="security.js?v=20260911"></script>
+  <script src="script.js?v=20260911"></script>
 </body>
 </html>

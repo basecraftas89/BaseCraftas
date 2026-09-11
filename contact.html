@@ -17,6 +17,29 @@
 .contact-topic-icon { font-size:1.2rem; flex-shrink:0; padding-top:.05rem; }
 .contact-topic-ttl { font-size:.9rem; font-weight:700; color:var(--green); margin-bottom:.2rem; }
 .contact-topic-desc { font-size:.82rem; color:var(--text-sub); line-height:1.75; }
+.contact-services { margin-bottom:2.5rem; }
+.contact-services p { margin:.7rem 0 1.2rem; color:var(--text-sub); font-size:.88rem; line-height:1.8; }
+.contact-service-links { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; }
+.contact-service-links .service-choice { display:block; padding:1rem; border:1px solid var(--border-sage); border-radius:10px; background:#fff; color:var(--green); font-size:.85rem; line-height:1.7; }
+.contact-service-links strong { display:block; }
+.contact-service-links .service-choice:hover,.contact-service-links .service-choice[aria-current="true"] { background:var(--mist); border-color:var(--terra); }
+.contact-service-links a:focus-visible { outline:3px solid var(--terra); outline-offset:3px; }
+@media(max-width:680px){.contact-service-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.service-entry { min-width:0; }
+.service-preview { display:inline-block; margin:.65rem .3rem; color:var(--green); font-size:.78rem; text-decoration:underline; text-underline-offset:3px; }
+.form-questions { margin-top:1rem; padding:1rem 1.2rem; background:var(--mist); border-radius:10px; font-size:.85rem; line-height:1.9; }
+.form-questions summary { cursor:pointer; font-weight:700; color:var(--green); }
+.form-questions ul { padding-left:1.3rem; margin:.7rem 0; }
+.consultation-guide { padding:1.6rem; border:1px solid var(--border-sage); border-radius:16px; background:var(--cream); }
+.consultation-guide .guide-label { color:var(--terra); font-size:.75rem; font-weight:700; }
+.consultation-guide h2 { margin:.6rem 0 1rem; line-height:1.6; }
+.consultation-guide ul { padding-left:1.2rem; color:var(--text-sub); font-size:.9rem; line-height:1.9; }
+.consultation-guide li + li { margin-top:.6rem; }
+.contact-info .guide-note { margin:1rem 0 0; font-size:.85rem; line-height:1.9; }
+.contact-steps { margin-top:1.8rem; }
+.contact-steps ol { padding-left:1.3rem; font-size:.86rem; line-height:1.9; color:var(--text-sub); }
+.contact-steps li + li { margin-top:.8rem; }
+.contact-steps strong { display:block; color:var(--green); }
 /* Google Form embed */
 .form-wrapper { background:#fff; border:1px solid var(--border-sage); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-card); }
 .form-header { background:var(--green); padding:1.8rem 2rem; }
@@ -79,52 +102,51 @@
 
 <section class="sec">
   <div class="sec-inner">
+    <div class="contact-services" aria-labelledby="consultation-choice-title">
+      <h2 id="consultation-choice-title">相談したいサービスを選ぶ</h2>
+      <p>受付フォームは共通です。お名前・連絡先 → 相談種別の確認 → サービス別の質問、の順で進みます。選んだサービスはフォームに引き継がれ、途中で変更もできます。</p>
+      <nav class="contact-service-links" aria-label="相談するサービス">
+        <div class="service-entry"><a class="service-choice" href="contact.html?service=growth#consultation-form" data-service="growth"><strong>Craft Growth</strong>採用ブランディング</a><a class="service-preview" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform?usp=pp_url&amp;entry.1472144996=%E6%8E%A1%E7%94%A8%E3%83%96%E3%83%A9%E3%83%B3%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E4%BC%B4%E8%B5%B0%EF%BC%88Craft+Growth%EF%BC%89" target="_blank" rel="noopener" aria-label="Craft Growthのフォームを別タブで確認">フォームを別タブで確認 ↗</a></div>
+        <div class="service-entry"><a class="service-choice" href="contact.html?service=flow#consultation-form" data-service="flow"><strong>Craft Flow</strong>AI・業務改善・アプリ開発</a><a class="service-preview" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform?usp=pp_url&amp;entry.1472144996=AI%E5%B0%8E%E5%85%A5%E3%83%BB%E6%A5%AD%E5%8B%99%E6%94%B9%E5%96%84%E3%83%BBWeb%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA%EF%BC%88Craft+Flow%EF%BC%89" target="_blank" rel="noopener" aria-label="Craft Flowのフォームを別タブで確認">フォームを別タブで確認 ↗</a></div>
+        <div class="service-entry"><a class="service-choice" href="contact.html?service=vital#consultation-form" data-service="vital"><strong>Craft Vital</strong>健康資本支援</a><a class="service-preview" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform?usp=pp_url&amp;entry.1472144996=%E5%81%A5%E5%BA%B7%E8%B3%87%E6%9C%AC%E6%94%AF%E6%8F%B4%EF%BC%88Craft+Vital%EF%BC%89" target="_blank" rel="noopener" aria-label="Craft Vitalのフォームを別タブで確認">フォームを別タブで確認 ↗</a></div>
+        <div class="service-entry"><a class="service-choice" href="contact.html?service=other#consultation-form" data-service="other"><strong>まだ決まっていない方</strong>その他・サービス選び</a><a class="service-preview" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform?usp=pp_url&amp;entry.1472144996=%E3%81%A9%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%90%88%E3%81%86%E3%81%8B%E7%9B%B8%E8%AB%87%E3%81%97%E3%81%9F%E3%81%84" target="_blank" rel="noopener" aria-label="まだ決まっていない方のフォームを別タブで確認">フォームを別タブで確認 ↗</a></div>
+      </nav>
+      <details class="form-questions">
+        <summary>入力前に、サービスごとの質問内容を確認する</summary>
+        <p>最初の画面は共通です。名前・メールアドレスは必須、会社名・役職・電話番号・Web/SNSは任意です。次の画面で相談種別を確認すると、以下の質問へ進みます。</p>
+        <ul>
+          <li><strong>Craft Growth：</strong>採用・ブランドの相談テーマ、現在の発信媒体、課題・背景</li>
+          <li><strong>Craft Flow：</strong>AI・業務改善・Webアプリ開発の相談テーマ、利用中のツール、課題・背景</li>
+          <li><strong>Craft Vital：</strong>希望する健康施策、職場の課題・希望</li>
+          <li><strong>まだ決まっていない方：</strong>相談内容・希望。講演・研修、取材・協業の相談もこちらで伺います。</li>
+        </ul>
+        <p>選択式の詳しい質問は任意、課題・背景や相談内容の自由記述は必須です。選んだ相談の質問に回答したら送信へ進みます。</p>
+      </details>
+    </div>
     <div class="contact-layout">
-      <!-- 左: 情報 -->
-      <div class="reveal">
-        <h2>相談・問い合わせについて</h2>
-        <p>以下のフォームより、お名前・ご連絡先・相談内容をお送りください。内容を確認のうえ、通常3営業日以内にご連絡いたします。</p>
-        <div style="margin:1.4rem 0;padding:1.25rem 1.4rem;background:var(--mist);border:1px solid var(--border-sage);border-radius:10px">
-          <p style="margin:0 0 .8rem;font-size:.88rem;color:var(--text-sub);line-height:1.85"><strong style="color:var(--green)">Craft Growthの30分無料相談について</strong><br>採用・ブランド課題のご相談は、公式LINEから優先して受け付けています。</p>
-          <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary" style="font-size:.82rem;padding:.7rem 1rem">公式LINEで無料相談する</a>
+      <!-- 左: 選択した相談に合わせた案内 -->
+      <aside class="reveal contact-info" aria-label="相談のヒント">
+        <div class="consultation-guide">
+          <span class="guide-label" id="guideLabel">まずは、今のお困りごとから</span>
+          <h2 id="guideTitle">うまく説明できなくても、大丈夫です。</h2>
+          <ul id="guideExamples">
+            <li>何から手をつければよいか、一緒に整理したい</li>
+            <li>複数の課題があり、どのサービスが合うかわからない</li>
+            <li>実施時期や依頼内容が決まる前に相談したい</li>
+          </ul>
+          <p class="guide-note" id="guideNote">「今、困っていること」を短く書いていただくだけでも構いません。講演・研修、取材・協業のご相談も受け付けています。</p>
         </div>
-        <p>お急ぎの場合や、フォームに書きにくい内容については、SNSのDMでのご連絡も歓迎です。</p>
-        <div class="contact-topics">
-          <div class="contact-topic">
-            <div class="contact-topic-icon">🌱</div>
-            <div>
-              <div class="contact-topic-ttl">採用ブランディング伴走について</div>
-              <div class="contact-topic-desc">採用ブランディング・院内人材育成・SNS内製化・AI活用・採用導線など</div>
-            </div>
-          </div>
-          <div class="contact-topic">
-            <div class="contact-topic-icon">🌿</div>
-            <div>
-              <div class="contact-topic-ttl">健康資本・健康経営について</div>
-              <div class="contact-topic-desc">従業員の身体・睡眠・疲労・心理的余白・職場環境など</div>
-            </div>
-          </div>
-          <div class="contact-topic">
-            <div class="contact-topic-icon">🏥</div>
-            <div>
-              <div class="contact-topic-ttl">AI導入・業務改善について</div>
-              <div class="contact-topic-desc">AIセミナー・実践研修・業務フロー診断・内製化支援など</div>
-            </div>
-          </div>
-          <div class="contact-topic">
-            <div class="contact-topic-icon">💬</div>
-            <div>
-              <div class="contact-topic-ttl">その他のご相談</div>
-              <div class="contact-topic-desc">どのサービスが合うかわからない方も歓迎です</div>
-            </div>
-          </div>
-          <div class="contact-topic">
-            <div class="contact-topic-icon">🎤</div>
-            <div>
-              <div class="contact-topic-ttl">講演・研修依頼 / 取材・協業</div>
-              <div class="contact-topic-desc">登壇・メディア対応・パートナーシップについて</div>
-            </div>
-          </div>
+        <div class="contact-steps">
+          <h2>お問い合わせ後の流れ</h2>
+          <ol>
+            <li><strong>相談内容を送る</strong>決まっていること・まだ迷っていることを、わかる範囲でお知らせください。</li>
+            <li><strong>通常3営業日以内にご連絡</strong>内容を確認し、ご入力いただいたメールアドレスへお返事します。</li>
+            <li><strong>進め方を一緒に整理</strong>必要に応じて詳しい状況を伺い、相談内容に合う次の進め方をご案内します。</li>
+          </ol>
+        </div>
+        <div id="growthLineContact" hidden style="margin:1.4rem 0;padding:1.25rem 1.4rem;background:var(--mist);border:1px solid var(--border-sage);border-radius:10px">
+          <p style="margin:0 0 .8rem;font-size:.88rem;line-height:1.85"><strong style="color:var(--green)">LINEからのご相談も可能です</strong><br>Craft Growthの30分無料相談は、公式LINEでも受け付けています。</p>
+          <a href="https://lin.ee/5RBvZ1N" target="_blank" rel="noopener" class="btn-primary" style="font-size:.82rem;padding:.7rem 1rem">公式LINEで無料相談する</a>
         </div>
         <div style="margin-top:2rem;padding:1.2rem 1.4rem;background:var(--mist);border-radius:10px;border:1px solid var(--border-sage)">
           <p style="font-size:.85rem;color:var(--text-sub);line-height:1.9;margin:0">
@@ -132,11 +154,11 @@
             ご入力いただいた情報は、お問い合わせへの回答・サービスのご案内目的に使用します。法令に基づく場合を除き、ご本人の同意なく第三者へ提供しません。フォーム運用にはGoogleフォーム等の外部サービスを利用します。患者・利用者の個人情報、診断名、詳細な健康情報、業務上の機密情報はフォームに入力しないでください。詳しくは<a href="privacy-policy.html" style="color:var(--terra)">プライバシーポリシー</a>をご確認ください。
           </p>
         </div>
-      </div>
+      </aside>
 
       <!-- 右: フォーム -->
       <div class="reveal">
-        <div class="form-wrapper">
+        <div class="form-wrapper" id="consultation-form" style="scroll-margin-top:90px">
           <div class="form-header">
             <div class="form-header-ttl">お問い合わせフォーム</div>
             <div class="form-header-sub">通常3営業日以内にご連絡いたします</div>
@@ -144,10 +166,11 @@
           <div class="form-context" id="serviceContext" aria-live="polite">
             <span>CONSULTATION</span>
             <strong id="serviceContextTitle">どのサービスが合うか、まだ決まっていなくても大丈夫です。</strong>
-            <p id="serviceContextDesc">現状と目指したい状態を伺い、最初に整理することをご案内します。</p>
+            <p id="serviceContextDesc">フォームの「ご相談種別」で近いものを選ぶと、その内容に合う質問へ進みます。</p>
           </div>
+          <div class="form-note"><p><a id="topExternalFormLink" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform" target="_blank" rel="noopener" class="service-preview">この相談のフォームを別タブで開く ↗</a><br>最初は共通の連絡先入力画面です。「次へ」で相談種別を確認し、専用の質問に進めます。</p></div>
           <div class="form-embed">
-            <iframe
+            <iframe id="consultationForm" title="Base Craftas サービス別お問い合わせフォーム"
               src="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform?embedded=true"
               width="100%"
               height="900"
@@ -158,7 +181,7 @@
             </iframe>
           </div>
           <div class="form-note">
-            <p>フォームでの送信が難しい場合は、<a href="https://forms.gle/w479Taq1TtQjreJQ8" target="_blank" rel="noopener" style="color:var(--terra)">別タブでフォームを開く</a>か、SNS（Instagram・X）のDMからでもご連絡いただけます。フォームはGoogleフォームを利用しています。</p>
+            <p>フォームでの送信が難しい場合は、<a id="externalFormLink" href="https://docs.google.com/forms/d/e/1FAIpQLSfZWGcttTCviIKz9OmNQ6XWpREIJ7mK2MZ2ryix6YlFvEDyuQ/viewform" target="_blank" rel="noopener" style="color:var(--terra)">別タブでフォームを開く</a>か、SNS（Instagram・X）のDMからでもご連絡いただけます。フォームはGoogleフォームを利用しています。</p>
           </div>
         </div>
       </div>
@@ -212,16 +235,10 @@ const mn=document.getElementById('mainNav');window.addEventListener('scroll',()=
 const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
 burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
 document.querySelectorAll('.mob-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
-const serviceContext={
-  growth:{title:'Craft Growthのご相談として承ります。',desc:'採用状況・施設の強み・現場とのギャップを整理し、最初に取り組む範囲を一緒に確認します。'},
-  flow:{title:'Craft Flowのご相談として承ります。',desc:'時間がかかる業務やAI活用の状況を伺い、改善の入口を一緒に整理します。'},
-  vital:{title:'Craft Vitalのご相談として承ります。',desc:'職場の健康課題や実施したいテーマを伺い、セミナー・診断・年間支援の適した始め方を整理します。'}
-};
-const selectedService=serviceContext[new URLSearchParams(location.search).get('service')];
-if(selectedService){document.getElementById('serviceContextTitle').textContent=selectedService.title;document.getElementById('serviceContextDesc').textContent=selectedService.desc;}
 const ro=new IntersectionObserver((e)=>{e.forEach((x,i)=>{if(x.isIntersecting){setTimeout(()=>x.target.classList.add('visible'),i*80);ro.unobserve(x.target);}});},{threshold:.07,rootMargin:'0px 0px -30px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 </script>
+<script src="js/contact-form.js?v=20260909b"></script>
 <script src="js/site-motion.js"></script>
 </body>
 </html>

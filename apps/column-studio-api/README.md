@@ -39,7 +39,7 @@ Worker の環境変数に次を設定してください。
 
 - R2 binding: `MEDIA`
 - 1枚あたりの上限: 2MB
-- 許可形式: JPEG / PNG / WebP / GIF / SVG
+- 許可形式: JPEG / PNG / WebP / GIF（SVG拒否）
 - 保存先キー: `contents/YYYY/MM/<uuid>-<filename>`
 
 公開記事で表示する画像は `GET /media/<r2_key>` から配信します。
@@ -111,3 +111,36 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 - 必須Secret: `GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL` と `GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY`
 - Google CloudでDrive APIを有効化し、対象フォルダをサービスアカウントのメールへ「閲覧者」で共有します。
 - 公開済み記事と同じ `source_id` のDriveファイルは重複作成しません。
+
+## 2026-09-11 セキュリティ改修
+
+`migrations/20260911_security.sql` が必須です。画像配信は公開スナップショット方式へ変更しました。
+アップロードには保存済みarticle_idが必要です。管理画面は認証付き `/api/column-studio/media/<key>` でプレビューし、
+`/column-media/<key>` は公開操作で確定した画像だけを返します。既存画像の移行が必要です。
+詳しい反映順序と未実施項目は `../../docs/SECURITY_RELEASE_2026-09-11.md` を参照してください。
+
+## Weekly・カリキュラム会員画面
+
+- `weekly_access`: Weekly単体会員。Weeklyとマイページを利用でき、カリキュラムはロック表示になります。
+- `curriculum_all_access`: カリキュラム会員。カリキュラムに加えてWeeklyも利用できます。
+- マイページの職種、勤務環境、役職、生成AI利用状況、関心テーマは `customer_profiles` に保存します。
+
+既存D1には次の順で一度だけ適用してください。
+
+1. `migrations/20260911_curriculum_foundation.sql`
+2. `migrations/20260912_weekly_member_portal.sql`
+3. `migrations/20260913_customer_profiles.sql`
+4. `migrations/20260914_weekly_priority_questions.sql`
+5. `migrations/20260915_weekly_delivery.sql`
+
+Weeklyの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、1時間ごとに動画メタデータを確認します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
+
+運営用の質問管理表 `ToToNoE Weekly｜優先質問管理` はWeekly資料フォルダに作成済みです。管理表では、類似質問グループ、対応状況、回答動画タイトル・URL、運営メモまで追跡できます。現時点の質問データの正本はD1です。自動転記用の送信先ID・列定義・D1同期状態は準備済みですが、会員メール・プロフィール・質問本文を外部送信する処理は明示承認まで無効です。
+
+管理表の列順は `weekly-question-sheet-schema.json` を正とします。フォーム回答列は `situation → goal → use_by → attempts → blocker → question → answer_format → privacy_confirmed → video_consent` の順で、運営用の列はその後ろへ配置します。
+
+回答動画は `/api/weekly/answer-videos/:id/stream` でWeekly会員権限を確認し、DriveファイルIDをブラウザへ出さず、Rangeリクエスト対応でストリーミングします。本番ではサービスアカウントのOAuthスコープに `drive.readonly` を使用し、回答動画フォルダはそのサービスアカウントだけへ「閲覧者」で共有してください。コードと自動テストは実装済みですが、Worker再反映後の実ファイル再生確認は別途必要です。
+
+質問管理表の自動転記を有効にする場合は、同じサービスアカウントへ対象スプレッドシートだけを「編集者」で共有し、OAuthスコープへ `spreadsheets` を追加します。Driveフォルダ全体への編集権限は付けません。
+
+静的画面のロックは会員向けの案内表示です。教材ファイル自体を有料会員だけに限定する本番運用では、教材URLを静的JSへ直接置かず、`curriculum_all_access` を検証するWorker API経由で返してください。

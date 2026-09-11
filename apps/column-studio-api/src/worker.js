@@ -1,3 +1,6 @@
+import {articleHtml} from './public-render.js';
+import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
+
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
@@ -9,13 +12,13 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/png",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
 ]);
 
 const DEFAULT_REPOSITORY = "basecraftas89/BaseCraftas";
 const DEFAULT_BRANCH = "main";
 const TRASH_RETENTION_DAYS = 30;
 const TRASH_PURGE_BATCH_SIZE = 50;
+const GOOGLE_API_SCOPES = "https://www.googleapis.com/auth/drive.readonly";
 const TOTONOE_MEMBERS = [
   { id: "shindo-toshiki", name: "神藤 俊希" },
   { id: "kajiwara-yusuke", name: "梶原 祐輔" },
@@ -80,7 +83,7 @@ async function verifyAccessJwt(request, env) {
 }
 
 async function getActorEmail(request, env) {
-  if (env.ALLOW_DEV_AUTH === "true") {
+  if (env.ALLOW_DEV_AUTH === "true" && ["localhost", "127.0.0.1", "test.local"].includes(new URL(request.url).hostname)) {
     const devEmail = request.headers.get("x-column-studio-dev-email");
     if (devEmail) return devEmail.toLowerCase();
   }
@@ -263,14 +266,23 @@ async function fetchLinkPreview(url) {
   };
   if (!canFetchPreview(target.href)) return base;
   try {
-    const res = await fetch(target.href, {
-      redirect: "follow",
+    let res;
+    for (let hop = 0; hop < 4; hop++) {
+      if (target.protocol !== "https:" || target.username || target.password || target.port || !canFetchPreview(target.href)) return base;
+      res = await fetch(target.href, {
+      redirect: "manual",
       signal: AbortSignal.timeout(8000),
       headers: {
         "accept": "text/html,application/xhtml+xml",
         "user-agent": "basecraftas-column-studio-link-preview/1.0",
       },
-    });
+      });
+      if (![301,302,303,307,308].includes(res.status)) break;
+      const next = res.headers.get("location");
+      await res.body?.cancel();
+      if (!next || hop === 3) return base;
+      target = new URL(next, target);
+    }
     if (!res.ok) return base;
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("text/html")) return base;
@@ -326,6 +338,16 @@ function parseJsonArray(value) {
   }
 }
 
+function parseJsonObject(value) {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(String(value || "{}"));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+}
+
 function normalizePersonIds(ids) {
   const seen = new Set();
   return parseJsonArray(ids)
@@ -340,9 +362,9 @@ function normalizePersonIds(ids) {
 }
 
 function normalizePublishedBody(html) {
-  return String(html || "")
-    .replace(/src="assets\/characters\//g, 'src="../../../apps/column-studio/assets/characters/')
-    .replace(/href="assets\/characters\//g, 'href="../../../apps/column-studio/assets/characters/');
+  return sanitizeBody(html)
+    .replace(/src="assets\/characters\//g, 'src="../assets/characters/')
+    .replace(/href="assets\/characters\//g, 'href="../assets/characters/');
 }
 
 function publicAssetUrl(request, key) {
@@ -358,9 +380,9 @@ function articleJson(article, publishedAt, linkPreview = null) {
   const mainActor = findTotonoEPerson(article.main_actor_id);
   const speakerIds = normalizePersonIds(article.speaker_ids);
   const contentType = normalizeContentType(article.content_type);
-  const heroUrl = article.hero_url || (linkPreview && linkPreview.image) || "";
+  const heroUrl = safeUrl(article.hero_url || (linkPreview && linkPreview.image), true);
   const sourceType = article.source_type || (linkPreview && linkPreview.kind) || externalLinkKind(article.media_url);
-  const sourceId = article.source_id || (linkPreview && linkPreview.source_id) || sourceProfile(article.media_url).source_id;
+  const sourceId = safeSourceId(article.source_id || (linkPreview && linkPreview.source_id) || sourceProfile(article.media_url).source_id);
   return {
     id: article.id,
     revision: article.revision || 1,
@@ -377,7 +399,7 @@ function articleJson(article, publishedAt, linkPreview = null) {
     main_actor: mainActor,
     speaker_ids: speakerIds,
     speakers: speakerIds.map((id) => findTotonoEPerson(id)),
-    media_url: article.media_url || "",
+    media_url: safeUrl(article.media_url),
     episode_no: article.episode_no || (linkPreview && linkPreview.episode_no) || null,
     source_published_at: article.source_published_at || (linkPreview && linkPreview.published_at) || "",
     source_type: sourceType,
@@ -399,146 +421,6 @@ function articleJson(article, publishedAt, linkPreview = null) {
     published_at: publishedAt,
     updated_at: new Date().toISOString(),
   };
-}
-
-function articleHtml(articleData) {
-  const tags = (articleData.tags || []).map((tag) => `<span>${escHtml(tag)}</span>`).join("");
-  const speakers = (articleData.speakers || []).map((person) => escHtml(person.name)).join("、") || "—";
-  const hero = articleData.hero_url
-    ? `<figure class="column-hero-image"><img src="${escHtml(articleData.hero_url)}" alt=""></figure>`
-    : "";
-  const linkLabel = externalLinkLabel(articleData.content_type, articleData.media_url);
-  const mediaLink = articleData.media_url
-    ? `<p class="content-media-link"><a href="${escHtml(articleData.media_url)}" target="_blank" rel="noopener">${escHtml(linkLabel)} ↗</a></p>`
-    : "";
-  const section = publicSection(articleData.content_type);
-  return `<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="index,follow">
-<meta name="content-revision" content="${articleData.revision}">
-<title>${escHtml(articleData.title)}｜ToToNoE+ ${escHtml(articleData.content_type_label)}</title>
-<meta name="description" content="${escHtml(articleData.excerpt)}">
-<link rel="canonical" href="${escHtml(articleData.absolute_url)}">
-<meta property="og:title" content="${escHtml(articleData.title)}｜ToToNoE+ ${escHtml(articleData.content_type_label)}">
-<meta property="og:description" content="${escHtml(articleData.excerpt)}">
-<meta property="og:type" content="article">
-<meta property="og:image" content="https://basecraftas.com/projects/totonoe/assets/og-image.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=20260905g">
-<style>
-.column-actor{display:flex;align-items:center;gap:.75rem;margin-top:1.2rem;color:var(--ink-soft);font-size:.9rem}
-.column-actor strong{color:var(--teal-deep)}
-.content-media-link{margin-top:1.2rem}
-.content-media-link a{display:inline-flex;align-items:center;gap:.4rem;padding:.72rem 1rem;border-radius:999px;background:var(--teal-deep);color:#fff;font-weight:700;text-decoration:none}
-.column-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.3rem}
-.column-tags span{padding:.3rem .6rem;border-radius:999px;background:rgba(61,107,94,.12);color:var(--teal-deep);font-size:.74rem}
-.column-hero-image{margin-top:2rem}
-.column-hero-image img{width:100%;border-radius:18px;box-shadow:var(--shadow-sm)}
-.column-body-inner{font-size:1rem;line-height:2.08}
-.column-body-inner h2{margin:2.8rem 0 1rem;font-size:1.65rem;color:var(--teal-deep)}
-.column-body-inner h3{margin:2rem 0 .8rem;font-size:1.28rem;color:var(--teal-deep)}
-.column-body-inner p+p{margin-top:1.1rem}
-.column-body-inner mark{background:#fff0a8;padding:.05em .22em;border-radius:.2em}
-.column-body-inner blockquote{margin:2rem 0;padding:1.3rem 1.5rem;border-left:4px solid var(--sun);background:var(--sky-2)}
-.editor-bubble{display:grid;grid-template-columns:92px minmax(0,1fr);gap:1rem;align-items:start;margin:2rem 0}
-.editor-bubble.right{grid-template-columns:minmax(0,1fr) 92px}
-.editor-bubble.right .bubble-avatar{order:2}
-.bubble-avatar{text-align:center}
-.character-icon{width:82px;height:82px;object-fit:cover;border-radius:50%;box-shadow:var(--shadow-card)}
-.character-nameplate{display:block;width:110px;max-width:110px;margin:.35rem 0 0 50%;transform:translateX(-50%)}
-.bubble-copy{padding:1.2rem 1.4rem;border:1px solid var(--line);border-radius:14px;background:var(--sky-2)}
-.column-back{display:inline-block;margin-top:3rem;color:var(--teal-deep);font-weight:700}
-@media(max-width:700px){.column-hero{padding:7rem 2rem 3rem}.column-wrap{width:min(100% - 32px,880px)}.editor-bubble,.editor-bubble.right{grid-template-columns:1fr}.editor-bubble.right .bubble-avatar{order:0}}
-</style>
-</head>
-<body>
-<header class="site-header scrolled" id="siteHeader">
-  <div class="header-inner">
-    <a href="../index.html" class="brand" aria-label="ToToNoE+ トップへ">
-      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
-    </a>
-    <nav class="site-nav" id="siteNav">
-      <a href="../index.html">TOP</a>
-      <div class="nav-dropdown">
-        <a href="../service.html" class="nav-main">サービス</a>
-        <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../weekend-ai.html">週末のAI整え習慣</a>
-          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
-          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="../contents.html#seminars" class="nav-main active">コンテンツ</a>
-        <div class="nav-menu" aria-label="コンテンツメニュー">
-          <a href="../contents.html#seminars">セミナー</a>
-          <a href="../contents.html#podcast">ポッドキャスト</a>
-          <a href="../contents.html#library">学習コンテンツ</a>
-          <a href="../contents.html#columns">コラム</a>
-          <a href="../contents.html#archive">アーカイブ動画</a>
-        </div>
-      </div>
-      <a href="../team.html">チーム</a>
-      <a href="../faq.html">FAQ</a>
-    </nav>
-    <a href="../service.html" class="btn btn-cta header-cta">サービスを見る</a>
-    <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-<main>
-  <article class="column-article">
-    <section class="column-article-hero">
-      <div class="container">
-        <p class="eyebrow">${escHtml(articleData.content_type_label)} / ${escHtml(articleData.published_at)}</p>
-        <h1>${escHtml(articleData.title)}</h1>
-        <p class="column-lead">${escHtml(articleData.excerpt)}</p>
-        <p class="column-actor">Main Actor <strong>${escHtml(articleData.main_actor.name)}</strong> / Speaker <strong>${speakers}</strong></p>
-        ${mediaLink}
-        <div class="column-tags">${tags}</div>
-        ${hero}
-      </div>
-    </section>
-    <section class="section">
-      <div class="container column-article-body column-body-inner">
-        ${articleData.body_html || "<p>本文はまだありません。</p>"}
-        <a class="column-back" href="../contents.html#${section.hash}">← ${section.label}一覧へ戻る</a>
-      </div>
-    </section>
-  </article>
-</main>
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <a href="../index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
-        <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
-      </a>
-      <p>本質に向き合い、専門職が大切にしたいことへ戻れる余白をつくるチームプロジェクト。</p>
-    </div>
-    <nav class="footer-nav" aria-label="フッターナビゲーション">
-      <a href="../index.html">TOP</a>
-      <a href="../service.html">サービス</a>
-      <a href="../contents.html#seminars">コンテンツ</a>
-      <a href="../team.html">チーム</a>
-      <a href="../faq.html">FAQ</a>
-    </nav>
-  </div>
-  <div class="footer-base">
-    <span>© 2026 ToToNoE+ / Base Craftas</span>
-    <a href="../privacy.html">プライバシーポリシー</a>
-    <a href="../legal.html">特定商取引法に基づく表記</a>
-    <a href="../cancellation.html">キャンセル・解約ポリシー</a>
-  </div>
-</footer>
-<script src="../common.js?v=20260905a"></script>
-</body>
-</html>
-`;
 }
 
 function contentIndexHtml() {
@@ -878,6 +760,11 @@ async function requireRole(request, env, roles) {
   if (!member || !roles.includes(member.role)) {
     return { error: json({ error: "forbidden" }, { status: 403 }) };
   }
+  if (["POST","PATCH","PUT","DELETE"].includes(request.method)) {
+    const bucket = Math.floor(Date.now() / 60000);
+    const result = await env.DB.prepare("INSERT INTO api_write_limits(actor_email, bucket, count) VALUES (?, ?, 1) ON CONFLICT(actor_email, bucket) DO UPDATE SET count = count + 1 WHERE count < 60").bind(email, bucket).run();
+    if (!result.meta.changes) return {error: json({error: "rate_limited", message: "操作が多すぎます。1分ほど待ってください。"}, {status: 429, headers: {"retry-after":"60"}})};
+  }
   return { email, member };
 }
 
@@ -894,6 +781,9 @@ function validMemberRole(value) {
   return ["admin", "editor", "viewer"].includes(value) ? value : null;
 }
 
+const memberChangeGuard = "(NOT (role = 'admin' AND status = 'active') OR (? = 'admin' AND ? = 'active') OR (SELECT COUNT(*) FROM members WHERE role = 'admin' AND status = 'active') > 1)";
+function lastAdminError() { return json({error: "last_admin", message: "最後の管理者は変更・停止できません。"}, {status: 409}); }
+
 async function createMember(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
   if (auth.error) return auth.error;
@@ -908,8 +798,9 @@ async function createMember(request, env) {
   const id = existing?.id || uid("member");
   const savedName = name || existing?.name || "";
   if (existing) {
-    await env.DB.prepare("UPDATE members SET email = ?, name = ?, role = ?, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = ?")
-      .bind(email, savedName, role, id).run();
+    const updated = await env.DB.prepare("UPDATE members SET email = ?, name = ?, role = ?, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND " + memberChangeGuard)
+      .bind(email, savedName, role, id, role, "active").run();
+    if (!updated.meta.changes) return lastAdminError();
   } else {
     await env.DB.prepare("INSERT INTO members (id, email, name, role, status) VALUES (?, ?, ?, ?, 'active')")
       .bind(id, email, savedName, role).run();
@@ -929,12 +820,8 @@ async function updateMember(request, env, id) {
   const status = payload?.status || current.status;
   if (!role || !["active", "disabled"].includes(status)) return json({ error: "invalid_member", message: "権限または状態を確認してください。" }, { status: 400 });
 
-  if (current.role === "admin" && current.status === "active" && (role !== "admin" || status !== "active")) {
-    const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM members WHERE role = 'admin' AND status = 'active'").first();
-    if (Number(count?.count || 0) <= 1) return json({ error: "last_admin", message: "最後の管理者は変更できません。" }, { status: 409 });
-  }
-
-  await env.DB.prepare("UPDATE members SET role = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(role, status, id).run();
+  const updated = await env.DB.prepare("UPDATE members SET role = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND " + memberChangeGuard).bind(role, status, id, role, status).run();
+  if (!updated.meta.changes) return lastAdminError();
   await audit(env, auth.email, "member.update", "member", id, { role, status });
   const member = await env.DB.prepare("SELECT id, email, name, role, status, created_at, updated_at FROM members WHERE id = ?").bind(id).first();
   return json({ member });
@@ -942,8 +829,10 @@ async function updateMember(request, env, id) {
 
 async function readJson(request) {
   try {
-    return await request.json();
-  } catch (_error) {
+    const value = JSON.parse(new TextDecoder().decode(await readBytes(request, 512 * 1024)));
+    return value && typeof value === "object" && !Array.isArray(value) ? value : null;
+  } catch (error) {
+    if (error.status) throw error;
     return null;
   }
 }
@@ -975,13 +864,13 @@ function normalizeArticle(input, fallback = {}) {
     tags: JSON.stringify(tags),
     main_actor_id: normalizeMainActorId(input.main_actor_id || input.mainActorId || fallback.main_actor_id),
     speaker_ids: JSON.stringify(speakerIds),
-    media_url: String(input.media_url || input.mediaUrl || fallback.media_url || "").trim(),
+    media_url: safeUrl(input.media_url ?? input.mediaUrl ?? fallback.media_url ?? ""),
     episode_no: Number(input.episode_no || input.episodeNo || fallback.episode_no) || null,
     source_published_at: String(input.source_published_at || input.sourcePublishedAt || fallback.source_published_at || "").slice(0, 10),
     source_type: String(input.source_type || input.sourceType || fallback.source_type || "").trim(),
-    source_id: String(input.source_id || input.sourceId || fallback.source_id || "").trim(),
-    hero_url: String(input.hero_url || input.heroUrl || fallback.hero_url || "").trim(),
-    body_html: String(input.body_html || input.bodyHtml || fallback.body_html || ""),
+    source_id: safeSourceId(input.source_id ?? input.sourceId ?? fallback.source_id ?? ""),
+    hero_url: safeUrl(input.hero_url ?? input.heroUrl ?? fallback.hero_url ?? "", true),
+    body_html: sanitizeBody(input.body_html ?? input.bodyHtml ?? fallback.body_html ?? ""),
     status: fallback.status === "published" ? "published" : "draft",
   };
 }
@@ -1035,7 +924,7 @@ async function listArticles(env) {
       ORDER BY updated_at DESC`
   ).all();
   return (result.results || []).map((article) => ({
-    ...article,
+    ...serializeArticle(article),
     content_type: normalizeContentType(article.content_type),
     topic_tags: parseJsonArray(article.tags),
     tags: parseJsonArray(article.tags),
@@ -1091,11 +980,11 @@ async function createArticle(request, env) {
   const created = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
   await recordVersion(env, created, auth.email);
   await audit(env, auth.email, "article.create", "article", id);
-  return json({ article: { ...created, content_type: normalizeContentType(created.content_type), topic_tags: parseJsonArray(created.tags), tags: parseJsonArray(created.tags), main_actor: findTotonoEPerson(created.main_actor_id), speaker_ids: normalizePersonIds(created.speaker_ids), speakers: normalizePersonIds(created.speaker_ids).map((speakerId) => findTotonoEPerson(speakerId)) } }, { status: 201 });
+  return json({ article: { ...serializeArticle(created), content_type: normalizeContentType(created.content_type), topic_tags: parseJsonArray(created.tags), tags: parseJsonArray(created.tags), main_actor: findTotonoEPerson(created.main_actor_id), speaker_ids: normalizePersonIds(created.speaker_ids), speakers: normalizePersonIds(created.speaker_ids).map((speakerId) => findTotonoEPerson(speakerId)) } }, { status: 201 });
 }
 
 function serializeArticle(article) {
-  return { ...article, tags: parseJsonArray(article.tags), topic_tags: parseJsonArray(article.tags),
+  return { ...article, body_html: sanitizeBody(article.body_html), media_url: safeUrl(article.media_url), hero_url: safeUrl(article.hero_url, true), tags: parseJsonArray(article.tags), topic_tags: parseJsonArray(article.tags),
     speaker_ids: normalizePersonIds(article.speaker_ids) };
 }
 
@@ -1259,7 +1148,12 @@ async function enqueuePublish(request, env, id) {
     .run();
   await audit(env, auth.email, "publish.start", "article", id, { jobId });
 
+    const mediaKeys = await publicationAssets(env, article);
     const result = await publishArticleToGitHub(env, article);
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM article_public_assets WHERE article_id = ?").bind(id),
+      ...mediaKeys.map(key => env.DB.prepare("INSERT INTO article_public_assets(article_id, r2_key) VALUES (?, ?)").bind(id, key)),
+    ]);
     await env.DB.prepare(
       `UPDATE publish_jobs
           SET status = 'published', commit_sha = ?, live_url = ?, updated_at = CURRENT_TIMESTAMP
@@ -1302,6 +1196,14 @@ function archiveFolderId(env) {
   return String(env.DRIVE_ARCHIVE_FOLDER_ID || "").trim();
 }
 
+function weeklyFolderId(env) {
+  return String(env.DRIVE_WEEKLY_FOLDER_ID || "").trim();
+}
+
+function weeklyResponseFolderId(env) {
+  return String(env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID || "").trim();
+}
+
 
 function encodeBase64Url(value) {
   const bytes = typeof value === "string" ? new TextEncoder().encode(value) : new Uint8Array(value);
@@ -1317,17 +1219,15 @@ function pemPrivateKey(value) {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
-let driveTokenCache = null;
 async function driveAccessToken(env) {
   if (env.GOOGLE_DRIVE_ACCESS_TOKEN) return env.GOOGLE_DRIVE_ACCESS_TOKEN;
-  if (driveTokenCache && driveTokenCache.expiresAt > Date.now() + 60000) return driveTokenCache.token;
   const email = String(env.GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL || "").trim();
   if (!email || !env.GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY) throw new Error("google_drive_credentials_missing");
   const issuedAt = Math.floor(Date.now() / 1000);
   const header = encodeBase64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const claim = encodeBase64Url(JSON.stringify({
     iss: email,
-    scope: "https://www.googleapis.com/auth/drive.metadata.readonly",
+    scope: GOOGLE_API_SCOPES,
     aud: "https://oauth2.googleapis.com/token",
     iat: issuedAt,
     exp: issuedAt + 3600,
@@ -1343,8 +1243,7 @@ async function driveAccessToken(env) {
   });
   const payload = JSON.parse(await readTextLimit(response, 256 * 1024) || "{}");
   if (!response.ok || !payload.access_token) throw new Error(payload.error_description || payload.error || "google_drive_token_failed");
-  driveTokenCache = { token: payload.access_token, expiresAt: Date.now() + Number(payload.expires_in || 3600) * 1000 };
-  return driveTokenCache.token;
+  return payload.access_token;
 }
 
 async function fetchDriveArchiveFiles(env) {
@@ -1465,6 +1364,523 @@ async function importArchiveCandidate(request, env, id) {
   return json({ article: serializeArticle(article), candidate: { ...candidate, status: "imported", article_id: articleId } }, { status: 201 });
 }
 
+function weeklyMaterialTitle(fileName) {
+  return String(fileName || "ToToNoE Weekly")
+    .replace(/\.pdf$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim() || "ToToNoE Weekly";
+}
+
+async function fetchDriveWeeklyFiles(env) {
+  const folderId = weeklyFolderId(env);
+  if (!folderId) throw new Error("drive_weekly_folder_missing");
+  const accessToken = await driveAccessToken(env);
+  const files = [];
+  let pageToken = "";
+  for (let page = 0; page < 5; page += 1) {
+    const params = new URLSearchParams({
+      q: "'" + folderId.replace(/'/g, "\\'") + "' in parents and trashed = false and mimeType = 'application/pdf'",
+      spaces: "drive",
+      orderBy: "createdTime desc",
+      pageSize: "1000",
+      fields: "nextPageToken,files(id,name,description,mimeType,size,createdTime,modifiedTime,webViewLink,webContentLink)",
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+    const response = await fetch("https://www.googleapis.com/drive/v3/files?" + params.toString(), {
+      signal: AbortSignal.timeout(10000),
+      headers: { accept: "application/json", authorization: "Bearer " + accessToken },
+    });
+    const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
+    if (!response.ok) throw new Error(payload?.error?.message || "google_drive_weekly_list_failed");
+    files.push(...(payload.files || []));
+    pageToken = payload.nextPageToken || "";
+    if (!pageToken) break;
+  }
+  return files;
+}
+
+async function saveWeeklySyncState(env, values) {
+  await env.DB.prepare(
+    "INSERT INTO weekly_material_sync_state (id, last_checked_at, last_success_at, last_error, file_count, new_count) VALUES ('drive', CURRENT_TIMESTAMP, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET last_checked_at = CURRENT_TIMESTAMP, last_success_at = excluded.last_success_at, last_error = excluded.last_error, file_count = excluded.file_count, new_count = excluded.new_count"
+  ).bind(values.success ? new Date().toISOString() : null, values.error || "", values.fileCount || 0, values.newCount || 0).run();
+}
+
+async function syncWeeklyMaterials(env, actorEmail = "system@column-studio") {
+  try {
+    const files = await fetchDriveWeeklyFiles(env);
+    let newCount = 0;
+    for (const file of files) {
+      const existing = await env.DB.prepare("SELECT id FROM weekly_materials WHERE drive_file_id = ?").bind(file.id).first();
+      if (!existing) newCount += 1;
+      const viewUrl = file.webViewLink || ("https://drive.google.com/file/d/" + encodeURIComponent(file.id) + "/view");
+      const downloadUrl = file.webContentLink || ("https://drive.google.com/uc?export=download&id=" + encodeURIComponent(file.id));
+      const publishedAt = String(file.createdTime || file.modifiedTime || new Date().toISOString());
+      await env.DB.prepare(
+        `INSERT INTO weekly_materials
+          (id, drive_file_id, title, file_name, description, mime_type, size_bytes, web_view_link, web_content_link, published_at, drive_created_time, drive_modified_time, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
+         ON CONFLICT(drive_file_id) DO UPDATE SET
+           title = excluded.title,
+           file_name = excluded.file_name,
+           description = excluded.description,
+           mime_type = excluded.mime_type,
+           size_bytes = excluded.size_bytes,
+           web_view_link = excluded.web_view_link,
+           web_content_link = excluded.web_content_link,
+           drive_created_time = excluded.drive_created_time,
+           drive_modified_time = excluded.drive_modified_time,
+           status = 'published',
+           updated_at = CURRENT_TIMESTAMP`
+      ).bind(
+        existing?.id || uid("weekly"),
+        file.id,
+        weeklyMaterialTitle(file.name),
+        String(file.name || "weekly.pdf").slice(0, 300),
+        String(file.description || "").slice(0, 1000),
+        String(file.mimeType || "application/pdf"),
+        Number(file.size || 0),
+        viewUrl,
+        downloadUrl,
+        publishedAt,
+        String(file.createdTime || ""),
+        String(file.modifiedTime || "")
+      ).run();
+    }
+    await saveWeeklySyncState(env, { success: true, fileCount: files.length, newCount });
+    await audit(env, actorEmail, "weekly.scan", "drive_folder", weeklyFolderId(env), { file_count: files.length, new_count: newCount });
+    return { file_count: files.length, new_count: newCount };
+  } catch (error) {
+    await saveWeeklySyncState(env, { success: false, error: String(error.message || error) });
+    throw error;
+  }
+}
+
+function weeklyAnswerVideoTitle(fileName) {
+  return String(fileName || "Weekly回答動画")
+    .replace(/\.(mp4|mov|m4v|webm)$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim() || "Weekly回答動画";
+}
+
+async function fetchDriveWeeklyAnswerVideos(env) {
+  const folderId = weeklyResponseFolderId(env);
+  if (!folderId) throw new Error("drive_weekly_response_folder_missing");
+  const accessToken = await driveAccessToken(env);
+  const files = [];
+  let pageToken = "";
+  for (let page = 0; page < 5; page += 1) {
+    const params = new URLSearchParams({
+      q: "'" + folderId.replace(/'/g, "\\'") + "' in parents and trashed = false",
+      spaces: "drive",
+      orderBy: "createdTime desc",
+      pageSize: "1000",
+      fields: "nextPageToken,files(id,name,description,mimeType,size,createdTime,modifiedTime)",
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+    const response = await fetch("https://www.googleapis.com/drive/v3/files?" + params.toString(), {
+      signal: AbortSignal.timeout(10000),
+      headers: { accept: "application/json", authorization: "Bearer " + accessToken },
+    });
+    const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
+    if (!response.ok) throw new Error(payload?.error?.message || "google_drive_weekly_response_list_failed");
+    files.push(...(payload.files || []).filter((file) => String(file.mimeType || "").startsWith("video/")));
+    pageToken = payload.nextPageToken || "";
+    if (!pageToken) break;
+  }
+  return files;
+}
+
+async function saveWeeklyAnswerVideoSyncState(env, values) {
+  await env.DB.prepare(
+    "INSERT INTO weekly_answer_video_sync_state (id, last_checked_at, last_success_at, last_error, file_count, new_count) VALUES ('drive', CURRENT_TIMESTAMP, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET last_checked_at = CURRENT_TIMESTAMP, last_success_at = excluded.last_success_at, last_error = excluded.last_error, file_count = excluded.file_count, new_count = excluded.new_count"
+  ).bind(values.success ? new Date().toISOString() : null, values.error || "", values.fileCount || 0, values.newCount || 0).run();
+}
+
+async function syncWeeklyAnswerVideos(env, actorEmail = "system@column-studio") {
+  try {
+    const files = await fetchDriveWeeklyAnswerVideos(env);
+    let newCount = 0;
+    for (const file of files) {
+      const existing = await env.DB.prepare("SELECT id FROM weekly_answer_videos WHERE drive_file_id = ?").bind(file.id).first();
+      if (!existing) newCount += 1;
+      const publishedAt = String(file.createdTime || file.modifiedTime || new Date().toISOString());
+      await env.DB.prepare(
+        `INSERT INTO weekly_answer_videos
+          (id, drive_file_id, title, description, file_name, mime_type, size_bytes, published_at, drive_created_time, drive_modified_time, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
+         ON CONFLICT(drive_file_id) DO UPDATE SET
+           title = excluded.title,
+           description = excluded.description,
+           file_name = excluded.file_name,
+           mime_type = excluded.mime_type,
+           size_bytes = excluded.size_bytes,
+           drive_created_time = excluded.drive_created_time,
+           drive_modified_time = excluded.drive_modified_time,
+           status = 'published',
+           updated_at = CURRENT_TIMESTAMP`
+      ).bind(existing?.id || uid("weekly_video"), file.id, weeklyAnswerVideoTitle(file.name), String(file.description || "").slice(0, 1000), String(file.name || "answer-video.mp4").slice(0, 300), String(file.mimeType || "video/mp4").slice(0, 100), Number(file.size || 0), publishedAt, String(file.createdTime || ""), String(file.modifiedTime || "")).run();
+    }
+    await saveWeeklyAnswerVideoSyncState(env, { success: true, fileCount: files.length, newCount });
+    await audit(env, actorEmail, "weekly.answer_videos.scan", "drive_folder", weeklyResponseFolderId(env), { file_count: files.length, new_count: newCount });
+    return { file_count: files.length, new_count: newCount };
+  } catch (error) {
+    await saveWeeklyAnswerVideoSyncState(env, { success: false, error: String(error.message || error) });
+    throw error;
+  }
+}
+
+async function getCustomerAccess(request, env) {
+  const email = await getActorEmail(request, env);
+  if (!email) return { error: json({ error: "authentication_required" }, { status: 401 }) };
+  const customer = await env.DB.prepare(
+    "SELECT id, email, display_name, status FROM customer_accounts WHERE lower(email) = ? AND status = 'active'"
+  ).bind(email).first();
+  if (!customer) return { error: json({ error: "customer_not_found" }, { status: 403 }) };
+  const result = await env.DB.prepare(
+    `SELECT
+       ce.entitlement_code,
+       ce.id AS entitlement_id,
+       ce.starts_at,
+       ce.ends_at,
+       cs.status AS subscription_status,
+       cs.current_period_end,
+       cs.cancel_at_period_end
+     FROM customer_entitlements ce
+     LEFT JOIN customer_subscriptions cs ON cs.id = ce.source_subscription_id
+     WHERE ce.customer_id = ?
+      AND ce.status = 'active'
+      AND datetime(ce.starts_at) <= datetime('now')
+      AND (ce.ends_at IS NULL OR datetime(ce.ends_at) > datetime('now'))
+       AND (
+         cs.id IS NULL
+         OR cs.status IN ('trialing', 'active')
+         OR (cs.status = 'canceled' AND cs.current_period_end IS NOT NULL AND datetime(cs.current_period_end) > datetime('now'))
+       )
+     ORDER BY COALESCE(ce.ends_at, '9999-12-31') DESC`
+  ).bind(customer.id).all();
+  const entitlements = result.results || [];
+  const hasWeeklyAccess = entitlements.some((item) => item.entitlement_code === "weekly_access" || item.entitlement_code === "curriculum_all_access");
+  const hasCurriculumAccess = entitlements.some((item) => item.entitlement_code === "curriculum_all_access");
+  const currentPeriodEnd = entitlements.map((item) => item.current_period_end || item.ends_at).filter(Boolean).sort().at(-1) || null;
+  return {
+    email,
+    customer,
+    entitlements,
+    access: {
+      customer_id: customer.id,
+      email: customer.email,
+      display_name: customer.display_name,
+      current_period_end: currentPeriodEnd,
+      has_weekly_access: hasWeeklyAccess,
+      has_curriculum_access: hasCurriculumAccess,
+    },
+  };
+}
+
+async function requireWeeklyAccess(request, env) {
+  const auth = await getCustomerAccess(request, env);
+  if (auth.error) return auth;
+  if (!auth.access.has_weekly_access) return { error: json({ error: "weekly_access_inactive" }, { status: 403 }) };
+  return auth;
+}
+
+async function requireCustomerMember(request, env) {
+  const auth = await getCustomerAccess(request, env);
+  if (auth.error) return auth;
+  if (!auth.access.has_weekly_access && !auth.access.has_curriculum_access) {
+    return { error: json({ error: "membership_inactive" }, { status: 403 }) };
+  }
+  return auth;
+}
+
+function serializeWeeklyMaterial(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    file_name: row.file_name,
+    description: row.description,
+    mime_type: row.mime_type,
+    size_bytes: Number(row.size_bytes || 0),
+    published_at: row.published_at,
+  };
+}
+
+async function weeklyMemberStatus(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  return json({ membership: auth.access });
+}
+
+async function listWeeklyMaterials(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const [materials, sync] = await Promise.all([
+    env.DB.prepare(
+      "SELECT id, title, file_name, description, mime_type, size_bytes, published_at FROM weekly_materials WHERE status = 'published' ORDER BY datetime(published_at) DESC, created_at DESC"
+    ).all(),
+    env.DB.prepare("SELECT last_success_at, last_error, file_count FROM weekly_material_sync_state WHERE id = 'drive'").first(),
+  ]);
+  return json({
+    membership: auth.access,
+    materials: (materials.results || []).map(serializeWeeklyMaterial),
+    sync: sync || null,
+  });
+}
+
+async function openWeeklyMaterial(request, env, id) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const material = await env.DB.prepare(
+    "SELECT id, web_view_link, web_content_link FROM weekly_materials WHERE id = ? AND status = 'published'"
+  ).bind(id).first();
+  if (!material) return json({ error: "weekly_material_not_found" }, { status: 404 });
+  const mode = new URL(request.url).searchParams.get("mode") === "download" ? "download" : "view";
+  const target = mode === "download" ? (material.web_content_link || material.web_view_link) : material.web_view_link;
+  await env.DB.prepare(
+    "INSERT INTO weekly_material_events (id, customer_id, material_id, event_type) VALUES (?, ?, ?, ?)"
+  ).bind(uid("weekly_event"), auth.access.customer_id, material.id, mode).run();
+  return new Response(null, {
+    status: 302,
+    headers: { location: target, "cache-control": "private, no-store", "referrer-policy": "no-referrer" },
+  });
+}
+
+async function syncWeeklyMaterialsRequest(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  try {
+    const [materials, answerVideos] = await Promise.all([
+      syncWeeklyMaterials(env, auth.email),
+      syncWeeklyAnswerVideos(env, auth.email),
+    ]);
+    return json({ materials, answer_videos: answerVideos });
+  } catch (error) {
+    return json({ error: "weekly_scan_failed", message: String(error.message || error) }, { status: 502 });
+  }
+}
+
+function serializeCustomerProfile(row, auth) {
+  return {
+    email: auth.access.email,
+    display_name: auth.access.display_name || "",
+    profession: row?.profession || "",
+    workplace_type: row?.workplace_type || "",
+    role_title: row?.role_title || "",
+    organization_size: row?.organization_size || "",
+    ai_usage_level: row?.ai_usage_level || "",
+    interest_topics: parseJsonArray(row?.interest_topics),
+    current_challenges: row?.current_challenges || "",
+    updated_at: row?.updated_at || null,
+    has_weekly_access: auth.access.has_weekly_access,
+    has_curriculum_access: auth.access.has_curriculum_access,
+  };
+}
+
+async function getCustomerProfile(request, env) {
+  const auth = await requireCustomerMember(request, env);
+  if (auth.error) return auth.error;
+  const profile = await env.DB.prepare("SELECT * FROM customer_profiles WHERE customer_id = ?").bind(auth.access.customer_id).first();
+  return json({ profile: serializeCustomerProfile(profile, auth) });
+}
+
+function profileText(value, maxLength) {
+  return String(value || "").normalize("NFKC").trim().slice(0, maxLength);
+}
+
+async function updateCustomerProfile(request, env) {
+  const auth = await requireCustomerMember(request, env);
+  if (auth.error) return auth.error;
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const interests = parseJsonArray(payload.interest_topics).map((item) => profileText(item, 40)).filter(Boolean).slice(0, 8);
+  const values = {
+    profession: profileText(payload.profession, 80),
+    workplace_type: profileText(payload.workplace_type, 80),
+    role_title: profileText(payload.role_title, 80),
+    organization_size: profileText(payload.organization_size, 40),
+    ai_usage_level: profileText(payload.ai_usage_level, 40),
+    interest_topics: JSON.stringify(interests),
+    current_challenges: profileText(payload.current_challenges, 1000),
+  };
+  await env.DB.prepare(
+    `INSERT INTO customer_profiles
+      (customer_id, profession, workplace_type, role_title, organization_size, ai_usage_level, interest_topics, current_challenges)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(customer_id) DO UPDATE SET
+       profession = excluded.profession,
+       workplace_type = excluded.workplace_type,
+       role_title = excluded.role_title,
+       organization_size = excluded.organization_size,
+       ai_usage_level = excluded.ai_usage_level,
+       interest_topics = excluded.interest_topics,
+       current_challenges = excluded.current_challenges,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(auth.access.customer_id, values.profession, values.workplace_type, values.role_title, values.organization_size, values.ai_usage_level, values.interest_topics, values.current_challenges).run();
+  const profile = await env.DB.prepare("SELECT * FROM customer_profiles WHERE customer_id = ?").bind(auth.access.customer_id).first();
+  return json({ profile: serializeCustomerProfile(profile, auth) });
+}
+
+function japanWeekStart(now = new Date()) {
+  const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  jst.setUTCDate(jst.getUTCDate() - jst.getUTCDay());
+  return jst.toISOString().slice(0, 10);
+}
+
+function serializePriorityQuestion(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    week_start: row.week_start,
+    situation: row.situation,
+    goal: row.goal,
+    attempts: row.attempts,
+    blocker: row.blocker,
+    question: row.question,
+    use_by: row.use_by,
+    answer_format: row.answer_format,
+    status: row.status,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    answered_at: row.answered_at,
+  };
+}
+
+async function limitCustomerWrite(env, email) {
+  const bucket = Math.floor(Date.now() / 60000);
+  const result = await env.DB.prepare(
+    "INSERT INTO api_write_limits(actor_email, bucket, count) VALUES (?, ?, 1) ON CONFLICT(actor_email, bucket) DO UPDATE SET count = count + 1 WHERE count < 10"
+  ).bind(email, bucket).run();
+  return Boolean(result.meta.changes);
+}
+
+async function getWeeklyPriorityQuestion(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const weekStart = japanWeekStart();
+  const question = await env.DB.prepare(
+    "SELECT * FROM weekly_priority_questions WHERE customer_id = ? AND week_start = ?"
+  ).bind(auth.access.customer_id, weekStart).first();
+  return json({ week_start: weekStart, available: !question, question: serializePriorityQuestion(question) });
+}
+
+async function saveWeeklyPriorityQuestion(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  if (!(await limitCustomerWrite(env, auth.email))) return json({ error: "rate_limited", message: "送信が続いています。1分ほど待ってください。" }, { status: 429, headers: { "retry-after": "60" } });
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const values = {
+    situation: profileText(payload.situation, 1200),
+    goal: profileText(payload.goal, 800),
+    attempts: profileText(payload.attempts, 1200),
+    blocker: profileText(payload.blocker, 800),
+    question: profileText(payload.question, 800),
+    use_by: /^\d{4}-\d{2}-\d{2}$/.test(String(payload.use_by || "")) ? String(payload.use_by) : "",
+    answer_format: ["demonstration", "steps", "criteria"].includes(payload.answer_format) ? payload.answer_format : "demonstration",
+  };
+  const tooShort = values.situation.length < 20 || values.goal.length < 15 || values.attempts.length < 10 || values.blocker.length < 10 || values.question.length < 20;
+  if (tooShort || payload.privacy_confirmed !== true || payload.video_consent !== true) {
+    return json({ error: "question_incomplete", message: "状況・目的・試したこと・つまずき・質問を具体的に入力し、確認項目に同意してください。" }, { status: 400 });
+  }
+  const weekStart = japanWeekStart();
+  const current = await env.DB.prepare(
+    "SELECT id, status FROM weekly_priority_questions WHERE customer_id = ? AND week_start = ?"
+  ).bind(auth.access.customer_id, weekStart).first();
+  if (current && current.status !== "submitted") {
+    return json({ error: "question_locked", message: "今週の質問は回答準備に入っているため変更できません。" }, { status: 409 });
+  }
+  const profile = await env.DB.prepare("SELECT profession, workplace_type, role_title, organization_size, ai_usage_level, interest_topics, current_challenges FROM customer_profiles WHERE customer_id = ?").bind(auth.access.customer_id).first();
+  const profileSnapshot = JSON.stringify(profile || {});
+  const id = current?.id || uid("weekly_question");
+  await env.DB.prepare(
+    `INSERT INTO weekly_priority_questions
+      (id, customer_id, week_start, situation, goal, attempts, blocker, question, use_by, answer_format, profile_snapshot, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted')
+     ON CONFLICT(customer_id, week_start) DO UPDATE SET
+       situation = excluded.situation,
+       goal = excluded.goal,
+       attempts = excluded.attempts,
+       blocker = excluded.blocker,
+       question = excluded.question,
+       use_by = excluded.use_by,
+       answer_format = excluded.answer_format,
+       profile_snapshot = excluded.profile_snapshot,
+       updated_at = CURRENT_TIMESTAMP
+     WHERE weekly_priority_questions.status = 'submitted'`
+  ).bind(id, auth.access.customer_id, weekStart, values.situation, values.goal, values.attempts, values.blocker, values.question, values.use_by, values.answer_format, profileSnapshot).run();
+  const saved = await env.DB.prepare("SELECT * FROM weekly_priority_questions WHERE id = ?").bind(id).first();
+  return json({ week_start: weekStart, available: false, question: serializePriorityQuestion(saved) }, { status: current ? 200 : 201 });
+}
+
+async function listWeeklyAnswerVideos(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const [videos, sync] = await Promise.all([
+    env.DB.prepare("SELECT id, title, description, file_name, mime_type, size_bytes, published_at FROM weekly_answer_videos WHERE status = 'published' ORDER BY datetime(published_at) DESC, created_at DESC").all(),
+    env.DB.prepare("SELECT last_success_at, last_error, file_count FROM weekly_answer_video_sync_state WHERE id = 'drive'").first(),
+  ]);
+  return json({
+    videos: (videos.results || []).map((video) => ({
+      ...video,
+      playback_url: "/api/column-studio/api/weekly/answer-videos/" + encodeURIComponent(video.id) + "/stream",
+    })),
+    sync: sync || null,
+    playback: "secure_proxy",
+  });
+}
+
+async function streamWeeklyAnswerVideo(request, env, id) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const video = await env.DB.prepare(
+    "SELECT id, drive_file_id, file_name, mime_type FROM weekly_answer_videos WHERE id = ? AND status = 'published'"
+  ).bind(id).first();
+  if (!video) return json({ error: "weekly_answer_video_not_found" }, { status: 404 });
+
+  const token = await driveAccessToken(env);
+  const headers = new Headers({ authorization: "Bearer " + token, accept: video.mime_type || "video/*" });
+  const requestedRange = String(request.headers.get("range") || "");
+  if (/^bytes=\d*-\d*$/.test(requestedRange)) headers.set("range", requestedRange);
+  const upstream = await fetch(
+    "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(video.drive_file_id) + "?alt=media",
+    { headers }
+  );
+  if (![200, 206].includes(upstream.status) || !upstream.body) {
+    upstream.body?.cancel();
+    return json({ error: "weekly_answer_video_unavailable" }, { status: upstream.status === 404 ? 404 : 502 });
+  }
+
+  const responseHeaders = new Headers({
+    "content-type": upstream.headers.get("content-type") || video.mime_type || "video/mp4",
+    "content-disposition": "inline",
+    "cache-control": "private, no-store",
+    "x-content-type-options": "nosniff",
+    "accept-ranges": upstream.headers.get("accept-ranges") || "bytes",
+  });
+  for (const name of ["content-length", "content-range", "etag", "last-modified"]) {
+    const value = upstream.headers.get(name);
+    if (value) responseHeaders.set(name, value);
+  }
+  await env.DB.prepare(
+    "INSERT INTO weekly_answer_video_events (id, customer_id, video_id, event_type) VALUES (?, ?, ?, 'play')"
+  ).bind(uid("weekly_video_event"), auth.access.customer_id, video.id).run();
+  return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+}
+
+async function listWeeklyPriorityQuestionsAdmin(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const result = await env.DB.prepare(
+    `SELECT q.*, a.email, a.display_name
+       FROM weekly_priority_questions q
+       JOIN customer_accounts a ON a.id = q.customer_id
+      ORDER BY q.week_start DESC, q.created_at ASC`
+  ).all();
+  return json({ questions: (result.results || []).map((row) => ({ ...serializePriorityQuestion(row), email: row.email, display_name: row.display_name, profile_snapshot: parseJsonObject(row.profile_snapshot) })) });
+}
+
 async function purgeExpiredTrash(env) {
   const expired = await env.DB.prepare(
     `SELECT id FROM articles
@@ -1495,6 +1911,7 @@ async function purgeExpiredTrash(env) {
       }
       const auditId = uid("audit");
       const results = await env.DB.batch([
+        env.DB.prepare("DELETE FROM article_public_assets WHERE article_id = ?").bind(article.id),
         env.DB.prepare("DELETE FROM article_assets WHERE article_id = ?").bind(article.id),
         env.DB.prepare("DELETE FROM article_versions WHERE article_id = ?").bind(article.id),
         env.DB.prepare("DELETE FROM publish_jobs WHERE article_id = ?").bind(article.id),
@@ -1503,7 +1920,7 @@ async function purgeExpiredTrash(env) {
         env.DB.prepare("INSERT INTO audit_events (id, actor_email, action, entity_type, entity_id, metadata) SELECT ?, ?, ?, ?, ?, ? WHERE changes() = 1")
           .bind(auditId, "system@column-studio", "article.purge", "article", article.id, JSON.stringify({ retention_days: TRASH_RETENTION_DAYS, asset_count: keys.length })),
       ]);
-      if (results[4].meta.changes) purged += 1;
+      if (results[5].meta.changes) purged += 1;
     } finally {
       await env.DB.prepare("DELETE FROM article_publish_locks WHERE article_id = ? AND expires_at = ?").bind(article.id, lease).run();
     }
@@ -1516,7 +1933,8 @@ async function uploadAsset(request, env) {
   if (auth.error) return auth.error;
   if (!env.MEDIA) return json({ error: "media_bucket_not_configured" }, { status: 500 });
 
-  const form = await request.formData();
+  const bytes = await readBytes(request, MAX_IMAGE_BYTES + 64 * 1024);
+  const form = await new Response(bytes, {headers: {"content-type": request.headers.get("content-type")}}).formData();
   const file = form.get("file");
   const articleId = String(form.get("article_id") || form.get("articleId") || "").trim();
 
@@ -1528,16 +1946,17 @@ async function uploadAsset(request, env) {
     return json({ error: "image_too_large", max_bytes: MAX_IMAGE_BYTES }, { status: 413 });
   }
 
-  if (articleId) {
-    const article = await env.DB.prepare("SELECT id FROM articles WHERE id = ?").bind(articleId).first();
-    if (!article) return json({ error: "article_not_found" }, { status: 404 });
-  }
+  if (!articleId) return json({error: "article_required", message: "先に下書きを保存してください。"}, {status: 400});
+  const article = await env.DB.prepare("SELECT id FROM articles WHERE id = ? AND deleted_at IS NULL").bind(articleId).first();
+  if (!article) return json({error: "article_not_found"}, {status: 404});
+  const content = new Uint8Array(await file.arrayBuffer());
+  if (imageType(content) !== file.type) return json({error: "invalid_image_content"}, {status: 415});
 
   const now = new Date();
   const yyyy = String(now.getUTCFullYear());
   const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
   const key = `contents/${yyyy}/${mm}/${crypto.randomUUID()}-${safeFilename(file.name)}`;
-  await env.MEDIA.put(key, file.stream(), {
+  await env.MEDIA.put(key, content, {
     httpMetadata: { contentType: file.type },
     customMetadata: {
       uploadedBy: auth.email,
@@ -1560,21 +1979,54 @@ async function uploadAsset(request, env) {
   return json({ asset: { id, article_id: articleId || null, key, url, filename: file.name || "", content_type: file.type, size_bytes: file.size } }, { status: 201 });
 }
 
-async function serveMedia(request, env, key) {
-  if (!env.MEDIA) return new Response("Media bucket is not configured.", { status: 500 });
-  const object = await env.MEDIA.get(key);
-  if (!object) return new Response("Not found", { status: 404 });
-
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set("etag", object.httpEtag);
-  headers.set("cache-control", "public, max-age=31536000, immutable");
-  return new Response(object.body, { headers });
+// Publication snapshots prevent edits/new uploads on an already-published article
+// from making draft media public before the next successful publication.
+async function publicationAssets(env, article) {
+  const body = sanitizeBody(article.body_html);
+  const urls = [safeUrl(article.hero_url, true), ...Array.from(body.matchAll(/<img\b[^>]*\bsrc="([^"]*)"/g), match => match[1].replace(/&amp;/g, '&'))];
+  const keys = new Set();
+  for (const value of urls.filter(Boolean)) {
+    const url = new URL(value, 'https://basecraftas.com');
+    if (url.hostname !== 'basecraftas.com' || !url.pathname.startsWith('/column-media/')) continue;
+    const key = decodeURIComponent(url.pathname.slice('/column-media/'.length));
+    const asset = await env.DB.prepare("SELECT * FROM article_assets WHERE r2_key = ? AND article_id = ?").bind(key, article.id).first();
+    if (!asset || !ALLOWED_IMAGE_TYPES.has(asset.content_type)) throw Object.assign(new Error('invalid_article_asset'), {status: 400});
+    keys.add(key);
+  }
+  return [...keys];
 }
 
-export default {
+async function serveMedia(request, env, key) {
+  if (!env.MEDIA) return new Response('Not found', {status: 404});
+  const isPrivate = new URL(request.url).pathname.startsWith('/api/column-studio/media/');
+  if (isPrivate) {
+    const auth = await requireRole(request, env, ['admin','editor','viewer']);
+    if (auth.error) return auth.error;
+  } else {
+    const published = await env.DB.prepare("SELECT p.r2_key FROM article_public_assets p JOIN articles a ON a.id = p.article_id WHERE p.r2_key = ? AND a.status = 'published' AND a.deleted_at IS NULL LIMIT 1").bind(key).first();
+    if (!published) return new Response('Not found', {status: 404});
+  }
+  const asset = await env.DB.prepare('SELECT content_type FROM article_assets WHERE r2_key = ?').bind(key).first();
+  if (!asset || !ALLOWED_IMAGE_TYPES.has(asset.content_type)) return new Response('Not found', {status: 404});
+  const object = await env.MEDIA.get(key);
+  if (!object) return new Response('Not found', {status: 404});
+  return new Response(object.body, {headers: {
+    'content-type': asset.content_type,
+    'cache-control': 'private, no-store',
+    'content-disposition': 'inline',
+  }});
+}
+
+const worker = {
   async scheduled(controller, env) {
+    await env.DB.prepare("DELETE FROM api_write_limits WHERE bucket < ?").bind(Math.floor(Date.now() / 60000) - 60).run();
     try {
+      if (controller.cron === "0 * * * *") {
+        const materials = await syncWeeklyMaterials(env);
+        const answerVideos = await syncWeeklyAnswerVideos(env);
+        console.log(JSON.stringify({ event: "weekly.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, materials, answer_videos: answerVideos }));
+        return;
+      }
       if (controller.cron === "0 0 * * 6") {
         const result = await scanDriveArchives(env);
         console.log(JSON.stringify({ event: "archive.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, ...result }));
@@ -1599,6 +2051,42 @@ export default {
       const email = await getActorEmail(request, env);
       const member = await getMember(env, email);
       return json({ email, member });
+    }
+
+    if (path === "/api/weekly/me" && request.method === "GET") {
+      return weeklyMemberStatus(request, env);
+    }
+    if (path === "/api/weekly/materials" && request.method === "GET") {
+      return listWeeklyMaterials(request, env);
+    }
+    if (path === "/api/weekly/priority-question" && request.method === "GET") {
+      return getWeeklyPriorityQuestion(request, env);
+    }
+    if (path === "/api/weekly/priority-question" && request.method === "POST") {
+      return saveWeeklyPriorityQuestion(request, env);
+    }
+    if (path === "/api/weekly/answer-videos" && request.method === "GET") {
+      return listWeeklyAnswerVideos(request, env);
+    }
+    const weeklyAnswerVideoMatch = path.match(/^\/api\/weekly\/answer-videos\/([^/]+)\/stream$/);
+    if (weeklyAnswerVideoMatch && request.method === "GET") {
+      return streamWeeklyAnswerVideo(request, env, weeklyAnswerVideoMatch[1]);
+    }
+    if (path === "/api/weekly/admin/questions" && request.method === "GET") {
+      return listWeeklyPriorityQuestionsAdmin(request, env);
+    }
+    if (path === "/api/weekly/admin/sync" && request.method === "POST") {
+      return syncWeeklyMaterialsRequest(request, env);
+    }
+    const weeklyMaterialMatch = path.match(/^\/api\/weekly\/materials\/([^/]+)\/open$/);
+    if (weeklyMaterialMatch && request.method === "GET") {
+      return openWeeklyMaterial(request, env, weeklyMaterialMatch[1]);
+    }
+    if (path === "/api/customer/profile" && request.method === "GET") {
+      return getCustomerProfile(request, env);
+    }
+    if (path === "/api/customer/profile" && request.method === "PATCH") {
+      return updateCustomerProfile(request, env);
     }
 
     if (path === "/api/members" && request.method === "GET") return listMembers(request, env);
@@ -1662,4 +2150,17 @@ export default {
 
     return json({ error: "not_found" }, { status: 404 });
   },
+};
+
+export default {
+  scheduled: worker.scheduled,
+  async fetch(request, env) {
+    try {
+      const path = normalizePath(new URL(request.url).pathname);
+      requestGuard(request, env, path);
+      return secureResponse(await worker.fetch(request, env), path.startsWith('/media/'));
+    } catch (error) {
+      return secureResponse(json({error: error.status ? error.message : 'internal_error'}, {status: error.status || 500}));
+    }
+  }
 };

@@ -2,9 +2,11 @@ name = "column-studio-api"
 main = "src/worker.js"
 compatibility_date = "2026-09-06"
 workers_dev = false
+compatibility_flags = ["nodejs_compat"]
+preview_urls = false
 
 [triggers]
-crons = [ "15 18 * * *", "0 0 * * 6" ]
+crons = [ "15 18 * * *", "0 0 * * 6", "0 * * * *" ]
 
 [vars]
 ALLOW_DEV_AUTH = "false"
@@ -13,6 +15,10 @@ POLICY_AUD = "bc858ed892e89c942df1e54dd631b77a6bdb6c7f8d8d0aa97462f2b968ae4a03"
 GITHUB_REPOSITORY = "basecraftas89/BaseCraftas"
 GITHUB_BRANCH = "main"
 DRIVE_ARCHIVE_FOLDER_ID = "12YHtKFODi75v_W08xFACzm97DjFIUCjg"
+DRIVE_WEEKLY_FOLDER_ID = "18Ahx_o5GwHH_BjyLK1e4NItNBKoWc8uy"
+DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "1QLSGk2uVnlM7Fu01pnM9yAjs7-J2XUC1"
+WEEKLY_QUESTION_SPREADSHEET_ID = "1v0TwwXE2zzJmsCCFV1B6bdsyUnkDAsuK7Cjlfx0eAHg"
+WEEKLY_QUESTION_SHEET_NAME = "質問管理"
 
 [[routes]]
 pattern = "basecraftas.com/api/column-studio/*"

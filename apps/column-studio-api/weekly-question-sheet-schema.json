@@ -1,0 +1,30 @@
+{
+  "spreadsheetId": "1v0TwwXE2zzJmsCCFV1B6bdsyUnkDAsuK7Cjlfx0eAHg",
+  "sheetName": "質問管理",
+  "headerRow": 5,
+  "columns": [
+    { "header": "受付ID", "source": "question.id" },
+    { "header": "対象週（日曜）", "source": "question.week_start" },
+    { "header": "受付日時", "source": "question.created_at" },
+    { "header": "会員メール", "source": "account.email" },
+    { "header": "表示名", "source": "account.display_name" },
+    { "header": "職種・専門分野", "source": "profile.profession" },
+    { "header": "勤務環境", "source": "profile.workplace_type" },
+    { "header": "役職・立場", "source": "profile.role_title" },
+    { "header": "AI利用状況", "source": "profile.ai_usage_level" },
+    { "header": "具体的な場面", "source": "form.situation" },
+    { "header": "実現したいこと", "source": "form.goal" },
+    { "header": "回答を使いたい時期（任意）", "source": "form.use_by" },
+    { "header": "すでに試したこと", "source": "form.attempts" },
+    { "header": "いちばん判断に迷っている点", "source": "form.blocker" },
+    { "header": "最終的な質問", "source": "form.question" },
+    { "header": "希望する回答の形", "source": "form.answer_format" },
+    { "header": "個人情報を含まないことを確認", "source": "form.privacy_confirmed" },
+    { "header": "共通回答動画への利用同意", "source": "form.video_consent" },
+    { "header": "類似質問グループ", "source": "operations.question_group" },
+    { "header": "対応状況", "source": "operations.status" },
+    { "header": "回答動画タイトル", "source": "operations.answer_video_title" },
+    { "header": "回答動画Drive URL", "source": "operations.answer_video_url" },
+    { "header": "運営メモ", "source": "operations.notes" }
+  ]
+}

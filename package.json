@@ -1,5 +1,21 @@
 {
   "scripts": {
-    "build": "echo \"Static site: no build step required\""
-  }
+    "build": "node scripts/build-site.mjs",
+    "test": "npm run build && node --test apps/column-studio-api/*.test.mjs",
+    "check:worker": "wrangler deploy --dry-run --config apps/column-studio-api/wrangler.toml --outdir /private/tmp/column-studio-security-worker",
+    "check:security": "node --test apps/column-studio-api/security.test.mjs",
+    "check:runtime": "node scripts/check-worker-runtime.mjs"
+  },
+  "dependencies": {
+    "dompurify": "3.4.15",
+    "sanitize-html": "2.17.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260910.1",
+    "esbuild": "0.28.2",
+    "jsdom": "29.1.1",
+    "wrangler": "4.131.0",
+    "miniflare": "5.20260910.0-alpha"
+  },
+  "private": true
 }

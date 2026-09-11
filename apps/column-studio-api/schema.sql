@@ -133,3 +133,135 @@ CREATE INDEX IF NOT EXISTS idx_audit_events_entity ON audit_events(entity_type, 
 CREATE INDEX IF NOT EXISTS idx_archive_candidates_status ON archive_candidates(status, detected_at);
 
 CREATE TABLE IF NOT EXISTS article_publish_locks (article_id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL);
+-- Keep empty until each article is safely republished. No draft-asset backfill.
+CREATE TABLE IF NOT EXISTS article_public_assets (
+  article_id TEXT NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+  r2_key TEXT NOT NULL REFERENCES article_assets(r2_key) ON DELETE CASCADE,
+  PRIMARY KEY (article_id, r2_key)
+);
+CREATE INDEX IF NOT EXISTS idx_public_assets_key ON article_public_assets(r2_key);
+
+CREATE TABLE IF NOT EXISTS weekly_materials (
+  id TEXT PRIMARY KEY,
+  drive_file_id TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  mime_type TEXT NOT NULL DEFAULT 'application/pdf',
+  size_bytes INTEGER NOT NULL DEFAULT 0 CHECK (size_bytes >= 0),
+  web_view_link TEXT NOT NULL,
+  web_content_link TEXT NOT NULL DEFAULT '',
+  published_at TEXT NOT NULL,
+  drive_created_time TEXT NOT NULL DEFAULT '',
+  drive_modified_time TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('published', 'missing', 'archived')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_weekly_materials_status_published
+  ON weekly_materials(status, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS weekly_material_events (
+  id TEXT PRIMARY KEY,
+  customer_id TEXT NOT NULL,
+  material_id TEXT NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('view', 'download')),
+  occurred_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_accounts(id),
+  FOREIGN KEY (material_id) REFERENCES weekly_materials(id)
+);
+CREATE INDEX IF NOT EXISTS idx_weekly_material_events_customer_time
+  ON weekly_material_events(customer_id, occurred_at DESC);
+
+CREATE TABLE IF NOT EXISTS weekly_material_sync_state (
+  id TEXT PRIMARY KEY,
+  last_checked_at TEXT,
+  last_success_at TEXT,
+  last_error TEXT NOT NULL DEFAULT '',
+  file_count INTEGER NOT NULL DEFAULT 0,
+  new_count INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS customer_profiles (
+  customer_id TEXT PRIMARY KEY,
+  profession TEXT NOT NULL DEFAULT '',
+  workplace_type TEXT NOT NULL DEFAULT '',
+  role_title TEXT NOT NULL DEFAULT '',
+  organization_size TEXT NOT NULL DEFAULT '',
+  ai_usage_level TEXT NOT NULL DEFAULT '',
+  interest_topics TEXT NOT NULL DEFAULT '[]',
+  current_challenges TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_accounts(id)
+);
+
+CREATE TABLE IF NOT EXISTS weekly_priority_questions (
+  id TEXT PRIMARY KEY,
+  customer_id TEXT NOT NULL,
+  week_start TEXT NOT NULL,
+  situation TEXT NOT NULL,
+  goal TEXT NOT NULL,
+  attempts TEXT NOT NULL,
+  blocker TEXT NOT NULL,
+  question TEXT NOT NULL,
+  use_by TEXT NOT NULL DEFAULT '',
+  answer_format TEXT NOT NULL DEFAULT 'demonstration',
+  profile_snapshot TEXT NOT NULL DEFAULT '{}',
+  status TEXT NOT NULL DEFAULT 'submitted' CHECK (status IN ('submitted', 'in_review', 'answered', 'closed')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  answered_at TEXT,
+  sheet_row INTEGER,
+  sheet_synced_at TEXT,
+  sheet_last_error TEXT NOT NULL DEFAULT '',
+  UNIQUE (customer_id, week_start),
+  FOREIGN KEY (customer_id) REFERENCES customer_accounts(id)
+);
+CREATE INDEX IF NOT EXISTS idx_weekly_priority_questions_week_status ON weekly_priority_questions(week_start, status, created_at);
+CREATE INDEX IF NOT EXISTS idx_weekly_priority_questions_sheet_sync ON weekly_priority_questions(sheet_synced_at, updated_at);
+
+CREATE TABLE IF NOT EXISTS weekly_answer_videos (
+  id TEXT PRIMARY KEY,
+  drive_file_id TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  file_name TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size_bytes INTEGER NOT NULL DEFAULT 0 CHECK (size_bytes >= 0),
+  published_at TEXT NOT NULL,
+  drive_created_time TEXT NOT NULL DEFAULT '',
+  drive_modified_time TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('published', 'missing', 'archived')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_weekly_answer_videos_status_published ON weekly_answer_videos(status, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS weekly_answer_video_events (
+  id TEXT PRIMARY KEY,
+  customer_id TEXT NOT NULL,
+  video_id TEXT NOT NULL,
+  event_type TEXT NOT NULL DEFAULT 'play' CHECK (event_type IN ('play')),
+  occurred_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_accounts(id),
+  FOREIGN KEY (video_id) REFERENCES weekly_answer_videos(id)
+);
+CREATE INDEX IF NOT EXISTS idx_weekly_answer_video_events_customer_time
+  ON weekly_answer_video_events(customer_id, occurred_at DESC);
+
+CREATE TABLE IF NOT EXISTS weekly_answer_video_sync_state (
+  id TEXT PRIMARY KEY,
+  last_checked_at TEXT,
+  last_success_at TEXT,
+  last_error TEXT NOT NULL DEFAULT '',
+  file_count INTEGER NOT NULL DEFAULT 0,
+  new_count INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS api_write_limits (
+  actor_email TEXT NOT NULL,
+  bucket INTEGER NOT NULL,
+  count INTEGER NOT NULL DEFAULT 1,
+  PRIMARY KEY (actor_email, bucket)
+);
