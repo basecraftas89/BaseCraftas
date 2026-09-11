@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>TAYORI会員ページ｜ToToNoE+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="weekly-member.css?v=20260912-login">
+</head>
+<body class="weekly-member-app">
+  <aside class="weekly-sidebar">
+    <a class="weekly-brand" href="../index.html" aria-label="ToToNoE+ トップへ">
+      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566">
+    </a>
+    <nav aria-label="会員メニュー">
+      <a href="./" class="is-active"><span class="material-symbols-rounded" aria-hidden="true">newspaper</span>TAYORI</a>
+      <a href="../curriculum/dashboard.html" id="curriculumNavLink" data-entitlement="curriculum"><span class="material-symbols-rounded" aria-hidden="true">school</span>IROHA</a>
+      <a href="../curriculum/mypage.html"><span class="material-symbols-rounded" aria-hidden="true">person</span>マイページ</a>
+      <a href="#backnumbers"><span class="material-symbols-rounded" aria-hidden="true">library_books</span>バックナンバー</a>
+      <a href="#priorityQuestion"><span class="material-symbols-rounded" aria-hidden="true">forum</span>優先質問</a>
+    </nav>
+    <p class="sidebar-note"><strong>毎週の変化を、<br>使える形で受け取る。</strong><br>最新号から、必要なところだけ確認できます。</p>
+  </aside>
+
+  <main class="weekly-main">
+    <header class="weekly-topbar">
+      <div>
+        <p class="eyebrow">TOTONOE TAYORI</p>
+        <h1>今週届いたもの</h1>
+      </div>
+      <div class="member-status" id="memberStatus" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div><strong>確認中</strong><small>会員状態を確認しています</small></div>
+      </div>
+    </header>
+
+    <div class="preview-banner" id="previewBanner" hidden>
+      <span class="material-symbols-rounded" aria-hidden="true">science</span>
+      ローカル確認用のサンプル表示です。本番では有効なTAYORI会員だけに表示されます。
+    </div>
+
+    <section class="gate-state" id="loadingState" aria-live="polite">
+      <span class="loading-ring" aria-hidden="true"></span>
+      <h2>TAYORIを準備しています</h2>
+      <p>会員状態と最新資料を確認しています。</p>
+    </section>
+
+    <section class="gate-state" id="blockedState" hidden>
+      <span class="material-symbols-rounded gate-icon" aria-hidden="true">lock</span>
+      <h2 id="blockedTitle">TAYORI会員ページへログインしてください</h2>
+      <p id="blockedMessage">このページは有効なTAYORI会員のみ利用できます。</p>
+      <div class="gate-actions">
+        <a class="primary-button" href="login.html?return=%2Fprojects%2Ftotonoe%2Fweekly%2F">登録メールでログイン</a>
+        <a class="secondary-button" href="../weekly.html#pricing">プランを確認する</a>
+      </div>
+    </section>
+
+    <div id="memberContent" hidden>
+      <section class="latest-section" id="latest" aria-labelledby="latestTitle">
+        <article class="latest-card">
+          <div class="latest-visual">
+            <img src="../assets/totonoe-weekly-newspaper-20260911.jpg" alt="深い緑とオレンジを基調にした、今週のAI情報を伝える新聞風ビジュアル" width="1672" height="941">
+            <span class="latest-label">LATEST ISSUE</span>
+          </div>
+          <div class="latest-copy">
+            <p class="release-date" id="latestDate">最新号</p>
+            <h2 id="latestTitle">最新資料を読み込んでいます</h2>
+            <p id="latestDescription">今週の重要なAIトピックを、仕事に使える形で整理しています。</p>
+            <div class="latest-actions">
+              <button class="primary-button" id="viewLatest" type="button">
+                <span class="material-symbols-rounded" aria-hidden="true">menu_book</span>ブラウザで読む
+              </button>
+              <button class="secondary-button" id="downloadLatest" type="button">
+                <span class="material-symbols-rounded" aria-hidden="true">download</span>ダウンロード
+              </button>
+            </div>
+            <p class="file-meta" id="latestMeta"></p>
+          </div>
+        </article>
+      </section>
+
+      <section class="weekly-benefits" aria-labelledby="benefitsTitle">
+        <div class="section-heading">
+          <div><p class="eyebrow">MEMBER BENEFITS</p><h2 id="benefitsTitle">TAYORIで得られるもの</h2></div>
+        </div>
+        <a class="benefits-slide" href="../assets/totonoe-tayori-benefits-v1.jpg" target="_blank" rel="noopener" aria-label="TAYORIで得られるものの図解を大きく表示">
+          <img src="../assets/totonoe-tayori-benefits-v1.jpg" alt="ToToNoE+ TAYORIで得られること。読む、観る、問いかける、深めるの4つを整理した図解" width="1672" height="941">
+          <span><span class="material-symbols-rounded" aria-hidden="true">open_in_full</span>タップして大きく表示</span>
+        </a>
+      </section>
+
+      <section class="weekly-interaction-grid" aria-label="優先質問と回答動画">
+        <article class="priority-question-section" id="priorityQuestion">
+          <div class="priority-icon"><span class="material-symbols-rounded" aria-hidden="true">contact_support</span></div>
+          <div class="priority-copy">
+            <p class="eyebrow">PRIORITY QUESTION</p>
+            <div class="priority-title-row"><h2>今週の優先質問</h2><span id="questionSlotBadge">1枠利用できます</span></div>
+            <p>状況や試したことを順番に整理して、回答動画につながる具体的な質問を送れます。類似する質問はまとめて扱い、TAYORI会員みんなで学べる内容として回答します。</p>
+            <p class="priority-status" id="questionStatus">今週分の質問を確認しています。</p>
+          </div>
+          <button class="primary-button" id="openQuestionDialog" type="button">質問を整理して送る</button>
+        </article>
+
+        <article class="answer-video-section" aria-labelledby="answerVideoTitle">
+          <div class="answer-video-heading"><div><p class="eyebrow">ANSWER VIDEOS</p><h2 id="answerVideoTitle">みんなの質問・回答動画</h2></div><span class="member-only-badge"><span class="material-symbols-rounded" aria-hidden="true">lock</span>TAYORI会員限定</span></div>
+          <p class="answer-video-guidance">似た質問をテーマごとにまとめ、TAYORI会員全員に向けて解説します。質問者だけが見る個別回答ではありません。</p>
+          <div class="answer-video-list" id="answerVideoList"></div>
+          <div class="answer-video-empty" id="answerVideoEmpty"><span class="material-symbols-rounded" aria-hidden="true">video_library</span><p>類似質問をまとめた回答動画が公開されると、TAYORI会員全員がここから確認できます。</p></div>
+        </article>
+      </section>
+
+      <section class="library-section" id="backnumbers" aria-labelledby="libraryTitle">
+        <div class="section-heading library-heading">
+          <div>
+            <p class="eyebrow">BACK NUMBERS</p>
+            <h2 id="libraryTitle">バックナンバー</h2>
+            <p>入会時期にかかわらず、これまでの資料を確認できます。</p>
+          </div>
+          <div class="library-tools" aria-label="バックナンバーの検索と並び替え">
+            <label class="select-field"><span>並び順</span><select id="materialSort"><option value="desc">新しい順</option><option value="asc">古い順</option></select></label>
+            <label class="search-field">
+              <span class="material-symbols-rounded" aria-hidden="true">search</span>
+              <span class="sr-only">資料を検索</span>
+              <input id="materialSearch" type="search" placeholder="タイトルで検索">
+            </label>
+          </div>
+        </div>
+        <div class="archive-groups" id="materialGrid"></div>
+        <div class="empty-state" id="emptyState" hidden>
+          <span class="material-symbols-rounded" aria-hidden="true">search_off</span>
+          <p>条件に合う資料がありません。</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <dialog class="question-dialog" id="priorityQuestionDialog" aria-labelledby="questionDialogTitle">
+    <form id="priorityQuestionForm">
+      <button class="dialog-close" id="closeQuestionDialog" type="button" aria-label="閉じる"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
+      <p class="eyebrow">TAYORI PRIORITY QUESTION</p>
+      <h2 id="questionDialogTitle">答えにつながる質問を、一緒に整理する</h2>
+      <p class="dialog-intro">一度に全部考えなくて大丈夫です。4つの順番で、わかる範囲から入力してください。</p>
+      <div class="question-progress" aria-label="質問入力の4ステップ"><span class="is-current">1</span><span>2</span><span>3</span><span>4</span></div>
+
+      <details class="question-step" data-question-step="1" open>
+        <summary><span><b>1</b><span><strong>いまの状況</strong><small>誰が、どの場面で困っていますか？</small></span></span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary>
+        <div class="question-step-body"><label>具体的な場面<textarea name="situation" minlength="20" maxlength="1200" rows="4" required placeholder="例：5人の訪問リハビリチームで、毎週の申し送り内容を主任が手作業で要約しています。"></textarea></label><button type="button" class="question-next" data-question-next="2">次へ：目的を整理</button></div>
+      </details>
+      <details class="question-step" data-question-step="2">
+        <summary><span><b>2</b><span><strong>どうなれば解決か</strong><small>実現したい状態と使う時期</small></span></span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary>
+        <div class="question-step-body"><label>実現したいこと<textarea name="goal" minlength="15" maxlength="800" rows="3" required placeholder="例：個人情報を守りながら、申し送りの要点を10分以内で整理できるようにしたいです。"></textarea></label><label>回答を使いたい時期（任意）<input type="date" name="use_by"></label><button type="button" class="question-next" data-question-next="3">次へ：試したことを整理</button></div>
+      </details>
+      <details class="question-step" data-question-step="3">
+        <summary><span><b>3</b><span><strong>試したこと・止まった点</strong><small>重複しない回答にするための情報</small></span></span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary>
+        <div class="question-step-body"><label>すでに試したこと<textarea name="attempts" minlength="10" maxlength="1200" rows="3" required placeholder="例：ChatGPTへ文章を貼って要約しましたが、重要なリスク情報が抜けました。"></textarea></label><label>いちばん判断に迷っている点<textarea name="blocker" minlength="10" maxlength="800" rows="3" required placeholder="例：どの情報を残すよう指示すれば安全なのか分かりません。"></textarea></label><button type="button" class="question-next" data-question-next="4">次へ：質問を仕上げる</button></div>
+      </details>
+      <details class="question-step" data-question-step="4">
+        <summary><span><b>4</b><span><strong>聞きたいことを一文に</strong><small>回答動画で扱う中心の問い</small></span></span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary>
+        <div class="question-step-body"><label>最終的な質問<textarea name="question" minlength="20" maxlength="800" rows="4" required placeholder="例：医療情報の重要項目を落とさず、匿名化した申し送り要約を作るプロンプトの組み立て方を、具体例つきで教えてください。"></textarea></label><label>希望する回答の形<select name="answer_format"><option value="demonstration">画面を見せながら実演</option><option value="steps">短い手順で整理</option><option value="criteria">考え方・判断基準を解説</option></select></label><label class="confirm-line"><input type="checkbox" name="privacy_confirmed" required>患者・顧客・勤務先などを特定できる情報は含めていません</label><label class="confirm-line"><input type="checkbox" name="video_consent" required>質問を個人が特定されない形に編集し、類似質問とまとめて、TAYORI会員全員が見られる回答動画で扱うことに同意します</label></div>
+      </details>
+      <p class="question-form-error" id="questionFormError" role="alert"></p>
+      <div class="question-dialog-actions"><button class="secondary-button" id="cancelQuestionDialog" type="button">あとで入力する</button><button class="primary-button" type="submit">今週の質問として送る</button></div>
+    </form>
+  </dialog>
+  <script src="weekly-member.js?v=20260912-login"></script>
+</body>
+</html>

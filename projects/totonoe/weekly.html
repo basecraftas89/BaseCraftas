@@ -12,10 +12,10 @@
   gtag('js', new Date());
   gtag('config', 'G-1SK6NEFC8V');
 </script>
-<title>ToToNoE Weekly｜必要な情報だけ、毎週整って届く。</title>
-<meta name="description" content="ToToNoE Weeklyは、情報収集に使っている時間を減らし、専門職に必要なAI・業務改善情報を使える状態で毎週届ける有料情報サービスです。">
+<title>ToToNoE+ TAYORI｜必要な情報だけ、毎週整って届く。</title>
+<meta name="description" content="ToToNoE+ TAYORIは、情報収集に使っている時間を減らし、専門職に必要なAI・業務改善情報を使える状態で毎週届ける有料情報サービスです。">
 <link rel="canonical" href="https://basecraftas.com/projects/totonoe/weekly.html">
-<meta property="og:title" content="ToToNoE Weekly｜必要な情報だけ、毎週整って届く。">
+<meta property="og:title" content="ToToNoE+ TAYORI｜必要な情報だけ、毎週整って届く。">
 <meta property="og:description" content="重要な情報を、専門職の実務に使える形で毎週整理して届けます。">
 <meta property="og:url" content="https://basecraftas.com/projects/totonoe/weekly.html">
 <meta property="og:image" content="https://basecraftas.com/projects/totonoe/assets/og-image.jpg">
@@ -39,7 +39,7 @@
         <a href="service.html" class="nav-main active">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
           <a href="weekend-ai.html">週末のAI整え習慣</a>
-          <span class="nav-disabled" aria-disabled="true">ウィークリー <small>準備中</small></span>
+          <span class="nav-disabled" aria-disabled="true">TAYORI <small>準備中</small></span>
           <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
         </div>
       </div>
@@ -67,7 +67,7 @@
 <main class="weekly-lp weekly-simple">
   <section class="page-hero weekly-page-hero photo-hero weekly-lp-hero">
     <div class="container photo-hero-inner">
-        <p class="eyebrow">ToToNoE Weekly</p>
+        <p class="eyebrow">TAYORI｜たより</p>
         <h1 class="page-hero-title">必要な情報だけ、<br><span class="accent">毎週整って届く。</span></h1>
         <p class="page-hero-lead">AIの変化を、あなたの仕事に引き寄せる。毎週の重要トピックを読みやすく整理し、短い解説と会員限定Q&Aで届けるメルマガサービスです。</p>
         <div class="page-hero-actions">
@@ -80,7 +80,7 @@
   <section class="weekly-lp-intro">
     <div class="container weekly-lp-intro-inner">
       <p class="eyebrow">ABOUT</p>
-      <h2>ToToNoE Weeklyは、<br>AI情報を追い続けないための週1メルマガです。</h2>
+      <h2>ToToNoE+ TAYORIは、<br>AI情報を追い続けないための週1メルマガです。</h2>
       <div class="weekly-lp-message weekly-summary-grid">
         <article>
           <span>01</span>
@@ -90,7 +90,7 @@
         <article>
           <span>02</span>
           <h3>観る</h3>
-          <p>Weeklyのテーマを短い解説動画で確認できます。</p>
+          <p>TAYORIのテーマを短い解説動画で確認できます。</p>
         </article>
         <article>
           <span>03</span>
@@ -111,7 +111,7 @@
       <p class="eyebrow">WHAT YOU GET</p>
       <h2 class="section-title">何が届くのかを、<br><span class="accent">1枚で確認できます。</span></h2>
       <figure class="weekly-benefit-slide">
-        <img src="assets/totonoe-weekly-benefits.jpg" alt="ToToNoE Weeklyで得られること。読む、観る、問いかける、深めるの4つを整理した図解" width="1672" height="941" loading="lazy" decoding="async">
+        <img src="assets/totonoe-tayori-benefits-v1.jpg" alt="ToToNoE+ TAYORIで得られること。読む、観る、問いかける、深めるの4つを整理した図解" width="1672" height="941" loading="lazy" decoding="async">
       </figure>
     </div>
   </section>
@@ -131,7 +131,12 @@
             <li>短い解説動画</li>
             <li>会員限定Q&A</li>
           </ul>
-          <a href="../../contact.html" class="btn btn-cta">個人で購読する</a>
+          <div class="weekly-price-summary" aria-label="料金の概要">
+            <strong>初回から月額980円</strong>
+            <span>入会金なし・いつでも解約可能</span>
+          </div>
+          <button type="button" class="btn btn-cta" data-tayori-checkout>個人で購読する</button>
+          <p class="weekly-payment-note">メール認証後、Stripeの安全な決済画面へ移動します。</p>
         </article>
         <article class="pricing-card weekly-plan-card weekly-plan-card-team" id="team-plan">
           <span class="service-label">TEAM / ORGANIZATION</span>
@@ -176,13 +181,40 @@
     <div class="container">
       <h2 class="final-title">情報を追う時間を減らして、<br>大切な実践へ戻る。</h2>
       <div class="section-cta">
-        <a href="#pricing" class="btn btn-cta btn-lg">個人で購読する</a>
+        <button type="button" class="btn btn-cta btn-lg" data-tayori-checkout>個人で購読する</button>
         <a href="#team-plan" class="btn btn-ghost btn-ghost-light">法人で導入する</a>
         <span class="btn btn-ghost btn-ghost-light btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
       </div>
     </div>
   </section>
 </main>
+
+<dialog class="tayori-checkout-dialog" id="tayoriCheckoutDialog" aria-labelledby="tayoriCheckoutTitle">
+  <div class="tayori-checkout-body">
+    <button type="button" class="tayori-dialog-close" aria-label="閉じる" data-tayori-dialog-close>×</button>
+    <p class="eyebrow">SECURE APPLICATION</p>
+    <h2 id="tayoriCheckoutTitle">TAYORIを購読する</h2>
+    <div class="tayori-checkout-summary">
+      <strong>月額980円（税込）</strong>
+      <span>入会金なし・申込時から月額課金</span>
+    </div>
+    <form id="tayoriEmailForm" class="tayori-auth-step">
+      <label for="tayoriAuthEmail">メールアドレス</label>
+      <input id="tayoriAuthEmail" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+      <p class="tayori-field-help">会員ページへのログインにも使用します。今後も確認できるアドレスをご入力ください。</p>
+      <button class="btn btn-cta" type="submit">認証コードを送る</button>
+    </form>
+    <form id="tayoriCodeForm" class="tayori-auth-step" hidden>
+      <label for="tayoriAuthCode">メールに届いた6桁の認証コード</label>
+      <input id="tayoriAuthCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" required minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
+      <p class="tayori-field-help">確認後、Stripeの決済画面へ移動します。カード情報は当サイトでは保持しません。</p>
+      <button class="btn btn-cta" type="submit">認証して決済へ進む</button>
+      <button class="tayori-back-button" type="button" data-tayori-auth-back>メールアドレスを変更</button>
+    </form>
+    <p class="tayori-auth-error" id="tayoriAuthError" role="alert" aria-live="polite"></p>
+    <p class="tayori-legal-links">お申し込み前に、<a href="privacy.html">プライバシーポリシー</a>・<a href="legal.html">特定商取引法に基づく表記</a>・<a href="cancellation.html">解約ポリシー</a>をご確認ください。</p>
+  </div>
+</dialog>
 
 <footer class="site-footer">
   <div class="container footer-grid">
@@ -209,5 +241,6 @@
 </footer>
 
 <script src="common.js?v=20260905a"></script>
+<script src="tayori-checkout.js?v=20260912a"></script>
 </body>
 </html>

@@ -1197,6 +1197,46 @@ body.sem-lock{overflow:hidden}
   content:"";position:absolute;left:0;top:.75em;width:7px;height:7px;border-radius:50%;background:var(--sun);
 }
 .weekly-plan-card-team{background:#fff}
+.weekly-price-summary{
+  display:flex;flex-direction:column;gap:3px;padding:13px 15px;border-radius:10px;
+  background:var(--sky-2);border:1px solid var(--line);color:var(--ink);
+}
+.weekly-price-summary strong{font-size:.94rem;color:var(--teal-deep)}
+.weekly-price-summary span,.weekly-payment-note{font-size:.76rem;line-height:1.7;color:var(--ink-soft)}
+.weekly-payment-note{margin:-6px 0 0;text-align:center}
+
+.tayori-checkout-dialog{
+  width:min(520px,calc(100% - 28px));max-height:calc(100dvh - 28px);padding:0;border:0;border-radius:20px;
+  color:var(--ink);box-shadow:0 28px 80px rgba(16,42,60,.34);overflow:auto;
+}
+.tayori-checkout-dialog::backdrop{background:rgba(16,42,60,.62);backdrop-filter:blur(3px)}
+.tayori-checkout-body{position:relative;padding:34px}
+.tayori-checkout-body h2{font-size:1.55rem;line-height:1.45;margin:6px 0 10px}
+.tayori-dialog-close{
+  position:absolute;right:16px;top:14px;width:40px;height:40px;border:0;border-radius:999px;
+  background:var(--sky-2);color:var(--ink);font-size:1.5rem;cursor:pointer;
+}
+.tayori-checkout-summary{display:flex;flex-direction:column;gap:3px;margin:18px 0;padding:15px 17px;border-radius:12px;background:var(--deep-grad);color:#fff}
+.tayori-checkout-summary strong{font-size:1.15rem}.tayori-checkout-summary span{font-size:.8rem;opacity:.88}
+.tayori-auth-step{display:grid;gap:11px}.tayori-auth-step[hidden]{display:none}
+.tayori-auth-step label{font-size:.88rem;font-weight:700;color:var(--ink)}
+.tayori-auth-step input{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:#fff}
+.tayori-auth-step input:focus{outline:3px solid rgba(19,115,160,.16);border-color:var(--teal)}
+.tayori-field-help,.tayori-legal-links{font-size:.78rem;line-height:1.7;color:var(--ink-soft)}
+.tayori-auth-step .btn{width:100%;margin-top:3px}.tayori-auth-step button:disabled{opacity:.55;cursor:wait}
+.tayori-back-button{justify-self:center;border:0;background:none;color:var(--teal-deep);font:700 .8rem/1.5 inherit;text-decoration:underline;cursor:pointer}
+.tayori-auth-error{min-height:1.5em;margin:10px 0 0;color:#a23f32;font-size:.82rem;font-weight:700;line-height:1.6}
+.tayori-legal-links{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tayori-legal-links a{color:var(--teal-deep);text-decoration:underline}
+
+.tayori-complete-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(150deg,var(--sky-2),#fff 62%)}
+.tayori-complete-card{width:min(640px,100%);padding:48px;border:1px solid var(--line);border-radius:22px;background:#fff;text-align:center;box-shadow:var(--shadow)}
+.tayori-complete-icon{display:grid;place-items:center;width:64px;height:64px;margin:16px auto;border-radius:999px;background:var(--deep-grad);color:#fff;font-size:2rem;font-weight:900}
+.tayori-complete-card h1{font-size:clamp(1.6rem,4vw,2.35rem);line-height:1.45;margin-bottom:16px;color:var(--ink)}
+.tayori-complete-card>p{line-height:1.9;color:var(--ink-soft)}
+.tayori-complete-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:26px 0 18px}
+.tayori-complete-note{font-size:.76rem!important;padding-top:14px;border-top:1px solid var(--line)}
+@media(max-width:600px){.tayori-checkout-body{padding:28px 20px}.tayori-complete-card{padding:34px 20px}.tayori-complete-actions .btn{width:100%}}
 .weekly-lp-team-use .weekly-flow-grid article,
 .weekly-lp-request .notice-card,
 .weekly-lp-loop .knowledge-loop span{

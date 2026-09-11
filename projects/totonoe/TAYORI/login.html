@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>会員ログイン｜ToToNoE+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="weekly-member.css?v=20260912-login">
+</head>
+<body class="member-login-page">
+  <main class="member-login-card">
+    <a class="member-login-brand" href="../index.html"><img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566"></a>
+    <p class="eyebrow">MEMBER LOGIN</p>
+    <h1>登録メールでログイン</h1>
+    <p class="member-login-intro">パスワードは不要です。メールに届く6桁の認証コードを入力してください。</p>
+    <form id="memberLoginEmailForm" class="member-login-form">
+      <label for="memberLoginEmail">登録メールアドレス</label>
+      <input id="memberLoginEmail" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+      <button class="primary-button" type="submit">認証コードを送る</button>
+    </form>
+    <form id="memberLoginCodeForm" class="member-login-form" hidden>
+      <label for="memberLoginCode">6桁の認証コード</label>
+      <input id="memberLoginCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" required placeholder="000000">
+      <button class="primary-button" type="submit">ログインする</button>
+      <button class="member-login-back" type="button" id="memberLoginBack">メールアドレスを変更</button>
+    </form>
+    <p class="member-login-status" id="memberLoginStatus" role="alert" aria-live="polite"></p>
+    <p class="member-login-help">メールが届かない場合は、迷惑メールフォルダと入力したアドレスをご確認ください。</p>
+    <a class="member-login-return" href="../weekly.html">TAYORIの説明へ戻る</a>
+  </main>
+  <script src="login.js?v=20260912a"></script>
+</body>
+</html>
