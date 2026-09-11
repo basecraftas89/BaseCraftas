@@ -123,14 +123,14 @@
         '</div>' +
         (ep.theme ? '<h3 class="pod-theme">' + esc(ep.theme) + '</h3>' : '') +
         '<div class="sfm-embed">' +
-          '<iframe src="' + ep.embed + '" loading="lazy" frameborder="0" height="190" width="100%" ' +
+          '<iframe src="' + esc(ep.embed) + '" loading="lazy" frameborder="0" height="190" width="100%" ' +
           'allow="autoplay; encrypted-media" allowtransparency="true" class="standfm-embed-iframe" ' +
           'title="第' + ep.no + '回 週末のAI整え習慣"></iframe>' +
         '</div>' +
         '<div class="pod-controls">' +
           '<button class="watch-btn">視聴済みにする</button>' +
           '<span class="pod-actions">' +
-            '<a class="pod-link" href="' + ep.link + '" target="_blank" rel="noopener">stand.fmで開く ↗</a>' +
+            '<a class="pod-link" href="' + esc(ep.link) + '" target="_blank" rel="noopener">stand.fmで開く ↗</a>' +
           '</span>' +
         '</div>';
 
@@ -431,7 +431,7 @@
     (items || []).filter(function (item) {
       return item.status === 'published' && item.content_type === 'podcast' && item.media_url;
     }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
-      var id = item.source_id || episodeId({ url: item.media_url });
+      var id = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : episodeId({ url: item.media_url });
       if (existing[item.media_url] || (id && existing[id])) return;
       existing[item.media_url] = true;
       if (id) existing[id] = true;
@@ -454,7 +454,7 @@
     (items || []).filter(function (item) {
       return item.status === 'published' && ['video', 'learning'].indexOf(item.content_type) > -1 && item.media_url;
     }).forEach(function (item) {
-      var sourceId = item.source_id || '';
+      var sourceId = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : '';
       if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
       if (sourceId) existing[sourceId] = true;
       existing[item.media_url] = true;
@@ -479,7 +479,7 @@
     (items || []).filter(function (item) {
       return item.status === 'published' && item.content_type === 'archive' && item.media_url;
     }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
-      var sourceId = item.source_id || '';
+      var sourceId = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : '';
       if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
       if (sourceId) existing[sourceId] = true;
       existing[item.media_url] = true;

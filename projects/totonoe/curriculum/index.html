@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ToToNoE+ カリキュラム｜料金・申込プレビュー</title>
+  <meta name="description" content="ToToNoE+ カリキュラムの料金と学習体験を確認するための未公開プレビューです。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="curriculum.css?v=20260911a">
+</head>
+<body class="curriculum-site">
+  <header class="curriculum-header">
+    <a class="curriculum-brand" href="../index.html" aria-label="ToToNoE+ トップへ">
+      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566">
+    </a>
+    <nav aria-label="カリキュラムページ">
+      <a href="#experience">学習体験</a>
+      <a href="#pricing">料金</a>
+      <a href="dashboard.html" class="text-link">画面プレビュー</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="curriculum-hero">
+      <div class="curriculum-hero-copy">
+        <p class="eyebrow">ToToNoE+ CURRICULUM</p>
+        <h1>AIを知るだけで終わらせず、<br>現場で使える力に。</h1>
+        <p class="hero-lead">生成AIやデジタルツールを、専門職の仕事に引き寄せながら学ぶ会員制カリキュラムです。</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#pricing">料金を確認する</a>
+          <a class="secondary-button" href="dashboard.html">学習画面を見る</a>
+        </div>
+        <p class="preview-note"><span class="material-symbols-rounded" aria-hidden="true">construction</span>現在は未公開の実装プレビューです。申込・決済はまだ行われません。</p>
+      </div>
+      <img class="curriculum-hero-image" src="../assets/totonoe-weekly-hero.jpg" alt="仕事の合間に学習する医療専門職" width="1663" height="941">
+    </section>
+
+    <section class="section-shell" id="experience">
+      <p class="eyebrow">LEARNING EXPERIENCE</p>
+      <h2>学びを続けやすくする、3つの仕組み</h2>
+      <div class="feature-list">
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">calendar_month</span>
+          <div><h3>日曜から始まる週間プラン</h3><p>今週取り組む2〜3件を自分で選び、未完了分は次週へ移せます。</p></div>
+        </article>
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">route</span>
+          <div><h3>目的とツールから選ぶ</h3><p>ChatGPT、Claude、Excel・マクロなどを、必要な順番で学べます。</p></div>
+        </article>
+        <article>
+          <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+          <div><h3>学びを相談につなげる</h3><p>最初のカリキュラムを修了すると、30分相談を1回利用できます。</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="pricing-section" id="pricing">
+      <div class="pricing-intro">
+        <p class="eyebrow">PRICING</p>
+        <h2>月額または年額を選べます。</h2>
+        <p>月額料金は原則固定。年額は2か月分お得です。</p>
+      </div>
+
+      <div class="billing-toggle" role="group" aria-label="支払い周期">
+        <button type="button" data-billing="monthly" aria-pressed="false">月額</button>
+        <button type="button" data-billing="annual" aria-pressed="true" class="is-active">年額 <small>2か月分お得</small></button>
+      </div>
+
+      <div class="audience-toggle" role="group" aria-label="申込区分">
+        <button type="button" data-audience="general" aria-pressed="true" class="is-active">一般</button>
+        <button type="button" data-audience="therapist" aria-pressed="false">セラピスト</button>
+      </div>
+
+      <article class="price-panel" aria-live="polite">
+        <div>
+          <p class="price-kicker" id="priceAudienceLabel">一般・初回登録</p>
+          <p class="price-total"><span id="priceTotal">79,800</span><small>円（税込）</small></p>
+          <p id="priceBreakdown">入会金50,000円＋年額29,800円</p>
+        </div>
+        <ul>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>公開中の全カリキュラム</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>ToToNoE Weekly</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>理解度チェック・学習履歴</li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">check</span>条件達成で30分相談1回</li>
+        </ul>
+        <button type="button" class="primary-button preview-checkout" data-preview-action>申込内容を確認</button>
+      </article>
+
+      <div class="price-details">
+        <article><h3>セラピスト割引</h3><p>資格確認後、初回入会金と再登録費の両方から20,000円を割り引きます。</p></article>
+        <article><h3>再登録</h3><p>一般30,000円、資格確認済みセラピスト10,000円。同じ認証済みメールアドレスが必要です。</p></article>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="preview-dialog" id="checkoutPreview">
+    <form method="dialog">
+      <button class="dialog-close" aria-label="閉じる"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
+      <p class="eyebrow">PREVIEW</p>
+      <h2>申込機能は準備中です</h2>
+      <p id="checkoutSummary">一般・年額プランの表示を確認しています。</p>
+      <p class="dialog-note">本番では、メール認証・資格確認・Stripe決済の完了後に受講権限を付与します。</p>
+      <button class="secondary-button" value="close">閉じる</button>
+    </form>
+  </dialog>
+
+  <script src="curriculum-config.js?v=20260911a"></script>
+  <script src="curriculum.js?v=20260911a"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>マイページ｜ToToNoE+ カリキュラム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="curriculum.css?v=20260911i">
+</head>
+<body class="learning-app mypage-app">
+  <aside class="learning-sidebar">
+    <a class="curriculum-brand" href="index.html" aria-label="カリキュラム料金ページへ"><img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566"></a>
+    <nav aria-label="会員メニュー">
+      <a href="../weekly/"><span class="material-symbols-rounded" aria-hidden="true">newspaper</span>Weekly</a>
+      <a href="dashboard.html" data-entitlement="curriculum"><span class="material-symbols-rounded" aria-hidden="true">school</span>カリキュラム</a>
+      <a href="#weeklyLogs"><span class="material-symbols-rounded" aria-hidden="true">monitoring</span>学習履歴</a>
+      <a href="mypage.html" class="is-active"><span class="material-symbols-rounded" aria-hidden="true">person</span>マイページ</a>
+    </nav>
+    <p class="sidebar-message"><strong>積み重ねを、<br>次の一歩へ。</strong><br>学習時間と週次レビューを、ここで振り返れます。</p>
+  </aside>
+  <main class="mypage-main">
+    <header class="mypage-header">
+      <div><p class="eyebrow">MY LEARNING</p><h1>マイページ</h1><p>学んだ時間と、毎週の気づき・目標を残します。</p></div>
+      <a class="secondary-button" href="dashboard.html">学習ホームへ戻る</a>
+    </header>
+    <section class="mypage-profile">
+      <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+      <div><h2 id="memberDisplayName">会員情報を確認中</h2><p id="memberPlanName">ご利用プラン</p></div>
+      <a href="index.html#pricing">契約内容を確認</a>
+    </section>
+    <section class="member-profile-section" aria-labelledby="profileTitle">
+      <div class="section-heading"><div><p class="eyebrow">PROFILE</p><h2 id="profileTitle">あなたの仕事と学びたいこと</h2><p>テーマリクエストを、実際の仕事に合う内容へ近づけるために使います。</p></div></div>
+      <form id="memberProfileForm" class="member-profile-form">
+        <div class="profile-form-grid">
+          <label><span>職種・専門分野</span><input type="text" name="profession" maxlength="80" placeholder="例：理学療法士、企画、個人事業主"></label>
+          <label><span>働いている環境</span><select name="workplace_type"><option value="">選択してください</option><option>病院・クリニック</option><option>介護・福祉施設</option><option>企業</option><option>教育機関</option><option>個人事業・フリーランス</option><option>その他</option></select></label>
+          <label><span>役職・立場</span><input type="text" name="role_title" maxlength="80" placeholder="例：スタッフ、管理職、経営者"></label>
+          <label><span>組織・チーム規模</span><select name="organization_size"><option value="">選択してください</option><option>1人</option><option>2〜10人</option><option>11〜50人</option><option>51〜200人</option><option>201人以上</option></select></label>
+          <label><span>生成AIの利用状況</span><select name="ai_usage_level"><option value="">選択してください</option><option>まだ使っていない</option><option>試し始めた</option><option>週に数回使う</option><option>ほぼ毎日使う</option><option>チームで活用している</option></select></label>
+        </div>
+        <fieldset class="interest-fields"><legend>関心のあるテーマ（複数選択可）</legend><div>
+          <label><input type="checkbox" name="interest_topics" value="文章作成">文章作成</label><label><input type="checkbox" name="interest_topics" value="情報収集">情報収集</label><label><input type="checkbox" name="interest_topics" value="資料作成">資料作成</label><label><input type="checkbox" name="interest_topics" value="業務自動化">業務自動化</label><label><input type="checkbox" name="interest_topics" value="画像・動画">画像・動画</label><label><input type="checkbox" name="interest_topics" value="組織活用">組織活用</label>
+        </div></fieldset>
+        <label class="profile-challenge"><span>今、仕事で困っていること・扱ってほしいテーマ</span><textarea name="current_challenges" maxlength="1000" rows="4" placeholder="例：会議録の作成時間を減らしたい。職場で安全に生成AIを使うルールを作りたい。"></textarea></label>
+        <div class="profile-form-actions"><p id="profileSaveStatus" role="status" aria-live="polite"></p><button class="primary-button" type="submit">プロフィールを保存</button></div>
+      </form>
+    </section>
+    <section class="learning-summary" aria-labelledby="summaryTitle">
+      <div class="section-heading"><div><p class="eyebrow">SUMMARY</p><h2 id="summaryTitle">学習サマリー</h2></div><p id="summaryPeriod"></p></div>
+      <div class="summary-cards">
+        <article><span class="material-symbols-rounded" aria-hidden="true">timer</span><small>累計学習時間</small><strong id="totalLearningTime">0分</strong></article>
+        <article><span class="material-symbols-rounded" aria-hidden="true">edit_calendar</span><small>学習した回数</small><strong id="totalSessions">0回</strong></article>
+        <article><span class="material-symbols-rounded" aria-hidden="true">flag</span><small>週次レビュー</small><strong id="totalReviews">0週</strong></article>
+      </div>
+    </section>
+    <section class="weekly-log-section" id="weeklyLogs" aria-labelledby="weeklyLogsTitle">
+      <div class="section-heading"><div><p class="eyebrow">WEEKLY LOG</p><h2 id="weeklyLogsTitle">振り返り・目標のログ</h2></div><a href="dashboard.html">今週を記録する</a></div>
+      <div class="weekly-log-list" id="weeklyLogList"></div>
+      <div class="empty-log" id="emptyLog" hidden><span class="material-symbols-rounded" aria-hidden="true">history_edu</span><h3>まだ週次ログがありません</h3><p>土曜日の週次レビューを保存すると、ここに積み重なります。</p></div>
+    </section>
+  </main>
+  <script src="member-shell.js?v=20260911a"></script>
+  <script src="mypage.js?v=20260911g"></script>
+</body>
+</html>

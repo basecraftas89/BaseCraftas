@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex,nofollow">
+  <title>レッスン｜ToToNoE+ カリキュラム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="curriculum.css?v=20260911i"><link rel="stylesheet" href="curriculum-admin.css?v=20260911a">
+</head>
+<body class="lesson-app" data-page-entitlement="curriculum">
+  <header class="admin-header"><a class="admin-brand" href="dashboard.html"><img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566"></a><nav><a href="../weekly/">Weekly</a><a href="dashboard.html" data-entitlement="curriculum">カリキュラム</a><a href="mypage.html">マイページ</a></nav></header>
+  <main class="lesson-shell">
+    <a class="lesson-breadcrumb" href="dashboard.html"><span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>学習ホームへ戻る</a>
+    <header class="lesson-head"><div><p class="eyebrow" id="lessonEyebrow">LESSON</p><h1 id="lessonTitle">レッスンを読み込み中</h1><p id="lessonMeta"></p></div><span class="status-chip" id="lessonAccess">有料会員向け</span></header>
+    <div class="lesson-stage">
+      <section class="video-card"><div class="video-frame" id="lessonVideo"></div><div class="asset-links" id="lessonAssets"></div></section>
+      <form class="completion-card" id="completionForm"><h2>このレッスンを記録</h2><p>Drive動画の再生位置は取得せず、自分で視聴完了を確認して記録します。</p><label class="check-line"><input type="checkbox" name="understood" required>最後まで確認し、要点を理解した</label><label>実務で試すこと<textarea name="action" rows="4" required placeholder="例：次の議事録でプロンプトの型を試す"></textarea></label><p class="completion-status" id="completionStatus">未完了</p><button class="primary-button" type="submit">視聴完了として保存</button><p class="form-error" id="completionError" role="alert"></p></form>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="member-shell.js?v=20260911a"></script><script src="curriculum-store.js?v=20260911a"></script><script src="lesson.js?v=20260911a"></script>
+</body>
+</html>
