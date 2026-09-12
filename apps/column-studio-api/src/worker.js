@@ -3189,6 +3189,12 @@ export default {
       if (path !== "/api/stripe/webhook") requestGuard(request, env, path);
       return secureResponse(await worker.fetch(request, env), path.startsWith('/media/'));
     } catch (error) {
+      console.error(JSON.stringify({
+        event: "request.error",
+        method: request.method,
+        path: new URL(request.url).pathname,
+        error: String(error?.message || error || "internal_error").slice(0, 300),
+      }));
       return secureResponse(json({error: error.status ? error.message : 'internal_error'}, {status: error.status || 500}));
     }
   }
