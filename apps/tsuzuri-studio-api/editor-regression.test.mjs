@@ -140,7 +140,10 @@ w.document.execCommand=(command,_,value)=>{if(command==='insertHTML')w.document.
 w.eval(readFileSync(resolve(root,'apps/tsuzuri-studio/security.js'),'utf8'));
 w.eval(js.replace(/\}\)\(\);\s*$/, 'window.editorTest={bootRemote,uploadHero,state,els,blankPost,collect,editPost,scheduleSave,syncRemoteArticle,sourceFromUrl,analyzeLink,setHeroPreview,showHistory,publish,insertBubble,checkpoint,api,openLatest,changeLifecycle,openContentView,setCloud:(value)=>{cloudReady=value;},setApi:(value)=>{API_BASE=value;}};})();'));
 const t=w.editorTest;
+assert.equal(w.document.title,'ToToNoE+ Studio');
+assert.equal(w.document.querySelector('.brand span').textContent.trim(),'ToToNoE+ Studio');
 assert.ok(w.document.querySelector('[data-content-view="column"]'));
+assert.match(w.document.querySelector('[data-content-view="video"]').textContent,/つまみ｜TSUMAMI/);
 assert.ok(w.document.querySelector('[data-content-view="weekend"]'));
 assert.equal(w.document.querySelector('[data-content-view="podcast"]'),null);
 assert.equal(w.document.querySelector('[data-content-view="archive"]'),null);
@@ -158,6 +161,8 @@ t.els.title.value='入力しても使わないタイトル';t.els.sourceDate.val
 const weekendPost=t.collect();assert.equal(weekendPost.title,'次回開催');assert.equal(weekendPost.source_published_at,'');assert.equal(weekendPost.media_url,'');assert.match(weekendPost.slug,/^weekend-\d+$/);
 assert.match(readFileSync(resolve(root,'apps/tsuzuri-studio/styles.css'),'utf8'),/data-editor-kind="weekend"[^}]+\.editor-paper\{display:none\}/);
 t.openContentView('video');t.blankPost(false);
+assert.equal(w.document.getElementById('contentListTitle').textContent,'つまみ｜TSUMAMI');
+assert.match(w.document.getElementById('breadcrumb').textContent,/ToToNoE\+ Studio/);
 assert.equal(t.els.contentType.value,'video');assert.ok(w.document.getElementById('view-editor').classList.contains('source-only-editor'));
 assert.equal(w.document.getElementById('imageDrop').closest('.setting-block').classList.contains('source-only-hidden'),false);
 t.openContentView('column');t.blankPost(false);

@@ -17,7 +17,7 @@
 
 - 記事の公開名称は「つづり｜TSUZURI」
 - 公開URLは `/projects/totonoe/tsuzuri/`
-- 管理画面の公開名称は「TSUZURI Studio」
+- 管理画面の公開名称は「ToToNoE+ Studio」
 - 既存の記事データを維持するため、内部の `content_type: column` とD1・R2の既存リソースIDは互換用識別子として維持する
 
 ## TAYORI

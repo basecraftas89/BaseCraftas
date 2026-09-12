@@ -4,20 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>TSUZURI Studio — ToToNoE+</title>
+  <title>ToToNoE+ Studio</title>
   <meta name="description" content="ToToNoE+のつづり、動画、次回開催サムネイルを編集・公開するダッシュボード">
   <link rel="icon" href="../../images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260913-weekend-image">
+  <link rel="stylesheet" href="styles.css?v=20260913-studio-name">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
         <img src="../../projects/totonoe/assets/totonoe-logo.png" alt="ToToNoE+">
-        <span>TSUZURI Studio</span>
+        <span>ToToNoE+ Studio</span>
       </div>
       <button class="new-post-button" type="button" data-action="new-post">
         <span aria-hidden="true">＋</span> 新しいコンテンツ
@@ -34,7 +34,7 @@
           <span class="nav-icon" aria-hidden="true">✎</span><span>つづり｜TSUZURI</span><span class="nav-count" id="tsuzuriNavCount">0</span>
         </button>
         <button class="nav-item" type="button" data-content-view="video">
-          <span class="nav-icon" aria-hidden="true">▶</span><span>動画</span><span class="nav-count" id="videoNavCount">0</span>
+          <span class="nav-icon" aria-hidden="true">▶</span><span>つまみ｜TSUMAMI</span><span class="nav-count" id="videoNavCount">0</span>
         </button>
         <button class="nav-item" type="button" data-content-view="weekend">
           <span class="nav-icon" aria-hidden="true">☀</span><span>次回開催</span><span class="nav-count" id="weekendNavCount">0</span>
@@ -62,7 +62,7 @@
     <main class="main-shell">
       <header class="topbar">
         <button class="mobile-menu" id="mobileMenu" type="button" aria-label="メニューを開く">☰</button>
-        <div class="breadcrumb" id="breadcrumb"><span>TSUZURI Studio</span><b>/</b> ホーム</div>
+        <div class="breadcrumb" id="breadcrumb"><span>ToToNoE+ Studio</span><b>/</b> ホーム</div>
         <div class="top-actions">
           <span class="save-state"><i></i><span id="saveState">すべて保存済み</span></span>
           <button class="site-link" type="button" data-action="open-site">サイトを見る ↗</button>
@@ -84,7 +84,7 @@
         <div class="page-wrap dashboard-wrap">
           <div class="welcome-row">
             <div>
-              <p class="eyebrow">TSUZURI STUDIO</p>
+              <p class="eyebrow">TOTONOE+ STUDIO</p>
               <h1>言葉を、届くかたちに。</h1>
               <p>つづり｜TSUZURI・つまみ｜TSUMAMIの動画リンクを整えて、そのままToToNoE+へ。むずかしい操作なしでコンテンツを育てられます。</p>
             </div>
@@ -230,7 +230,7 @@
           <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを登録</button></div>
           <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事の公開、メンバー、公開設定を管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成・編集ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
           <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
-          <p class="security-note">🔒 ここではTSUZURI Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
+          <p class="security-note">🔒 ここではToToNoE+ Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
         </div>
       </section>
 
@@ -271,6 +271,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260911"></script>
-  <script src="script.js?v=20260913-weekend-image"></script>
+  <script src="script.js?v=20260913-studio-name"></script>
 </body>
 </html>
