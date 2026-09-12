@@ -78,7 +78,7 @@ test('weekend page switches podcast and member-only archive with accessible butt
 
 test('weekend page renders the published next-event thumbnail with the fixed signup link', async () => {
   const html=readFileSync('projects/totonoe/weekend-ai.html','utf8');
-  const script=readFileSync('projects/totonoe/weekend-next-event.js','utf8');
+  const script=readFileSync('projects/totonoe/weekend-next-thumbnail.js','utf8');
   const dom=new JSDOM(html,{url:'https://basecraftas.com/projects/totonoe/weekend-ai.html',runScripts:'outside-only'});
   try {
     dom.window.fetch=async()=>({ok:true,json:async()=>({event:{hero_url:'https://basecraftas.com/column-media/weekend.png',updated_at:'2026-09-13 00:00:00'}})});
@@ -94,7 +94,7 @@ test('weekend page keeps the standard guidance when no upcoming event is publish
   const dom=new JSDOM(readFileSync('projects/totonoe/weekend-ai.html','utf8'),{url:'https://basecraftas.com/projects/totonoe/weekend-ai.html',runScripts:'outside-only'});
   try {
     dom.window.fetch=async()=>({ok:true,json:async()=>({event:null})});
-    dom.window.eval(readFileSync('projects/totonoe/weekend-next-event.js','utf8'));await new Promise(resolve=>setTimeout(resolve,20));
+    dom.window.eval(readFileSync('projects/totonoe/weekend-next-thumbnail.js','utf8'));await new Promise(resolve=>setTimeout(resolve,20));
     assert.equal(dom.window.document.getElementById('weekendNextEvent').hidden,true);
     assert.match(dom.window.document.getElementById('schedule').textContent,/毎週土曜 朝6:00/);
   } finally {dom.window.close();}

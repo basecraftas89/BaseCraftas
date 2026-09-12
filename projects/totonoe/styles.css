@@ -961,15 +961,6 @@ body.sem-lock{overflow:hidden}
   border-radius:0 14px 14px 0;color:#fff;font-size:1.08rem;font-weight:900;
 }
 .weekend-reason .reason-emph{font-size:1.08rem}
-.weekend-next-event{
-  margin:0 0 28px;padding:clamp(12px,2vw,20px);border:1px solid var(--line);border-radius:24px;
-  background:#fff;box-shadow:var(--shadow);overflow:hidden;
-}
-.weekend-next-event[hidden]{display:none}
-.weekend-next-link{display:block;border-radius:18px;overflow:hidden}
-.weekend-next-link:focus-visible{outline:4px solid rgba(19,115,160,.32);outline-offset:4px}
-.weekend-next-visual{margin:0;background:var(--sky)}
-.weekend-next-visual img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .how-section{background:#fff}
 .who-section,.next-learning{background:linear-gradient(180deg,#F7FAF5,#fff)}
 .scroll-figure img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff}
@@ -1830,8 +1821,6 @@ body.cv-lock{overflow:hidden}
   .section{padding:64px 0}
 }
 @media (max-width:680px){
-  .weekend-next-event{padding:8px;border-radius:16px}
-  .weekend-next-link{border-radius:11px}
   .weekend-media-tabs{gap:6px;margin-bottom:34px;padding:5px;border-radius:15px}
   .weekend-media-tab{min-height:48px;padding:8px 10px;font-size:.84rem;border-radius:11px}
   .benefit-grid{grid-template-columns:1fr 1fr}
