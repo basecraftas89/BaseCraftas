@@ -41,6 +41,7 @@
     const allowed = required === "curriculum" ? access.has_curriculum_access : required === "member" ? hasMembership : true;
     if (allowed) return;
     document.body.classList.add("access-locked");
+    document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.removeAttribute("open"));
     const gate = document.createElement("section");
     gate.className = "entitlement-gate";
     const isSignedIn = access.authenticated === true;

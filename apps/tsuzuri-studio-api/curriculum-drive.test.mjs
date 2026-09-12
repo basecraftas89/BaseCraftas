@@ -60,7 +60,7 @@ test("curriculum learner flow is protected and management stays local-only", asy
 test("IROHA direct access stays locked until an IROHA entitlement is confirmed", async () => {
   const shell = await fs.readFile(path.join(curriculumDir, "member-shell.js"), "utf8");
   const check = async (profile, expectedLocked) => {
-    const dom = new JSDOM('<!doctype html><html class="member-access-pending"><body data-page-entitlement="curriculum"><main class="learning-main">paid</main></body></html>', {
+    const dom = new JSDOM('<!doctype html><html class="member-access-pending"><body data-page-entitlement="curriculum"><main class="learning-main">paid</main><dialog open><p>weekly review</p></dialog></body></html>', {
       url: "https://basecraftas.com/projects/totonoe/IROHA/dashboard.html",
       runScripts: "outside-only"
     });
@@ -72,6 +72,7 @@ test("IROHA direct access stays locked until an IROHA entitlement is confirmed",
     assert.equal(dom.window.document.documentElement.classList.contains("member-access-pending"), false);
     assert.equal(dom.window.document.body.classList.contains("access-locked"), expectedLocked);
     assert.equal(Boolean(dom.window.document.querySelector(".entitlement-gate")), expectedLocked);
+    assert.equal(dom.window.document.querySelector("dialog").hasAttribute("open"), !expectedLocked);
   };
 
   await check(null, true);

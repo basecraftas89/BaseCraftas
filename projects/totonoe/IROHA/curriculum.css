@@ -371,6 +371,7 @@ dialog h2 { margin: 0 0 12px; color: var(--ink); }
 .entitlement-gate > p:not(.eyebrow) { max-width: 620px; margin: 0 0 22px; }
 .member-access-pending body[data-page-entitlement] { visibility: hidden; }
 .access-locked .learning-sidebar, .access-locked .admin-header, .access-locked .learning-main, .access-locked .lesson-shell, .access-locked .mypage-main { display: none; }
+.access-locked dialog { display: none !important; }
 .access-locked .entitlement-gate { margin-left: 0; }
 .entitlement-gate .secondary-button { margin-top: 10px; }
 .learning-summary, .weekly-log-section { margin-top: 18px; padding: 22px; background: white; border: 1px solid var(--line); border-radius: 16px; }
