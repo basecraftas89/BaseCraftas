@@ -227,10 +227,15 @@ dialog form { padding: 34px; position: relative; }
 .auth-step { padding: 0; display: grid; gap: 10px; }
 .auth-step[hidden] { display: none; }
 .auth-step label { color: var(--ink); font-size: .86rem; font-weight: 800; }
-.auth-step input { width: 100%; min-height: 50px; padding: 10px 13px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 10px; }
-.auth-step input:focus { border-color: var(--sage); outline: 3px solid rgba(61,107,94,.14); }
+.auth-step input, .auth-step select { width: 100%; min-height: 50px; padding: 10px 13px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 10px; }
+.auth-step input:focus, .auth-step select:focus { border-color: var(--sage); outline: 3px solid rgba(61,107,94,.14); }
 .auth-step .primary-button { width: 100%; margin-top: 4px; }
 .field-help { margin: 0 0 4px; color: #687b74; font-size: .74rem; }
+.qualification-intro, .qualification-pending p { margin: 0 0 4px; color: #536961; font-size: .8rem; line-height: 1.7; }
+.qualification-consent { display: grid; grid-template-columns: 20px 1fr; gap: 9px; align-items: start; color: #536961; font-size: .74rem; line-height: 1.6; }
+.qualification-consent input { width: 18px; min-height: 18px; margin-top: 2px; }
+.qualification-pending { padding: 18px; background: #f3f8f5; border: 1px solid rgba(61,107,94,.25); border-radius: 12px; }
+.qualification-pending strong { color: var(--ink); }
 .auth-back { width: fit-content; margin: 0 auto; padding: 5px 8px; color: var(--sage); background: transparent; border: 0; cursor: pointer; font-size: .74rem; font-weight: 700; text-decoration: underline; }
 .auth-step button[disabled] { cursor: wait; opacity: .62; }
 .checkout-result { min-height: 100vh; padding: 32px; display: grid; place-items: center; background: var(--paper); }

@@ -206,8 +206,8 @@ test("回答動画は会員確認後にDrive IDを隠したままRange対応で�
 });
 
 test("Weekly画面は新聞ビジュアル、年・月アコーディオン、横長資料行を備える", () => {
-  const html = readFileSync("projects/totonoe/weekly/index.html", "utf8");
-  const script = readFileSync("projects/totonoe/weekly/weekly-member.js", "utf8");
+  const html = readFileSync("projects/totonoe/TAYORI/index.html", "utf8");
+  const script = readFileSync("projects/totonoe/TAYORI/weekly-member.js", "utf8");
   assert.match(html, /totonoe-weekly-newspaper-20260911\.jpg/);
   assert.match(html, /id="materialSort"/);
   assert.match(html, /data-entitlement="curriculum"/);
@@ -220,8 +220,8 @@ test("Weekly画面は新聞ビジュアル、年・月アコーディオン、�
 });
 
 test("Weekly画面は優先質問を小分けで入力し、会員限定の回答動画欄を備える", () => {
-  const html = readFileSync("projects/totonoe/weekly/index.html", "utf8");
-  const script = readFileSync("projects/totonoe/weekly/weekly-member.js", "utf8");
+  const html = readFileSync("projects/totonoe/TAYORI/index.html", "utf8");
+  const script = readFileSync("projects/totonoe/TAYORI/weekly-member.js", "utf8");
   assert.match(html, /id="priorityQuestionForm"/);
   assert.match(html, /data-question-step="1" open/);
   assert.match(html, /name="situation"/);
@@ -245,7 +245,7 @@ test("優先質問フォームと管理表の回答列は同じ順序・項目�
 });
 
 test("マイページは会員共通ナビとテーマ最適化用プロフィール項目を備える", () => {
-  const html = readFileSync("projects/totonoe/curriculum/mypage.html", "utf8");
+  const html = readFileSync("projects/totonoe/IROHA/mypage.html", "utf8");
   assert.match(html, /data-entitlement="curriculum"/);
   assert.match(html, /name="workplace_type"/);
   assert.match(html, /name="role_title"/);

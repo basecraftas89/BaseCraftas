@@ -82,6 +82,15 @@
         invalid_auth_code: "認証コードが一致しません。",
         auth_code_expired: "認証コードの有効期限が切れました。もう一度送信してください。",
         therapist_verification_required: "セラピスト料金の利用には資格確認が必要です。先に資格確認をお申し込みください。",
+        qualification_already_pending: "資格確認はすでに審査中です。",
+        qualification_already_verified: "資格確認は完了しています。",
+        file_required: "資格証明画像を選択してください。",
+        profession_required: "資格・職種を選択してください。",
+        applicant_name_required: "資格証明書に記載された氏名を入力してください。",
+        privacy_consent_required: "資格画像の利用目的と削除方針への同意が必要です。",
+        unsupported_image_type: "JPEG・PNG・WebP・GIF形式の画像を選択してください。",
+        invalid_image_content: "画像ファイルを確認できませんでした。別の画像を選択してください。",
+        image_too_large: "画像は2MB以内にしてください。",
         subscription_already_exists: "このメールアドレスには利用中の契約があります。マイページからご確認ください。",
         stripe_checkout_not_enabled: "現在は決済機能の最終準備中です。受付開始までしばらくお待ちください。",
       };
@@ -89,10 +98,11 @@
     }
 
     async function api(path, options = {}) {
+      const isFormData = options.body instanceof FormData;
       const response = await fetch(`${config.apiBase}${path}`, {
         credentials: "same-origin",
         ...options,
-        headers: { "content-type": "application/json", ...(options.headers || {}) },
+        headers: { ...(isFormData ? {} : { "content-type": "application/json" }), ...(options.headers || {}) },
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(apiErrorMessage(result.error)), { code: result.error, status: response.status });
@@ -149,6 +159,8 @@
     const dialog = document.querySelector("#checkoutPreview");
     const emailForm = document.querySelector("#emailAuthForm");
     const codeForm = document.querySelector("#codeAuthForm");
+    const qualificationForm = document.querySelector("#qualificationForm");
+    const qualificationPending = document.querySelector("#qualificationPending");
     const error = document.querySelector("#authError");
     let verifiedEmail = "";
     let checkoutRequestId = "";
@@ -156,12 +168,18 @@
     function setAuthStep(step) {
       emailForm.hidden = step !== "email";
       codeForm.hidden = step !== "code";
+      qualificationForm.hidden = step !== "qualification";
+      qualificationPending.hidden = step !== "pending";
       error.textContent = "";
-      window.setTimeout(() => (step === "email" ? emailForm.elements.email : codeForm.elements.code).focus(), 20);
+      window.setTimeout(() => {
+        if (step === "email") emailForm.elements.email.focus();
+        if (step === "code") codeForm.elements.code.focus();
+        if (step === "qualification") qualificationForm.elements.profession.focus();
+      }, 20);
     }
 
     function setBusy(form, busy) {
-      form.querySelectorAll("button, input").forEach((element) => { element.disabled = busy; });
+      form.querySelectorAll("button, input, select").forEach((element) => { element.disabled = busy; });
     }
 
     document.querySelector("[data-preview-action]")?.addEventListener("click", () => {
@@ -174,7 +192,7 @@
       setAuthStep("email");
       dialog?.showModal();
     });
-    document.querySelector("[data-dialog-close]")?.addEventListener("click", () => dialog?.close());
+    document.querySelectorAll("[data-dialog-close]").forEach((button) => button.addEventListener("click", () => dialog?.close()));
     document.querySelector("[data-auth-back]")?.addEventListener("click", () => setAuthStep("email"));
 
     emailForm?.addEventListener("submit", async (event) => {
@@ -207,6 +225,14 @@
           method: "POST",
           body: JSON.stringify({ email: verifiedEmail, code: codeForm.elements.code.value }),
         });
+        if (audience === "therapist") {
+          const qualification = await api("/api/customer/qualification", { method: "GET" });
+          if (qualification.therapist_status !== "verified") {
+            if (qualification.display_name) qualificationForm.elements.applicant_name.value = qualification.display_name;
+            setAuthStep(qualification.therapist_status === "pending" ? "pending" : "qualification");
+            return;
+          }
+        }
         const checkout = await api("/api/customer/billing/checkout", {
           method: "POST",
           body: JSON.stringify({
@@ -220,6 +246,22 @@
         error.textContent = apiError.message;
       } finally {
         setBusy(codeForm, false);
+      }
+    });
+
+    qualificationForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      error.textContent = "";
+      setBusy(qualificationForm, true);
+      try {
+        const form = new FormData(qualificationForm);
+        await api("/api/customer/qualification", { method: "POST", body: form });
+        qualificationForm.reset();
+        setAuthStep("pending");
+      } catch (apiError) {
+        error.textContent = apiError.message;
+      } finally {
+        setBusy(qualificationForm, false);
       }
     });
     update();

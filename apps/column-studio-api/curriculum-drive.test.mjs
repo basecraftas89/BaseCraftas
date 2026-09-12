@@ -5,7 +5,7 @@ import path from "node:path";
 import { JSDOM } from "jsdom";
 
 const root = path.resolve(import.meta.dirname, "../..");
-const curriculumDir = path.join(root, "projects/totonoe/curriculum");
+const curriculumDir = path.join(root, "projects/totonoe/IROHA");
 
 async function loadStore() {
   const dom = new JSDOM("<!doctype html><body></body>", { url: "http://localhost/", runScripts: "outside-only" });
@@ -72,6 +72,12 @@ test("curriculum LP shows the therapist-only regular entry fee before the campai
   assert.match(script, /recurringUnit/);
   assert.match(script, /config\.entryFees\.first\[audience\]/);
   assert.match(script, /Math\.round\(\(1 - entry \/ originalEntry\) \* 100\)/);
+  assert.match(html, /id="qualificationForm"/);
+  assert.match(html, /審査完了から30日後に削除/);
+  assert.match(html, /name="applicant_name"/);
+  assert.match(html, /name="privacy_consent"/);
+  assert.match(script, /\/api\/customer\/qualification/);
+  assert.match(script, /qualification\.therapist_status !== "verified"/);
 });
 
 

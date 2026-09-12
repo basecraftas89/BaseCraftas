@@ -1,3 +1,4 @@
+import {archiveMetadata} from './archive-metadata.js';
 import {articleHtml} from './public-render.js';
 import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
 import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
@@ -14,6 +15,7 @@ import {
   buildStripeCheckoutParams,
   createStripeCheckoutSession,
   createStripePortalSession,
+  sendQualificationReviewEmail,
 } from './customer-auth.js';
 
 const jsonHeaders = {
@@ -22,6 +24,7 @@ const jsonHeaders = {
 };
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+const QUALIFICATION_RETENTION_DAYS = 30;
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -140,6 +143,8 @@ function isPublicMemberRequest(rawPath, normalizedPath, method) {
     "POST /api/customer/auth/logout",
     "POST /api/customer/billing/checkout",
     "POST /api/customer/billing/portal",
+    "GET /api/customer/qualification",
+    "POST /api/customer/qualification",
     "POST /api/stripe/webhook",
     "GET /api/customer/profile",
     "PATCH /api/customer/profile",
@@ -1399,11 +1404,14 @@ async function importArchiveCandidate(request, env, id) {
   let slug = archiveSlug(candidate.drive_file_id);
   const collision = await env.DB.prepare("SELECT id FROM articles WHERE slug = ?").bind(slug).first();
   if (collision) slug += "-" + crypto.randomUUID().slice(0, 8);
-  const title = archiveTitle(candidate.name);
-  const sourceDate = String(candidate.created_time || "").slice(0, 10);
+  const metadata = archiveMetadata(candidate.name, candidate.created_time);
+  const podcasts = metadata.episodeNo ? await env.DB.prepare("SELECT title, source_published_at FROM articles WHERE content_type = 'podcast' AND episode_no = ? AND deleted_at IS NULL AND status != 'archived' LIMIT 2").bind(metadata.episodeNo).all() : { results: [] };
+  const podcast = podcasts.results.length === 1 ? podcasts.results[0] : null;
+  const title = podcast ? podcast.title : archiveTitle(candidate.name);
+  const sourceDate = metadata.sourceDate;
   const statements = [
-    env.DB.prepare("INSERT INTO articles (id, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url, source_published_at, source_type, source_id, hero_url, body_html, status, author_email, editor_email) VALUES (?, ?, ?, ?, 'content', 'totonoe', 'archive', '[]', '', '[]', ?, ?, 'archive', ?, ?, '', 'draft', ?, ?)")
-      .bind(articleId, slug, title, "Google Driveのアーカイブ候補から作成した下書きです。", candidate.web_view_link, sourceDate, candidate.drive_file_id, "", auth.email, auth.email),
+    env.DB.prepare("INSERT INTO articles (id, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url, episode_no, source_published_at, source_type, source_id, hero_url, body_html, status, author_email, editor_email) VALUES (?, ?, ?, ?, 'content', 'totonoe', 'archive', '[]', '', '[]', ?, ?, ?, 'archive', ?, ?, '', 'draft', ?, ?)")
+      .bind(articleId, slug, title, "Google Driveのアーカイブ候補から作成した下書きです。", candidate.web_view_link, metadata.episodeNo, sourceDate, candidate.drive_file_id, "", auth.email, auth.email),
     env.DB.prepare("UPDATE archive_candidates SET status = 'imported', article_id = ?, imported_at = CURRENT_TIMESTAMP WHERE id = ?").bind(articleId, id),
   ];
   const results = await env.DB.batch(statements);
@@ -1800,6 +1808,163 @@ async function logoutCustomer(request, env) {
   return json({ ok: true }, { headers: { "set-cookie": clearCustomerSessionCookie() } });
 }
 
+async function getCustomerQualification(request, env) {
+  const auth = await requireCustomerIdentity(request, env);
+  if (auth.error) return auth.error;
+  const submission = await env.DB.prepare(
+    `SELECT id, profession, status, review_note, reviewed_at, created_at, updated_at
+       FROM qualification_submissions
+      WHERE customer_id = ? AND status != 'deleted'
+      ORDER BY datetime(created_at) DESC LIMIT 1`
+  ).bind(auth.customer.id).first();
+  return json({
+    therapist_status: auth.customer.therapist_status,
+    display_name: auth.customer.display_name || "",
+    submission: submission || null,
+  });
+}
+
+async function submitCustomerQualification(request, env) {
+  const auth = await requireCustomerIdentity(request, env);
+  if (auth.error) return auth.error;
+  if (!env.MEDIA) return json({ error: "media_bucket_not_configured" }, { status: 500 });
+  if (auth.customer.therapist_status === "verified") {
+    return json({ error: "qualification_already_verified" }, { status: 409 });
+  }
+  const existing = await env.DB.prepare(
+    "SELECT id FROM qualification_submissions WHERE customer_id = ? AND status = 'pending' LIMIT 1"
+  ).bind(auth.customer.id).first();
+  if (existing) return json({ error: "qualification_already_pending" }, { status: 409 });
+
+  const bytes = await readBytes(request, MAX_IMAGE_BYTES + 64 * 1024);
+  const form = await new Response(bytes, { headers: { "content-type": request.headers.get("content-type") } }).formData();
+  const file = form.get("file");
+  const profession = String(form.get("profession") || "").normalize("NFKC").trim().slice(0, 80);
+  const applicantName = String(form.get("applicant_name") || "").normalize("NFKC").trim().replace(/\s+/g, " ").slice(0, 100);
+  const privacyConsent = String(form.get("privacy_consent") || "");
+  if (!(file instanceof File)) return json({ error: "file_required" }, { status: 400 });
+  if (!profession) return json({ error: "profession_required" }, { status: 400 });
+  if (!applicantName) return json({ error: "applicant_name_required" }, { status: 400 });
+  if (privacyConsent !== "accepted") return json({ error: "privacy_consent_required" }, { status: 400 });
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    return json({ error: "unsupported_image_type", allowed: Array.from(ALLOWED_IMAGE_TYPES) }, { status: 415 });
+  }
+  if (file.size > MAX_IMAGE_BYTES) return json({ error: "image_too_large", max_bytes: MAX_IMAGE_BYTES }, { status: 413 });
+  const content = new Uint8Array(await file.arrayBuffer());
+  if (imageType(content) !== file.type) return json({ error: "invalid_image_content" }, { status: 415 });
+
+  const submissionId = uid("qualification");
+  const key = `qualifications/${auth.customer.id}/${crypto.randomUUID()}-${safeFilename(file.name || "license-image")}`;
+  await env.MEDIA.put(key, content, {
+    httpMetadata: { contentType: file.type },
+    customMetadata: { customerId: auth.customer.id, submissionId },
+  });
+  try {
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO qualification_submissions
+          (id, customer_id, profession, private_r2_object_key, original_file_name, mime_type, size_bytes, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`
+      ).bind(submissionId, auth.customer.id, profession, key, String(file.name || "").slice(0, 255), file.type, file.size),
+      env.DB.prepare(
+        "UPDATE customer_accounts SET display_name = ?, therapist_status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+      ).bind(applicantName, auth.customer.id),
+    ]);
+  } catch (error) {
+    await env.MEDIA.delete(key);
+    throw error;
+  }
+  await audit(env, auth.customer.email, "qualification.submit", "qualification_submission", submissionId, { profession });
+  return json({ submission: { id: submissionId, profession, status: "pending" } }, { status: 201 });
+}
+
+async function listQualificationsAdmin(request, env) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const result = await env.DB.prepare(
+    `SELECT qs.id, qs.customer_id, ca.email, ca.display_name, qs.profession, qs.original_file_name, qs.mime_type,
+            qs.size_bytes, qs.status, qs.review_note, qs.reviewed_at, qs.created_at, qs.updated_at
+       FROM qualification_submissions qs
+       JOIN customer_accounts ca ON ca.id = qs.customer_id
+      WHERE qs.status != 'deleted'
+      ORDER BY CASE qs.status WHEN 'pending' THEN 0 ELSE 1 END, datetime(qs.created_at) DESC`
+  ).all();
+  return json({ submissions: result.results || [] });
+}
+
+async function openQualificationImageAdmin(request, env, submissionId) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  if (!env.MEDIA) return new Response("Not found", { status: 404 });
+  const submission = await env.DB.prepare(
+    "SELECT private_r2_object_key, mime_type FROM qualification_submissions WHERE id = ? AND status != 'deleted'"
+  ).bind(submissionId).first();
+  if (!submission || !ALLOWED_IMAGE_TYPES.has(submission.mime_type)) return new Response("Not found", { status: 404 });
+  const object = await env.MEDIA.get(submission.private_r2_object_key);
+  if (!object) return new Response("Not found", { status: 404 });
+  return new Response(object.body, { headers: {
+    "content-type": submission.mime_type,
+    "cache-control": "private, no-store",
+    "content-disposition": "inline",
+  } });
+}
+
+async function reviewQualificationAdmin(request, env, submissionId) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const status = String(payload.status || "");
+  if (!["verified", "rejected"].includes(status)) return json({ error: "invalid_qualification_status" }, { status: 400 });
+  const note = String(payload.review_note || "").normalize("NFKC").trim().slice(0, 500);
+  if (status === "rejected" && !note) return json({ error: "review_note_required" }, { status: 400 });
+  const submission = await env.DB.prepare(
+    `SELECT qs.id, qs.customer_id, qs.status, ca.email
+       FROM qualification_submissions qs JOIN customer_accounts ca ON ca.id = qs.customer_id
+      WHERE qs.id = ? AND qs.status = 'pending'`
+  ).bind(submissionId).first();
+  if (!submission) return json({ error: "qualification_not_pending" }, { status: 409 });
+  await env.DB.batch([
+    env.DB.prepare(
+      `UPDATE qualification_submissions
+          SET status = ?, reviewer_member_id = ?, review_note = ?, reviewed_at = CURRENT_TIMESTAMP,
+              purge_after = datetime('now', ?), updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND status = 'pending'`
+    ).bind(status, auth.member.id, note, `+${QUALIFICATION_RETENTION_DAYS} days`, submissionId),
+    env.DB.prepare(
+      "UPDATE customer_accounts SET therapist_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(status, submission.customer_id),
+  ]);
+  await audit(env, auth.email, `qualification.${status}`, "qualification_submission", submissionId, { customer_id: submission.customer_id });
+  let notificationSent = false;
+  try {
+    await sendQualificationReviewEmail(env, { email: submission.email, status, submissionId, reviewNote: note });
+    notificationSent = true;
+  } catch (error) {
+    console.error(JSON.stringify({ event: "qualification.notification_failed", submission_id: submissionId, error: String(error.message || error) }));
+  }
+  return json({ submission: { id: submissionId, status, review_note: note }, notification_sent: notificationSent });
+}
+
+async function purgeExpiredQualificationImages(env) {
+  if (!env.MEDIA) return 0;
+  const expired = await env.DB.prepare(
+    `SELECT id, private_r2_object_key FROM qualification_submissions
+      WHERE status IN ('verified', 'rejected') AND purge_after IS NOT NULL
+        AND datetime(purge_after) <= datetime('now')
+      LIMIT 100`
+  ).all();
+  let purged = 0;
+  for (const submission of expired.results || []) {
+    if (submission.private_r2_object_key) await env.MEDIA.delete(submission.private_r2_object_key);
+    const result = await env.DB.prepare(
+      "UPDATE qualification_submissions SET status = 'deleted', private_r2_object_key = '', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status IN ('verified', 'rejected')"
+    ).bind(submission.id).run();
+    purged += Number(result.meta?.changes || 0);
+  }
+  return purged;
+}
+
 function checkoutSiteOrigin(request, env) {
   const configured = String(env.PUBLIC_SITE_ORIGIN || "https://basecraftas.com").replace(/\/$/, "");
   if (!/^https:\/\/[^/]+$/.test(configured)) throw Object.assign(new Error("invalid_public_site_origin"), { status: 503 });
@@ -1863,11 +2028,11 @@ async function createCustomerCheckout(request, env) {
     customer: auth.customer,
     attemptId,
     successUrl: isWeeklyPlan
-      ? `${origin}/projects/totonoe/weekly/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`
-      : `${origin}/projects/totonoe/curriculum/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`,
+      ? `${origin}/projects/totonoe/TAYORI/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/projects/totonoe/IROHA/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: isWeeklyPlan
-      ? `${origin}/projects/totonoe/weekly.html?checkout=cancelled#pricing`
-      : `${origin}/projects/totonoe/curriculum/index.html?checkout=cancelled#pricing`,
+      ? `${origin}/projects/totonoe/TAYORI/index.html?checkout=cancelled#pricing`
+      : `${origin}/projects/totonoe/IROHA/index.html?checkout=cancelled#pricing`,
   });
   try {
     const session = await createStripeCheckoutSession(env, params, idempotencyKey);
@@ -1908,7 +2073,7 @@ async function createCustomerPortal(request, env) {
   const origin = checkoutSiteOrigin(request, env);
   const session = await createStripePortalSession(env, {
     customerId: auth.customer.stripe_customer_id,
-    returnUrl: `${origin}/projects/totonoe/curriculum/mypage.html?billing=returned`,
+    returnUrl: `${origin}/projects/totonoe/IROHA/mypage.html?billing=returned`,
   });
   return json({ portal_url: session.url }, { status: 201 });
 }
@@ -2549,6 +2714,7 @@ const worker = {
       await env.DB.prepare("DELETE FROM customer_auth_rate_limits WHERE bucket < ?").bind(Math.floor(Date.now() / (AUTH_RATE_BUCKET_MINUTES * 60 * 1000)) - 6).run();
       await env.DB.prepare("DELETE FROM customer_auth_challenges WHERE datetime(created_at) <= datetime('now', '-1 day')").run();
       await env.DB.prepare("DELETE FROM customer_sessions WHERE datetime(expires_at) <= datetime('now') OR datetime(COALESCE(revoked_at, '9999-12-31')) <= datetime('now', '-7 days')").run();
+      await purgeExpiredQualificationImages(env);
     } catch (error) {
       // During a staged release, existing scheduled jobs may run before the new migration is applied.
       if (!String(error.message || error).includes("no such table")) throw error;
@@ -2605,6 +2771,12 @@ const worker = {
     if (path === "/api/customer/billing/portal" && request.method === "POST") {
       return createCustomerPortal(request, env);
     }
+    if (path === "/api/customer/qualification" && request.method === "GET") {
+      return getCustomerQualification(request, env);
+    }
+    if (path === "/api/customer/qualification" && request.method === "POST") {
+      return submitCustomerQualification(request, env);
+    }
     if (path === "/api/stripe/webhook" && request.method === "POST") {
       return handleStripeWebhook(request, env);
     }
@@ -2649,6 +2821,12 @@ const worker = {
     if (path === "/api/members" && request.method === "POST") return createMember(request, env);
     const memberMatch = path.match(/^\/api\/members\/([^/]+)$/);
     if (memberMatch && request.method === "PATCH") return updateMember(request, env, memberMatch[1]);
+
+    if (path === "/api/admin/qualifications" && request.method === "GET") return listQualificationsAdmin(request, env);
+    const qualificationImageMatch = path.match(/^\/api\/admin\/qualifications\/([^/]+)\/image$/);
+    if (qualificationImageMatch && request.method === "GET") return openQualificationImageAdmin(request, env, qualificationImageMatch[1]);
+    const qualificationReviewMatch = path.match(/^\/api\/admin\/qualifications\/([^/]+)$/);
+    if (qualificationReviewMatch && request.method === "PATCH") return reviewQualificationAdmin(request, env, qualificationReviewMatch[1]);
 
     if (path === "/api/articles" && request.method === "GET") {
       const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);

@@ -19,12 +19,14 @@
 - ChatGPT・Claude・Geminiの公式ロゴと初期カリキュラム構成を表示する
 - D1向けの会員・契約・資格確認・学習進捗スキーマを確認する
 - 相談特典を法人研修プラン公開後に解放し、担当者の30分枠へ接続する構造を確認する
+- メール認証後にStripeテストCheckoutへ進み、WebhookからD1へ契約・権限を反映する
+- セラピスト資格画像を非公開R2へ提出し、管理者が承認または再提出を依頼する
+- 審査結果をResendで申請者へ通知し、審査完了30日後に資格画像を削除する
 
 ## まだ接続していないもの
 
-- 本番ログイン、メール認証、権限制御
-- Stripe等の決済・Webhook・請求管理
-- セラピスト資格画像のR2アップロードと審査
+- Stripe本番モードへの切り替え
+- 資格審査フローの公開環境へのデプロイと実画像での通し確認
 - 実際のDriveフォルダ作成・共有権限変更・Drive API同期
 - D1への実データ保存
 - 30分相談枠の予約サービス
@@ -52,8 +54,8 @@
 2. Google Driveに `DRIVE_SETUP.md` と `drive-folder-blueprint.json` に沿ったフォルダを作成し、制限付き権限を設定する
 3. 専用Google CloudサービスアカウントとDrive APIを用意し、秘密鍵をWorker Secretへ保存する
 4. D1へ `20260911_curriculum_foundation.sql` と `20260911_curriculum_drive_delivery.sql` を検証環境から順番に適用する
-5. Stripeの商品・価格・Checkout・Customer Portal・Webhookを接続する
-6. 非公開R2バケットと資格審査フローを接続する
+5. Stripeの商品・価格・Checkout・Customer Portal・Webhookをテストモードで通し確認する
+6. 非公開R2バケットと資格審査フローを公開環境で通し確認する
 7. 学習API、権利判定、進捗同期を実装する
 8. テスト購入、解約、TAYORIへの変更、再登録、資格画像削除を通しで検証する
 9. 承認後に公開ナビゲーションへ追加する

@@ -7,7 +7,7 @@
   let email = "";
 
   function returnPath() {
-    const fallback = "/projects/totonoe/weekly/";
+    const fallback = "/projects/totonoe/TAYORI/";
     const value = new URLSearchParams(location.search).get("return") || fallback;
     return /^\/projects\/totonoe\/(?:weekly\/|curriculum\/(?:mypage|dashboard)\.html)(?:[?#].*)?$/.test(value) ? value : fallback;
   }

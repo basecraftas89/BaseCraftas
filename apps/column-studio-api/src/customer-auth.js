@@ -117,6 +117,47 @@ export async function sendOtpWithResend(env, { email, code, challengeId }) {
   return { messageId: String(result.id) };
 }
 
+function escapeEmailHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export async function sendQualificationReviewEmail(env, { email, status, submissionId, reviewNote = "" }) {
+  if (!String(env.RESEND_API_KEY || "").startsWith("re_")) throw serviceError("resend_api_key_missing", 503);
+  const from = String(env.RESEND_FROM_EMAIL || "").trim();
+  if (!from) throw serviceError("resend_from_email_missing", 503);
+  const approved = status === "verified";
+  const subject = approved ? "【ToToNoE+】セラピスト資格確認が完了しました" : "【ToToNoE+】資格証明画像の再提出をお願いします";
+  const action = approved
+    ? "資格確認が完了しました。同じメールアドレスでIROHAへお申し込みください。"
+    : "提出内容を確認できなかったため、IROHAの申込画面から改めて資格証明画像をご提出ください。";
+  const note = String(reviewNote || "").trim().slice(0, 500);
+  const noteText = note ? `\n運営からのご案内：${note}` : "";
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "content-type": "application/json",
+      "idempotency-key": `totonoe-qualification-${submissionId}-${status}`,
+      "user-agent": "totonoe-customer-auth/1.0",
+    },
+    body: JSON.stringify({
+      from,
+      to: [email],
+      subject,
+      text: `${action}${noteText}\n\nこのメールに心当たりがない場合は、破棄してください。`,
+      html: `<div style="font-family:sans-serif;line-height:1.8;color:#1a332c"><h1 style="font-size:20px">${escapeEmailHtml(subject.replace("【ToToNoE+】", ""))}</h1><p>${escapeEmailHtml(action)}</p>${note ? `<p style="padding:12px;background:#f3f6f4;border-radius:8px"><strong>運営からのご案内</strong><br>${escapeEmailHtml(note)}</p>` : ""}<p style="font-size:13px;color:#5f716b">このメールに心当たりがない場合は、破棄してください。</p></div>`,
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+  const result = await readJsonLimit(response);
+  if (!response.ok || !result.id) throw serviceError("qualification_email_delivery_failed", 502);
+  return { messageId: String(result.id) };
+}
+
 export function customerSessionCookie(token, maxAgeSeconds = 30 * 24 * 60 * 60) {
   return `totonoe_session=${token}; Path=/; Max-Age=${maxAgeSeconds}; HttpOnly; Secure; SameSite=Lax`;
 }

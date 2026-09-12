@@ -85,7 +85,8 @@ export function requestGuard(request, env, path) {
     throw Object.assign(new Error('invalid_origin'), {status: 403});
   }
   const type = request.headers.get('content-type') || '';
-  if (path === '/api/assets' ? !type.startsWith('multipart/form-data;') : !/^application\/json(?:;|$)/i.test(type)) {
+  const multipart = path === '/api/assets' || path === '/api/customer/qualification';
+  if (multipart ? !type.startsWith('multipart/form-data;') : !/^application\/json(?:;|$)/i.test(type)) {
     throw Object.assign(new Error('unsupported_content_type'), {status: 415});
   }
 }

@@ -46,6 +46,7 @@
     { url: 'https://stand.fm/episodes/6a88cf4935c40266c30d32ff', no: 13, theme: 'Geminiの画像、実は「あのマーク」消せます！秘密の設定大公開', date: '8/22' },
     { url: 'https://stand.fm/episodes/6a921025ce0a6c53375389d8', no: 14, theme: 'Claude公式講座が日本語対応！1日10分で学べる最新AI活用術', date: '8/29' },
     { url: 'https://stand.fm/episodes/6a9b459df67f3111cf58409f', no: 15, theme: 'ChatGPT Workを活かすフォルダリング術！', date: '9/5' },
+    { url: 'https://stand.fm/episodes/6aa47d67279752ae5dd1c9c7', no: 16, theme: 'ChatGPT image2.5 背景削除とGIF動画作成', date: '9/12' },
   ];
   // 既定の表示順： 'newest'（新しい回が上＝降順）/ 'oldest'（第1回が上＝昇順）
   var POD_ORDER = 'newest';
@@ -69,7 +70,7 @@
 
   function episodeId(ep) {
     if (ep.id) return ep.id;
-    var m = String(ep.url || '').match(/episodes\/([A-Za-z0-9]+)/);
+    var m = String(ep.url || '').match(/^https:\/\/stand\.fm\/episodes\/([A-Za-z0-9_-]+)(?:[?#].*)?$/);
     return m ? m[1] : '';
   }
 
@@ -425,26 +426,24 @@
   }
 
   function mergeGeneratedPodcast(items) {
-    var existing = {};
-    EPISODES.forEach(function (ep) { if (ep.url) existing[ep.url] = true; if (ep.id) existing[ep.id] = true; });
     var next = nextNumber(EPISODES);
     (items || []).filter(function (item) {
       return item.status === 'published' && item.content_type === 'podcast' && item.media_url;
     }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
-      var id = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : episodeId({ url: item.media_url });
-      if (existing[item.media_url] || (id && existing[id])) return;
-      existing[item.media_url] = true;
-      if (id) existing[id] = true;
-      var no = Number(item.episode_no) || titleEpisodeNo(item.title) || next++;
-      EPISODES.push({
-        url: item.media_url,
-        id: id,
-        no: no,
+      var id = episodeId({ url: item.media_url });
+      if (!id) return;
+      var index = EPISODES.findIndex(function (ep) { return ep.id === id || ep.url === item.media_url; });
+      var prior = index < 0 ? {} : EPISODES[index];
+      var no = Number(item.episode_no) || titleEpisodeNo(item.title) || prior.no || next;
+      next = Math.max(next, no + 1);
+      var episode = {
+        url: item.media_url, id: id, no: no,
         theme: String(item.title || '').replace(/^(?:#|第)\s*\d+\s*(?:回)?\s*/, ''),
-        date: generatedDate(item),
-        embed: id ? 'https://stand.fm/embed/episodes/' + id : '',
-        link: item.media_url
-      });
+        date: generatedDate(item) || prior.date,
+        embed: 'https://stand.fm/embed/episodes/' + id, link: item.media_url
+      };
+      if (index < 0) EPISODES.push(episode);
+      else EPISODES[index] = episode;
     });
   }
 
@@ -473,23 +472,23 @@
   }
 
   function mergeGeneratedArchives(items) {
-    var existing = {};
-    ARCHIVES.forEach(function (archive) { if (archive.driveId) existing[archive.driveId] = true; if (archive.folderId) existing[archive.folderId] = true; if (archive.url) existing[archive.url] = true; });
     var next = nextNumber(ARCHIVES);
     (items || []).filter(function (item) {
       return item.status === 'published' && item.content_type === 'archive' && item.media_url;
     }).slice().sort(function (a, b) { return generatedDate(a).localeCompare(generatedDate(b)); }).forEach(function (item) {
-      var sourceId = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : '';
-      if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
-      if (sourceId) existing[sourceId] = true;
-      existing[item.media_url] = true;
-      ARCHIVES.push({
-        no: Number(item.episode_no) || titleEpisodeNo(item.title) || next++,
-        date: generatedDate(item),
-        driveId: item.source_type === 'archive' ? sourceId : '',
-        url: item.media_url,
-        title: item.title
-      });
+      var match = String(item.media_url).match(/^https:\/\/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/);
+      var sourceId = match ? match[1] : (item.source_type === 'archive' && /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : '');
+      var index = ARCHIVES.findIndex(function (archive) { return (sourceId && archive.driveId === sourceId) || archive.url === item.media_url; });
+      var prior = index < 0 ? {} : ARCHIVES[index];
+      var no = Number(item.episode_no) || titleEpisodeNo(item.title) || prior.no || next;
+      next = Math.max(next, no + 1);
+      var archive = {
+        no: no, date: generatedDate(item) || prior.date,
+        driveId: sourceId, url: item.media_url,
+        title: String(item.title || '').replace(/^(?:#|第)\s*\d+\s*(?:回)?\s*/, '')
+      };
+      if (index < 0) ARCHIVES.push(archive);
+      else ARCHIVES[index] = archive;
     });
   }
 
@@ -690,7 +689,7 @@
 
 
   /* =====================================================
-     アーカイブ動画（コメキャリメンバー限定）
+     アーカイブ動画（チームメンバー・コメキャリ生限定）
      ─────────────────────────────────────────────────────
      ▼ 新しい回を追加するとき
        1. Googleドライブの「アーカイブ」フォルダに動画をアップロード
@@ -710,6 +709,8 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
+    { no: 16, date: '2026-09-12', driveId: '1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo',
+      title: 'ChatGPT image2.5 背景削除とGIF動画作成' },
     { no: 15, date: '2026-09-05', driveId: '1Nes5adTlWH5A4EhdJ4Lb2BWRuVg-mj0C',
       title: 'ChatGPT Workを活かすフォルダリング術！' },
     { no: 14, date: '2026-08-29', driveId: '1q895zrVq9EQ3qMaw8lBC6AVPOI2pWOiS',
@@ -939,7 +940,7 @@
       card.setAttribute('role', 'listitem');
       card.innerHTML =
         '<button type="button" class="archive-card-main" aria-label="第' + a.no + '回の録画を再生">' +
-          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>メンバー限定</span>' +
+          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>チームメンバー・コメキャリ生限定</span>' +
           '<span class="archive-no">第' + a.no + '回</span>' +
           '<span class="archive-date">' + formatDate(a.date) + '</span>' +
           '<span class="archive-title">' + esc(a.title) + '</span>' +
@@ -963,8 +964,9 @@
     if (!a.driveId && a.folderId) {
       cvModalBody.innerHTML =
         '<div class="cv-modal-content">' +
-          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリメンバー限定</p>' +
+          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 チームメンバー・コメキャリ生限定</p>' +
           '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
+          '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
           '<div class="cv-fallback">' +
             '<p class="cv-fallback-title">\uD83D\uDD12 アーカイブ動画フォルダを開く</p>' +
             '<p class="cv-fallback-body">この回の動画は、Googleドライブのアーカイブ動画フォルダに格納されています。' +
@@ -983,8 +985,9 @@
         'allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>' +
       '</div>' +
       '<div class="cv-modal-content">' +
-        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリメンバー限定</p>' +
+        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 チームメンバー・コメキャリ生限定</p>' +
         '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
+          '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
         '<div class="cv-fallback">' +
           '<p class="cv-fallback-title">\uD83D\uDD12 映像が表示されない場合</p>' +
           '<p class="cv-fallback-body">視聴権限のあるGoogleアカウントでログインしているかご確認ください。' +

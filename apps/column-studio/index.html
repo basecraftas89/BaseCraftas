@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260909">
+  <link rel="stylesheet" href="styles.css?v=20260912-qualification">
 </head>
 <body>
   <div class="app-shell">
@@ -48,6 +48,9 @@
         <div class="nav-label">管理</div>
         <button class="nav-item admin-only" type="button" data-view="members">
           <span class="nav-icon" aria-hidden="true">♙</span><span>メンバー・権限</span>
+        </button>
+        <button class="nav-item admin-only" type="button" data-view="qualifications">
+          <span class="nav-icon" aria-hidden="true">✓</span><span>資格審査</span><span class="nav-count" id="qualificationNavCount">0</span>
         </button>
         <button class="nav-item admin-only" type="button" data-view="settings">
           <span class="nav-icon" aria-hidden="true">⚙</span><span>公開設定</span>
@@ -164,8 +167,8 @@
                   </div>
                 </article>
               </section>
-              <input class="title-input" id="postTitle" type="text" placeholder="記事のタイトルを入力">
-              <input class="lead-input" id="postExcerpt" type="text" placeholder="この記事をひとことで紹介すると…">
+              <input class="title-input" id="postTitle" type="text" aria-label="タイトル" placeholder="記事のタイトルを入力">
+              <input class="lead-input" id="postExcerpt" type="text" aria-label="紹介文" placeholder="この記事をひとことで紹介すると…">
               <div class="format-toolbar" id="formatToolbar" role="toolbar" aria-label="文章の装飾">
                 <select id="blockFormat" aria-label="文字スタイル"><option value="p">本文</option><option value="h2">見出し2</option><option value="h3">見出し3</option></select>
                 <span class="tool-divider"></span>
@@ -217,7 +220,7 @@
                 <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
                 <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">Podcast・動画の登壇者や対話者を複数選択できます。</small></div>
                 <div class="setting-field topic-tag-field"><label for="postTags">Topic Tag</label><input id="postTags" type="text" placeholder="候補を選ぶか、カンマ区切りで入力"><small class="field-help">現在のToToNoE+で使用中のタグから選べます。独自タグも入力でき、更新履歴に残ります。</small><div class="topic-tag-suggestions" id="topicTagSuggestions" aria-label="使用中のトピックタグ"></div></div>
-                <div class="source-detail-grid" id="sourceDetailFields" hidden><label>第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="15"></label><label>元コンテンツの公開日<input id="postSourceDate" type="date"></label></div>
+                <div class="source-detail-grid" id="sourceDetailFields" hidden><label>第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="16"></label><label>開催日・公開日<input id="postSourceDate" type="date"></label></div>
                 <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
                 <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
@@ -239,6 +242,14 @@
           <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事の公開、メンバー、公開設定を管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成・編集ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
           <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
           <p class="security-note">🔒 ここではColumn Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-qualifications" data-title="資格審査">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">THERAPIST VERIFICATION</p><h1>資格審査</h1><p>セラピスト限定価格を利用する申請者の資格証明画像を確認します。</p></div><button class="secondary-button" type="button" data-action="refresh-qualifications">更新</button></div>
+          <p class="security-note">🔒 画像は非公開R2に保存され、管理者だけが閲覧できます。審査完了から30日後に画像を削除し、確認結果だけを保持します。</p>
+          <div class="qualification-admin-list" id="qualificationAdminList"><div class="empty-state">申請情報を読み込んでいます。</div></div>
         </div>
       </section>
 
@@ -265,6 +276,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260911"></script>
-  <script src="script.js?v=20260911"></script>
+  <script src="script.js?v=20260912-qualification"></script>
 </body>
 </html>

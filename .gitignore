@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.wrangler/
+.pet-runs/
+00_GitHubに入れない_ローカル専用/
+.env
+.env.*
+
+dist/
+
+# Local Worker secrets and future production drafts
+.dev.vars
+.dev.vars.*
+/output/

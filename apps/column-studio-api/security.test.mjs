@@ -114,7 +114,13 @@ test('preview redirects are validated before contacting next host',async()=>{
 test('public build excludes source/config/report files and includes real 404/security headers',()=>{
  for(const file of ['apps/column-studio-api/src/worker.js','apps/column-studio-api/schema.sql','apps/column-studio-api/wrangler.toml','README.md','package.json','package-lock.json','scripts/build-site.mjs','apps/column-studio/security-entry.js'])assert.equal(existsSync(join('dist',file)),false,file);
  for(const file of ['index.html','404.html','_headers','apps/column-studio/security.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
- assert.match(readFileSync('dist/_headers','utf8'),/script-src 'self'/);
+  assert.match(readFileSync('dist/_headers','utf8'),/script-src 'self'/);
+  const dashboard=readFileSync('apps/column-studio/index.html','utf8');
+  const dashboardScript=readFileSync('apps/column-studio/script.js','utf8');
+  assert.match(dashboard,/data-view="qualifications"/);
+  assert.match(dashboard,/id="qualificationAdminList"/);
+  assert.match(dashboardScript,/api\/admin\/qualifications/);
+  assert.match(dashboardScript,/data-qualification-review/);
 });
 
 test('successful publish emits sanitized HTML and fixes public media snapshot only after GitHub commit',async()=>{
