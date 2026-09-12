@@ -713,6 +713,11 @@ body.sem-lock{overflow:hidden}
   padding:10px 10px 14px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:var(--shadow-sm);
   transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;
 }
+.latest-visual-card[hidden]{display:none}
+.latest-seminar-empty{
+  margin:0;padding:24px;border:1px solid var(--line);border-radius:16px;background:#fff;
+  color:var(--muted);font-size:.92rem;text-align:center;box-shadow:var(--shadow-sm);
+}
 .latest-visual-card:hover,.latest-visual-card:focus-visible{
   transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(61,107,94,.38);outline:none;
 }

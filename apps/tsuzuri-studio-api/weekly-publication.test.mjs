@@ -52,16 +52,39 @@ test('weekend page reflects edited and newly published episodes in descending or
   } finally {dom.window.close();}
 });
 
-test('homepage shows seminars only and exposes four consistently named services', async () => {
-  const dom=new JSDOM(readFileSync('projects/totonoe/index.html','utf8'));
+test('homepage labels the section as seminars and shows only seminars that have not started', async () => {
+  const html=readFileSync('projects/totonoe/index.html','utf8');
+  const script=readFileSync('projects/totonoe/home-seminars.js','utf8');
+  const dom=new JSDOM(html,{runScripts:'outside-only'});
   try {
     const d=dom.window.document;
     const latest=d.querySelector('#latest');
-    assert.equal(latest.querySelectorAll('.latest-visual-card').length,3);
+    assert.equal(latest.querySelector('.content-strip-title').textContent,'セミナー');
+    assert.equal(latest.querySelectorAll('.latest-visual-card').length,2);
     assert.doesNotMatch(latest.textContent,/ポッドキャスト|アーカイブ動画/);
+    dom.window.TOTONOE_NOW=Date.parse('2026-09-12T00:00:00+09:00');
+    dom.window.eval(script);
+    assert.equal(latest.querySelectorAll('.latest-visual-card:not([hidden])').length,2);
     assert.equal(d.querySelectorAll('.service-content-grid .service-hub-card').length,4);
     for(const name of ['たより｜TAYORI','つづり｜TSUZURI','つまみ｜TSUMAMI','いろは｜IROHA'])assert.match(d.querySelector('.service-content-grid').textContent,new RegExp(name));
   } finally {dom.window.close();}
+
+  const afterFirst=new JSDOM(html,{runScripts:'outside-only'});
+  try {
+    afterFirst.window.TOTONOE_NOW=Date.parse('2026-09-14T21:00:00+09:00');
+    afterFirst.window.eval(script);
+    const visible=[...afterFirst.window.document.querySelectorAll('#latest .latest-visual-card:not([hidden])')];
+    assert.equal(visible.length,1);
+    assert.match(visible[0].textContent,/2026\.09\.28/);
+  } finally {afterFirst.window.close();}
+
+  const afterAll=new JSDOM(html,{runScripts:'outside-only'});
+  try {
+    afterAll.window.TOTONOE_NOW=Date.parse('2026-09-28T20:00:00+09:00');
+    afterAll.window.eval(script);
+    assert.equal(afterAll.window.document.querySelectorAll('#latest .latest-visual-card:not([hidden])').length,0);
+    assert.equal(afterAll.window.document.querySelector('#latestSeminarEmpty').hidden,false);
+  } finally {afterAll.window.close();}
   for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
 });
 
