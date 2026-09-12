@@ -1,0 +1,18 @@
+name = "basecraftas"
+main = "worker.js"
+compatibility_date = "2026-09-11"
+
+[assets]
+directory = "../../dist"
+binding = "ASSETS"
+run_worker_first = [
+  "/projects/totonoe/TAYORI",
+  "/projects/totonoe/TAYORI/",
+  "/projects/totonoe/TAYORI/index.html",
+  "/projects/totonoe/IROHA/dashboard",
+  "/projects/totonoe/IROHA/dashboard.html",
+  "/projects/totonoe/IROHA/lesson",
+  "/projects/totonoe/IROHA/lesson.html",
+  "/projects/totonoe/IROHA/mypage",
+  "/projects/totonoe/IROHA/mypage.html"
+]
