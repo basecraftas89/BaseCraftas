@@ -36,7 +36,32 @@ const DEFAULT_REPOSITORY = "basecraftas89/BaseCraftas";
 const DEFAULT_BRANCH = "main";
 const TRASH_RETENTION_DAYS = 30;
 const TRASH_PURGE_BATCH_SIZE = 50;
-const GOOGLE_API_SCOPES = "https://www.googleapis.com/auth/drive.readonly";
+const GOOGLE_API_SCOPES = [
+  "https://www.googleapis.com/auth/drive.readonly",
+  "https://www.googleapis.com/auth/spreadsheets",
+].join(" ");
+const WEEKLY_QUESTION_HEADERS = [
+  "受付ID", "対象週（日曜）", "受付日時", "会員メール", "表示名", "職種・専門分野", "勤務環境", "役職・立場", "AI利用状況",
+  "具体的な場面", "実現したいこと", "回答を使いたい時期（任意）", "すでに試したこと", "いちばん判断に迷っている点", "最終的な質問",
+  "希望する回答の形", "個人情報を含まないことを確認", "共通回答動画への利用同意", "類似質問グループ", "対応状況",
+  "回答動画タイトル", "回答動画Drive URL", "運営メモ",
+];
+const WEEKLY_QUESTION_HEADER_ROW = 5;
+const WEEKLY_QUESTION_FIRST_DATA_ROW = 6;
+const WEEKLY_QUESTION_MAX_ROWS = 2000;
+const WEEKLY_ANSWER_FORMAT_LABELS = {
+  demonstration: "画面を見せながら実演",
+  steps: "手順を順番に解説",
+  criteria: "判断基準を整理",
+};
+const WEEKLY_OPERATION_STATUS_MAP = {
+  "": "submitted",
+  "受付済み": "submitted",
+  "類似質問を整理中": "in_review",
+  "回答準備中": "in_review",
+  "回答動画公開済み": "answered",
+  "対応終了": "closed",
+};
 const CUSTOMER_OTP_TTL_MINUTES = 10;
 const CUSTOMER_SESSION_DAYS = 30;
 const AUTH_RATE_BUCKET_MINUTES = 10;
@@ -1301,6 +1326,250 @@ async function driveAccessToken(env) {
   return payload.access_token;
 }
 
+function weeklyQuestionSpreadsheetId(env) {
+  return String(env.WEEKLY_QUESTION_SPREADSHEET_ID || "").trim();
+}
+
+function weeklyQuestionSheetName(env) {
+  return String(env.WEEKLY_QUESTION_SHEET_NAME || "質問管理").trim() || "質問管理";
+}
+
+function weeklyQuestionSheetConfigured(env) {
+  return Boolean(weeklyQuestionSpreadsheetId(env) && weeklyQuestionSheetName(env));
+}
+
+function sheetsRangeUrl(env, range) {
+  const spreadsheetId = encodeURIComponent(weeklyQuestionSpreadsheetId(env));
+  const qualifiedRange = weeklyQuestionSheetName(env) + "!" + range;
+  return "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values/" + encodeURIComponent(qualifiedRange);
+}
+
+async function googleJsonRequest(env, url, init = {}) {
+  const token = await driveAccessToken(env);
+  const headers = new Headers(init.headers || {});
+  headers.set("accept", "application/json");
+  headers.set("authorization", "Bearer " + token);
+  if (init.body) headers.set("content-type", "application/json; charset=utf-8");
+  const response = await fetch(url, { ...init, headers, signal: AbortSignal.timeout(10000) });
+  const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
+  if (!response.ok) {
+    const error = new Error(payload?.error?.message || "google_api_request_failed");
+    error.status = response.status;
+    throw error;
+  }
+  return payload;
+}
+
+async function readWeeklyQuestionSheetRange(env, range) {
+  const payload = await googleJsonRequest(env, sheetsRangeUrl(env, range) + "?majorDimension=ROWS");
+  return Array.isArray(payload.values) ? payload.values : [];
+}
+
+async function assertWeeklyQuestionHeaders(env) {
+  const rows = await readWeeklyQuestionSheetRange(env, "A" + WEEKLY_QUESTION_HEADER_ROW + ":W" + WEEKLY_QUESTION_HEADER_ROW);
+  const actual = rows[0] || [];
+  if (WEEKLY_QUESTION_HEADERS.some((header, index) => String(actual[index] || "").trim() !== header)) {
+    throw new Error("weekly_question_sheet_header_mismatch");
+  }
+}
+
+function weeklyQuestionProfile(row) {
+  const snapshot = parseJsonObject(row.profile_snapshot);
+  return {
+    profession: snapshot.profession || "",
+    workplace_type: snapshot.workplace_type || "",
+    role_title: snapshot.role_title || "",
+    ai_usage_level: snapshot.ai_usage_level || "",
+  };
+}
+
+function weeklyQuestionSystemCells(row) {
+  const profile = weeklyQuestionProfile(row);
+  return [
+    row.id,
+    row.week_start,
+    row.created_at,
+    row.email || "",
+    row.display_name || "",
+    profile.profession,
+    profile.workplace_type,
+    profile.role_title,
+    profile.ai_usage_level,
+    row.situation,
+    row.goal,
+    row.use_by || "",
+    row.attempts,
+    row.blocker,
+    row.question,
+    WEEKLY_ANSWER_FORMAT_LABELS[row.answer_format] || WEEKLY_ANSWER_FORMAT_LABELS.demonstration,
+    Boolean(row.privacy_confirmed),
+    Boolean(row.video_consent),
+  ];
+}
+
+function weeklyQuestionAllCells(row) {
+  return [
+    ...weeklyQuestionSystemCells(row),
+    row.question_group || "",
+    row.operations_status || "",
+    row.answer_video_title || "",
+    row.answer_video_url || "",
+    row.operations_notes || "",
+  ];
+}
+
+async function findWeeklyQuestionSheetRow(env, questionId) {
+  const rows = await readWeeklyQuestionSheetRange(env, "A" + WEEKLY_QUESTION_FIRST_DATA_ROW + ":A" + (WEEKLY_QUESTION_FIRST_DATA_ROW + WEEKLY_QUESTION_MAX_ROWS - 1));
+  const index = rows.findIndex((row) => String(row?.[0] || "") === questionId);
+  return index < 0 ? null : WEEKLY_QUESTION_FIRST_DATA_ROW + index;
+}
+
+function parseUpdatedSheetRow(updatedRange) {
+  const match = String(updatedRange || "").match(/!A(\d+)(?::W\d+)?$/i);
+  return match ? Number(match[1]) : null;
+}
+
+function sanitizedSyncError(error) {
+  return String(error?.message || error || "weekly_question_sheet_sync_failed").replace(/[\r\n\t]+/g, " ").slice(0, 300);
+}
+
+async function writeWeeklyQuestionToSheet(env, row) {
+  await assertWeeklyQuestionHeaders(env);
+  let sheetRow = Number(row.sheet_row || 0) || await findWeeklyQuestionSheetRow(env, row.id);
+  if (sheetRow) {
+    const url = sheetsRangeUrl(env, "A" + sheetRow + ":R" + sheetRow) + "?valueInputOption=RAW";
+    await googleJsonRequest(env, url, { method: "PUT", body: JSON.stringify({ majorDimension: "ROWS", values: [weeklyQuestionSystemCells(row)] }) });
+    return sheetRow;
+  }
+  const url = sheetsRangeUrl(env, "A:W") + "?valueInputOption=RAW&insertDataOption=INSERT_ROWS&includeValuesInResponse=false";
+  const payload = await googleJsonRequest(env, url, { method: "POST", body: JSON.stringify({ majorDimension: "ROWS", values: [weeklyQuestionAllCells(row)] }) });
+  sheetRow = parseUpdatedSheetRow(payload?.updates?.updatedRange);
+  if (!sheetRow) throw new Error("weekly_question_sheet_row_unknown");
+  return sheetRow;
+}
+
+async function syncWeeklyQuestionToSheet(env, questionId) {
+  if (!weeklyQuestionSheetConfigured(env)) return { status: "disabled" };
+  const leaseUntil = Date.now() + 30000;
+  const lock = await env.DB.prepare(
+    "UPDATE weekly_priority_questions SET sheet_syncing_until = ? WHERE id = ? AND COALESCE(sheet_syncing_until, 0) < ?"
+  ).bind(leaseUntil, questionId, Date.now()).run();
+  if (!lock.meta.changes) return { status: "busy" };
+  try {
+    const row = await env.DB.prepare(
+      `SELECT q.*, a.email, a.display_name
+         FROM weekly_priority_questions q
+         JOIN customer_accounts a ON a.id = q.customer_id
+        WHERE q.id = ?`
+    ).bind(questionId).first();
+    if (!row) {
+      await env.DB.prepare("UPDATE weekly_priority_questions SET sheet_syncing_until = 0 WHERE id = ?").bind(questionId).run();
+      return { status: "missing" };
+    }
+    const sheetRow = await writeWeeklyQuestionToSheet(env, row);
+    await env.DB.prepare(
+      "UPDATE weekly_priority_questions SET sheet_row = ?, sheet_synced_at = CURRENT_TIMESTAMP, sheet_last_error = '', sheet_syncing_until = 0 WHERE id = ?"
+    ).bind(sheetRow, questionId).run();
+    return { status: "synced", sheet_row: sheetRow };
+  } catch (error) {
+    await env.DB.prepare(
+      "UPDATE weekly_priority_questions SET sheet_last_error = ?, sheet_syncing_until = 0 WHERE id = ?"
+    ).bind(sanitizedSyncError(error), questionId).run();
+    return { status: "failed", error: sanitizedSyncError(error) };
+  }
+}
+
+async function syncPendingWeeklyQuestionsToSheet(env, limit = 50) {
+  if (!weeklyQuestionSheetConfigured(env)) return { status: "disabled", attempted: 0, synced: 0, failed: 0 };
+  const pending = await env.DB.prepare(
+    `SELECT id FROM weekly_priority_questions
+      WHERE sheet_synced_at IS NULL
+         OR datetime(updated_at) > datetime(sheet_synced_at)
+         OR sheet_last_error <> ''
+      ORDER BY created_at ASC
+      LIMIT ?`
+  ).bind(limit).all();
+  let synced = 0;
+  let failed = 0;
+  for (const item of pending.results || []) {
+    const result = await syncWeeklyQuestionToSheet(env, item.id);
+    if (result.status === "synced") synced += 1;
+    if (result.status === "failed") failed += 1;
+  }
+  return { status: failed ? "partial" : "ok", attempted: (pending.results || []).length, synced, failed };
+}
+
+function driveFileIdFromUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    if (!new Set(["drive.google.com", "docs.google.com"]).has(url.hostname)) return "";
+    const pathMatch = url.pathname.match(/\/d\/([A-Za-z0-9_-]{10,})/);
+    const id = pathMatch?.[1] || url.searchParams.get("id") || "";
+    return /^[A-Za-z0-9_-]{10,}$/.test(id) ? id : "";
+  } catch {
+    return "";
+  }
+}
+
+async function validateWeeklyAnswerVideoUrl(env, url) {
+  if (!url) return { id: "", title: "" };
+  const fileId = driveFileIdFromUrl(url);
+  if (!fileId) throw new Error("weekly_answer_video_url_invalid");
+  const response = await googleJsonRequest(env, "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?fields=id,name,mimeType,parents,trashed");
+  if (response.trashed || !String(response.mimeType || "").startsWith("video/") || !(response.parents || []).includes(weeklyResponseFolderId(env))) {
+    throw new Error("weekly_answer_video_outside_authorized_folder");
+  }
+  const stored = await env.DB.prepare("SELECT id, title FROM weekly_answer_videos WHERE drive_file_id = ? AND status = 'published'").bind(fileId).first();
+  if (!stored) throw new Error("weekly_answer_video_not_synced");
+  return stored;
+}
+
+async function syncWeeklyQuestionOperationsFromSheet(env) {
+  if (!weeklyQuestionSheetConfigured(env)) return { status: "disabled", checked: 0, updated: 0, rejected: 0 };
+  await assertWeeklyQuestionHeaders(env);
+  const rows = await readWeeklyQuestionSheetRange(env, "A" + WEEKLY_QUESTION_FIRST_DATA_ROW + ":W" + (WEEKLY_QUESTION_FIRST_DATA_ROW + WEEKLY_QUESTION_MAX_ROWS - 1));
+  let updated = 0;
+  let rejected = 0;
+  for (let index = 0; index < rows.length; index += 1) {
+    const cells = rows[index] || [];
+    const questionId = String(cells[0] || "").trim();
+    if (!questionId) continue;
+    const existing = await env.DB.prepare("SELECT id, status, question_group, operations_status, answer_video_title, answer_video_url, operations_notes FROM weekly_priority_questions WHERE id = ?").bind(questionId).first();
+    if (!existing) continue;
+    const values = {
+      question_group: profileText(cells[18], 120),
+      operations_status: profileText(cells[19], 80),
+      answer_video_title: profileText(cells[20], 300),
+      answer_video_url: String(cells[21] || "").trim().slice(0, 1000),
+      operations_notes: profileText(cells[22], 2000),
+    };
+    if (values.operations_status && !(values.operations_status in WEEKLY_OPERATION_STATUS_MAP)) {
+      await env.DB.prepare("UPDATE weekly_priority_questions SET sheet_last_error = ? WHERE id = ?").bind("weekly_question_operation_status_invalid", questionId).run();
+      rejected += 1;
+      continue;
+    }
+    try {
+      await validateWeeklyAnswerVideoUrl(env, values.answer_video_url);
+    } catch (error) {
+      await env.DB.prepare("UPDATE weekly_priority_questions SET sheet_last_error = ? WHERE id = ?").bind(sanitizedSyncError(error), questionId).run();
+      rejected += 1;
+      continue;
+    }
+    const nextStatus = WEEKLY_OPERATION_STATUS_MAP[values.operations_status] || existing.status;
+    await env.DB.prepare(
+      `UPDATE weekly_priority_questions
+          SET question_group = ?, operations_status = ?, answer_video_title = ?, answer_video_url = ?, operations_notes = ?,
+              status = ?, answered_at = CASE WHEN ? = 'answered' THEN COALESCE(answered_at, CURRENT_TIMESTAMP) ELSE answered_at END,
+              sheet_operations_synced_at = CURRENT_TIMESTAMP, sheet_last_error = ''
+        WHERE id = ?`
+    ).bind(values.question_group, values.operations_status, values.answer_video_title, values.answer_video_url, values.operations_notes, nextStatus, nextStatus, questionId).run();
+    if (Object.keys(values).some((key) => String(values[key] || "") !== String(existing[key] || "")) || nextStatus !== existing.status) updated += 1;
+  }
+  return { status: rejected ? "partial" : "ok", checked: rows.length, updated, rejected };
+}
+
 async function fetchDriveArchiveFiles(env) {
   const folderId = archiveFolderId(env);
   if (!folderId) throw new Error("drive_archive_folder_missing");
@@ -2345,7 +2614,9 @@ async function syncWeeklyMaterialsRequest(request, env) {
       syncWeeklyMaterials(env, auth.email),
       syncWeeklyAnswerVideos(env, auth.email),
     ]);
-    return json({ materials, answer_videos: answerVideos });
+    const questionSheet = await syncPendingWeeklyQuestionsToSheet(env);
+    const questionOperations = await syncWeeklyQuestionOperationsFromSheet(env);
+    return json({ materials, answer_videos: answerVideos, question_sheet: questionSheet, question_operations: questionOperations });
   } catch (error) {
     return json({ error: "weekly_scan_failed", message: String(error.message || error) }, { status: 502 });
   }
@@ -2431,6 +2702,8 @@ function serializePriorityQuestion(row) {
     use_by: row.use_by,
     answer_format: row.answer_format,
     status: row.status,
+    question_group: row.question_group || "",
+    answer_video_title: row.answer_video_title || "",
     created_at: row.created_at,
     updated_at: row.updated_at,
     answered_at: row.answered_at,
@@ -2486,8 +2759,8 @@ async function saveWeeklyPriorityQuestion(request, env) {
   const id = current?.id || uid("weekly_question");
   await env.DB.prepare(
     `INSERT INTO weekly_priority_questions
-      (id, customer_id, week_start, situation, goal, attempts, blocker, question, use_by, answer_format, profile_snapshot, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted')
+      (id, customer_id, week_start, situation, goal, attempts, blocker, question, use_by, answer_format, profile_snapshot, privacy_confirmed, video_consent, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'submitted')
      ON CONFLICT(customer_id, week_start) DO UPDATE SET
        situation = excluded.situation,
        goal = excluded.goal,
@@ -2497,11 +2770,15 @@ async function saveWeeklyPriorityQuestion(request, env) {
        use_by = excluded.use_by,
        answer_format = excluded.answer_format,
        profile_snapshot = excluded.profile_snapshot,
+       privacy_confirmed = 1,
+       video_consent = 1,
+       sheet_synced_at = NULL,
        updated_at = CURRENT_TIMESTAMP
      WHERE weekly_priority_questions.status = 'submitted'`
   ).bind(id, auth.access.customer_id, weekStart, values.situation, values.goal, values.attempts, values.blocker, values.question, values.use_by, values.answer_format, profileSnapshot).run();
+  const sheetSync = await syncWeeklyQuestionToSheet(env, id);
   const saved = await env.DB.prepare("SELECT * FROM weekly_priority_questions WHERE id = ?").bind(id).first();
-  return json({ week_start: weekStart, available: false, question: serializePriorityQuestion(saved) }, { status: current ? 200 : 201 });
+  return json({ week_start: weekStart, available: false, question: serializePriorityQuestion(saved), sheet_sync: sheetSync.status }, { status: current ? 200 : 201 });
 }
 
 async function listWeeklyAnswerVideos(request, env) {
@@ -2568,7 +2845,19 @@ async function listWeeklyPriorityQuestionsAdmin(request, env) {
        JOIN customer_accounts a ON a.id = q.customer_id
       ORDER BY q.week_start DESC, q.created_at ASC`
   ).all();
-  return json({ questions: (result.results || []).map((row) => ({ ...serializePriorityQuestion(row), email: row.email, display_name: row.display_name, profile_snapshot: parseJsonObject(row.profile_snapshot) })) });
+  return json({ questions: (result.results || []).map((row) => ({
+    ...serializePriorityQuestion(row),
+    email: row.email,
+    display_name: row.display_name,
+    profile_snapshot: parseJsonObject(row.profile_snapshot),
+    operations_status: row.operations_status || "",
+    answer_video_url: row.answer_video_url || "",
+    operations_notes: row.operations_notes || "",
+    sheet_row: row.sheet_row || null,
+    sheet_synced_at: row.sheet_synced_at || null,
+    sheet_operations_synced_at: row.sheet_operations_synced_at || null,
+    sheet_last_error: row.sheet_last_error || "",
+  })) });
 }
 
 async function purgeExpiredTrash(env) {
@@ -2724,7 +3013,9 @@ const worker = {
       if (controller.cron === "0 * * * *") {
         const materials = await syncWeeklyMaterials(env);
         const answerVideos = await syncWeeklyAnswerVideos(env);
-        console.log(JSON.stringify({ event: "weekly.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, materials, answer_videos: answerVideos }));
+        const questionSheet = await syncPendingWeeklyQuestionsToSheet(env);
+        const questionOperations = await syncWeeklyQuestionOperationsFromSheet(env);
+        console.log(JSON.stringify({ event: "weekly.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, materials, answer_videos: answerVideos, question_sheet: questionSheet, question_operations: questionOperations }));
         return;
       }
       if (controller.cron === "0 0 * * 6") {

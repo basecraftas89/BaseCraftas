@@ -158,6 +158,146 @@ test("Weekly会員は日曜始まりの週ごとに優先質問を1枠保存・�
   assert.equal((await current.json()).available, false);
 });
 
+test("優先質問は同意をD1へ保存し、管理表へ一度だけ追加して以後A〜Rだけ更新する", async () => {
+  const active = fixture();
+  active.seed();
+  active.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-google-token";
+  active.env.WEEKLY_QUESTION_SPREADSHEET_ID = "sheet-1";
+  active.env.WEEKLY_QUESTION_SHEET_NAME = "質問管理";
+  const schema = JSON.parse(readFileSync("apps/column-studio-api/weekly-question-sheet-schema.json", "utf8"));
+  const body = {
+    situation: "5人のチームで、毎週の申し送り内容を主任が手作業で要約しています。",
+    goal: "重要事項を落とさず、10分以内で要約できるようにしたいです。",
+    attempts: "ChatGPTへ文章を貼って要約しましたが、重要な情報が抜けました。",
+    blocker: "残すべき情報をどのように指示すればよいか判断できません。",
+    question: "重要事項を落とさない申し送り要約のプロンプトを具体例付きで教えてください。",
+    answer_format: "demonstration",
+    privacy_confirmed: true,
+    video_consent: true,
+  };
+  const writes = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init = {}) => {
+    const url = decodeURIComponent(String(input));
+    if (url.includes("!A5:W5")) return Response.json({ values: [schema.columns.map((column) => column.header)] });
+    if (url.includes("!A6:A2005")) return Response.json({ values: [] });
+    writes.push({ method: init.method, url, body: JSON.parse(init.body) });
+    if (init.method === "POST") return Response.json({ updates: { updatedRange: "質問管理!A6:W6" } });
+    return Response.json({ updatedRange: "質問管理!A6:R6" });
+  };
+  try {
+    const created = await active.call("/api/weekly/priority-question", "weekly@example.com", { method: "POST", body });
+    assert.equal(created.status, 201);
+    assert.equal((await created.json()).sheet_sync, "synced");
+    const stored = active.sql.prepare("SELECT id, privacy_confirmed, video_consent, sheet_row, sheet_last_error FROM weekly_priority_questions").get();
+    assert.equal(stored.privacy_confirmed, 1);
+    assert.equal(stored.video_consent, 1);
+    assert.equal(stored.sheet_row, 6);
+    assert.equal(stored.sheet_last_error, "");
+    assert.equal(writes[0].method, "POST");
+    assert.equal(writes[0].body.values[0].length, 23);
+    assert.deepEqual(writes[0].body.values[0].slice(16, 18), [true, true]);
+
+    const updated = await active.call("/api/weekly/priority-question", "weekly@example.com", { method: "POST", body: { ...body, question: "重要事項を残す要約プロンプトを、実演形式で具体的に改善してください。" } });
+    assert.equal(updated.status, 200);
+    assert.equal(writes.filter((item) => item.method === "POST").length, 1);
+    assert.equal(writes.filter((item) => item.method === "PUT").length, 1);
+    assert.match(writes.at(-1).url, /!A6:R6/);
+    assert.equal(writes.at(-1).body.values[0].length, 18);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("管理表障害でも質問はD1へ残り、受付ID検索による再同期で重複行を作らない", async () => {
+  const active = fixture();
+  active.seed();
+  active.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-google-token";
+  active.env.WEEKLY_QUESTION_SPREADSHEET_ID = "sheet-1";
+  active.env.WEEKLY_QUESTION_SHEET_NAME = "質問管理";
+  const schema = JSON.parse(readFileSync("apps/column-studio-api/weekly-question-sheet-schema.json", "utf8"));
+  const body = {
+    situation: "複数職種の会議内容を、毎週担当者が手作業で整理している状況です。",
+    goal: "共有までの作業時間を短縮し、判断事項を正確に残したいです。",
+    attempts: "要約プロンプトを試しましたが、決定事項と宿題が混ざりました。",
+    blocker: "出力形式を安定させる条件が分からず、毎回修正しています。",
+    question: "決定事項と宿題を分けて出すプロンプトを、具体例付きで教えてください。",
+    answer_format: "steps",
+    privacy_confirmed: true,
+    video_consent: true,
+  };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ error: { message: "temporary" } }, { status: 503 });
+  try {
+    const created = await active.call("/api/weekly/priority-question", "weekly@example.com", { method: "POST", body });
+    assert.equal(created.status, 201);
+    assert.equal((await created.json()).sheet_sync, "failed");
+    const stored = active.sql.prepare("SELECT id, sheet_last_error FROM weekly_priority_questions").get();
+    assert.equal(stored.sheet_last_error, "temporary");
+    let appendCount = 0;
+    let updateCount = 0;
+    globalThis.fetch = async (input, init = {}) => {
+      const url = decodeURIComponent(String(input));
+      if (url.includes("!A5:W5")) return Response.json({ values: [schema.columns.map((column) => column.header)] });
+      if (url.includes("!A6:A2005")) return Response.json({ values: [[stored.id]] });
+      if (init.method === "POST") appendCount += 1;
+      if (init.method === "PUT") updateCount += 1;
+      return Response.json({ updatedRange: "質問管理!A6:R6" });
+    };
+    const retried = await active.call("/api/weekly/priority-question", "weekly@example.com", { method: "POST", body: { ...body, question: "決定事項と宿題を分けて安定出力する方法を、手順で詳しく教えてください。" } });
+    assert.equal((await retried.json()).sheet_sync, "synced");
+    assert.equal(appendCount, 0);
+    assert.equal(updateCount, 1);
+    assert.equal(active.sql.prepare("SELECT sheet_row FROM weekly_priority_questions").get().sheet_row, 6);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォルダ直下の同期済み動画に限定する", async () => {
+  const active = fixture();
+  active.seed();
+  active.sql.prepare("INSERT INTO members (id, email, role, status) VALUES ('admin-1', 'admin@example.com', 'admin', 'active')").run();
+  active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at) VALUES ('video-1', 'drive-video-12345', '回答動画', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z')").run();
+  active.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-google-token";
+  active.env.WEEKLY_QUESTION_SPREADSHEET_ID = "sheet-1";
+  active.env.WEEKLY_QUESTION_SHEET_NAME = "質問管理";
+  active.env.DRIVE_WEEKLY_FOLDER_ID = "pdf-folder";
+  active.env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "answer-folder";
+  const schema = JSON.parse(readFileSync("apps/column-studio-api/weekly-question-sheet-schema.json", "utf8"));
+  const questionId = "weekly_question_ops";
+  active.sql.prepare(`INSERT INTO weekly_priority_questions
+    (id, customer_id, week_start, situation, goal, attempts, blocker, question, profile_snapshot, privacy_confirmed, video_consent, sheet_row, sheet_synced_at)
+    VALUES (?, 'customer-1', '2026-09-06', '具体的な場面です', '実現したいことです', '試した内容です', '迷っている点です', '最終的な質問です', '{}', 1, 1, 6, CURRENT_TIMESTAMP)`).run(questionId);
+  const sheetRow = Array(23).fill("");
+  sheetRow[0] = questionId;
+  sheetRow[18] = "議事録自動化";
+  sheetRow[19] = "回答動画公開済み";
+  sheetRow[20] = "類似質問まとめ：議事録";
+  sheetRow[21] = "https://drive.google.com/file/d/drive-video-12345/view";
+  sheetRow[22] = "公開済み";
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input) => {
+    const url = decodeURIComponent(String(input));
+    if (url.includes("sheets.googleapis.com") && url.includes("!A5:W5")) return Response.json({ values: [schema.columns.map((column) => column.header)] });
+    if (url.includes("sheets.googleapis.com") && url.includes("!A6:W2005")) return Response.json({ values: [sheetRow] });
+    if (url.includes("drive/v3/files/drive-video-12345")) return Response.json({ id: "drive-video-12345", name: "answer.mp4", mimeType: "video/mp4", parents: ["answer-folder"], trashed: false });
+    if (url.includes("drive/v3/files?")) return Response.json({ files: [] });
+    throw new Error("unexpected fetch: " + url);
+  };
+  try {
+    const response = await active.call("/api/weekly/admin/sync", "admin@example.com", { method: "POST", body: {} });
+    assert.equal(response.status, 200);
+    const stored = active.sql.prepare("SELECT status, question_group, operations_status, answer_video_title, answer_video_url, operations_notes FROM weekly_priority_questions WHERE id = ?").get(questionId);
+    assert.equal(stored.status, "answered");
+    assert.equal(stored.question_group, "議事録自動化");
+    assert.equal(stored.operations_status, "回答動画公開済み");
+    assert.equal(stored.answer_video_url, sheetRow[21]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("回答動画一覧はWeekly会員だけが取得でき、DriveファイルIDを露出しない", async () => {
   const active = fixture();
   active.seed();

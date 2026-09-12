@@ -215,6 +215,15 @@ CREATE TABLE IF NOT EXISTS weekly_priority_questions (
   sheet_row INTEGER,
   sheet_synced_at TEXT,
   sheet_last_error TEXT NOT NULL DEFAULT '',
+  sheet_syncing_until INTEGER NOT NULL DEFAULT 0,
+  sheet_operations_synced_at TEXT,
+  privacy_confirmed INTEGER NOT NULL DEFAULT 0 CHECK (privacy_confirmed IN (0, 1)),
+  video_consent INTEGER NOT NULL DEFAULT 0 CHECK (video_consent IN (0, 1)),
+  question_group TEXT NOT NULL DEFAULT '',
+  operations_status TEXT NOT NULL DEFAULT '',
+  answer_video_title TEXT NOT NULL DEFAULT '',
+  answer_video_url TEXT NOT NULL DEFAULT '',
+  operations_notes TEXT NOT NULL DEFAULT '',
   UNIQUE (customer_id, week_start),
   FOREIGN KEY (customer_id) REFERENCES customer_accounts(id)
 );
