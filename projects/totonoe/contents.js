@@ -234,7 +234,7 @@
   }
 
   /* =====================================================
-     学習コンテンツ
+     ツマミ｜TSUMAMI
      ・編集するのは CONTENTS だけです
 
      ▼ タグについて（フィルターに使用・設定不要）
@@ -326,19 +326,19 @@
   /* date は「YouTube Studio → 動画の詳細」に表示されるアップロード日時（日本時間換算）を入れてください。
      新しい回を追加するときも、この date を基準に新しい順／古い順の並び替えが決まります。 */
 
-  var LIB_ORDER_KEY = 'wa_library_order_v1';
-  var libOrder = (function () {
-    try { return localStorage.getItem(LIB_ORDER_KEY) || 'newest'; } catch (e) { return 'newest'; }
+  var TSUMAMI_ORDER_KEY = 'wa_tsumami_order_v1';
+  var tsumamiOrder = (function () {
+    try { return localStorage.getItem(TSUMAMI_ORDER_KEY) || localStorage.getItem('wa_library_order_v1') || 'newest'; } catch (e) { return 'newest'; }
   })();
 
-  function initLibrarySort() {
-    var btns = document.querySelectorAll('[data-lib-order]');
+  function initTsumamiSort() {
+    var btns = document.querySelectorAll('[data-tsumami-order]');
     if (!btns.length) return;
     btns.forEach(function (b) {
       b.addEventListener('click', function () {
-        libOrder = b.dataset.libOrder;
-        try { localStorage.setItem(LIB_ORDER_KEY, libOrder); } catch (e) {}
-        renderLibrary();
+        tsumamiOrder = b.dataset.tsumamiOrder;
+        try { localStorage.setItem(TSUMAMI_ORDER_KEY, tsumamiOrder); } catch (e) {}
+        renderTsumami();
       });
     });
   }
@@ -348,10 +348,10 @@
     return m ? (m[1] + '.' + m[2] + '.' + m[3]) : '';
   }
 
-  var grid = document.getElementById('contentGrid');
-  var empty = document.getElementById('contentEmpty');
-  var filterWrap = document.getElementById('contentFilter');
-  var countEl = document.getElementById('contentCount');
+  var grid = document.getElementById('tsumamiGrid');
+  var empty = document.getElementById('tsumamiEmpty');
+  var filterWrap = document.getElementById('tsumamiFilter');
+  var countEl = document.getElementById('tsumamiCount');
   var currentTag = 'all';
 
   /* =====================================================
@@ -421,7 +421,7 @@
     });
   }
 
-  function mergeGeneratedLibrary(items) {
+  function mergeGeneratedTsumami(items) {
     (items || []).filter(function (item) {
       return item.status === 'published' && ['video', 'learning'].indexOf(item.content_type) > -1 && item.media_url;
     }).forEach(function (item) {
@@ -434,7 +434,7 @@
         desc: item.excerpt || '',
         tags: item.topic_tags || item.tags || [],
         date: generatedDate(item),
-        type: item.content_type === 'video' ? '動画' : (item.content_type_label || '学習コンテンツ'),
+        type: item.content_type === 'video' ? '動画' : (item.content_type_label || 'ツマミ｜TSUMAMI'),
         url: item.media_url,
         source: item.external_link && item.external_link.provider ? item.external_link.provider : ''
       };
@@ -473,14 +473,14 @@
         var items = data.articles || [];
         mergeGeneratedTsuzuri(items);
         mergeGeneratedPodcast(items);
-        mergeGeneratedLibrary(items);
+        mergeGeneratedTsumami(items);
         mergeGeneratedArchives(items);
         buildTsuzuriFilter();
         renderTsuzuri();
         renderPodcastRangeButtons();
         renderPodcast();
         buildFilter();
-        renderLibrary();
+        renderTsumami();
         renderArchiveRangeButtons();
         renderArchive();
       })
@@ -615,7 +615,7 @@
       filterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
         b.classList.toggle('active', b === btn);
       });
-      renderLibrary();
+      renderTsumami();
     });
   }
 
@@ -974,17 +974,17 @@
     document.body.classList.add('cv-lock');
   }
 
-  function renderLibrary() {
+  function renderTsumami() {
     if (!grid) return;
 
     // 並び替えボタンの見た目を同期
-    document.querySelectorAll('[data-lib-order]').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.libOrder === libOrder);
+    document.querySelectorAll('[data-tsumami-order]').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.tsumamiOrder === tsumamiOrder);
     });
 
     var list = CONTENTS.slice().sort(function (a, b) {
       var diff = new Date(a.date) - new Date(b.date);
-      return libOrder === 'oldest' ? diff : -diff;
+      return tsumamiOrder === 'oldest' ? diff : -diff;
     });
     if (currentTag !== 'all') {
       list = list.filter(function (c) { return (c.tags || []).indexOf(currentTag) !== -1; });
@@ -1048,9 +1048,9 @@
   setupSlider({ trackId: 'podList', prevId: 'podPrev', nextId: 'podNext', cardSelector: '.pod-card', hintId: 'podHint' });
   renderPodcast();
 
-  initLibrarySort();
+  initTsumamiSort();
   buildFilter();
-  renderLibrary();
+  renderTsumami();
 
   initTsuzuriSort();
   buildTsuzuriFilter();

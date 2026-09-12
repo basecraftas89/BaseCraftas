@@ -11,7 +11,7 @@ function publicSection(contentType) {
   if (contentType === "podcast") return { hash: "podcast", label: "Podcast" };
   if (contentType === "archive") return { hash: "archive", label: "アーカイブ動画" };
   if (contentType === "seminar") return { hash: "seminars", label: "セミナー" };
-  if (["video", "learning"].includes(contentType)) return { hash: "library", label: "学習コンテンツ" };
+  if (["video", "learning"].includes(contentType)) return { hash: "tsumami", label: "ツマミ｜TSUMAMI" };
   return { hash: "tsuzuri", label: "つづり｜TSUZURI" };
 }
 
@@ -85,12 +85,13 @@ export function articleHtml(articleData) {
     </a>
     <nav class="site-nav" id="siteNav">
       <a href="../index.html">TOP</a>
+      <a href="../weekend-ai.html">週末のAI整え習慣</a>
       <div class="nav-dropdown">
         <a href="../service.html" class="nav-main">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../weekend-ai.html">週末のAI整え習慣</a>
-          <span class="nav-disabled" aria-disabled="true">TAYORI <small>準備中</small></span>
-          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
+          <a href="../TAYORI/">TAYORI｜たより</a>
+          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
+          <a href="../contents.html#tsumami">ツマミ｜TSUMAMI</a>
         </div>
       </div>
       <div class="nav-dropdown">
@@ -98,8 +99,6 @@ export function articleHtml(articleData) {
         <div class="nav-menu" aria-label="コンテンツメニュー">
           <a href="../contents.html#seminars">セミナー</a>
           <a href="../contents.html#podcast">ポッドキャスト</a>
-          <a href="../contents.html#library">学習コンテンツ</a>
-          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
           <a href="../contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -143,6 +142,7 @@ export function articleHtml(articleData) {
     </div>
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <a href="../index.html">TOP</a>
+      <a href="../weekend-ai.html">週末のAI整え習慣</a>
       <a href="../service.html">サービス</a>
       <a href="../contents.html#seminars">コンテンツ</a>
       <a href="../team.html">チーム</a>

@@ -681,7 +681,7 @@ body.sem-lock{overflow:hidden}
 }
 .content-strip-link:hover{background:var(--sky)}
 .latest-category-tabs{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 16px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px;
   padding:8px;border:1px solid var(--line);border-radius:999px;background:var(--sky-2);
 }
 .latest-tab{
@@ -754,6 +754,36 @@ body.sem-lock{overflow:hidden}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   min-height:3.1em;font-size:.9rem;line-height:1.55;color:var(--ink);overflow-wrap:anywhere;
 }
+.archive-preview-thumb{
+  position:relative;display:flex;align-items:flex-end;justify-content:space-between;
+  width:100%;aspect-ratio:16/9;padding:18px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(145deg,#1A332C 0%,#3D6B5E 72%,#D66A45 100%);color:#fff;
+}
+.archive-preview-thumb::after{
+  content:"";position:absolute;width:130px;height:130px;right:-36px;top:-42px;
+  border:1px solid rgba(255,255,255,.34);border-radius:50%;
+}
+.archive-preview-thumb span{font-family:var(--font-en);font-size:.72rem;letter-spacing:.18em;font-weight:700}
+.archive-preview-thumb b{font-family:var(--font-en);font-size:2.5rem;line-height:1;font-weight:700}
+.service-content-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.home-service-priority .service-content-grid .service-hub-card{
+  display:grid;grid-template-columns:1fr;padding:0;overflow:hidden;border:1px solid var(--line);
+}
+.home-service-priority .service-content-grid .service-hub-card > img{
+  width:100%;aspect-ratio:16/8;object-fit:cover;border-radius:0;
+}
+.home-service-priority .service-content-grid .service-hub-card > div{padding:24px}
+.service-concept-line{font-size:1.08rem;font-weight:900;color:var(--teal-deep);margin:.35rem 0 .55rem}
+
+/* 開催・配信コンテンツとサービスコンテンツを別のまとまりとして示す。 */
+.tab-group.content-tab-sections{
+  display:grid;grid-template-columns:3fr 2fr;gap:16px;padding:0;background:transparent;border:0;border-radius:0;
+}
+.content-tab-section{padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--sky-2)}
+.content-tab-section-services{background:#fff8f3;border-color:rgba(214,106,69,.28)}
+.content-tab-label{margin:0 0 8px;font-family:var(--font-en);font-size:.68rem;letter-spacing:.16em;font-weight:700;color:var(--teal)}
+.content-tab-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.content-tab-section-services .content-tab-row{grid-template-columns:repeat(2,minmax(0,1fr))}
 .column-thumb-art{
   position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;
   border-radius:12px;overflow:hidden;border:1px solid rgba(61,107,94,.18);
@@ -1462,7 +1492,7 @@ body.sem-lock{overflow:hidden}
 .content-empty-title{font-size:1.06rem;font-weight:700;color:var(--ink);margin-bottom:8px}
 .content-empty-body{font-size:.88rem;color:var(--ink-soft);line-height:1.9}
 
-/* ---- 学習コンテンツ：動画カード（サムネイル付き） ---- */
+/* ---- ツマミ｜TSUMAMI：動画カード（サムネイル付き） ---- */
 .content-card-video{padding:0;overflow:hidden}
 .content-card-thumb{
   position:relative;display:block;width:100%;aspect-ratio:16/9;
@@ -1660,7 +1690,7 @@ body.sem-lock{overflow:hidden}
   padding-top:42px;
 }
 
-/* ---- 学習コンテンツ：動画ポップアップ ---- */
+/* ---- ツマミ｜TSUMAMI：動画ポップアップ ---- */
 .cv-modal{
   position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   padding:24px;opacity:0;pointer-events:none;transition:opacity .2s ease;
@@ -1750,7 +1780,7 @@ body.cv-lock{overflow:hidden}
   .totonoe-hero .hero-copy{justify-content:center}
   .totonoe-hero .hero-actions{border-radius:24px;flex-direction:column;width:min(100%,360px)}
   .content-strip-head{align-items:flex-start;flex-direction:column}
-  .latest-category-tabs{grid-template-columns:repeat(2,minmax(0,1fr));border-radius:18px}
+  .latest-category-tabs{grid-template-columns:repeat(3,minmax(0,1fr));border-radius:18px}
   .latest-tab{font-size:.82rem;padding:9px 10px}
   .latest-card-grid{
     padding-bottom:8px;
@@ -1771,6 +1801,8 @@ body.cv-lock{overflow:hidden}
   .home-content-strip{margin-top:0;padding:0 16px 28px}
   .content-strip-inner{padding:16px;border-radius:20px}
   .latest-visual-group{padding:14px}
+  .service-content-grid{grid-template-columns:1fr}
+  .content-tab-sections{grid-template-columns:1fr}
   .support-menu-grid,.weekly-point-grid,.compare-grid,.weekly-flow-grid{grid-template-columns:1fr}
   .weekly-feature-grid,.weekly-plan-grid,.usage-scene-grid{grid-template-columns:1fr}
   .weekly-summary-grid{grid-template-columns:1fr}

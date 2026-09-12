@@ -52,14 +52,14 @@ test('homepage reflects edited and newly published episodes in descending order'
   } finally {dom.window.close();}
 });
 
-test('homepage renders published TSUZURI metadata and the three original articles are removed', async () => {
-  const item={status:'published',content_type:'column',slug:'tsuzuri-test',title:'つづり表示確認',hero_url:'https://example.com/hero.jpg',url:'tsuzuri/tsuzuri-test.html',published_at:'2026-09-12'};
-  const dom=await page('index.html','latest-tsuzuri.js',[item]);
+test('homepage separates event media from TSUZURI and TSUMAMI services', async () => {
+  const dom=new JSDOM(readFileSync('projects/totonoe/index.html','utf8'));
   try {
-    const card=dom.window.document.querySelector('#latestTsuzuriGrid .latest-column-card');
-    assert.ok(card);assert.match(card.textContent,/つづり表示確認/);assert.equal(card.getAttribute('href'),'tsuzuri/tsuzuri-test.html');
-    assert.equal(card.querySelector('img').getAttribute('src'),'https://example.com/hero.jpg');
-    assert.equal(dom.window.document.getElementById('latestTsuzuriEmpty').hidden,true);
+    const d=dom.window.document;
+    assert.deepEqual([...d.querySelectorAll('[data-latest-tab]')].map(el=>el.dataset.latestTab),['seminar','podcast','archive']);
+    assert.equal(d.querySelectorAll('.service-content-grid .service-hub-card').length,2);
+    assert.match(d.querySelector('.service-content-grid').textContent,/つづり｜TSUZURI/);
+    assert.match(d.querySelector('.service-content-grid').textContent,/気になるAIを、ひとつまみ。/);
   } finally {dom.window.close();}
   for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
 });
@@ -67,7 +67,7 @@ test('homepage renders published TSUZURI metadata and the three original article
 
 test('studio video edits replace existing cards and preserve the selected thumbnail; new TSUZURI articles appear', async () => {
   const baseline=await page('contents.html','contents.js',[]);
-  const videoCount=baseline.window.document.querySelectorAll('#contentGrid .content-card-video').length;baseline.window.close();
+  const videoCount=baseline.window.document.querySelectorAll('#tsumamiGrid .content-card-video').length;baseline.window.close();
   const dom=await page('contents.html','contents.js',[
     {id:'video-edit',status:'published',content_type:'video',title:'更新された動画',media_url:'https://www.youtube.com/watch?v=8ubAUePSwY8',source_type:'video',source_id:'8ubAUePSwY8',hero_url:'https://example.com/custom.jpg'},
     {id:'new-column',slug:'new-column',status:'published',content_type:'column',title:'追加したつづり',excerpt:'つづり概要'},
@@ -75,7 +75,7 @@ test('studio video edits replace existing cards and preserve the selected thumbn
   ]);
   try {
     const d=dom.window.document;
-    const cards=[...d.querySelectorAll('#contentGrid .content-card-video')];
+    const cards=[...d.querySelectorAll('#tsumamiGrid .content-card-video')];
     const edited=cards.filter(card=>card.textContent.includes('更新された動画'));
     assert.equal(cards.length,videoCount);assert.equal(edited.length,1);
     assert.equal(edited[0].querySelector('img').src,'https://example.com/custom.jpg');

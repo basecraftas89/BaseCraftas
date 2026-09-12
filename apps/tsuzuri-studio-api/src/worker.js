@@ -82,7 +82,7 @@ const CONTENT_TYPES = {
   video: "動画",
   archive: "アーカイブ動画",
   seminar: "セミナー",
-  learning: "学習コンテンツ",
+  learning: "ツマミ｜TSUMAMI",
   weekend: "週末のAI整え習慣",
 };
 
@@ -268,7 +268,7 @@ function sourceProfile(url) {
       Object.assign(profile, { kind: "podcast", provider: "stand.fm", recommended_content_type: "podcast", public_target: "Podcast", source_id: match ? match[1] : "" });
     } else if (host === "youtu.be" || host === "youtube.com" || host.endsWith(".youtube.com")) {
       match = host === "youtu.be" ? target.pathname.match(/^\/([^/]+)/) : target.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/);
-      Object.assign(profile, { kind: "video", provider: "YouTube", recommended_content_type: "video", public_target: "学習コンテンツ", source_id: (match && match[1]) || target.searchParams.get("v") || "" });
+      Object.assign(profile, { kind: "video", provider: "YouTube", recommended_content_type: "video", public_target: "ツマミ｜TSUMAMI", source_id: (match && match[1]) || target.searchParams.get("v") || "" });
     } else if (host === "drive.google.com" || host === "docs.google.com") {
       match = target.pathname.match(/\/(?:file\/d|folders)\/([^/?]+)/);
       Object.assign(profile, { kind: "archive", provider: "Google Drive", recommended_content_type: "archive", public_target: "アーカイブ動画", source_id: (match && match[1]) || target.searchParams.get("id") || "" });
@@ -321,7 +321,7 @@ function publicSection(contentType) {
   if (contentType === "podcast") return { hash: "podcast", label: "Podcast" };
   if (contentType === "archive") return { hash: "archive", label: "アーカイブ動画" };
   if (contentType === "seminar") return { hash: "seminars", label: "セミナー" };
-  if (["video", "learning"].includes(contentType)) return { hash: "library", label: "学習コンテンツ" };
+  if (["video", "learning"].includes(contentType)) return { hash: "tsumami", label: "ツマミ｜TSUMAMI" };
   return { hash: "tsuzuri", label: "つづり｜TSUZURI" };
 }
 
@@ -447,7 +447,10 @@ function normalizePublishedBody(html) {
 }
 
 function publicArticleDirectory(contentType) {
-  return normalizeContentType(contentType) === "column" ? "tsuzuri" : "contents";
+  const normalized = normalizeContentType(contentType);
+  if (normalized === "column") return "tsuzuri";
+  if (["video", "learning"].includes(normalized)) return "tsumami";
+  return "contents";
 }
 
 function publicAssetUrl(request, key) {
@@ -547,12 +550,13 @@ function contentIndexHtml() {
     </a>
     <nav class="site-nav" id="siteNav">
       <a href="../index.html">TOP</a>
+      <a href="../weekend-ai.html">週末のAI整え習慣</a>
       <div class="nav-dropdown">
         <a href="../service.html" class="nav-main">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../weekend-ai.html">週末のAI整え習慣</a>
-          <span class="nav-disabled" aria-disabled="true">TAYORI <small>準備中</small></span>
-          <span class="nav-disabled" aria-disabled="true">法人向け支援 <small>準備中</small></span>
+          <a href="../TAYORI/">TAYORI｜たより</a>
+          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
+          <a href="../contents.html#tsumami">ツマミ｜TSUMAMI</a>
         </div>
       </div>
       <div class="nav-dropdown">
@@ -560,8 +564,6 @@ function contentIndexHtml() {
         <div class="nav-menu" aria-label="コンテンツメニュー">
           <a href="../contents.html#seminars">セミナー</a>
           <a href="../contents.html#podcast">ポッドキャスト</a>
-          <a href="../contents.html#library">学習コンテンツ</a>
-          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
           <a href="../contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -579,7 +581,7 @@ function contentIndexHtml() {
     <div class="columns-wrap">
       <p class="eyebrow">CONTENTS</p>
       <h1>コンテンツ</h1>
-      <p>ToToNoE+のつづり｜TSUZURI、Podcast、動画、学習コンテンツを読み直せる形で整理していきます。</p>
+      <p>ToToNoE+のセミナー、Podcast、アーカイブ動画と、つづり｜TSUZURI、ツマミ｜TSUMAMIを整理して掲載します。</p>
     </div>
   </section>
   <section class="columns-list">
@@ -598,6 +600,7 @@ function contentIndexHtml() {
     </div>
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <a href="../index.html">TOP</a>
+      <a href="../weekend-ai.html">週末のAI整え習慣</a>
       <a href="../service.html">サービス</a>
       <a href="../contents.html#seminars">コンテンツ</a>
       <a href="../team.html">チーム</a>

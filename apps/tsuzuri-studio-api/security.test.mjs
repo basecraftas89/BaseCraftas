@@ -144,12 +144,12 @@ for (const contentType of ['column','video']) test(contentType+' publish emits s
   const r=await f.call('/api/articles/'+a.id+'/publish','POST',{expected_revision:2});
   assert.equal(r.status,200,await r.clone().text());
   assert.ok(tree);const articleEntry=tree.tree.find(x=>x.path.endsWith(a.slug+'.html'));
-  assert.equal(articleEntry.path,`projects/totonoe/${contentType==='column'?'tsuzuri':'contents'}/${a.slug}.html`);
+  assert.equal(articleEntry.path,`projects/totonoe/${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);
   const html=blobs.get(articleEntry.sha);
   assert.doesNotMatch(html,/onerror/);assert.match(html,/<p>published<\/p>/);
   const index=JSON.parse(blobs.get(tree.tree.find(x=>x.path.endsWith('data/contents/index.json')).sha));
   assert.equal(index.articles[0].content_type,contentType);
-  assert.equal(index.articles[0].url,`${contentType==='column'?'tsuzuri':'contents'}/${a.slug}.html`);
+  assert.equal(index.articles[0].url,`${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);
   if(contentType==='video'){assert.equal(index.articles[0].source_id,'8ubAUePSwY8');assert.match(html,/href="https:\/\/youtu.be\/8ubAUePSwY8"/);}
   assert.equal((await f.call('/column-media/'+asset.key,'GET',undefined,'')).status,200);
  }finally{globalThis.fetch=original;}

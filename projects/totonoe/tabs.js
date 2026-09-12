@@ -1,6 +1,6 @@
 /* =========================================================
    週末のAI整え習慣 — 汎用タブ切替
-   contents.html（Podcast／学習コンテンツ）と
+   contents.html（Podcast／ツマミ｜TSUMAMI）と
    faq.html（参加について／内容について／セミナーについて／資料・コンテンツについて）
    の両方で使う共通スクリプトです。
 
@@ -51,6 +51,7 @@
 
     // 初期表示：URLハッシュが対象パネルなら反映、それ以外は先頭タブ
     var hash = (location.hash || '').replace('#', '');
+    if (hash === 'library') hash = 'tsumami';
     var ids = Array.prototype.map.call(buttons, function (b) { return b.dataset.target; });
     var initial = ids.indexOf(hash) !== -1 ? hash : ids[0];
     activate(group, initial, false);
