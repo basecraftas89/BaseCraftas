@@ -103,7 +103,7 @@ test('public weekend event exposes only the nearest upcoming published card with
  const next=await f.article({slug:'weekend-next',title:'次回テーマ',excerpt:'次回の紹介',content_type:'weekend',source_published_at:day(3),hero_url:'https://basecraftas.com/column-media/next.png',media_url:'https://example.com/apply'});
  const later=await f.article({slug:'weekend-later',title:'次々回テーマ',content_type:'weekend',source_published_at:day(10),hero_url:'https://basecraftas.com/column-media/later.png'});
  f.sql.prepare("UPDATE articles SET status='published' WHERE id IN (?,?,?)").run(past.id,next.id,later.id);
- const response=await f.call('/api/public/weekend-event','GET',undefined,'');
+ const response=await f.call('/public-content/weekend-event.json','GET',undefined,'');
  assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
  const body=await response.json();assert.equal(body.event.title,'次回テーマ');assert.equal(body.event.source_published_at,day(3));assert.equal(body.event.hero_url,'https://basecraftas.com/column-media/next.png');
  assert.deepEqual(Object.keys(body.event).sort(),['excerpt','hero_url','media_url','source_published_at','title','updated_at']);

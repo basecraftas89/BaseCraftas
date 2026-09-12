@@ -12,7 +12,7 @@
     if(date.getFullYear()!==Number(match[1])||date.getMonth()!==Number(match[2])-1||date.getDate()!==Number(match[3]))return '';
     return new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(date)+' 6:00〜6:30';
   }
-  fetch('/api/tsuzuri-studio/api/public/weekend-event',{cache:'no-store',credentials:'omit'})
+  fetch('/public-content/weekend-event.json',{cache:'no-store',credentials:'omit'})
     .then(function(response){if(!response.ok)throw new Error('request failed');return response.json();})
     .then(function(data){
       var event=data&&data.event,date=event&&formatDate(event.source_published_at),image=event&&safeUrl(event.hero_url);

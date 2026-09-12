@@ -49,6 +49,10 @@ zone_name = "basecraftas.com"
 pattern = "basecraftas.com/column-media/*"
 zone_name = "basecraftas.com"
 
+[[routes]]
+pattern = "basecraftas.com/public-content/*"
+zone_name = "basecraftas.com"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "column-studio-db"

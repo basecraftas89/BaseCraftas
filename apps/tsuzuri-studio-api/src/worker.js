@@ -144,6 +144,7 @@ function normalizePath(pathname) {
   const rawPath = pathname.replace(/\/+$/, "") || "/";
   const basePaths = ["/api/tsuzuri-studio", "/api/column-studio", "/api/totonoe-member"];
   const mediaBasePath = "/column-media";
+  const publicContentBasePath = "/public-content";
   for (const basePath of basePaths) {
     if (rawPath === basePath) return "/";
     if (rawPath.startsWith(`${basePath}/`)) {
@@ -152,6 +153,9 @@ function normalizePath(pathname) {
   }
   if (rawPath.startsWith(`${mediaBasePath}/`)) {
     return `/media/${rawPath.slice(mediaBasePath.length).replace(/^\/+/, "")}`;
+  }
+  if (rawPath.startsWith(`${publicContentBasePath}/`)) {
+    return `/api/public/${rawPath.slice(publicContentBasePath.length).replace(/^\/+/, "").replace(/\.json$/, "")}`;
   }
   return rawPath;
 }
