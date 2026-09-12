@@ -55,7 +55,6 @@ const WEEKLY_ANSWER_FORMAT_LABELS = {
   criteria: "判断基準を整理",
 };
 const WEEKLY_OPERATION_STATUS_MAP = {
-  "": "submitted",
   "受付済み": "submitted",
   "類似質問を整理中": "in_review",
   "回答準備中": "in_review",
@@ -1557,7 +1556,9 @@ async function syncWeeklyQuestionOperationsFromSheet(env) {
       rejected += 1;
       continue;
     }
-    const nextStatus = WEEKLY_OPERATION_STATUS_MAP[values.operations_status] || existing.status;
+    const nextStatus = values.operations_status
+      ? WEEKLY_OPERATION_STATUS_MAP[values.operations_status]
+      : existing.status;
     await env.DB.prepare(
       `UPDATE weekly_priority_questions
           SET question_group = ?, operations_status = ?, answer_video_title = ?, answer_video_url = ?, operations_notes = ?,

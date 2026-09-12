@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260912-qualification">
+  <link rel="stylesheet" href="styles.css?v=20260912-tayori-sync">
 </head>
 <body>
   <div class="app-shell">
@@ -259,6 +259,12 @@
           <section class="panel settings-panel">
             <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コンテンツのURL<input value="https://basecraftas.com/projects/totonoe/contents/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
           </section>
+          <section class="panel settings-panel admin-only weekly-sync-panel">
+            <h2>TAYORI連携</h2>
+            <p>Google Driveの配布資料・回答動画と、優先質問管理表を今すぐ同期します。自動同期は1時間ごとにも実行されます。</p>
+            <div class="settings-actions"><button class="secondary-button" type="button" data-action="sync-weekly">今すぐ同期</button></div>
+            <p class="weekly-sync-status" id="weeklySyncStatus" role="status">まだ手動同期していません。</p>
+          </section>
         </div>
       </section>
     </main>
@@ -276,6 +282,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260911"></script>
-  <script src="script.js?v=20260912-qualification"></script>
+  <script src="script.js?v=20260912-tayori-sync"></script>
 </body>
 </html>

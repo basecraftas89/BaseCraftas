@@ -266,9 +266,13 @@ test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォ�
   active.env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "answer-folder";
   const schema = JSON.parse(readFileSync("apps/column-studio-api/weekly-question-sheet-schema.json", "utf8"));
   const questionId = "weekly_question_ops";
+  const untouchedQuestionId = "weekly_question_keep_status";
   active.sql.prepare(`INSERT INTO weekly_priority_questions
     (id, customer_id, week_start, situation, goal, attempts, blocker, question, profile_snapshot, privacy_confirmed, video_consent, sheet_row, sheet_synced_at)
     VALUES (?, 'customer-1', '2026-09-06', '具体的な場面です', '実現したいことです', '試した内容です', '迷っている点です', '最終的な質問です', '{}', 1, 1, 6, CURRENT_TIMESTAMP)`).run(questionId);
+  active.sql.prepare(`INSERT INTO weekly_priority_questions
+    (id, customer_id, week_start, situation, goal, attempts, blocker, question, profile_snapshot, privacy_confirmed, video_consent, status, sheet_row, sheet_synced_at)
+    VALUES (?, 'customer-1', '2026-09-13', '別の場面です', '別の目標です', '試した内容です', '迷っている点です', '別の質問です', '{}', 1, 1, 'in_review', 7, CURRENT_TIMESTAMP)`).run(untouchedQuestionId);
   const sheetRow = Array(23).fill("");
   sheetRow[0] = questionId;
   sheetRow[18] = "議事録自動化";
@@ -276,11 +280,13 @@ test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォ�
   sheetRow[20] = "類似質問まとめ：議事録";
   sheetRow[21] = "https://drive.google.com/file/d/drive-video-12345/view";
   sheetRow[22] = "公開済み";
+  const untouchedSheetRow = Array(23).fill("");
+  untouchedSheetRow[0] = untouchedQuestionId;
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input) => {
     const url = decodeURIComponent(String(input));
     if (url.includes("sheets.googleapis.com") && url.includes("!A5:W5")) return Response.json({ values: [schema.columns.map((column) => column.header)] });
-    if (url.includes("sheets.googleapis.com") && url.includes("!A6:W2005")) return Response.json({ values: [sheetRow] });
+    if (url.includes("sheets.googleapis.com") && url.includes("!A6:W2005")) return Response.json({ values: [sheetRow, untouchedSheetRow] });
     if (url.includes("drive/v3/files/drive-video-12345")) return Response.json({ id: "drive-video-12345", name: "answer.mp4", mimeType: "video/mp4", parents: ["answer-folder"], trashed: false });
     if (url.includes("drive/v3/files?")) return Response.json({ files: [] });
     throw new Error("unexpected fetch: " + url);
@@ -293,6 +299,7 @@ test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォ�
     assert.equal(stored.question_group, "議事録自動化");
     assert.equal(stored.operations_status, "回答動画公開済み");
     assert.equal(stored.answer_video_url, sheetRow[21]);
+    assert.equal(active.sql.prepare("SELECT status FROM weekly_priority_questions WHERE id = ?").get(untouchedQuestionId).status, "in_review");
   } finally {
     globalThis.fetch = originalFetch;
   }
