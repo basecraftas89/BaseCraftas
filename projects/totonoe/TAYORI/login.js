@@ -9,7 +9,7 @@
   function returnPath() {
     const fallback = "/projects/totonoe/TAYORI/";
     const value = new URLSearchParams(location.search).get("return") || fallback;
-    return /^\/projects\/totonoe\/(?:weekly\/|curriculum\/(?:mypage|dashboard)\.html)(?:[?#].*)?$/.test(value) ? value : fallback;
+    return /^\/projects\/totonoe\/(?:TAYORI\/(?:index\.html)?|IROHA\/(?:mypage|dashboard|lesson)\.html)(?:[?#].*)?$/.test(value) ? value : fallback;
   }
 
   function message(code) {

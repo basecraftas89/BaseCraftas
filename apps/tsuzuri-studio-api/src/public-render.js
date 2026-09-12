@@ -89,7 +89,7 @@ export function articleHtml(articleData) {
       <div class="nav-dropdown">
         <a href="../service.html" class="nav-main">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../TAYORI/">たより｜TAYORI</a>
+          <a href="../weekly.html">たより｜TAYORI</a>
           <a href="../tsuzuri/">つづり｜TSUZURI</a>
           <a href="../tsumami/">つまみ｜TSUMAMI</a>
           <a href="../IROHA/">いろは｜IROHA</a>

@@ -369,7 +369,10 @@ dialog h2 { margin: 0 0 12px; color: var(--ink); }
 .entitlement-gate > .material-symbols-rounded { width: 66px; height: 66px; display: grid; place-items: center; color: var(--sage); background: white; border: 1px solid var(--line); border-radius: 50%; box-shadow: var(--shadow); font-size: 2rem; }
 .entitlement-gate h1 { max-width: 600px; margin: 12px 0 8px; color: var(--ink); font-size: clamp(1.6rem, 4vw, 2.6rem); }
 .entitlement-gate > p:not(.eyebrow) { max-width: 620px; margin: 0 0 22px; }
-.access-locked .learning-main, .access-locked .lesson-shell { display: none; }
+.member-access-pending body[data-page-entitlement] { visibility: hidden; }
+.access-locked .learning-sidebar, .access-locked .admin-header, .access-locked .learning-main, .access-locked .lesson-shell, .access-locked .mypage-main { display: none; }
+.access-locked .entitlement-gate { margin-left: 0; }
+.entitlement-gate .secondary-button { margin-top: 10px; }
 .learning-summary, .weekly-log-section { margin-top: 18px; padding: 22px; background: white; border: 1px solid var(--line); border-radius: 16px; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
 .section-heading h2 { margin: 0; color: var(--ink); font-size: 1.15rem; }

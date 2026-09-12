@@ -272,3 +272,29 @@ test('会員画面は再ログインと契約管理の導線を備える',()=>{
   assert.match(mypageScript,/customer\/billing\/portal/);
   assert.match(mypageScript,/customer\/auth\/logout/);
 });
+
+test('公開サービス導線はLPに入り、購入者ページは会員区分で保護される',()=>{
+  const home=readFileSync('projects/totonoe/index.html','utf8');
+  const service=readFileSync('projects/totonoe/service.html','utf8');
+  const tayoriLp=readFileSync('projects/totonoe/weekly.html','utf8');
+  const irohaLp=readFileSync('projects/totonoe/IROHA/index.html','utf8');
+  const dashboard=readFileSync('projects/totonoe/IROHA/dashboard.html','utf8');
+  const mypage=readFileSync('projects/totonoe/IROHA/mypage.html','utf8');
+  const shell=readFileSync('projects/totonoe/IROHA/member-shell.js','utf8');
+  const loginScript=readFileSync('projects/totonoe/TAYORI/login.js','utf8');
+
+  assert.match(home,/href="weekly\.html" class="btn btn-ghost">詳細・料金を見る/);
+  assert.match(service,/href="weekly\.html" class="btn btn-ghost">詳細・料金を見る/);
+  assert.doesNotMatch(home,/href="TAYORI\/"/);
+  assert.doesNotMatch(service,/href="TAYORI\/"/);
+  assert.match(tayoriLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FTAYORI%2F/);
+  assert.match(irohaLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FIROHA%2Fdashboard\.html/);
+  assert.doesNotMatch(irohaLp,/href="dashboard\.html"/);
+  assert.match(dashboard,/<html lang="ja" class="member-access-pending">/);
+  assert.match(dashboard,/data-page-entitlement="curriculum"/);
+  assert.match(mypage,/data-page-entitlement="member"/);
+  assert.match(shell,/required === "curriculum" \? access\.has_curriculum_access/);
+  assert.match(shell,/access\.has_weekly_access \|\| access\.has_curriculum_access/);
+  assert.ok(loginScript.includes('TAYORI\\/(?:index\\.html)?'));
+  assert.ok(loginScript.includes('IROHA\\/(?:mypage|dashboard|lesson)\\.html'));
+});

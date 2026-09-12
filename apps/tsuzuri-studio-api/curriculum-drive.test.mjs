@@ -41,7 +41,7 @@ test("admin state and lesson completion are stored in separate namespaces", asyn
   assert.notEqual(store.ADMIN_KEY, store.LEARNER_KEY);
 });
 
-test("curriculum pages expose the management and learner flows", async () => {
+test("curriculum learner flow is protected and management stays local-only", async () => {
   const [adminHtml, lessonHtml, dashboardHtml] = await Promise.all([
     fs.readFile(path.join(curriculumDir, "admin.html"), "utf8"),
     fs.readFile(path.join(curriculumDir, "lesson.html"), "utf8"),
@@ -50,8 +50,33 @@ test("curriculum pages expose the management and learner flows", async () => {
   assert.match(adminHtml, /id="driveSettingsForm"/);
   assert.match(adminHtml, /id="lessonForm"/);
   assert.match(lessonHtml, /id="completionForm"/);
-  assert.match(dashboardHtml, /href="admin\.html"/);
+  assert.doesNotMatch(dashboardHtml, /href="admin\.html"/);
+  assert.match(adminHtml, /location\.replace\("index\.html"\)/);
+  assert.match(dashboardHtml, /data-page-entitlement="curriculum"/);
+  assert.match(dashboardHtml, /member-access-pending/);
   assert.match(dashboardHtml, /curriculum-store\.js/);
+});
+
+test("IROHA direct access stays locked until an IROHA entitlement is confirmed", async () => {
+  const shell = await fs.readFile(path.join(curriculumDir, "member-shell.js"), "utf8");
+  const check = async (profile, expectedLocked) => {
+    const dom = new JSDOM('<!doctype html><html class="member-access-pending"><body data-page-entitlement="curriculum"><main class="learning-main">paid</main></body></html>', {
+      url: "https://basecraftas.com/projects/totonoe/IROHA/dashboard.html",
+      runScripts: "outside-only"
+    });
+    dom.window.fetch = async () => profile
+      ? { ok: true, status: 200, json: async () => ({ profile }) }
+      : { ok: false, status: 401 };
+    dom.window.eval(shell);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(dom.window.document.documentElement.classList.contains("member-access-pending"), false);
+    assert.equal(dom.window.document.body.classList.contains("access-locked"), expectedLocked);
+    assert.equal(Boolean(dom.window.document.querySelector(".entitlement-gate")), expectedLocked);
+  };
+
+  await check(null, true);
+  await check({ has_weekly_access: true, has_curriculum_access: false }, true);
+  await check({ has_weekly_access: true, has_curriculum_access: true }, false);
 });
 
 test("curriculum LP shows the therapist-only regular entry fee before the campaign price", async () => {

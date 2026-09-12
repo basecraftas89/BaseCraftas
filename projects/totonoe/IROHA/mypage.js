@@ -199,7 +199,7 @@
     try {
       if (!isLocalPreview) await fetch(logoutApi, { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: "{}" });
     } finally {
-      window.location.assign("../weekly/login.html");
+      window.location.assign("../TAYORI/login.html");
     }
   }
 

@@ -28,6 +28,8 @@
 - 解説動画：短い動画で理解を深める
 - 会員限定Q&A：ほかの会員の疑問からも学ぶ
 - 優先質問権：知りたいテーマを届ける。解説テーマとして優先検討する仕組みで、個別回答を保証しない
+- 公開LPは `/projects/totonoe/weekly.html`
+- 会員ページは `/projects/totonoe/TAYORI/`。`weekly_access` または `curriculum_all_access` の購入者だけが利用できる
 
 ## TSUMAMI
 
@@ -47,6 +49,9 @@
 - AI別の活用：ChatGPT・Claude・Geminiなど
 - 副収入のスキル：動画編集・情報発信
 - TAYORIの全特典を含む
+- 公開LPは `/projects/totonoe/IROHA/`
+- 会員ページは `/projects/totonoe/IROHA/dashboard.html`。`curriculum_all_access` の購入者だけが利用できる
+- IROHA購入者には `curriculum_all_access` と `weekly_access` を付与する。TAYORI単体購入者には `weekly_access` だけを付与する
 
 TAYORI単体とIROHAは同じものではない。IROHAは学習サービスにTAYORIを内包する。名称変更自体は価格・契約条件・権限・提供開始状況の変更や稼働確認を意味しない。
 
