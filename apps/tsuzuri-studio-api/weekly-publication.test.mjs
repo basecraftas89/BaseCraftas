@@ -114,6 +114,7 @@ test('homepage labels the section as seminars and shows only seminars that have 
     assert.ok(recurring.classList.contains('recurring-seminar-card'));
     assert.equal(recurring.href,'https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu');
     assert.match(recurring.querySelector('img').src,/assets\/weekend-ai-default-thumbnail\.webp$/);
+    assert.match(recurring.textContent,/参加者のニーズに合わせて設計します/);
     assert.doesNotMatch(latest.textContent,/ポッドキャスト|アーカイブ動画/);
     dom.window.TOTONOE_NOW=Date.parse('2026-09-12T00:00:00+09:00');
     dom.window.eval(script);
@@ -140,6 +141,8 @@ test('homepage labels the section as seminars and shows only seminars that have 
     assert.equal(afterAll.window.document.querySelector('#latestSeminarEmpty').hidden,true);
   } finally {afterAll.window.close();}
   for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
+  assert.match(readFileSync('projects/totonoe/weekend-ai.html','utf8'),/毎週水曜頃までにテーマを確定し、サムネイルを差し替えます/);
+  assert.match(readFileSync('projects/totonoe/styles.css','utf8'),/\.recurring-seminar-card\{/);
 });
 
 
