@@ -52,6 +52,30 @@ test('weekend page reflects edited and newly published episodes in descending or
   } finally {dom.window.close();}
 });
 
+test('weekend page switches podcast and member-only archive with accessible buttons and deep links', () => {
+  const html=readFileSync('projects/totonoe/weekend-ai.html','utf8');
+  const script=readFileSync('projects/totonoe/weekend-media-tabs.js','utf8');
+  const dom=new JSDOM(html,{url:'https://local.test/projects/totonoe/weekend-ai.html#archive',runScripts:'outside-only'});
+  try {
+    dom.window.requestAnimationFrame=callback=>callback();
+    dom.window.eval(script);
+    const d=dom.window.document;
+    const podcastButton=d.getElementById('mediaTabPodcast');
+    const archiveButton=d.getElementById('mediaTabArchive');
+    assert.equal(archiveButton.getAttribute('aria-selected'),'true');
+    assert.equal(d.getElementById('archive').hidden,false);
+    assert.equal(d.getElementById('podcast').hidden,true);
+    assert.match(d.getElementById('archive').textContent,/コメキャリ生のみ/);
+
+    podcastButton.click();
+    assert.equal(dom.window.location.hash,'#podcast');
+    assert.equal(podcastButton.getAttribute('aria-selected'),'true');
+    assert.equal(archiveButton.getAttribute('aria-selected'),'false');
+    assert.equal(d.getElementById('podcast').hidden,false);
+    assert.equal(d.getElementById('archive').hidden,true);
+  } finally {dom.window.close();}
+});
+
 test('homepage labels the section as seminars and shows only seminars that have not started', async () => {
   const html=readFileSync('projects/totonoe/index.html','utf8');
   const script=readFileSync('projects/totonoe/home-seminars.js','utf8');

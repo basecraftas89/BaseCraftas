@@ -1087,6 +1087,20 @@ body.sem-lock{overflow:hidden}
 .service-detail-hero h1{margin:.65rem 0 1rem;font-size:clamp(2.25rem,5vw,4rem);line-height:1.2;color:var(--ink)}
 .service-detail-hero .service-concept-line{font-size:clamp(1.15rem,2vw,1.5rem);margin-bottom:16px}
 .weekend-media .members-only{margin-bottom:42px}
+.weekend-media-tabs{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  max-width:680px;margin:0 auto 46px;padding:7px;border:1px solid var(--line);
+  border-radius:18px;background:rgba(255,255,255,.72);box-shadow:var(--shadow-sm);
+}
+.weekend-media-tab{
+  display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;
+  border:1px solid transparent;border-radius:13px;background:transparent;color:var(--ink-soft);
+  font-size:.94rem;font-weight:900;cursor:pointer;transition:background-color .16s ease,color .16s ease,box-shadow .16s ease;
+}
+.weekend-media-tab:hover{background:#fff;color:var(--teal-deep)}
+.weekend-media-tab.active{background:var(--teal-deep);color:#fff;box-shadow:0 10px 22px rgba(12,64,53,.18)}
+.weekend-media-tab:focus-visible{outline:3px solid rgba(19,115,160,.28);outline-offset:3px}
+.weekend-media-panel[hidden]{display:none}
 .service-coming-note{
   padding:10px 12px;border-radius:12px;background:rgba(232,240,237,.72);
   color:var(--teal-deep) !important;font-weight:800;
@@ -1807,6 +1821,8 @@ body.cv-lock{overflow:hidden}
   .section{padding:64px 0}
 }
 @media (max-width:680px){
+  .weekend-media-tabs{gap:6px;margin-bottom:34px;padding:5px;border-radius:15px}
+  .weekend-media-tab{min-height:48px;padding:8px 10px;font-size:.84rem;border-radius:11px}
   .benefit-grid{grid-template-columns:1fr 1fr}
   .pod-list .pod-card{flex:0 0 82%;max-width:82%}
 
