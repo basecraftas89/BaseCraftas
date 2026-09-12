@@ -107,27 +107,55 @@ const indexBlobRequest=deletionRequests.find(item=>item.pathname.endsWith('/git/
 const nextIndex=JSON.parse(Buffer.from(indexBlobRequest.body.content,'base64').toString('utf8'));assert.deepEqual(nextIndex.articles.map(item=>item.id),['keep']);
 globalThis.fetch=originalFetch;delete env.GITHUB_TOKEN;delete env.GITHUB_REPOSITORY;delete env.GITHUB_BRANCH;
 res=await call('/api/articles','POST',{slug:'podcast-16',title:'#16 テスト配信タイトル',content_type:'podcast',episode_no:16,source_published_at:'2026-09-12',media_url:'https://stand.fm/episodes/test16'});assert.equal(res.status,201);
-env.GOOGLE_DRIVE_ACCESS_TOKEN='drive-test-token';env.DRIVE_ARCHIVE_FOLDER_ID='folder-test';
-const driveRequests=[];globalThis.fetch=async url=>{driveRequests.push(String(url));return new Response(JSON.stringify({files:[{id:'drive_video_1',name:'第16回 9/12.m4a',mimeType:'video/mp4',createdTime:'2026-09-11T22:19:01.935Z',modifiedTime:'2026-09-10T02:00:00Z',webViewLink:'https://drive.google.com/file/d/drive_video_1/view'}]}),{status:200});};
+const weekendExpiryId='article_32345678-1234-1234-1234-123456789abc';
+res=await call('/api/articles','POST',{id:weekendExpiryId,slug:'weekend-expiry-test',title:'次回開催',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/weekend-test.png',main_actor_id:'shindo-toshiki'});assert.equal(res.status,201);
+sql.prepare("UPDATE articles SET status='published', updated_at='2026-09-10 03:00:00' WHERE id=?").run(weekendExpiryId);
+const nextWeekendId='article_42345678-1234-1234-1234-123456789abc';
+res=await call('/api/articles','POST',{id:nextWeekendId,slug:'weekend-next-test',title:'次週開催',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/weekend-next.png',main_actor_id:'shindo-toshiki'});assert.equal(res.status,201);
+sql.prepare("UPDATE articles SET status='published', updated_at='2026-09-11 22:00:00' WHERE id=?").run(nextWeekendId);
+env.GOOGLE_DRIVE_ACCESS_TOKEN='drive-test-token';env.DRIVE_ARCHIVE_FOLDER_ID='folder-test';env.DRIVE_WEEKLY_FOLDER_ID='weekly-folder-test';env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID='answer-folder-test';
+const driveRequests=[];globalThis.fetch=async url=>{
+ const value=String(url);driveRequests.push(value);
+ const files=value.includes('weekly-folder-test')
+  ?[{id:'weekly_pdf_1',name:'週末資料.pdf',mimeType:'application/pdf',createdTime:'2026-09-11T22:19:01.935Z',modifiedTime:'2026-09-10T02:00:00Z',webViewLink:'https://drive.google.com/file/d/weekly_pdf_1/view'}]
+  :value.includes('answer-folder-test')
+  ?[{id:'answer_video_1',name:'回答動画.mp4',mimeType:'video/mp4',createdTime:'2026-09-11T22:19:01.935Z',modifiedTime:'2026-09-10T02:00:00Z'}]
+  :[
+    {id:'drive_video_1',name:'第16回 9/12.mp4',mimeType:'video/mp4',createdTime:'2026-09-11T22:19:01.935Z',modifiedTime:'2026-09-10T02:00:00Z',webViewLink:'https://drive.google.com/file/d/drive_video_1/view'},
+    {id:'drive_audio_1',name:'第16回 9/12.m4a',mimeType:'audio/mp4',createdTime:'2026-09-11T22:19:01.935Z',modifiedTime:'2026-09-10T02:00:00Z',webViewLink:'https://drive.google.com/file/d/drive_audio_1/view'},
+  ];
+ return new Response(JSON.stringify({files}),{status:200});
+};
 res=await call('/api/archive-candidates/scan','POST',{});assert.equal(res.status,200);assert.equal((await res.json()).new_count,1);
 res=await call('/api/archive-candidates');let archiveData=await res.json();assert.equal(archiveData.candidates.length,1);assert.equal(archiveData.candidates[0].status,'new');assert.match(archiveData.schedule,/土曜日 09:00/);
 res=await call('/api/archive-candidates/'+archiveData.candidates[0].id+'/import','POST',{});assert.equal(res.status,201);let archiveArticle=(await res.json()).article;assert.equal(archiveArticle.content_type,'archive');assert.equal(archiveArticle.status,'draft');assert.equal(archiveArticle.source_id,'drive_video_1');assert.equal(archiveArticle.main_actor_id,'');assert.equal(archiveArticle.episode_no,16);assert.equal(archiveArticle.title,'#16 テスト配信タイトル');assert.equal(archiveArticle.source_published_at,'2026-09-12');
 res=await call('/api/archive-candidates/'+archiveData.candidates[0].id+'/import','POST',{});assert.equal(res.status,200);assert.equal((await res.json()).article.id,archiveArticle.id);
-await worker.scheduled({cron:'0 0 * * 6',scheduledTime:Date.now()},env);
+const hourlyRequestStart=driveRequests.length;
+await worker.scheduled({cron:'0 * * * *',scheduledTime:Date.parse('2026-09-12T08:00:00+09:00')},env);
+const hourlyRequests=driveRequests.slice(hourlyRequestStart);
+assert.ok(hourlyRequests.some(url=>url.includes('answer-folder-test')));
+assert.ok(hourlyRequests.every(url=>!url.includes('weekly-folder-test')&&!url.includes('%27folder-test%27')&&!url.includes("'folder-test'")));
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM weekly_answer_videos').get().n,1);
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM weekly_materials').get().n,0);
+assert.equal(sql.prepare('SELECT status FROM articles WHERE id=?').get(weekendExpiryId).status,'published');
+await worker.scheduled({cron:'0 0 * * SAT',scheduledTime:Date.parse('2026-09-12T09:00:00+09:00')},env);
 assert.ok(driveRequests.some(url=>url.includes("'folder-test'+in+parents")||url.includes('%27folder-test%27+in+parents')));
 assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM archive_candidates').get().n,1);
-globalThis.fetch=originalFetch;delete env.GOOGLE_DRIVE_ACCESS_TOKEN;delete env.DRIVE_ARCHIVE_FOLDER_ID;
-console.log('PASS: weekly Drive scan detects candidates and imports a reviewable archive draft');
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM weekly_materials').get().n,1);
+assert.equal(sql.prepare('SELECT status FROM articles WHERE id=?').get(weekendExpiryId).status,'archived');
+assert.equal(sql.prepare('SELECT status FROM articles WHERE id=?').get(nextWeekendId).status,'published');
+console.log('PASS: Saturday sync archives the finished thumbnail, syncs materials, and keeps video-only archive candidates');
 sql.prepare("UPDATE articles SET deleted_at='2026-07-01 00:00:00', status='archived' WHERE id=?").run(lifecycleId);
 sql.prepare("INSERT INTO article_assets(id,article_id,r2_key,url) VALUES('asset_old',?,'contents/old.png','https://test.local/old.png')").run(lifecycleId);
 const removedKeys=[];env.MEDIA={delete:async keys=>removedKeys.push(...(Array.isArray(keys)?keys:[keys]))};
-await worker.scheduled({cron:'15 18 * * *',scheduledTime:Date.now()},env);
+await worker.scheduled({cron:'0 0 * * SAT',scheduledTime:Date.parse('2026-09-12T09:00:00+09:00')},env);
 assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM articles WHERE id=?').get(lifecycleId).n,0);
 assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM article_versions WHERE article_id=?').get(lifecycleId).n,0);
 assert.deepEqual(removedKeys,['contents/old.png']);
 assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE entity_id=? AND action='article.purge'").get(lifecycleId).n,1);
 delete env.MEDIA;
-console.log('PASS: admin-only trash, restore, atomic GitHub unpublish, and 30-day purge');
+globalThis.fetch=originalFetch;delete env.GOOGLE_DRIVE_ACCESS_TOKEN;delete env.DRIVE_ARCHIVE_FOLDER_ID;delete env.DRIVE_WEEKLY_FOLDER_ID;delete env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID;
+console.log('PASS: admin-only trash, restore, atomic GitHub unpublish, and weekly 30-day purge');
 
 const html=readFileSync(resolve(root,'apps/tsuzuri-studio/index.html'),'utf8');
 const js=readFileSync(resolve(root,'apps/tsuzuri-studio/script.js'),'utf8');

@@ -68,6 +68,8 @@ Worker の環境変数に次を設定してください。
 
 `media_url` に外部URLを入れた場合は公開時にも再取得します。noteリンクで `og:image` が取得できた場合は、手動アイキャッチ未設定のサムネイルとして `hero_url` に反映します。Podcast・動画・アーカイブは `data/contents/index.json` からToToNoE+の対応タブに自動反映します。
 
+「次回開催」でサムネイルを公開すると週末のAI整え習慣ページへ即時反映されます。土曜日06:30（日本時間）を過ぎると公開APIは既定サムネイルへ自動的に戻し、同日09:00の土曜Cronで終了済みサムネイルをアーカイブします。次週の画像を土曜日06:30以降に先行公開した場合は次回分として保持し、09:00のアーカイブ対象にはしません。
+
 4ファイルのGitHub更新は1つのcommitとして反映し、競合した場合は1回だけ最新状態を取得し直します。
 
 必要な設定:
@@ -85,11 +87,11 @@ Worker の環境変数に次を設定してください。
 - 非公開: 公開中の記事をGitHubの一覧JSONと個別HTML/JSONから取り除き、D1では `archived` として保持します。
 - ゴミ箱: 必要なら同じ公開ファイル削除を行い、D1の `deleted_at` を記録します。移動直後から30日間は記事本文、編集履歴、R2画像を保持します。
 - 復元: 30日以内のゴミ箱記事を `draft` に戻します。自動公開はせず、確認後に公開ボタンを押します。
-- 期限切れ削除: 毎日03:15（日本時間）のCron Triggerで、移動から30日を過ぎた記事・編集履歴・公開履歴・R2画像を完全削除します。処理は1回50記事までです。
+- 期限切れ削除: 毎週土曜日09:00（日本時間）のCron Triggerで、移動から30日を過ぎた記事・編集履歴・公開履歴・R2画像を完全削除します。処理は1回50記事までです。
 
 APIは `POST /api/articles/:id/lifecycle` で、`action` に `unpublish` / `trash` / `restore`、`expected_revision` に現在のリビジョンを送ります。完全削除は実装していません。
 
-既存D1には `migrations/20260908_article_lifecycle.sql` を一度だけ適用してください。Cron Triggerは `wrangler.toml` の `15 18 * * *`（UTC）を使用します。
+既存D1には `migrations/20260908_article_lifecycle.sql` を一度だけ適用してください。期限切れ削除は土曜処理にまとめ、Cron Triggerは `wrangler.toml` の `0 0 * * SAT`（UTC。日本時間の土曜日09:00）を使用します。
 
 ダッシュボードは「すべて・つづり｜TSUZURI・動画」を表示します。Podcastとアーカイブはスタジオ外で管理し、既存データ/APIは互換性のため保持しています。
 
@@ -106,7 +108,8 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 ## Google Drive アーカイブ確認
 
 - 対象フォルダ: `12YHtKFODi75v_W08xFACzm97DjFIUCjg`
-- 自動確認: 毎週土曜日 09:00（日本時間。CronはUTCの `0 0 * * 6`）
+- 対象ファイル: 動画のみ（音声ファイルは同期しません）
+- 自動確認: 毎週土曜日 09:00（日本時間。CronはUTCの `0 0 * * SAT`）
 - 旧ダッシュボードの手動確認・取り込みUIは撤去済みです。以下のAPI・定期処理は既存運用のため保持しています。
 - 反映方法: 新着を候補として保存し、「下書きに取り込む」で記事化します。Main Actorなどを確認してから公開します。
 - 必須Secret: `GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL` と `GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY`
@@ -159,9 +162,9 @@ StripeのシークレットキーとWebhook署名シークレットは、リポ�
 
 会員向けCheckout APIは `/api/totonoe-member/api/customer/billing/checkout` です。料金・初回／再登録・キャンペーン・資格割引はWorkerがD1と環境変数から確定し、ブラウザから金額やStripe Price IDは受け取りません。誤課金を防ぐため、Stripeテスト環境でのE2E確認が終わるまでは `STRIPE_CHECKOUT_ENABLED = "false"` のままにします。
 
-TAYORIの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、1時間ごとに動画メタデータを確認します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
+TAYORIの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、毎時00分に動画メタデータを確認します。週末資料は毎週土曜日09:00に同期します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
 
-運営用の質問管理表 `ToToNoE+ TAYORI｜優先質問管理` はTAYORI資料フォルダに作成済みです。管理表では、類似質問グループ、対応状況、回答動画タイトル・URL、運営メモまで追跡できます。質問データの正本はD1です。会員の送信後にA〜R列を管理表へ転記し、失敗時はD1へエラーを残して1時間ごとに再試行します。S〜W列は運営専用で、WorkerはA〜R列の更新時に上書きしません。運営列は1時間ごと、または管理画面の手動同期でD1へ取り込みます。
+運営用の質問管理表 `ToToNoE+ TAYORI｜優先質問管理` はTAYORI資料フォルダに作成済みです。管理表では、類似質問グループ、対応状況、回答動画タイトル・URL、運営メモまで追跡できます。質問データの正本はD1です。会員の送信後にA〜R列を管理表へ転記し、失敗時はD1へエラーを残して毎時00分に再試行します。S〜W列は運営専用で、WorkerはA〜R列の更新時に上書きしません。運営列は毎時00分、または管理画面の手動同期でD1へ取り込みます。
 
 管理表の列順は `weekly-question-sheet-schema.json` を正とします。フォーム回答列は `situation → goal → use_by → attempts → blocker → question → answer_format → privacy_confirmed → video_consent` の順で、運営用の列はその後ろへ配置します。
 

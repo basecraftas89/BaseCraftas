@@ -2,7 +2,7 @@ import {archiveMetadata} from './archive-metadata.js';
 import {articleHtml} from './public-render.js';
 import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
 import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
-import { isCurrentWeekendThumbnail } from './weekend-event.js';
+import { isCurrentWeekendThumbnail, latestSaturdayEventEnd } from './weekend-event.js';
 import {
   normalizeCustomerEmail,
   generateOtpCode,
@@ -946,6 +946,23 @@ async function publicWeekendEvent(env) {
   } }, { headers: { "cache-control": "no-store" } });
 }
 
+async function archiveExpiredWeekendThumbnails(env, nowMs = Date.now()) {
+  const boundary = new Date(latestSaturdayEventEnd(nowMs)).toISOString();
+  const result = await env.DB.prepare(
+    `UPDATE articles
+        SET status = 'archived', revision = revision + 1, updated_at = CURRENT_TIMESTAMP
+      WHERE content_type = 'weekend'
+        AND status = 'published'
+        AND deleted_at IS NULL
+        AND datetime(updated_at) < datetime(?)`
+  ).bind(boundary).run();
+  const archived = Number(result.meta?.changes || 0);
+  if (archived) {
+    await audit(env, "system@column-studio", "weekend.thumbnail.archive", "content_type", "weekend", { archived, boundary });
+  }
+  return { archived, boundary };
+}
+
 async function createArticle(request, env) {
   const auth = await requireRole(request, env, ["admin", "editor"]);
   if (auth.error) return auth.error;
@@ -1530,9 +1547,7 @@ async function fetchDriveArchiveFiles(env) {
     });
     const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
     if (!response.ok) throw new Error(payload?.error?.message || "google_drive_list_failed");
-    files.push(...(payload.files || []).filter((file) =>
-      String(file.mimeType || "").startsWith("video/") || String(file.mimeType || "").startsWith("audio/")
-    ));
+    files.push(...(payload.files || []).filter((file) => String(file.mimeType || "").startsWith("video/")));
     pageToken = payload.nextPageToken || "";
     if (!pageToken) break;
   }
@@ -2951,20 +2966,21 @@ const worker = {
     }
     try {
       if (controller.cron === "0 * * * *") {
-        const materials = await syncWeeklyMaterials(env);
         const answerVideos = await syncWeeklyAnswerVideos(env);
         const questionSheet = await syncPendingWeeklyQuestionsToSheet(env);
         const questionOperations = await syncWeeklyQuestionOperationsFromSheet(env);
-        console.log(JSON.stringify({ event: "weekly.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, materials, answer_videos: answerVideos, question_sheet: questionSheet, question_operations: questionOperations }));
+        console.log(JSON.stringify({ event: "weekly.hourly_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, answer_videos: answerVideos, question_sheet: questionSheet, question_operations: questionOperations }));
         return;
       }
-      if (controller.cron === "0 0 * * 6") {
-        const result = await scanDriveArchives(env);
-        console.log(JSON.stringify({ event: "archive.scan", cron: controller.cron, scheduled_time: controller.scheduledTime, ...result }));
+      if (controller.cron === "0 0 * * SAT") {
+        const weekendThumbnails = await archiveExpiredWeekendThumbnails(env, controller.scheduledTime || Date.now());
+        const materials = await syncWeeklyMaterials(env);
+        const archiveVideos = await scanDriveArchives(env);
+        const trash = await purgeExpiredTrash(env);
+        console.log(JSON.stringify({ event: "weekly.saturday_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, weekend_thumbnails: weekendThumbnails, materials, archive_videos: archiveVideos, trash }));
         return;
       }
-      const result = await purgeExpiredTrash(env);
-      console.log(JSON.stringify({ event: "trash.purge", cron: controller.cron, scheduled_time: controller.scheduledTime, ...result }));
+      console.log(JSON.stringify({ event: "scheduled.skipped", cron: controller.cron, scheduled_time: controller.scheduledTime, reason: "unknown_cron" }));
     } catch (error) {
       console.error(JSON.stringify({ event: "scheduled.error", cron: controller.cron, scheduled_time: controller.scheduledTime, error: String(error.message || error) }));
       throw error;
