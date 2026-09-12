@@ -142,7 +142,7 @@ test('homepage labels the section as seminars and shows only seminars that have 
   } finally {afterAll.window.close();}
   for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
   assert.match(readFileSync('projects/totonoe/weekend-ai.html','utf8'),/毎週水曜頃までにテーマを確定し、サムネイルを差し替えます/);
-  assert.match(readFileSync('projects/totonoe/styles.css','utf8'),/\.recurring-seminar-card\{/);
+  assert.match(readFileSync('projects/totonoe/recurring-seminar.css','utf8'),/\.recurring-seminar-card\{/);
 });
 
 
