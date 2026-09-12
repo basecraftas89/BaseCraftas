@@ -1,0 +1,86 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {existsSync,readFileSync} from 'node:fs';
+import {JSDOM} from 'jsdom';
+import {archiveMetadata} from './src/archive-metadata.js';
+
+test('archive dates use the event filename and Japan time, with calendar validation', () => {
+  assert.deepEqual(archiveMetadata('第16回 9/12.m4a', '2026-09-11T22:19:01Z'), {title:'第16回 9/12',episodeNo:16,sourceDate:'2026-09-12'});
+  assert.equal(archiveMetadata('EP17.mp4','2026-09-18T22:00:00Z').sourceDate,'2026-09-19');
+  assert.equal(archiveMetadata('第20回 12/31.mp4','2027-01-01T00:00:00Z').sourceDate,'2026-12-31');
+  assert.equal(archiveMetadata('第20回 2/30.mp4','2026-03-01T00:00:00Z').sourceDate,'2026-03-01');
+  assert.equal(archiveMetadata('日付なし.mp4','invalid').sourceDate,'');
+});
+
+const articles = [
+  {status:'published',content_type:'podcast',episode_no:16,title:'#16 更新したPodcast',media_url:'https://stand.fm/episodes/6aa47d67279752ae5dd1c9c7',source_published_at:'2026-09-12'},
+  {status:'published',content_type:'archive',episode_no:16,title:'#16 更新したアーカイブ',media_url:'https://drive.google.com/file/d/1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo/view',source_published_at:'2026-09-12'},
+  {status:'draft',content_type:'podcast',episode_no:17,title:'未公開の回',media_url:'https://stand.fm/episodes/draft17'},
+];
+async function page(file, script, data) {
+  const dom = new JSDOM(readFileSync('projects/totonoe/'+file,'utf8'),{url:'https://local.test/projects/totonoe/'+file,runScripts:'outside-only',pretendToBeVisual:true});
+  dom.window.fetch=async()=>({ok:true,json:async()=>({articles:data})});
+  dom.window.matchMedia=()=>({matches:false,addEventListener(){}});
+  dom.window.scrollTo=()=>{};
+  dom.window.eval(readFileSync('projects/totonoe/'+script,'utf8'));
+  await new Promise(resolve=>setTimeout(resolve,30));
+  return dom;
+}
+
+test('published dashboard metadata replaces legacy cards without duplication; drafts stay hidden', async () => {
+  const dom=await page('contents.html','contents.js',articles);
+  try {
+    const d=dom.window.document;
+    assert.equal(d.querySelectorAll('.pod-card').length,16);
+    assert.equal(d.querySelectorAll('.archive-card').length,16);
+    assert.match(d.querySelector('.pod-card').textContent,/更新したPodcast/);
+    assert.match(d.querySelector('.archive-card').textContent,/更新したアーカイブ/);
+    assert.equal(d.querySelector('.pod-card iframe').getAttribute('src'),'https://stand.fm/embed/episodes/6aa47d67279752ae5dd1c9c7');
+    assert.doesNotMatch(d.body.textContent,/未公開の回/);
+  } finally {dom.window.close();}
+});
+
+test('homepage reflects edited and newly published episodes in descending order', async () => {
+  const next={status:'published',content_type:'podcast',episode_no:17,title:'#17 次の回',media_url:'https://stand.fm/episodes/new17',source_published_at:'2026-09-19'};
+  const dom=await page('index.html','latest-podcast.js',[...articles,next]);
+  try {
+    const cards=[...dom.window.document.querySelectorAll('.latest-podcast-card')];
+    assert.equal(cards.length,3);
+    assert.match(cards[0].textContent,/第17回/);
+    assert.match(cards[1].textContent,/更新したPodcast/);
+    assert.match(cards[2].textContent,/第15回/);
+  } finally {dom.window.close();}
+});
+
+test('homepage renders published TSUZURI metadata and the three original articles are removed', async () => {
+  const item={status:'published',content_type:'column',slug:'tsuzuri-test',title:'つづり表示確認',hero_url:'https://example.com/hero.jpg',url:'tsuzuri/tsuzuri-test.html',published_at:'2026-09-12'};
+  const dom=await page('index.html','latest-tsuzuri.js',[item]);
+  try {
+    const card=dom.window.document.querySelector('#latestTsuzuriGrid .latest-column-card');
+    assert.ok(card);assert.match(card.textContent,/つづり表示確認/);assert.equal(card.getAttribute('href'),'tsuzuri/tsuzuri-test.html');
+    assert.equal(card.querySelector('img').getAttribute('src'),'https://example.com/hero.jpg');
+    assert.equal(dom.window.document.getElementById('latestTsuzuriEmpty').hidden,true);
+  } finally {dom.window.close();}
+  for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
+});
+
+
+test('studio video edits replace existing cards and preserve the selected thumbnail; new TSUZURI articles appear', async () => {
+  const baseline=await page('contents.html','contents.js',[]);
+  const videoCount=baseline.window.document.querySelectorAll('#contentGrid .content-card-video').length;baseline.window.close();
+  const dom=await page('contents.html','contents.js',[
+    {id:'video-edit',status:'published',content_type:'video',title:'更新された動画',media_url:'https://www.youtube.com/watch?v=8ubAUePSwY8',source_type:'video',source_id:'8ubAUePSwY8',hero_url:'https://example.com/custom.jpg'},
+    {id:'new-column',slug:'new-column',status:'published',content_type:'column',title:'追加したつづり',excerpt:'つづり概要'},
+    {id:'draft-video',status:'draft',content_type:'video',title:'未公開動画',media_url:'https://youtu.be/draft123456'},
+  ]);
+  try {
+    const d=dom.window.document;
+    const cards=[...d.querySelectorAll('#contentGrid .content-card-video')];
+    const edited=cards.filter(card=>card.textContent.includes('更新された動画'));
+    assert.equal(cards.length,videoCount);assert.equal(edited.length,1);
+    assert.equal(edited[0].querySelector('img').src,'https://example.com/custom.jpg');
+    assert.match(d.body.textContent,/追加したつづり/);assert.doesNotMatch(d.body.textContent,/未公開動画/);
+    edited[0].querySelector('button').click();
+    assert.ok([...d.querySelectorAll('iframe')].some(frame=>frame.src.includes('youtube-nocookie.com/embed/8ubAUePSwY8')));
+  } finally {dom.window.close();}
+});

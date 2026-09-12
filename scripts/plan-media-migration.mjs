@@ -3,7 +3,7 @@
 import {readFile,writeFile,readdir} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {JSDOM} from 'jsdom';
-import {sanitizeBody,safeUrl} from '../apps/column-studio-api/src/security.js';
+import {sanitizeBody,safeUrl} from '../apps/tsuzuri-studio-api/src/security.js';
 const [snapshotFile,publicDirectory,outputFile]=process.argv.slice(2);
 if(!snapshotFile||!publicDirectory||!outputFile)throw new Error('Usage: node scripts/plan-media-migration.mjs snapshot.json published-json-directory /private/tmp/media-plan.sql');
 const output=resolve(outputFile),root=resolve('.');

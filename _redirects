@@ -1,2 +1,7 @@
 /projects/weekend-ai/* /projects/totonoe/:splat 301
 /projects/weekend-ai /projects/totonoe/ 301
+/apps/column-studio/* /apps/tsuzuri-studio/:splat 301
+/apps/column-studio /apps/tsuzuri-studio/ 301
+/projects/totonoe/columns/* /projects/totonoe/contents.html#tsuzuri 301
+/projects/totonoe/columns /projects/totonoe/contents.html#tsuzuri 301
+/projects/totonoe/contents/studio-display-test-20260912* /projects/totonoe/tsuzuri/studio-display-test-20260912 301

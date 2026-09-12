@@ -1,9 +1,9 @@
 {
   "scripts": {
     "build": "node scripts/build-site.mjs",
-    "test": "npm run build && node --test apps/column-studio-api/*.test.mjs",
-    "check:worker": "wrangler deploy --dry-run --config apps/column-studio-api/wrangler.toml --outdir /private/tmp/column-studio-security-worker",
-    "check:security": "node --test apps/column-studio-api/security.test.mjs",
+    "test": "npm run build && node --test apps/tsuzuri-studio-api/*.test.mjs",
+    "check:worker": "wrangler deploy --dry-run --config apps/tsuzuri-studio-api/wrangler.toml --outdir /private/tmp/tsuzuri-studio-security-worker",
+    "check:security": "node --test apps/tsuzuri-studio-api/security.test.mjs",
     "check:runtime": "node scripts/check-worker-runtime.mjs"
   },
   "dependencies": {

@@ -6,8 +6,18 @@
 |---|---|---|---|
 | TAYORI | たより | Weekly / ToToNoE Weekly / ウィークリー | 必要な情報を受け取り、問いを深める |
 | IROHA | いろは | Curriculum / カリキュラム（旧商品名） | 基礎から学び、自分らしく活かす力を身につける |
+| TSUZURI | つづり | コラム / Column Studio | 考えや実践を読み物として綴り、共有する |
 
-ブランド併記は「ToToNoE+ TAYORI」「ToToNoE+ IROHA」。読みを添える場合は「TAYORI｜たより」「IROHA｜いろは」。会話中の「タイオリー」は別の採用名ではなく、先に確定したTAYORI｜たよりを指す。
+ブランド併記は「ToToNoE+ TAYORI」「ToToNoE+ IROHA」「ToToNoE+ TSUZURI」。読みを添える場合は「TAYORI｜たより」「IROHA｜いろは」「つづり｜TSUZURI」。会話中の「タイオリー」は別の採用名ではなく、先に確定したTAYORI｜たよりを指す。
+
+## TSUZURI
+
+考えや実践を、あとから読み返せる言葉に。
+
+- 記事の公開名称は「つづり｜TSUZURI」
+- 公開URLは `/projects/totonoe/tsuzuri/`
+- 管理画面の公開名称は「TSUZURI Studio」
+- 既存の記事データを維持するため、内部の `content_type: column` とD1・R2の既存リソースIDは互換用識別子として維持する
 
 ## TAYORI
 

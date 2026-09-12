@@ -1,6 +1,6 @@
 /* =========================================================
    週末のAI整え習慣 — コンテンツページ
-   Podcast（stand.fm）／学習資料／コラム／アーカイブ動画を
+   Podcast（stand.fm）／学習資料／つづり｜TSUZURI／アーカイブ動画を
    1つのページにタブでまとめて表示します。
 
    ▼ Podcastを追加するとき
@@ -9,9 +9,8 @@
    ▼ 学習資料を追加するとき
    下の CONTENTS に1件追記するだけです（Googleドライブの共有リンクを貼る）。
 
-   ▼ コラムを追加するとき
-   手動追加分は COLUMNS に残し、Column Studio 公開分は
-   data/contents/index.json から自動で追加します。
+   ▼ つづり｜TSUZURIを追加するとき
+   TSUZURI Studio 公開分を data/contents/index.json から自動で追加します。
    ========================================================= */
 (function () {
   'use strict';
@@ -356,56 +355,31 @@
   var currentTag = 'all';
 
   /* =====================================================
-     コラム
-     ・手動追加分は COLUMNS に残し、Column Studio 公開分は data/contents/index.json から自動で読み込みます
+     つづり｜TSUZURI
+     ・TSUZURI Studio 公開分は data/contents/index.json から自動で読み込みます
      ・image は未指定でもCSSの簡易サムネイルで表示されます
      ===================================================== */
-  var COLUMNS = [
-    {
-      title: '道具を使う前に、仕事をほどく。',
-      desc: '新しい道具を取り入れる前に、本質ではない仕事を見つける視点を整理します。まず業務をほどくことで、本当に整えるべき場所が見えやすくなります。',
-      tags: ['AI活用', '業務整理'],
-      date: '2026-09-04',
-      url: 'columns/ai-yohaku.html',
-      thumb: 'WORK'
-    },
-    {
-      title: '週末の30分を、次の一歩に変える。',
-      desc: '情報を知るだけで終わらせず、整え、置き換え、試すところまで進めるための週末サイクルについてまとめます。',
-      tags: ['週末のAI整え習慣', '学び方'],
-      date: '2026-09-01',
-      url: 'columns/weekend-cycle.html',
-      thumb: '30min'
-    },
-    {
-      title: 'チームで整えると、学びは続きやすい。',
-      desc: '一人で追いかけるAI情報を、チームで見立て直す。専門職同士が学びを続けるための関係性を考えます。',
-      tags: ['チーム', '実践'],
-      date: '2026-08-29',
-      url: 'columns/team-learning.html',
-      thumb: 'TEAM'
-    }
-  ];
+  var TSUZURI_ITEMS = [];
 
-  function mergeGeneratedColumns(items) {
+  function mergeGeneratedTsuzuri(items) {
     var existing = {};
-    COLUMNS.forEach(function (c) { existing[c.url] = true; });
+    TSUZURI_ITEMS.forEach(function (c) { existing[c.url] = true; });
     (items || [])
       .filter(function (item) {
         return item.status === 'published' && (item.content_type || 'column') === 'column';
       })
       .forEach(function (item) {
-        var url = item.url || ('contents/' + item.slug + '.html');
+        var url = item.url || ('tsuzuri/' + item.slug + '.html');
         if (existing[url]) return;
         existing[url] = true;
-        COLUMNS.push({
+        TSUZURI_ITEMS.push({
           title: item.title,
           desc: item.excerpt || item.summary || '',
           tags: item.topic_tags || item.tags || [],
           date: item.published_at || String(item.updated_at || '').slice(0, 10),
           url: url,
           image: item.hero_url || '',
-          thumb: 'COLUMN',
+          thumb: 'TSUZURI',
           mainActor: item.main_actor && item.main_actor.name ? item.main_actor.name : '',
           speakers: (item.speakers || []).map(function (person) { return person.name; })
         });
@@ -448,16 +422,14 @@
   }
 
   function mergeGeneratedLibrary(items) {
-    var existing = {};
-    CONTENTS.forEach(function (content) { if (content.youtubeId) existing[content.youtubeId] = true; if (content.url) existing[content.url] = true; });
     (items || []).filter(function (item) {
       return item.status === 'published' && ['video', 'learning'].indexOf(item.content_type) > -1 && item.media_url;
     }).forEach(function (item) {
       var sourceId = /^[A-Za-z0-9_-]{1,200}$/.test(item.source_id || '') ? item.source_id : '';
-      if ((sourceId && existing[sourceId]) || existing[item.media_url]) return;
-      if (sourceId) existing[sourceId] = true;
-      existing[item.media_url] = true;
+      var index = CONTENTS.findIndex(function (content) { return (item.id && content.id === item.id) || (sourceId && content.youtubeId === sourceId) || content.url === item.media_url; });
       var content = {
+        id: item.id,
+        image: item.hero_url || '',
         title: item.title,
         desc: item.excerpt || '',
         tags: item.topic_tags || item.tags || [],
@@ -467,7 +439,8 @@
         source: item.external_link && item.external_link.provider ? item.external_link.provider : ''
       };
       if (item.source_type === 'video' && sourceId) content.youtubeId = sourceId;
-      CONTENTS.push(content);
+      if (index < 0) CONTENTS.push(content);
+      else CONTENTS[index] = content;
     });
   }
 
@@ -498,12 +471,12 @@
       .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
       .then(function (data) {
         var items = data.articles || [];
-        mergeGeneratedColumns(items);
+        mergeGeneratedTsuzuri(items);
         mergeGeneratedPodcast(items);
         mergeGeneratedLibrary(items);
         mergeGeneratedArchives(items);
-        buildColumnFilter();
-        renderColumns();
+        buildTsuzuriFilter();
+        renderTsuzuri();
         renderPodcastRangeButtons();
         renderPodcast();
         buildFilter();
@@ -514,19 +487,19 @@
       .catch(function () {});
   }
 
-  var COLUMN_ORDER_KEY = 'wa_column_order_v1';
-  var columnOrder = (function () {
-    try { return localStorage.getItem(COLUMN_ORDER_KEY) || 'newest'; } catch (e) { return 'newest'; }
+  var TSUZURI_ORDER_KEY = 'wa_tsuzuri_order_v1';
+  var tsuzuriOrder = (function () {
+    try { return localStorage.getItem(TSUZURI_ORDER_KEY) || localStorage.getItem('wa_column_order_v1') || 'newest'; } catch (e) { return 'newest'; }
   })();
-  var columnGrid = document.getElementById('columnGrid');
-  var columnFilterWrap = document.getElementById('columnFilter');
-  var columnCountEl = document.getElementById('columnCount');
-  var currentColumnTag = 'all';
+  var tsuzuriGrid = document.getElementById('tsuzuriGrid');
+  var tsuzuriFilterWrap = document.getElementById('tsuzuriFilter');
+  var tsuzuriCountEl = document.getElementById('tsuzuriCount');
+  var currentTsuzuriTag = 'all';
 
-  function collectColumnTags() {
+  function collectTsuzuriTags() {
     var seen = {};
     var list = [];
-    COLUMNS.forEach(function (c) {
+    TSUZURI_ITEMS.forEach(function (c) {
       (c.tags || []).forEach(function (t) {
         if (!seen[t]) { seen[t] = true; list.push(t); }
       });
@@ -534,61 +507,61 @@
     return list;
   }
 
-  function buildColumnFilter() {
-    if (!columnFilterWrap) return;
-    if (!COLUMNS.length) { columnFilterWrap.hidden = true; return; }
-    var tags = collectColumnTags();
-    if (!tags.length) { columnFilterWrap.hidden = true; return; }
-    columnFilterWrap.hidden = false;
+  function buildTsuzuriFilter() {
+    if (!tsuzuriFilterWrap) return;
+    if (!TSUZURI_ITEMS.length) { tsuzuriFilterWrap.hidden = true; return; }
+    var tags = collectTsuzuriTags();
+    if (!tags.length) { tsuzuriFilterWrap.hidden = true; return; }
+    tsuzuriFilterWrap.hidden = false;
 
-    var html = '<button type="button" class="filter-btn active" data-column-cat="all">すべて</button>';
+    var html = '<button type="button" class="filter-btn active" data-tsuzuri-cat="all">すべて</button>';
     tags.forEach(function (tag) {
-      html += '<button type="button" class="filter-btn" data-column-cat="' + esc(tag) + '">' + esc(tag) + '</button>';
+      html += '<button type="button" class="filter-btn" data-tsuzuri-cat="' + esc(tag) + '">' + esc(tag) + '</button>';
     });
-    columnFilterWrap.innerHTML = html;
+    tsuzuriFilterWrap.innerHTML = html;
 
-    if (!columnFilterWrap.dataset.ready) {
-      columnFilterWrap.dataset.ready = 'true';
-      columnFilterWrap.addEventListener('click', function (e) {
+    if (!tsuzuriFilterWrap.dataset.ready) {
+      tsuzuriFilterWrap.dataset.ready = 'true';
+      tsuzuriFilterWrap.addEventListener('click', function (e) {
         var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
         if (!btn) return;
-        currentColumnTag = btn.dataset.columnCat;
-        columnFilterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
+        currentTsuzuriTag = btn.dataset.tsuzuriCat;
+        tsuzuriFilterWrap.querySelectorAll('.filter-btn').forEach(function (b) {
           b.classList.toggle('active', b === btn);
         });
-        renderColumns();
+        renderTsuzuri();
       });
     }
   }
 
-  function initColumnSort() {
-    var btns = document.querySelectorAll('[data-column-order]');
+  function initTsuzuriSort() {
+    var btns = document.querySelectorAll('[data-tsuzuri-order]');
     if (!btns.length) return;
     btns.forEach(function (b) {
       b.addEventListener('click', function () {
-        columnOrder = b.dataset.columnOrder;
-        try { localStorage.setItem(COLUMN_ORDER_KEY, columnOrder); } catch (e) {}
-        renderColumns();
+        tsuzuriOrder = b.dataset.tsuzuriOrder;
+        try { localStorage.setItem(TSUZURI_ORDER_KEY, tsuzuriOrder); } catch (e) {}
+        renderTsuzuri();
       });
     });
   }
 
-  function renderColumns() {
-    if (!columnGrid) return;
-    document.querySelectorAll('[data-column-order]').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.columnOrder === columnOrder);
+  function renderTsuzuri() {
+    if (!tsuzuriGrid) return;
+    document.querySelectorAll('[data-tsuzuri-order]').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.tsuzuriOrder === tsuzuriOrder);
     });
 
-    var list = COLUMNS.slice().sort(function (a, b) {
+    var list = TSUZURI_ITEMS.slice().sort(function (a, b) {
       var diff = new Date(a.date) - new Date(b.date);
-      return columnOrder === 'oldest' ? diff : -diff;
+      return tsuzuriOrder === 'oldest' ? diff : -diff;
     });
-    if (currentColumnTag !== 'all') {
-      list = list.filter(function (c) { return (c.tags || []).indexOf(currentColumnTag) !== -1; });
+    if (currentTsuzuriTag !== 'all') {
+      list = list.filter(function (c) { return (c.tags || []).indexOf(currentTsuzuriTag) !== -1; });
     }
-    if (columnCountEl) columnCountEl.textContent = '全' + list.length + '件';
+    if (tsuzuriCountEl) tsuzuriCountEl.textContent = '全' + list.length + '件';
 
-    columnGrid.innerHTML = '';
+    tsuzuriGrid.innerHTML = '';
     list.forEach(function (c, i) {
       var tagChips = (c.tags || []).map(function (t) {
         return '<span class="content-cat">' + esc(t) + '</span>';
@@ -599,7 +572,7 @@
         '<a class="content-card-thumb column-thumb" href="' + esc(c.url) + '">' +
           (c.image
             ? '<img src="' + esc(c.image) + '" alt="' + esc(c.title) + '" loading="lazy" decoding="async">'
-            : '<span class="column-thumb-art column-thumb-art-0' + ((i % 3) + 1) + '"><span>' + esc(c.thumb || 'COLUMN') + '</span></span>') +
+            : '<span class="column-thumb-art column-thumb-art-0' + ((i % 3) + 1) + '"><span>' + esc(c.thumb || 'TSUZURI') + '</span></span>') +
         '</a>' +
         '<div class="content-card-body">' +
           '<div class="content-head">' + tagChips + '</div>' +
@@ -608,7 +581,7 @@
           '<p class="content-meta"><span>' + formatDate(c.date) + '</span></p>' +
           '<a class="content-link" href="' + esc(c.url) + '">続きを読む</a>' +
         '</div>';
-      columnGrid.appendChild(card);
+      tsuzuriGrid.appendChild(card);
     });
   }
 
@@ -1038,7 +1011,7 @@
         // カード面はサムネイル・タイトル・概要（2文程度）のみを表示
         card.innerHTML =
           '<button type="button" class="content-card-thumb" aria-label="' + esc(c.title) + 'を再生">' +
-            '<img src="' + esc(ytThumbUrl(c.youtubeId)) + '" alt="' + esc(c.title) + '" loading="lazy">' +
+            '<img src="' + esc(c.image || ytThumbUrl(c.youtubeId)) + '" alt="' + esc(c.title) + '" loading="lazy">' +
             '<span class="content-play-badge">▶ 動画を見る</span>' +
           '</button>' +
           '<div class="content-card-body">' +
@@ -1079,9 +1052,9 @@
   buildFilter();
   renderLibrary();
 
-  initColumnSort();
-  buildColumnFilter();
-  renderColumns();
+  initTsuzuriSort();
+  buildTsuzuriFilter();
+  renderTsuzuri();
   loadGeneratedContent();
 
   initArchiveRanges();

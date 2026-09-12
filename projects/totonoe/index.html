@@ -49,7 +49,7 @@
           <a href="contents.html#seminars">セミナー</a>
           <a href="contents.html#podcast">ポッドキャスト</a>
           <a href="contents.html#library">学習コンテンツ</a>
-          <a href="contents.html#columns">コラム</a>
+          <a href="contents.html#tsuzuri">つづり｜TSUZURI</a>
           <a href="contents.html#archive">アーカイブ動画</a>
         </div>
       </div>
@@ -90,7 +90,7 @@
         <button type="button" class="latest-tab active" id="latestTabSeminar" role="tab" aria-selected="true" aria-controls="latestPanelSeminar" data-latest-tab="seminar">セミナー</button>
         <button type="button" class="latest-tab" id="latestTabPodcast" role="tab" aria-selected="false" aria-controls="latestPanelPodcast" data-latest-tab="podcast">ポッドキャスト</button>
         <button type="button" class="latest-tab" id="latestTabLibrary" role="tab" aria-selected="false" aria-controls="latestPanelLibrary" data-latest-tab="library">学習コンテンツ</button>
-        <button type="button" class="latest-tab" id="latestTabColumns" role="tab" aria-selected="false" aria-controls="latestPanelColumns" data-latest-tab="columns">コラム</button>
+        <button type="button" class="latest-tab" id="latestTabTsuzuri" role="tab" aria-selected="false" aria-controls="latestPanelTsuzuri" data-latest-tab="tsuzuri">つづり｜TSUZURI</button>
       </div>
 
       <div class="latest-visual-groups">
@@ -187,34 +187,13 @@
           </div>
         </section>
 
-        <section class="latest-visual-group" id="latestPanelColumns" role="tabpanel" aria-labelledby="latestTabColumns" data-latest-panel="columns" hidden>
+        <section class="latest-visual-group" id="latestPanelTsuzuri" role="tabpanel" aria-labelledby="latestTabTsuzuri" data-latest-panel="tsuzuri" hidden>
           <div class="latest-group-head">
-            <h3 id="latestColumnsTitle">コラム</h3>
-            <a href="contents.html#columns">一覧へ</a>
+            <h3 id="latestTsuzuriTitle">つづり｜TSUZURI</h3>
+            <a href="contents.html#tsuzuri">一覧へ</a>
           </div>
-          <div class="latest-card-grid" data-auto-scroll>
-            <a class="latest-visual-card latest-column-card" href="columns/ai-yohaku.html">
-              <span class="column-thumb-art column-thumb-art-01" aria-hidden="true">
-                <span>WORK</span>
-              </span>
-              <span class="peek-date">2026.09.04 / コラム</span>
-              <strong>道具を使う前に、仕事をほどく。</strong>
-            </a>
-            <a class="latest-visual-card latest-column-card" href="columns/weekend-cycle.html">
-              <span class="column-thumb-art column-thumb-art-02" aria-hidden="true">
-                <span>30min</span>
-              </span>
-              <span class="peek-date">2026.09.01 / コラム</span>
-              <strong>週末の30分を、次の一歩に変える。</strong>
-            </a>
-            <a class="latest-visual-card latest-column-card" href="columns/team-learning.html">
-              <span class="column-thumb-art column-thumb-art-03" aria-hidden="true">
-                <span>TEAM</span>
-              </span>
-              <span class="peek-date">2026.08.29 / コラム</span>
-              <strong>チームで整えると、学びは続きやすい。</strong>
-            </a>
-          </div>
+          <div class="latest-card-grid" id="latestTsuzuriGrid" data-auto-scroll></div>
+          <p class="content-empty" id="latestTsuzuriEmpty">公開中のつづりはまだありません。</p>
         </section>
       </div>
     </div>
@@ -269,5 +248,6 @@
 <script src="common.js?v=20260905a"></script>
 <script src="home.js?v=20260904a"></script>
   <script src="latest-podcast.js?v=20260912-ep16"></script>
+  <script src="latest-tsuzuri.js?v=20260912a"></script>
 </body>
 </html>

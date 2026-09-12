@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>TSUZURI Studio — ToToNoE+</title>
+  <meta name="description" content="ToToNoE+のつづり｜TSUZURIと動画コンテンツを編集・公開するダッシュボード">
+  <link rel="icon" href="../../images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260912-tayori-sync">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="../../projects/totonoe/assets/totonoe-logo.png" alt="ToToNoE+">
+        <span>TSUZURI Studio</span>
+      </div>
+      <button class="new-post-button" type="button" data-action="new-post">
+        <span aria-hidden="true">＋</span> 新しいコンテンツ
+      </button>
+      <nav class="side-nav" aria-label="管理メニュー">
+        <button class="nav-item active" type="button" data-view="dashboard">
+          <span class="nav-icon" aria-hidden="true">⌂</span><span>ホーム</span>
+        </button>
+        <div class="nav-label">コンテンツ</div>
+        <button class="nav-item" type="button" data-content-view="all">
+          <span class="nav-icon" aria-hidden="true">▤</span><span>すべて</span><span class="nav-count" id="postNavCount">3</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="column">
+          <span class="nav-icon" aria-hidden="true">✎</span><span>つづり｜TSUZURI</span><span class="nav-count" id="tsuzuriNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="video">
+          <span class="nav-icon" aria-hidden="true">▶</span><span>動画</span><span class="nav-count" id="videoNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="editor">
+          <span class="nav-icon" aria-hidden="true">＋</span><span>新規作成</span>
+        </button>
+        <div class="nav-label">管理</div>
+        <button class="nav-item admin-only" type="button" data-view="members">
+          <span class="nav-icon" aria-hidden="true">♙</span><span>メンバー・権限</span>
+        </button>
+        <button class="nav-item admin-only" type="button" data-view="qualifications">
+          <span class="nav-icon" aria-hidden="true">✓</span><span>資格審査</span><span class="nav-count" id="qualificationNavCount">0</span>
+        </button>
+        <button class="nav-item admin-only" type="button" data-view="settings">
+          <span class="nav-icon" aria-hidden="true">⚙</span><span>公開設定</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="workspace-mark">BC</div>
+        <div><strong>ToToNoE+</strong><span>管理ワークスペース</span></div>
+      </div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" type="button" aria-label="メニューを開く">☰</button>
+        <div class="breadcrumb" id="breadcrumb"><span>TSUZURI Studio</span><b>/</b> ホーム</div>
+        <div class="top-actions">
+          <span class="save-state"><i></i><span id="saveState">すべて保存済み</span></span>
+          <button class="site-link" type="button" data-action="open-site">サイトを見る ↗</button>
+          <button class="account-button" id="accountButton" type="button" aria-haspopup="true" aria-expanded="false">
+            <span class="account-avatar">KS</span>
+            <span class="account-copy"><strong>管理者</strong><small id="currentRoleLabel">Administrator</small></span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="account-menu" id="accountMenu">
+            <p>権限表示を確認</p>
+            <button type="button" data-role-preview="admin">管理者として表示</button>
+            <button type="button" data-role-preview="editor">編集者として表示</button>
+            <button type="button" data-role-preview="viewer">閲覧者として表示</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-dashboard" data-title="ホーム">
+        <div class="page-wrap dashboard-wrap">
+          <div class="welcome-row">
+            <div>
+              <p class="eyebrow">TSUZURI STUDIO</p>
+              <h1>言葉を、届くかたちに。</h1>
+              <p>つづり｜TSUZURI・動画リンクを整えて、そのままToToNoE+へ。むずかしい操作なしでコンテンツを育てられます。</p>
+            </div>
+            <button class="primary-button" type="button" data-action="new-post">＋ 作成する</button>
+          </div>
+          <div class="status-grid">
+            <article class="status-card"><span>公開中</span><strong id="publishedCount">1</strong><small>本の記事</small><i class="status-accent green"></i></article>
+            <article class="status-card"><span>下書き</span><strong id="draftCount">2</strong><small>本の記事</small><i class="status-accent terra"></i></article>
+            <article class="status-card"><span>今月の更新</span><strong id="monthCount">3</strong><small>本</small><i class="status-accent blue"></i></article>
+            <article class="status-card"><span>チーム</span><strong id="memberCount">3</strong><small>人</small><i class="status-accent gold"></i></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel recent-panel">
+              <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコンテンツ</h2></div><button type="button" class="text-button" data-content-view="all">すべて見る →</button></div>
+              <div id="recentPosts" class="recent-list"></div>
+            </section>
+            <aside class="dashboard-aside">
+              <section class="panel quick-panel">
+                <p class="eyebrow">QUICK START</p><h2>何から始めますか？</h2>
+                <button type="button" data-action="new-post"><span>✎</span><div><strong>まっさらな記事を書く</strong><small>自由に文章を組み立てる</small></div><b>›</b></button>
+                <button type="button" data-action="new-template"><span>▦</span><div><strong>型から書き始める</strong><small>導入・本題・まとめを自動準備</small></div><b>›</b></button>
+              </section>
+              <section class="tip-card"><span>編集のヒント</span><p>文章を選択して、ツールバーの「マーカー」や「太字」を押すだけで装飾できます。</p></section>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-posts" data-title="コンテンツ">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">つづり｜TSUZURI・動画コンテンツを管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
+          <div class="list-toolbar">
+            <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
+            <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button><button type="button" data-filter="archived">非公開</button><button type="button" data-filter="trash">ゴミ箱</button></div>
+          </div>
+          <p class="trash-retention-note" id="trashRetentionNote" hidden>ゴミ箱の記事は30日間保存され、期限後に記事・履歴・画像が完全削除されます。</p>
+          <div class="panel table-panel"><div class="post-table-head"><span>タイトル</span><span>コンテンツ種別</span><span>ステータス</span><span>更新日</span><span></span></div><div id="postTable"></div></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-editor" data-title="つづり｜TSUZURIを編集">
+        <div class="editor-shell">
+          <div class="editor-topline">
+            <button class="back-button" type="button" data-view="posts">← 一覧へ</button>
+            <div class="editor-actions">
+              <button class="secondary-button" type="button" data-action="preview">プレビュー</button>
+              <button class="secondary-button" type="button" data-action="save-draft">下書き保存</button>
+              <button class="primary-button" type="button" data-action="publish">公開する</button>
+            </div>
+          </div>
+          <div class="editor-layout">
+            <article class="editor-paper">
+              <section class="link-intake" aria-labelledby="linkIntakeTitle">
+                <div class="link-intake-copy">
+                  <span class="link-step">STEP 1</span>
+                  <div><strong id="linkIntakeTitle">元コンテンツのURLを貼り付け</strong><small>note・YouTube・セミナーURLを自動判定します。</small></div>
+                </div>
+                <div class="link-input-row">
+                  <input id="postMediaUrl" type="url" inputmode="url" autocomplete="url" aria-label="元コンテンツURL" placeholder="https://note.com/...">
+                  <button class="secondary-button" id="analyzeLinkButton" type="button" data-action="analyze-link">情報を取得</button>
+                </div>
+                <p class="link-status" id="linkStatus" role="status">本文を直接書く場合は、URLなしでも作成できます。</p>
+                <article class="link-preview-card" id="linkPreviewCard" hidden>
+                  <div class="link-preview-image" id="linkPreviewImage" aria-hidden="true"></div>
+                  <div class="link-preview-copy">
+                    <div class="link-preview-meta"><span id="linkPreviewProvider"></span><span id="linkPreviewTarget"></span></div>
+                    <strong id="linkPreviewTitle"></strong>
+                    <p id="linkPreviewDescription"></p>
+                  </div>
+                </article>
+              </section>
+              <input class="title-input" id="postTitle" type="text" aria-label="タイトル" placeholder="記事のタイトルを入力">
+              <input class="lead-input" id="postExcerpt" type="text" aria-label="紹介文" placeholder="この記事をひとことで紹介すると…">
+              <div class="format-toolbar" id="formatToolbar" role="toolbar" aria-label="文章の装飾">
+                <select id="blockFormat" aria-label="文字スタイル"><option value="p">本文</option><option value="h2">見出し2</option><option value="h3">見出し3</option></select>
+                <span class="tool-divider"></span>
+                <button type="button" data-command="bold" aria-label="太字"><b>B</b></button>
+                <button type="button" data-command="underline" aria-label="下線"><u>U</u></button>
+                <button type="button" data-command="marker" class="marker-button" aria-label="マーカー">M</button>
+                <span class="tool-divider"></span>
+                <button type="button" data-command="insertUnorderedList" aria-label="箇条書き">☷</button>
+                <button type="button" data-command="insertOrderedList" aria-label="番号付きリスト">☰</button>
+                <button type="button" data-command="blockquote" aria-label="引用">“</button>
+                <button type="button" data-command="link" aria-label="リンク">⌁</button>
+                <span class="tool-divider"></span>
+                <button type="button" class="bubble-tool" data-action="bubble-picker" aria-controls="bubblePicker" aria-expanded="false"><span class="bubble-tool-icon">💬</span><span>キャラクター会話</span></button>
+              </div>
+              <div class="bubble-picker" id="bubblePicker">
+                <div class="bubble-picker-head"><div><strong>会話ブロックを追加</strong><small>話すキャラクターと表情を選びます</small></div><button type="button" data-action="close-bubble" aria-label="閉じる">×</button></div>
+                <p class="bubble-picker-guide">① 本文の挿入したい位置をクリック　② 下から表情を選択　③ 挿入後に会話文を編集</p>
+                <div class="character-group"><p>ミオン</p><div class="reaction-grid">
+                  <button type="button" data-character="mion-standard"><img src="assets/characters/mion-standard.png" alt="ミオン 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="mion-question"><img src="assets/characters/mion-question.png" alt="ミオン 質問"><span>質問</span></button>
+                  <button type="button" data-character="mion-thinking"><img src="assets/characters/mion-thinking.png" alt="ミオン 考える"><span>考える</span></button>
+                  <button type="button" data-character="mion-insight"><img src="assets/characters/mion-insight.png" alt="ミオン 気づき"><span>気づき</span></button>
+                  <button type="button" data-character="mion-cautious"><img src="assets/characters/mion-cautious.png" alt="ミオン 慎重"><span>慎重</span></button>
+                </div></div>
+                <div class="character-group"><p>ツグモ</p><div class="reaction-grid">
+                  <button type="button" data-character="tsugumo-standard"><img src="assets/characters/tsugumo-standard.png" alt="ツグモ 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="tsugumo-question"><img src="assets/characters/tsugumo-question.png" alt="ツグモ 疑問"><span>疑問</span></button>
+                  <button type="button" data-character="tsugumo-organization"><img src="assets/characters/tsugumo-organization.png" alt="ツグモ 組織視点"><span>組織視点</span></button>
+                  <button type="button" data-character="tsugumo-proposal"><img src="assets/characters/tsugumo-proposal.png" alt="ツグモ 提案"><span>提案</span></button>
+                  <button type="button" data-character="tsugumo-discovery"><img src="assets/characters/tsugumo-discovery.png" alt="ツグモ 発見"><span>発見</span></button>
+                </div></div>
+                <div class="character-group"><p>ハクト</p><div class="reaction-grid">
+                  <button type="button" data-character="hakuto-standard"><img src="assets/characters/hakuto-standard.png" alt="ハクト 標準会話"><span>標準会話</span></button>
+                  <button type="button" data-character="hakuto-thinking"><img src="assets/characters/hakuto-thinking.png" alt="ハクト 本質を探る"><span>本質を探る</span></button>
+                  <button type="button" data-character="hakuto-question"><img src="assets/characters/hakuto-question.png" alt="ハクト 問いかけ"><span>問いかけ</span></button>
+                  <button type="button" data-character="hakuto-insight"><img src="assets/characters/hakuto-insight.png" alt="ハクト まとめる"><span>まとめる</span></button>
+                  <button type="button" data-character="hakuto-watch"><img src="assets/characters/hakuto-watch.png" alt="ハクト 見守る"><span>見守る</span></button>
+                </div></div>
+              </div>
+              <div class="article-editor" id="articleEditor" contenteditable="true" spellcheck="true" data-placeholder="ここから本文を書き始めます。Enterで段落を追加できます。"></div>
+              <div class="word-count"><span id="wordCount">0文字</span><span>最終保存 <time id="lastSaved">—</time></span></div>
+            </article>
+            <aside class="editor-settings">
+              <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
+              <div class="setting-content active" id="setting-post">
+                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ コンテンツ</option></select></label>
+                <label>コンテンツ種別<select id="postContentType"><option value="column">つづり｜TSUZURI</option><option value="video">動画コンテンツ</option><option value="seminar">セミナー</option><option value="learning">学習コンテンツ</option><option value="weekend">週末のAI整え習慣</option></select></label>
+                <input id="postCategory" type="hidden" value="content">
+                <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
+                <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">コンテンツの登壇者や対話者を複数選択できます。</small></div>
+                <div class="setting-field topic-tag-field"><label for="postTags">Topic Tag</label><input id="postTags" type="text" placeholder="候補を選ぶか、カンマ区切りで入力"><small class="field-help">現在のToToNoE+で使用中のタグから選べます。独自タグも入力でき、更新履歴に残ります。</small><div class="topic-tag-suggestions" id="topicTagSuggestions" aria-label="使用中のトピックタグ"></div></div>
+                <div class="source-detail-grid" id="sourceDetailFields" hidden><label>第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="16"></label><label>開催日・公開日<input id="postSourceDate" type="date"></label></div>
+                <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
+                <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
+                <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
+                <div class="setting-block"><span>アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small>推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
+              </div>
+              <div class="setting-content" id="setting-style">
+                <label>マーカー色<select id="markerColor"><option value="#fff0a8">やわらかい黄</option><option value="#dcefe8">セージ</option><option value="#f8ddd3">テラコッタ</option><option value="#dfe8f7">ブルー</option></select></label>
+                <label>本文の幅<select><option>標準（読みやすい）</option><option>広め</option><option>コンパクト</option></select></label>
+                <p class="setting-note">公開ページではホームページのフォントと余白に自動で揃います。</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-members" data-title="メンバー・権限">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを登録</button></div>
+          <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事の公開、メンバー、公開設定を管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成・編集ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
+          <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
+          <p class="security-note">🔒 ここではTSUZURI Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-qualifications" data-title="資格審査">
+        <div class="page-wrap">
+          <div class="page-heading"><div><p class="eyebrow">THERAPIST VERIFICATION</p><h1>資格審査</h1><p>セラピスト限定価格を利用する申請者の資格証明画像を確認します。</p></div><button class="secondary-button" type="button" data-action="refresh-qualifications">更新</button></div>
+          <p class="security-note">🔒 画像は非公開R2に保存され、管理者だけが閲覧できます。審査完了から30日後に画像を削除し、確認結果だけを保持します。</p>
+          <div class="qualification-admin-list" id="qualificationAdminList"><div class="empty-state">申請情報を読み込んでいます。</div></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings" data-title="公開設定">
+        <div class="page-wrap narrow-wrap">
+          <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コンテンツの公開先とURLのルールを設定します。</p></div></div>
+          <section class="panel settings-panel">
+            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コンテンツのURL<input value="https://basecraftas.com/projects/totonoe/contents/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
+          </section>
+          <section class="panel settings-panel admin-only weekly-sync-panel">
+            <h2>TAYORI連携</h2>
+            <p>Google Driveの配布資料・回答動画と、優先質問管理表を今すぐ同期します。自動同期は1時間ごとにも実行されます。</p>
+            <div class="settings-actions"><button class="secondary-button" type="button" data-action="sync-weekly">今すぐ同期</button></div>
+            <p class="weekly-sync-status" id="weeklySyncStatus" role="status">まだ手動同期していません。</p>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="preview-dialog" id="previewDialog">
+    <div class="preview-bar"><div><span></span><b>記事プレビュー</b><small>公開前の見え方</small></div><button type="button" data-action="close-preview">×</button></div>
+    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　Speaker：<span id="previewSpeakers">—</span>　／　<span id="previewDate"></span></div><p class="preview-media" id="previewMediaUrl"></p><div class="preview-body" id="previewBody"></div></article>
+  </dialog>
+
+  <dialog class="invite-dialog" id="inviteDialog">
+    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>登録後、Cloudflare Accessでも同じメールアドレスを許可するとログインできます。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
+  <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
+  <script src="security.js?v=20260911"></script>
+  <script src="script.js?v=20260912-tayori-sync"></script>
+</body>
+</html>

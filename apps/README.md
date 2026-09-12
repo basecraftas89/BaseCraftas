@@ -18,4 +18,4 @@ in `projects/`.
 
 ## Available apps
 
-- `column-studio/`: WordPress-like column editor and editorial dashboard prototype
+- `tsuzuri-studio/`: つづり｜TSUZURIと動画コンテンツの編集・公開ダッシュボード
