@@ -320,6 +320,7 @@ function externalLinkLabel(contentType, url) {
 function publicSection(contentType) {
   if (contentType === "podcast") return { href: "../weekend-ai.html#podcast", label: "ポッドキャスト" };
   if (contentType === "archive") return { href: "../weekend-ai.html#archive", label: "アーカイブ動画" };
+  if (contentType === "weekend") return { href: "../weekend-ai.html#schedule", label: "週末のAI整え習慣・次回開催" };
   if (contentType === "seminar") return { href: "../index.html#latest", label: "セミナー" };
   if (["video", "learning"].includes(contentType)) return { href: "../tsumami/", label: "つまみ｜TSUMAMI" };
   return { href: "../tsuzuri/", label: "つづり｜TSUZURI" };
@@ -470,6 +471,12 @@ function articleJson(article, publishedAt, linkPreview = null) {
   const sourceType = article.source_type || (linkPreview && linkPreview.kind) || externalLinkKind(article.media_url);
   const sourceId = safeSourceId(article.source_id || (linkPreview && linkPreview.source_id) || sourceProfile(article.media_url).source_id);
   const publicDirectory = publicArticleDirectory(contentType);
+  const publicUrl = contentType === "weekend"
+    ? "../weekend-ai.html#schedule"
+    : `${publicDirectory}/${article.slug}.html`;
+  const absoluteUrl = contentType === "weekend"
+    ? "https://basecraftas.com/projects/totonoe/weekend-ai.html#schedule"
+    : `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}.html`;
   return {
     id: article.id,
     revision: article.revision || 1,
@@ -503,8 +510,8 @@ function articleJson(article, publishedAt, linkPreview = null) {
     hero_url: heroUrl,
     body_html: normalizePublishedBody(article.body_html),
     status: "published",
-    url: `${publicDirectory}/${article.slug}.html`,
-    absolute_url: `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}.html`,
+    url: publicUrl,
+    absolute_url: absoluteUrl,
     published_at: publishedAt,
     updated_at: new Date().toISOString(),
   };
@@ -914,6 +921,29 @@ async function listArticles(env) {
   }));
 }
 
+async function publicWeekendEvent(env) {
+  const event = await env.DB.prepare(
+    `SELECT title, excerpt, media_url, source_published_at, hero_url, updated_at
+       FROM articles
+      WHERE content_type = 'weekend'
+        AND status = 'published'
+        AND deleted_at IS NULL
+        AND hero_url != ''
+        AND source_published_at >= date('now', '+9 hours')
+      ORDER BY source_published_at ASC, updated_at DESC
+      LIMIT 1`
+  ).first();
+  if (!event) return json({ event: null }, { headers: { "cache-control": "no-store" } });
+  return json({ event: {
+    title: String(event.title || "").slice(0, 300),
+    excerpt: String(event.excerpt || "").slice(0, 1000),
+    media_url: safeUrl(event.media_url),
+    source_published_at: String(event.source_published_at || "").slice(0, 10),
+    hero_url: safeUrl(event.hero_url, true),
+    updated_at: event.updated_at,
+  } }, { headers: { "cache-control": "no-store" } });
+}
+
 async function createArticle(request, env) {
   const auth = await requireRole(request, env, ["admin", "editor"]);
   if (auth.error) return auth.error;
@@ -1113,6 +1143,15 @@ async function enqueuePublish(request, env, id) {
   }
   if (["podcast", "video", "archive", "seminar"].includes(normalizeContentType(article.content_type)) && !article.media_url) {
     return json({ error: "media_url_required", message: "このコンテンツ種別は元コンテンツURLが必要です。" }, { status: 400 });
+  }
+  if (normalizeContentType(article.content_type) === "weekend") {
+    const todayInJapan = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(article.source_published_at || "") || article.source_published_at < todayInJapan) {
+      return json({ error: "future_event_date_required", message: "本日以降の開催日を入力してください。" }, { status: 400 });
+    }
+    if (!safeUrl(article.hero_url, true)) {
+      return json({ error: "event_thumbnail_required", message: "次回開催のサムネイル画像を設定してください。" }, { status: 400 });
+    }
   }
 
   const lease = Date.now() + 300000;
@@ -2940,6 +2979,7 @@ const worker = {
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204 });
     if (path === "/api/health") return json({ ok: true, service: "tsuzuri-studio-api" });
+    if (path === "/api/public/weekend-event" && request.method === "GET") return publicWeekendEvent(env);
 
     if (path === "/api/me") {
       const email = await getActorEmail(request, env);

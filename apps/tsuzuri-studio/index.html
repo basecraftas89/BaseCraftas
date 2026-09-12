@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>TSUZURI Studio — ToToNoE+</title>
-  <meta name="description" content="ToToNoE+のつづり｜TSUZURIと動画コンテンツを編集・公開するダッシュボード">
+  <meta name="description" content="ToToNoE+のつづり、動画、次回開催情報を編集・公開するダッシュボード">
   <link rel="icon" href="../../images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260912-tayori-sync">
+  <link rel="stylesheet" href="styles.css?v=20260912-weekend-event">
 </head>
 <body>
   <div class="app-shell">
@@ -35,6 +35,9 @@
         </button>
         <button class="nav-item" type="button" data-content-view="video">
           <span class="nav-icon" aria-hidden="true">▶</span><span>動画</span><span class="nav-count" id="videoNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-content-view="weekend">
+          <span class="nav-icon" aria-hidden="true">☀</span><span>次回開催</span><span class="nav-count" id="weekendNavCount">0</span>
         </button>
         <button class="nav-item" type="button" data-view="editor">
           <span class="nav-icon" aria-hidden="true">＋</span><span>新規作成</span>
@@ -201,16 +204,16 @@
               <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
               <div class="setting-content active" id="setting-post">
                 <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ サービス</option></select></label>
-                <label>コンテンツ種別<select id="postContentType"><option value="column">つづり｜TSUZURI</option><option value="video">つまみ｜TSUMAMI（動画）</option><option value="seminar">セミナー</option><option value="learning">つまみ｜TSUMAMI（資料）</option><option value="weekend">週末のAI整え習慣</option></select></label>
+                <label>コンテンツ種別<select id="postContentType"><option value="column">つづり｜TSUZURI</option><option value="video">つまみ｜TSUMAMI（動画）</option><option value="seminar">セミナー</option><option value="learning">つまみ｜TSUMAMI（資料）</option><option value="weekend">週末のAI整え習慣・次回開催</option></select></label>
                 <input id="postCategory" type="hidden" value="content">
                 <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
                 <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">コンテンツの登壇者や対話者を複数選択できます。</small></div>
                 <div class="setting-field topic-tag-field"><label for="postTags">Topic Tag</label><input id="postTags" type="text" placeholder="候補を選ぶか、カンマ区切りで入力"><small class="field-help">現在のToToNoE+で使用中のタグから選べます。独自タグも入力でき、更新履歴に残ります。</small><div class="topic-tag-suggestions" id="topicTagSuggestions" aria-label="使用中のトピックタグ"></div></div>
-                <div class="source-detail-grid" id="sourceDetailFields" hidden><label>第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="16"></label><label>開催日・公開日<input id="postSourceDate" type="date"></label></div>
+                <div class="source-detail-grid" id="sourceDetailFields" hidden><label id="episodeNoField">第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="16"></label><label><span id="sourceDateLabel">開催日・公開日</span><input id="postSourceDate" type="date"></label></div>
                 <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
                 <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
-                <div class="setting-block"><span>アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small>推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
+                <div class="setting-block"><span id="imageFieldLabel">アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small id="imageFieldHelp">推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
               </div>
               <div class="setting-content" id="setting-style">
                 <label>マーカー色<select id="markerColor"><option value="#fff0a8">やわらかい黄</option><option value="#dcefe8">セージ</option><option value="#f8ddd3">テラコッタ</option><option value="#dfe8f7">ブルー</option></select></label>
@@ -268,6 +271,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260911"></script>
-  <script src="script.js?v=20260912-tayori-sync"></script>
+  <script src="script.js?v=20260912-weekend-event"></script>
 </body>
 </html>

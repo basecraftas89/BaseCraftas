@@ -93,7 +93,18 @@
 <section class="section" id="schedule">
   <div class="container editorial-schedule">
     <h2 class="section-title">次回の開催について</h2>
-    <div><p>毎週土曜 朝6:00〜6:30に開催しています。次回のテーマ・担当者・参加案内は、各領域の申込先でご確認ください。</p><a href="#final" class="editorial-link">領域を選んで開催情報を確認する</a></div>
+    <div>
+      <article class="weekend-next-event" id="weekendNextEvent" hidden aria-live="polite">
+        <figure class="weekend-next-visual"><img id="weekendNextImage" alt="" width="1600" height="900" loading="eager" decoding="async"></figure>
+        <div class="weekend-next-copy">
+          <p class="weekend-next-date" id="weekendNextDate"></p>
+          <h3 id="weekendNextTitle"></h3>
+          <p id="weekendNextExcerpt"></p>
+          <a id="weekendNextLink" class="btn btn-primary" target="_blank" rel="noopener noreferrer" hidden>詳細・申込先を見る</a>
+        </div>
+      </article>
+      <p>毎週土曜 朝6:00〜6:30に開催しています。次回のテーマ・担当者・参加案内は、各領域の申込先でご確認ください。</p><a href="#final" class="editorial-link">領域を選んで開催情報を確認する</a>
+    </div>
   </div>
 </section>
 <section class="section" id="how">
@@ -254,6 +265,7 @@
 <script src="config.js?v=20260908visual"></script>
 <script src="common.js?v=20260905a"></script>
 <script src="weekend-media-tabs.js?v=20260912a"></script>
+<script src="weekend-next-event.js?v=20260912a"></script>
 <script src="service-content.js?v=20260912-service-pages"></script>
 <script src="voices.js?v=20260831b"></script>
 <script src="bgm.js?v=20260905a"></script>

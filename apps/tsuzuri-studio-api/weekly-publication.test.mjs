@@ -76,6 +76,30 @@ test('weekend page switches podcast and member-only archive with accessible butt
   } finally {dom.window.close();}
 });
 
+test('weekend page renders the published next-event thumbnail and safe signup link', async () => {
+  const html=readFileSync('projects/totonoe/weekend-ai.html','utf8');
+  const script=readFileSync('projects/totonoe/weekend-next-event.js','utf8');
+  const dom=new JSDOM(html,{url:'https://basecraftas.com/projects/totonoe/weekend-ai.html',runScripts:'outside-only'});
+  try {
+    dom.window.fetch=async()=>({ok:true,json:async()=>({event:{title:'AIと仕事を整える朝',excerpt:'週末に試すことを一緒に整理します。',source_published_at:'2026-09-19',hero_url:'https://basecraftas.com/column-media/weekend.png',media_url:'https://example.com/apply'}})});
+    dom.window.eval(script);await new Promise(resolve=>setTimeout(resolve,20));
+    const d=dom.window.document,card=d.getElementById('weekendNextEvent');
+    assert.equal(card.hidden,false);assert.match(card.textContent,/AIと仕事を整える朝/);assert.match(card.textContent,/2026年9月19日/);
+    assert.equal(d.getElementById('weekendNextImage').src,'https://basecraftas.com/column-media/weekend.png');
+    assert.equal(d.getElementById('weekendNextLink').href,'https://example.com/apply');assert.equal(d.getElementById('weekendNextLink').hidden,false);
+  } finally {dom.window.close();}
+});
+
+test('weekend page keeps the standard guidance when no upcoming event is published', async () => {
+  const dom=new JSDOM(readFileSync('projects/totonoe/weekend-ai.html','utf8'),{url:'https://basecraftas.com/projects/totonoe/weekend-ai.html',runScripts:'outside-only'});
+  try {
+    dom.window.fetch=async()=>({ok:true,json:async()=>({event:null})});
+    dom.window.eval(readFileSync('projects/totonoe/weekend-next-event.js','utf8'));await new Promise(resolve=>setTimeout(resolve,20));
+    assert.equal(dom.window.document.getElementById('weekendNextEvent').hidden,true);
+    assert.match(dom.window.document.getElementById('schedule').textContent,/毎週土曜 朝6:00/);
+  } finally {dom.window.close();}
+});
+
 test('homepage labels the section as seminars and shows only seminars that have not started', async () => {
   const html=readFileSync('projects/totonoe/index.html','utf8');
   const script=readFileSync('projects/totonoe/home-seminars.js','utf8');

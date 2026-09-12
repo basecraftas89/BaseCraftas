@@ -95,6 +95,31 @@ test('public member route exposes only customer-scoped endpoints',async()=>{
  }
 });
 
+test('public weekend event exposes only the nearest upcoming published card without authentication',async()=>{
+ const f=fixture();
+ const today=new Date(Date.now()+9*60*60*1000);
+ const day=offset=>new Date(today.getTime()+offset*86400000).toISOString().slice(0,10);
+ const past=await f.article({slug:'weekend-past',title:'過去の開催',content_type:'weekend',source_published_at:day(-1),hero_url:'https://basecraftas.com/column-media/past.png'});
+ const next=await f.article({slug:'weekend-next',title:'次回テーマ',excerpt:'次回の紹介',content_type:'weekend',source_published_at:day(3),hero_url:'https://basecraftas.com/column-media/next.png',media_url:'https://example.com/apply'});
+ const later=await f.article({slug:'weekend-later',title:'次々回テーマ',content_type:'weekend',source_published_at:day(10),hero_url:'https://basecraftas.com/column-media/later.png'});
+ f.sql.prepare("UPDATE articles SET status='published' WHERE id IN (?,?,?)").run(past.id,next.id,later.id);
+ const response=await f.call('/api/public/weekend-event','GET',undefined,'');
+ assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+ const body=await response.json();assert.equal(body.event.title,'次回テーマ');assert.equal(body.event.source_published_at,day(3));assert.equal(body.event.hero_url,'https://basecraftas.com/column-media/next.png');
+ assert.deepEqual(Object.keys(body.event).sort(),['excerpt','hero_url','media_url','source_published_at','title','updated_at']);
+});
+
+test('weekend event publication requires a current date and thumbnail',async()=>{
+ const f=fixture(),today=new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
+ const article=await f.article({content_type:'weekend',source_published_at:'2020-01-01'});
+ let response=await f.call('/api/articles/'+article.id+'/publish','POST',{expected_revision:article.revision});
+ assert.equal(response.status,400);assert.equal((await response.json()).error,'future_event_date_required');
+ response=await f.call('/api/articles/'+article.id,'PATCH',{expected_revision:article.revision,source_published_at:today});
+ const updated=(await response.json()).article;
+ response=await f.call('/api/articles/'+article.id+'/publish','POST',{expected_revision:updated.revision});
+ assert.equal(response.status,400);assert.equal((await response.json()).error,'event_thumbnail_required');
+});
+
 test('JSON body bounded without relying on content-length; per-account write limit',async()=>{
  const f=fixture();assert.equal((await f.call('/api/articles','POST',{slug:'large',body_html:'a'.repeat(513*1024)})).status,413);
  for(let i=0;i<59;i++)await f.call('/api/articles','POST',{});
