@@ -89,6 +89,10 @@
 .source-only-editor .topic-tag-suggestions button{padding:7px 10px;font-size:9px}
 .source-only-editor[data-editor-kind="video"] .link-step,.source-only-editor[data-editor-kind="learning"] .link-step{background:#5676a6}
 .source-only-editor[data-editor-kind="podcast"] .link-step{background:var(--terra)}
+.source-only-editor[data-editor-kind="weekend"] .editor-layout{grid-template-columns:minmax(320px,620px);justify-content:center}
+.source-only-editor[data-editor-kind="weekend"] .editor-paper{display:none}
+.source-only-editor[data-editor-kind="weekend"] .editor-settings{padding-top:0}
+.source-only-editor[data-editor-kind="weekend"] [data-action="preview"]{display:none}
 @media(max-width:980px){.source-only-editor .editor-layout{grid-template-columns:1fr}.source-only-editor .editor-paper{min-height:0}.source-only-editor .editor-settings{padding-top:24px}}
 @media(max-width:720px){.source-only-editor .editor-paper{margin:14px 10px;padding:22px}.source-only-editor .link-intake{padding:20px}.source-only-editor .link-intake-copy strong{font-size:16px}}
 

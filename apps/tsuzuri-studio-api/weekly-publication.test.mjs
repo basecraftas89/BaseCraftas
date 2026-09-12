@@ -76,17 +76,17 @@ test('weekend page switches podcast and member-only archive with accessible butt
   } finally {dom.window.close();}
 });
 
-test('weekend page renders the published next-event thumbnail and safe signup link', async () => {
+test('weekend page renders the published next-event thumbnail with the fixed signup link', async () => {
   const html=readFileSync('projects/totonoe/weekend-ai.html','utf8');
   const script=readFileSync('projects/totonoe/weekend-next-event.js','utf8');
   const dom=new JSDOM(html,{url:'https://basecraftas.com/projects/totonoe/weekend-ai.html',runScripts:'outside-only'});
   try {
-    dom.window.fetch=async()=>({ok:true,json:async()=>({event:{title:'AIと仕事を整える朝',excerpt:'週末に試すことを一緒に整理します。',source_published_at:'2026-09-19',hero_url:'https://basecraftas.com/column-media/weekend.png',media_url:'https://example.com/apply'}})});
+    dom.window.fetch=async()=>({ok:true,json:async()=>({event:{hero_url:'https://basecraftas.com/column-media/weekend.png',updated_at:'2026-09-13 00:00:00'}})});
     dom.window.eval(script);await new Promise(resolve=>setTimeout(resolve,20));
     const d=dom.window.document,card=d.getElementById('weekendNextEvent');
-    assert.equal(card.hidden,false);assert.match(card.textContent,/AIと仕事を整える朝/);assert.match(card.textContent,/2026年9月19日/);
+    assert.equal(card.hidden,false);
     assert.equal(d.getElementById('weekendNextImage').src,'https://basecraftas.com/column-media/weekend.png');
-    assert.equal(d.getElementById('weekendNextLink').href,'https://example.com/apply');assert.equal(d.getElementById('weekendNextLink').hidden,false);
+    assert.equal(d.querySelector('.weekend-next-link').href,'https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu');
   } finally {dom.window.close();}
 });
 

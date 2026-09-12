@@ -151,11 +151,12 @@ assert.ok(!w.document.getElementById('postTable').textContent.includes('Podcast�
 t.openContentView('weekend');t.blankPost(false);
 assert.equal(t.els.contentType.value,'weekend');assert.equal(w.document.getElementById('contentListTitle').textContent,'次回開催');
 assert.ok(w.document.getElementById('view-editor').classList.contains('source-only-editor'));
-assert.equal(w.document.getElementById('episodeNoField').classList.contains('source-only-hidden'),true);
-assert.equal(w.document.getElementById('sourceDateLabel').textContent,'開催日');
+assert.equal(w.document.getElementById('sourceDetailFields').classList.contains('source-only-hidden'),true);
+assert.equal(w.document.querySelector('.topic-tag-field').classList.contains('source-only-hidden'),true);
 assert.equal(w.document.getElementById('imageFieldLabel').textContent,'次回開催サムネイル');
-t.els.title.value='今週のAIテーマ';t.els.sourceDate.value='2026-09-19';
-assert.equal(t.collect().slug,'weekend-2026-09-19');
+t.els.title.value='入力しても使わないタイトル';t.els.sourceDate.value='2026-09-19';t.els.mediaUrl.value='https://example.com/unused';
+const weekendPost=t.collect();assert.equal(weekendPost.title,'次回開催');assert.equal(weekendPost.source_published_at,'');assert.equal(weekendPost.media_url,'');assert.match(weekendPost.slug,/^weekend-\d+$/);
+assert.match(readFileSync(resolve(root,'apps/tsuzuri-studio/styles.css'),'utf8'),/data-editor-kind="weekend"[^}]+\.editor-paper\{display:none\}/);
 t.openContentView('video');t.blankPost(false);
 assert.equal(t.els.contentType.value,'video');assert.ok(w.document.getElementById('view-editor').classList.contains('source-only-editor'));
 assert.equal(w.document.getElementById('imageDrop').closest('.setting-block').classList.contains('source-only-hidden'),false);

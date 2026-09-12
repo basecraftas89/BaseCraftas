@@ -962,17 +962,14 @@ body.sem-lock{overflow:hidden}
 }
 .weekend-reason .reason-emph{font-size:1.08rem}
 .weekend-next-event{
-  display:grid;grid-template-columns:minmax(260px,46%) 1fr;gap:clamp(20px,4vw,42px);align-items:center;
-  margin:0 0 28px;padding:clamp(16px,2.5vw,26px);border:1px solid var(--line);border-radius:24px;
-  background:#fff;box-shadow:var(--shadow);
+  margin:0 0 28px;padding:clamp(12px,2vw,20px);border:1px solid var(--line);border-radius:24px;
+  background:#fff;box-shadow:var(--shadow);overflow:hidden;
 }
 .weekend-next-event[hidden]{display:none}
-.weekend-next-visual{margin:0;overflow:hidden;border-radius:18px;background:var(--sky)}
+.weekend-next-link{display:block;border-radius:18px;overflow:hidden}
+.weekend-next-link:focus-visible{outline:4px solid rgba(19,115,160,.32);outline-offset:4px}
+.weekend-next-visual{margin:0;background:var(--sky)}
 .weekend-next-visual img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
-.weekend-next-date{margin:0 0 9px;color:var(--teal-deep);font:900 .88rem/1.5 var(--font-en);letter-spacing:.04em}
-.weekend-next-copy h3{margin:0 0 12px;color:var(--ink);font-size:clamp(1.25rem,2.4vw,1.75rem);line-height:1.5}
-.weekend-next-copy > p:not(.weekend-next-date){margin:0 0 20px;color:var(--ink-soft);line-height:1.85}
-.weekend-next-copy .btn{width:max-content}
 .how-section{background:#fff}
 .who-section,.next-learning{background:linear-gradient(180deg,#F7FAF5,#fff)}
 .scroll-figure img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff}
@@ -1833,8 +1830,8 @@ body.cv-lock{overflow:hidden}
   .section{padding:64px 0}
 }
 @media (max-width:680px){
-  .weekend-next-event{grid-template-columns:1fr;padding:14px;border-radius:18px}
-  .weekend-next-visual{border-radius:13px}
+  .weekend-next-event{padding:8px;border-radius:16px}
+  .weekend-next-link{border-radius:11px}
   .weekend-media-tabs{gap:6px;margin-bottom:34px;padding:5px;border-radius:15px}
   .weekend-media-tab{min-height:48px;padding:8px 10px;font-size:.84rem;border-radius:11px}
   .benefit-grid{grid-template-columns:1fr 1fr}

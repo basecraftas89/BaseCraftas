@@ -927,22 +927,17 @@ async function listArticles(env) {
 
 async function publicWeekendEvent(env) {
   const event = await env.DB.prepare(
-    `SELECT title, excerpt, media_url, source_published_at, hero_url, updated_at
+    `SELECT hero_url, updated_at
        FROM articles
       WHERE content_type = 'weekend'
         AND status = 'published'
         AND deleted_at IS NULL
         AND hero_url != ''
-        AND source_published_at >= date('now', '+9 hours')
-      ORDER BY source_published_at ASC, updated_at DESC
+      ORDER BY updated_at DESC, rowid DESC
       LIMIT 1`
   ).first();
   if (!event) return json({ event: null }, { headers: { "cache-control": "no-store" } });
   return json({ event: {
-    title: String(event.title || "").slice(0, 300),
-    excerpt: String(event.excerpt || "").slice(0, 1000),
-    media_url: safeUrl(event.media_url),
-    source_published_at: String(event.source_published_at || "").slice(0, 10),
     hero_url: safeUrl(event.hero_url, true),
     updated_at: event.updated_at,
   } }, { headers: { "cache-control": "no-store" } });
@@ -1149,10 +1144,6 @@ async function enqueuePublish(request, env, id) {
     return json({ error: "media_url_required", message: "このコンテンツ種別は元コンテンツURLが必要です。" }, { status: 400 });
   }
   if (normalizeContentType(article.content_type) === "weekend") {
-    const todayInJapan = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(article.source_published_at || "") || article.source_published_at < todayInJapan) {
-      return json({ error: "future_event_date_required", message: "本日以降の開催日を入力してください。" }, { status: 400 });
-    }
     if (!safeUrl(article.hero_url, true)) {
       return json({ error: "event_thumbnail_required", message: "次回開催のサムネイル画像を設定してください。" }, { status: 400 });
     }
