@@ -2,8 +2,8 @@
 /projects/weekend-ai /projects/totonoe/ 301
 /apps/column-studio/* /apps/tsuzuri-studio/:splat 301
 /apps/column-studio /apps/tsuzuri-studio/ 301
-/projects/totonoe/columns/* /projects/totonoe/contents.html#tsuzuri 301
-/projects/totonoe/columns /projects/totonoe/contents.html#tsuzuri 301
-/projects/totonoe/library/* /projects/totonoe/contents.html#tsumami 301
-/projects/totonoe/library /projects/totonoe/contents.html#tsumami 301
+/projects/totonoe/columns/* /projects/totonoe/tsuzuri/:splat 301
+/projects/totonoe/columns /projects/totonoe/tsuzuri/ 301
+/projects/totonoe/library/* /projects/totonoe/tsumami/:splat 301
+/projects/totonoe/library /projects/totonoe/tsumami/ 301
 /projects/totonoe/contents/studio-display-test-20260912* /projects/totonoe/tsuzuri/studio-display-test-20260912 301

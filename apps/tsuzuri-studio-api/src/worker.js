@@ -82,7 +82,7 @@ const CONTENT_TYPES = {
   video: "動画",
   archive: "アーカイブ動画",
   seminar: "セミナー",
-  learning: "ツマミ｜TSUMAMI",
+  learning: "つまみ｜TSUMAMI",
   weekend: "週末のAI整え習慣",
 };
 
@@ -268,7 +268,7 @@ function sourceProfile(url) {
       Object.assign(profile, { kind: "podcast", provider: "stand.fm", recommended_content_type: "podcast", public_target: "Podcast", source_id: match ? match[1] : "" });
     } else if (host === "youtu.be" || host === "youtube.com" || host.endsWith(".youtube.com")) {
       match = host === "youtu.be" ? target.pathname.match(/^\/([^/]+)/) : target.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/);
-      Object.assign(profile, { kind: "video", provider: "YouTube", recommended_content_type: "video", public_target: "ツマミ｜TSUMAMI", source_id: (match && match[1]) || target.searchParams.get("v") || "" });
+      Object.assign(profile, { kind: "video", provider: "YouTube", recommended_content_type: "video", public_target: "つまみ｜TSUMAMI", source_id: (match && match[1]) || target.searchParams.get("v") || "" });
     } else if (host === "drive.google.com" || host === "docs.google.com") {
       match = target.pathname.match(/\/(?:file\/d|folders)\/([^/?]+)/);
       Object.assign(profile, { kind: "archive", provider: "Google Drive", recommended_content_type: "archive", public_target: "アーカイブ動画", source_id: (match && match[1]) || target.searchParams.get("id") || "" });
@@ -318,11 +318,11 @@ function externalLinkLabel(contentType, url) {
 }
 
 function publicSection(contentType) {
-  if (contentType === "podcast") return { hash: "podcast", label: "Podcast" };
-  if (contentType === "archive") return { hash: "archive", label: "アーカイブ動画" };
-  if (contentType === "seminar") return { hash: "seminars", label: "セミナー" };
-  if (["video", "learning"].includes(contentType)) return { hash: "tsumami", label: "ツマミ｜TSUMAMI" };
-  return { hash: "tsuzuri", label: "つづり｜TSUZURI" };
+  if (contentType === "podcast") return { href: "../weekend-ai.html#podcast", label: "ポッドキャスト" };
+  if (contentType === "archive") return { href: "../weekend-ai.html#archive", label: "アーカイブ動画" };
+  if (contentType === "seminar") return { href: "../index.html#latest", label: "セミナー" };
+  if (["video", "learning"].includes(contentType)) return { href: "../tsumami/", label: "つまみ｜TSUMAMI" };
+  return { href: "../tsuzuri/", label: "つづり｜TSUZURI" };
 }
 
 async function fetchLinkPreview(url) {
@@ -515,129 +515,13 @@ function contentIndexHtml() {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>コンテンツ｜ToToNoE+</title>
-<meta name="description" content="ToToNoE+のコンテンツ一覧です。">
-<link rel="icon" href="../assets/totonoe-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=20260905g">
-<style>
-.columns-hero{padding:9rem 5rem 4rem;background:var(--sky-2);border-bottom:1px solid var(--line)}
-.columns-wrap{width:min(100% - 40px,1080px);margin:0 auto}
-.columns-hero .eyebrow{font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:.22em;color:var(--teal);font-weight:700}
-.columns-hero h1{margin-top:.8rem;font-size:clamp(2.2rem,4vw,3.5rem)}
-.columns-hero p{margin-top:1rem;max-width:680px;color:var(--ink-soft)}
-.columns-list{padding:4rem 0 5rem}
-.columns-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.3rem}
-.column-card{display:flex;flex-direction:column;min-height:260px;padding:1.5rem;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);transition:transform .18s ease,box-shadow .18s ease}
-.column-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.column-card img{width:100%;aspect-ratio:1.91/1;object-fit:cover;border-radius:10px;margin-bottom:1.1rem;background:var(--mist)}
-.column-card time{font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:.12em;color:var(--teal);font-weight:700}
-.column-card h2{margin-top:.55rem;font-size:1.12rem;line-height:1.55}
-.column-card p{margin-top:.6rem;color:var(--ink-soft);font-size:.88rem;line-height:1.8}
-.column-card .tags{margin-top:auto;padding-top:1.2rem;display:flex;flex-wrap:wrap;gap:.45rem}
-.column-card .tags span{padding:.28rem .55rem;border-radius:999px;background:var(--mist);color:var(--teal);font-size:.72rem}
-.empty-columns{padding:2rem;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink-soft)}
-@media(max-width:900px){.columns-grid{grid-template-columns:1fr 1fr}.columns-hero{padding:7rem 2rem 3rem}}
-@media(max-width:640px){.columns-grid{grid-template-columns:1fr}.columns-wrap{width:min(100% - 32px,1080px)}}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=../index.html#latest">
+<title>移動しています｜ToToNoE+</title>
 </head>
-<body>
-<header class="site-header scrolled" id="siteHeader">
-  <div class="header-inner">
-    <a href="../index.html" class="brand" aria-label="ToToNoE+ トップへ">
-      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
-    </a>
-    <nav class="site-nav" id="siteNav">
-      <a href="../index.html">TOP</a>
-      <a href="../weekend-ai.html">週末のAI整え習慣</a>
-      <div class="nav-dropdown">
-        <a href="../service.html" class="nav-main">サービス</a>
-        <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../TAYORI/">TAYORI｜たより</a>
-          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
-          <a href="../contents.html#tsumami">ツマミ｜TSUMAMI</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="../contents.html#seminars" class="nav-main active">コンテンツ</a>
-        <div class="nav-menu" aria-label="コンテンツメニュー">
-          <a href="../contents.html#seminars">セミナー</a>
-          <a href="../contents.html#podcast">ポッドキャスト</a>
-          <a href="../contents.html#archive">アーカイブ動画</a>
-        </div>
-      </div>
-      <a href="../team.html">チーム</a>
-      <a href="../faq.html">FAQ</a>
-    </nav>
-    <a href="../service.html" class="btn btn-cta header-cta">サービスを見る</a>
-    <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-<main>
-  <section class="columns-hero">
-    <div class="columns-wrap">
-      <p class="eyebrow">CONTENTS</p>
-      <h1>コンテンツ</h1>
-      <p>ToToNoE+のセミナー、Podcast、アーカイブ動画と、つづり｜TSUZURI、ツマミ｜TSUMAMIを整理して掲載します。</p>
-    </div>
-  </section>
-  <section class="columns-list">
-    <div class="columns-wrap">
-      <div class="columns-grid" id="columnsGrid"></div>
-    </div>
-  </section>
-</main>
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <a href="../index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
-        <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
-      </a>
-      <p>本質に向き合い、専門職が大切にしたいことへ戻れる余白をつくるチームプロジェクト。</p>
-    </div>
-    <nav class="footer-nav" aria-label="フッターナビゲーション">
-      <a href="../index.html">TOP</a>
-      <a href="../weekend-ai.html">週末のAI整え習慣</a>
-      <a href="../service.html">サービス</a>
-      <a href="../contents.html#seminars">コンテンツ</a>
-      <a href="../team.html">チーム</a>
-      <a href="../faq.html">FAQ</a>
-    </nav>
-  </div>
-  <div class="footer-base">
-    <span>© 2026 ToToNoE+ / Base Craftas</span>
-    <a href="../privacy.html">プライバシーポリシー</a>
-    <a href="../legal.html">特定商取引法に基づく表記</a>
-    <a href="../cancellation.html">キャンセル・解約ポリシー</a>
-  </div>
-</footer>
-<script src="../common.js?v=20260905a"></script>
-<script>
-(function(){
-  var grid=document.getElementById('columnsGrid');
-  function esc(v){var d=document.createElement('div');d.textContent=v||'';return d.innerHTML;}
-  fetch('../data/contents/index.json',{cache:'no-store'}).then(function(res){return res.json();}).then(function(data){
-    var articles=(data.articles||[]).filter(function(article){return article.status==='published';});
-    if(!articles.length){grid.innerHTML='<div class="empty-columns">公開中のコンテンツはまだありません。</div>';return;}
-    grid.innerHTML=articles.map(function(article){
-      var tags=(article.topic_tags||article.tags||[]).slice(0,3).map(function(tag){return '<span>'+esc(tag)+'</span>';}).join('');
-      return '<a class="column-card" href="'+esc(article.url)+'">'+
-        (article.hero_url?'<img src="'+esc(article.hero_url)+'" alt="">':'')+
-        '<time>'+esc(article.content_type_label||'コンテンツ')+' / '+esc(article.published_at||article.updated_at||'')+'</time>'+
-        '<h2>'+esc(article.title)+'</h2>'+
-        '<p>'+esc(article.excerpt)+'</p>'+
-        '<div class="tags">'+tags+'</div>'+
-      '</a>';
-    }).join('');
-  }).catch(function(){grid.innerHTML='<div class="empty-columns">コンテンツ一覧を読み込めませんでした。</div>';});
-})();
-</script>
-</body>
-</html>
-`;
+<body><p><a href="../index.html#latest">ToToNoE+へ移動する</a></p></body>
+</html>`;
 }
 
 async function githubRequest(env, path, options = {}) {

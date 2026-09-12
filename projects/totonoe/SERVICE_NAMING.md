@@ -4,12 +4,12 @@
 
 | 正式表記 | 読み | 旧名称（検索・照合専用） | 役割 |
 |---|---|---|---|
-| TAYORI | たより | Weekly / ToToNoE Weekly / ウィークリー | 必要な情報を受け取り、問いを深める |
-| IROHA | いろは | Curriculum / カリキュラム（旧商品名） | 基礎から学び、自分らしく活かす力を身につける |
-| TSUZURI | つづり | コラム / Column Studio | 考えや実践を読み物として綴り、共有する |
-| TSUMAMI | ツマミ | 学習コンテンツ / Library | 気になるAIの要点を短い動画や資料で気軽に学ぶ |
+| たより｜TAYORI | たより | Weekly / ToToNoE Weekly / ウィークリー | 必要な情報を受け取り、問いを深める |
+| つづり｜TSUZURI | つづり | コラム / Column Studio | 考えや実践を読み物として綴り、共有する |
+| つまみ｜TSUMAMI | つまみ | 学習コンテンツ / Library | 気になるAIの要点を短い動画や資料で気軽に学ぶ |
+| いろは｜IROHA | いろは | Curriculum / カリキュラム（旧商品名） | 基礎から学び、自分らしく活かす力を身につける |
 
-ブランド併記は「ToToNoE+ TAYORI」「ToToNoE+ IROHA」「ToToNoE+ TSUZURI」「ToToNoE+ TSUMAMI」。読みを添える場合は「TAYORI｜たより」「IROHA｜いろは」「つづり｜TSUZURI」「ツマミ｜TSUMAMI」。会話中の「タイオリー」は別の採用名ではなく、先に確定したTAYORI｜たよりを指す。
+公開表記は、ひらがなを先にして「たより｜TAYORI」「つづり｜TSUZURI」「つまみ｜TSUMAMI」「いろは｜IROHA」に統一する。会話中の「タイオリー」は別の採用名ではなく、たより｜TAYORIを指す。
 
 ## TSUZURI
 
@@ -33,8 +33,8 @@
 
 気になるAIを、ひとつまみ。
 
-- 旧「学習コンテンツ」の公開名称は「ツマミ｜TSUMAMI」
-- コンテンツページの公開導線は `/projects/totonoe/contents.html#tsumami`
+- 旧「学習コンテンツ」の公開名称は「つまみ｜TSUMAMI」
+- 公開導線は `/projects/totonoe/tsumami/`
 - サービスURLは `/projects/totonoe/tsumami/`
 - 動画や学習資料を短時間で選びやすい形にして届ける
 - 既存データを維持するため、内部の `content_type: video` / `content_type: learning` は互換用識別子として維持する
@@ -61,7 +61,9 @@ TAYORI単体とIROHAは同じものではない。IROHAは学習サービスにT
 - 一般名詞としての「カリキュラム」（学習課程・講座構成）は使用できる。
 - 「週末のAI整え習慣」は別企画。改名しない。
 - サイトの主要ナビゲーションでは「週末のAI整え習慣」をTOPとサービスの間に独立表示する。
-- サービスの主要3導線は「TAYORI｜たより」「つづり｜TSUZURI」「ツマミ｜TSUMAMI」とする。
+- サービスの主要4導線は「たより｜TAYORI」「つづり｜TSUZURI」「つまみ｜TSUMAMI」「いろは｜IROHA」とする。
+- ポッドキャストとアーカイブ動画は「週末のAI整え習慣」ページに掲載し、アーカイブ動画はコメキャリ生限定と明記する。
+- 独立した「コンテンツ」ページ・ナビゲーションは設けない。旧URLは各公開先への転送用としてのみ保持する。
 - URL、フォルダ名、API、DB、権限キー、過去のファイル名などの `weekly` / `curriculum` は技術的な識別子として維持する。表示名と混同しない。
 - Google Driveのサービスフォルダ・優先質問管理表とStripeサンドボックスの商品名・説明は新名称へ更新済み。旧画像・生成プロンプトは履歴として保存。ホームページのローカルHTML・表示用JS・掲載JPEGも更新済み。本番への反映状況は更新記録を参照する。
 - 現行広告は `00_GitHubに入れない_ローカル専用/制作データ/output/service-banners/tayori-banner-v1.png` と `00_GitHubに入れない_ローカル専用/制作データ/output/service-banners/iroha-banner-v1.png`。

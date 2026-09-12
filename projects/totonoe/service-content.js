@@ -1,7 +1,7 @@
 /* =========================================================
-   週末のAI整え習慣 — コンテンツページ
-   Podcast（stand.fm）／学習資料／つづり｜TSUZURI／アーカイブ動画を
-   1つのページにタブでまとめて表示します。
+   ToToNoE+ 公開コンテンツ
+   Podcast・アーカイブは週末のAI整え習慣、つづりとつまみは
+   それぞれのサービスページに表示します。
 
    ▼ Podcastを追加するとき
    下の EPISODES に1行足すだけです（stand.fmのURLを貼るだけでOK）。
@@ -234,7 +234,7 @@
   }
 
   /* =====================================================
-     ツマミ｜TSUMAMI
+     つまみ｜TSUMAMI
      ・編集するのは CONTENTS だけです
 
      ▼ タグについて（フィルターに使用・設定不要）
@@ -370,6 +370,9 @@
       })
       .forEach(function (item) {
         var url = item.url || ('tsuzuri/' + item.slug + '.html');
+        if (window.TOTONOE_CONTENT_BASE_URL && !/^(?:[a-z]+:|\/|\.\.\/)/i.test(url)) {
+          url = window.TOTONOE_CONTENT_BASE_URL + url;
+        }
         if (existing[url]) return;
         existing[url] = true;
         TSUZURI_ITEMS.push({
@@ -434,7 +437,7 @@
         desc: item.excerpt || '',
         tags: item.topic_tags || item.tags || [],
         date: generatedDate(item),
-        type: item.content_type === 'video' ? '動画' : (item.content_type_label || 'ツマミ｜TSUMAMI'),
+        type: item.content_type === 'video' ? '動画' : (item.content_type_label || 'つまみ｜TSUMAMI'),
         url: item.media_url,
         source: item.external_link && item.external_link.provider ? item.external_link.provider : ''
       };
@@ -467,7 +470,7 @@
 
   function loadGeneratedContent() {
     if (!window.fetch) return;
-    fetch('data/contents/index.json', { cache: 'no-store' })
+    fetch(window.TOTONOE_CONTENT_DATA_URL || 'data/contents/index.json', { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
       .then(function (data) {
         var items = data.articles || [];
@@ -662,7 +665,7 @@
 
 
   /* =====================================================
-     アーカイブ動画（チームメンバー・コメキャリ生限定）
+     アーカイブ動画（コメキャリ生限定）
      ─────────────────────────────────────────────────────
      ▼ 新しい回を追加するとき
        1. Googleドライブの「アーカイブ」フォルダに動画をアップロード
@@ -913,7 +916,7 @@
       card.setAttribute('role', 'listitem');
       card.innerHTML =
         '<button type="button" class="archive-card-main" aria-label="第' + a.no + '回の録画を再生">' +
-          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>チームメンバー・コメキャリ生限定</span>' +
+          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>コメキャリ生限定</span>' +
           '<span class="archive-no">第' + a.no + '回</span>' +
           '<span class="archive-date">' + formatDate(a.date) + '</span>' +
           '<span class="archive-title">' + esc(a.title) + '</span>' +
@@ -937,7 +940,7 @@
     if (!a.driveId && a.folderId) {
       cvModalBody.innerHTML =
         '<div class="cv-modal-content">' +
-          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 チームメンバー・コメキャリ生限定</p>' +
+          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリ生限定</p>' +
           '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
           '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
           '<div class="cv-fallback">' +
@@ -958,7 +961,7 @@
         'allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>' +
       '</div>' +
       '<div class="cv-modal-content">' +
-        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 チームメンバー・コメキャリ生限定</p>' +
+        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリ生限定</p>' +
         '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
           '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
         '<div class="cv-fallback">' +

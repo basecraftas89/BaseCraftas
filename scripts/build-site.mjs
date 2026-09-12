@@ -53,8 +53,8 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
       article.content_type_label='つづり｜TSUZURI';article.public_target='つづり｜TSUZURI';
       article.url='tsuzuri/'+article.slug+'.html';article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
     }else if(['video','learning'].includes(article.content_type)){
-      if(article.content_type==='learning')article.content_type_label='ツマミ｜TSUMAMI';
-      article.public_target='ツマミ｜TSUMAMI';
+      if(article.content_type==='learning')article.content_type_label='つまみ｜TSUMAMI';
+      article.public_target='つまみ｜TSUMAMI';
       article.url='tsumami/'+article.slug+'.html';article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
     }
     return article;

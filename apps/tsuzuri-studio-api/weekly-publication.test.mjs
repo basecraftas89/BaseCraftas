@@ -28,7 +28,7 @@ async function page(file, script, data) {
 }
 
 test('published dashboard metadata replaces legacy cards without duplication; drafts stay hidden', async () => {
-  const dom=await page('contents.html','contents.js',articles);
+  const dom=await page('weekend-ai.html','service-content.js',articles);
   try {
     const d=dom.window.document;
     assert.equal(d.querySelectorAll('.pod-card').length,16);
@@ -40,47 +40,52 @@ test('published dashboard metadata replaces legacy cards without duplication; dr
   } finally {dom.window.close();}
 });
 
-test('homepage reflects edited and newly published episodes in descending order', async () => {
+test('weekend page reflects edited and newly published episodes in descending order', async () => {
   const next={status:'published',content_type:'podcast',episode_no:17,title:'#17 次の回',media_url:'https://stand.fm/episodes/new17',source_published_at:'2026-09-19'};
-  const dom=await page('index.html','latest-podcast.js',[...articles,next]);
+  const dom=await page('weekend-ai.html','service-content.js',[...articles,next]);
   try {
-    const cards=[...dom.window.document.querySelectorAll('.latest-podcast-card')];
-    assert.equal(cards.length,3);
+    const cards=[...dom.window.document.querySelectorAll('.pod-card')];
+    assert.equal(cards.length,17);
     assert.match(cards[0].textContent,/第17回/);
     assert.match(cards[1].textContent,/更新したPodcast/);
     assert.match(cards[2].textContent,/第15回/);
   } finally {dom.window.close();}
 });
 
-test('homepage separates event media from TSUZURI and TSUMAMI services', async () => {
+test('homepage shows seminars only and exposes four consistently named services', async () => {
   const dom=new JSDOM(readFileSync('projects/totonoe/index.html','utf8'));
   try {
     const d=dom.window.document;
-    assert.deepEqual([...d.querySelectorAll('[data-latest-tab]')].map(el=>el.dataset.latestTab),['seminar','podcast','archive']);
-    assert.equal(d.querySelectorAll('.service-content-grid .service-hub-card').length,2);
-    assert.match(d.querySelector('.service-content-grid').textContent,/つづり｜TSUZURI/);
-    assert.match(d.querySelector('.service-content-grid').textContent,/気になるAIを、ひとつまみ。/);
+    const latest=d.querySelector('#latest');
+    assert.equal(latest.querySelectorAll('.latest-visual-card').length,3);
+    assert.doesNotMatch(latest.textContent,/ポッドキャスト|アーカイブ動画/);
+    assert.equal(d.querySelectorAll('.service-content-grid .service-hub-card').length,4);
+    for(const name of ['たより｜TAYORI','つづり｜TSUZURI','つまみ｜TSUMAMI','いろは｜IROHA'])assert.match(d.querySelector('.service-content-grid').textContent,new RegExp(name));
   } finally {dom.window.close();}
   for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
 });
 
 
 test('studio video edits replace existing cards and preserve the selected thumbnail; new TSUZURI articles appear', async () => {
-  const baseline=await page('contents.html','contents.js',[]);
+  const baseline=await page('tsumami/index.html','service-content.js',[]);
   const videoCount=baseline.window.document.querySelectorAll('#tsumamiGrid .content-card-video').length;baseline.window.close();
-  const dom=await page('contents.html','contents.js',[
+  const generated=[
     {id:'video-edit',status:'published',content_type:'video',title:'更新された動画',media_url:'https://www.youtube.com/watch?v=8ubAUePSwY8',source_type:'video',source_id:'8ubAUePSwY8',hero_url:'https://example.com/custom.jpg'},
     {id:'new-column',slug:'new-column',status:'published',content_type:'column',title:'追加したつづり',excerpt:'つづり概要'},
     {id:'draft-video',status:'draft',content_type:'video',title:'未公開動画',media_url:'https://youtu.be/draft123456'},
-  ]);
+  ];
+  const dom=await page('tsumami/index.html','service-content.js',generated);
   try {
     const d=dom.window.document;
     const cards=[...d.querySelectorAll('#tsumamiGrid .content-card-video')];
     const edited=cards.filter(card=>card.textContent.includes('更新された動画'));
     assert.equal(cards.length,videoCount);assert.equal(edited.length,1);
     assert.equal(edited[0].querySelector('img').src,'https://example.com/custom.jpg');
-    assert.match(d.body.textContent,/追加したつづり/);assert.doesNotMatch(d.body.textContent,/未公開動画/);
+    assert.doesNotMatch(d.body.textContent,/未公開動画/);
     edited[0].querySelector('button').click();
     assert.ok([...d.querySelectorAll('iframe')].some(frame=>frame.src.includes('youtube-nocookie.com/embed/8ubAUePSwY8')));
   } finally {dom.window.close();}
+  const tsuzuri=await page('tsuzuri/index.html','service-content.js',generated);
+  try { assert.match(tsuzuri.window.document.body.textContent,/追加したつづり/); }
+  finally { tsuzuri.window.close(); }
 });

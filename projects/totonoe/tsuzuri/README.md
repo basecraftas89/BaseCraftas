@@ -4,7 +4,7 @@
 TSUZURI Studioから公開すると、記事HTMLと `data/contents/index.json` が自動更新されます。
 
 - 正式表記：`つづり｜TSUZURI`
-- 公開一覧：`../contents.html#tsuzuri`
+- 公開一覧：`./index.html`
 - 管理画面：`../../../apps/tsuzuri-studio/`
 - 内部互換値：既存データとの互換性のため `content_type: column` を維持
 

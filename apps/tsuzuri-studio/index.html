@@ -83,7 +83,7 @@
             <div>
               <p class="eyebrow">TSUZURI STUDIO</p>
               <h1>言葉を、届くかたちに。</h1>
-              <p>つづり｜TSUZURI・動画リンクを整えて、そのままToToNoE+へ。むずかしい操作なしでコンテンツを育てられます。</p>
+              <p>つづり｜TSUZURI・つまみ｜TSUMAMIの動画リンクを整えて、そのままToToNoE+へ。むずかしい操作なしでコンテンツを育てられます。</p>
             </div>
             <button class="primary-button" type="button" data-action="new-post">＋ 作成する</button>
           </div>
@@ -112,7 +112,7 @@
 
       <section class="view" id="view-posts" data-title="コンテンツ">
         <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">つづり｜TSUZURI・動画コンテンツを管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
+          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">つづり｜TSUZURI・つまみ｜TSUMAMIを管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
           <div class="list-toolbar">
             <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
             <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button><button type="button" data-filter="archived">非公開</button><button type="button" data-filter="trash">ゴミ箱</button></div>
@@ -200,8 +200,8 @@
             <aside class="editor-settings">
               <div class="setting-tabs"><button class="active" type="button" data-setting-tab="post">記事</button><button type="button" data-setting-tab="style">表示</button></div>
               <div class="setting-content active" id="setting-post">
-                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ コンテンツ</option></select></label>
-                <label>コンテンツ種別<select id="postContentType"><option value="column">つづり｜TSUZURI</option><option value="video">動画コンテンツ</option><option value="seminar">セミナー</option><option value="learning">ツマミ｜TSUMAMI</option><option value="weekend">週末のAI整え習慣</option></select></label>
+                <label>公開先<select id="postDestination"><option value="totonoe">ToToNoE+ サービス</option></select></label>
+                <label>コンテンツ種別<select id="postContentType"><option value="column">つづり｜TSUZURI</option><option value="video">つまみ｜TSUMAMI（動画）</option><option value="seminar">セミナー</option><option value="learning">つまみ｜TSUMAMI（資料）</option><option value="weekend">週末のAI整え習慣</option></select></label>
                 <input id="postCategory" type="hidden" value="content">
                 <label>Main Actor<select id="postMainActor"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select></label>
                 <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">コンテンツの登壇者や対話者を複数選択できます。</small></div>
@@ -243,7 +243,7 @@
         <div class="page-wrap narrow-wrap">
           <div class="page-heading"><div><p class="eyebrow">PUBLISHING</p><h1>公開設定</h1><p>コンテンツの公開先とURLのルールを設定します。</p></div></div>
           <section class="panel settings-panel">
-            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>コンテンツのURL<input value="https://basecraftas.com/projects/totonoe/contents/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
+            <h2>公開サイト</h2><label>サイト名<input value="ToToNoE+"></label><label>つづりのURL<input value="https://basecraftas.com/projects/totonoe/tsuzuri/"></label><label>下書きの自動保存<select><option>入力のたびに保存</option><option>1分ごと</option><option>手動のみ</option></select></label><div class="settings-actions"><button class="primary-button" type="button" data-action="save-settings">設定を保存</button></div>
           </section>
           <section class="panel settings-panel admin-only weekly-sync-panel">
             <h2>TAYORI連携</h2>

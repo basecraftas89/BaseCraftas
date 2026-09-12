@@ -279,7 +279,7 @@ strong{color:inherit}
 .pod-list{
   display:flex;gap:18px;overflow-x:auto;overflow-y:hidden;
   /* html{scroll-behavior:smooth} が継承されるため、必ず auto で打ち消すこと。
-     理由は .archive-track と同じ（contents.js のコメント参照）。 */
+     理由は .archive-track と同じ（service-content.js のコメント参照）。 */
   scroll-behavior:auto;
   scroll-snap-type:x proximity;
   padding:4px 4px 14px;margin:0 -4px;
@@ -1056,6 +1056,7 @@ body.sem-lock{overflow:hidden}
 .service-overview-figure{width:min(100%,980px);margin:30px auto 0}
 .service-overview-figure img{width:100%;border-radius:22px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff}
 .service-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:32px}
+.service-card-grid-four{grid-template-columns:repeat(2,minmax(0,1fr))}
 .service-card{
   display:flex;flex-direction:column;gap:12px;padding:22px;border:1px solid var(--line);
   border-radius:22px;background:#fff;box-shadow:var(--shadow-sm);
@@ -1075,6 +1076,12 @@ body.sem-lock{overflow:hidden}
 .service-card strong,.support-menu-grid strong{color:var(--teal-deep);line-height:1.6}
 .service-card p,.support-menu-grid p,.compare-card li,.pricing-card p,.notice-card p{font-size:.9rem;color:var(--ink-soft);line-height:1.85}
 .service-card .btn{margin-top:auto}
+.service-detail-hero{padding:132px 0 64px;background:linear-gradient(180deg,#f7faf5,#fff)}
+.service-detail-hero-inner{display:grid;grid-template-columns:minmax(280px,440px) 1fr;gap:clamp(32px,6vw,80px);align-items:center}
+.service-detail-hero img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:28px;box-shadow:var(--shadow);background:#fff}
+.service-detail-hero h1{margin:.65rem 0 1rem;font-size:clamp(2.25rem,5vw,4rem);line-height:1.2;color:var(--ink)}
+.service-detail-hero .service-concept-line{font-size:clamp(1.15rem,2vw,1.5rem);margin-bottom:16px}
+.weekend-media .members-only{margin-bottom:42px}
 .service-coming-note{
   padding:10px 12px;border-radius:12px;background:rgba(232,240,237,.72);
   color:var(--teal-deep) !important;font-weight:800;
@@ -1440,7 +1447,7 @@ body.sem-lock{overflow:hidden}
 .next-label{font-size:.74rem;font-weight:700;color:var(--teal-deep);letter-spacing:.04em}
 .next-title{font-size:.92rem;font-weight:700;color:var(--ink);line-height:1.6}
 
-/* ===== タブ切替（共通：contents.html / faq.html） ===== */
+/* ===== タブ切替（FAQ） ===== */
 .tab-group{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
 .tab-btn{
   font-size:.9rem;font-weight:700;color:var(--ink-soft);
@@ -1458,7 +1465,7 @@ body.sem-lock{overflow:hidden}
 .faq-section .section-title{margin-bottom:22px}
 .faq-item p a{color:var(--teal-deep);font-weight:700;text-decoration:underline}
 
-/* ===== コンテンツページ ===== */
+/* ===== Podcast・サービス一覧・アーカイブ共通 ===== */
 .content-toolbar{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .content-count{font-size:.86rem;font-weight:500;color:var(--ink-soft);margin-left:12px}
 .content-filter{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 4px}
@@ -1492,7 +1499,7 @@ body.sem-lock{overflow:hidden}
 .content-empty-title{font-size:1.06rem;font-weight:700;color:var(--ink);margin-bottom:8px}
 .content-empty-body{font-size:.88rem;color:var(--ink-soft);line-height:1.9}
 
-/* ---- ツマミ｜TSUMAMI：動画カード（サムネイル付き） ---- */
+/* ---- つまみ｜TSUMAMI：動画カード（サムネイル付き） ---- */
 .content-card-video{padding:0;overflow:hidden}
 .content-card-thumb{
   position:relative;display:block;width:100%;aspect-ratio:16/9;
@@ -1690,7 +1697,7 @@ body.sem-lock{overflow:hidden}
   padding-top:42px;
 }
 
-/* ---- ツマミ｜TSUMAMI：動画ポップアップ ---- */
+/* ---- つまみ｜TSUMAMI：動画ポップアップ ---- */
 .cv-modal{
   position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   padding:24px;opacity:0;pointer-events:none;transition:opacity .2s ease;
@@ -1725,6 +1732,7 @@ body.cv-lock{overflow:hidden}
   .benefit-grid{grid-template-columns:repeat(3,1fr)}
   .totonoe-principle-grid,.totonoe-project-grid{grid-template-columns:1fr}
   .service-card-grid,.final-card-grid{grid-template-columns:1fr}
+  .service-detail-hero-inner{grid-template-columns:minmax(220px,340px) 1fr;gap:32px}
   .home-service-priority .service-hub-card{grid-template-columns:1fr}
   .support-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .corporate-hero::before{background-position:58% center;background-size:cover}
@@ -1802,6 +1810,9 @@ body.cv-lock{overflow:hidden}
   .content-strip-inner{padding:16px;border-radius:20px}
   .latest-visual-group{padding:14px}
   .service-content-grid{grid-template-columns:1fr}
+  .service-detail-hero{padding:100px 0 48px}
+  .service-detail-hero-inner{grid-template-columns:1fr}
+  .service-detail-hero img{width:min(100%,420px);margin:0 auto}
   .content-tab-sections{grid-template-columns:1fr}
   .support-menu-grid,.weekly-point-grid,.compare-grid,.weekly-flow-grid{grid-template-columns:1fr}
   .weekly-feature-grid,.weekly-plan-grid,.usage-scene-grid{grid-template-columns:1fr}
@@ -2331,7 +2342,7 @@ body.cv-lock{overflow:hidden}
   display:flex;gap:18px;overflow-x:auto;overflow-y:hidden;
   /* html{scroll-behavior:smooth} が継承されるので、必ず auto で打ち消すこと。
      smooth のままだと scroll-snap と干渉して、矢印ボタンがまったく効きません。
-     なめらかな動きは contents.js の arcAnimate() が担当しています。 */
+     なめらかな動きは service-content.js の arcAnimate() が担当しています。 */
   scroll-behavior:auto;
   scroll-snap-type:x proximity;
   padding:4px 4px 14px;margin:0 -4px;

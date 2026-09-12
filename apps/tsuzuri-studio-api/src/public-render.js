@@ -8,11 +8,11 @@ function escHtml(value) {
 }
 
 function publicSection(contentType) {
-  if (contentType === "podcast") return { hash: "podcast", label: "Podcast" };
-  if (contentType === "archive") return { hash: "archive", label: "アーカイブ動画" };
-  if (contentType === "seminar") return { hash: "seminars", label: "セミナー" };
-  if (["video", "learning"].includes(contentType)) return { hash: "tsumami", label: "ツマミ｜TSUMAMI" };
-  return { hash: "tsuzuri", label: "つづり｜TSUZURI" };
+  if (contentType === "podcast") return { href: "../weekend-ai.html#podcast", label: "ポッドキャスト" };
+  if (contentType === "archive") return { href: "../weekend-ai.html#archive", label: "アーカイブ動画" };
+  if (contentType === "seminar") return { href: "../index.html#latest", label: "セミナー" };
+  if (["video", "learning"].includes(contentType)) return { href: "../tsumami/", label: "つまみ｜TSUMAMI" };
+  return { href: "../tsuzuri/", label: "つづり｜TSUZURI" };
 }
 
 function externalLinkLabel(type, url) {
@@ -89,17 +89,10 @@ export function articleHtml(articleData) {
       <div class="nav-dropdown">
         <a href="../service.html" class="nav-main">サービス</a>
         <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../TAYORI/">TAYORI｜たより</a>
-          <a href="../contents.html#tsuzuri">つづり｜TSUZURI</a>
-          <a href="../contents.html#tsumami">ツマミ｜TSUMAMI</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="../contents.html#seminars" class="nav-main active">コンテンツ</a>
-        <div class="nav-menu" aria-label="コンテンツメニュー">
-          <a href="../contents.html#seminars">セミナー</a>
-          <a href="../contents.html#podcast">ポッドキャスト</a>
-          <a href="../contents.html#archive">アーカイブ動画</a>
+          <a href="../TAYORI/">たより｜TAYORI</a>
+          <a href="../tsuzuri/">つづり｜TSUZURI</a>
+          <a href="../tsumami/">つまみ｜TSUMAMI</a>
+          <a href="../IROHA/">いろは｜IROHA</a>
         </div>
       </div>
       <a href="../team.html">チーム</a>
@@ -127,7 +120,7 @@ export function articleHtml(articleData) {
     <section class="section">
       <div class="container column-article-body column-body-inner">
         ${sanitizeBody(articleData.body_html) || "<p>本文はまだありません。</p>"}
-        <a class="column-back" href="../contents.html#${section.hash}">← ${section.label}一覧へ戻る</a>
+        <a class="column-back" href="${section.href}">← ${section.label}一覧へ戻る</a>
       </div>
     </section>
   </article>
@@ -144,7 +137,6 @@ export function articleHtml(articleData) {
       <a href="../index.html">TOP</a>
       <a href="../weekend-ai.html">週末のAI整え習慣</a>
       <a href="../service.html">サービス</a>
-      <a href="../contents.html#seminars">コンテンツ</a>
       <a href="../team.html">チーム</a>
       <a href="../faq.html">FAQ</a>
     </nav>
