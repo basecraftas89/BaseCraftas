@@ -4,6 +4,7 @@
   var testNow = Number(window.TOTONOE_NOW);
   var now = Number.isFinite(testNow) && testNow > 0 ? testNow : Date.now();
   var cards = Array.from(document.querySelectorAll('#latest .latest-visual-card[data-seminar-start]'));
+  var recurringCard = document.querySelector('#latest .recurring-seminar-card');
   var visibleCount = 0;
 
   cards.forEach(function (card) {
@@ -14,5 +15,5 @@
   });
 
   var emptyMessage = document.getElementById('latestSeminarEmpty');
-  if (emptyMessage) emptyMessage.hidden = visibleCount !== 0;
+  if (emptyMessage) emptyMessage.hidden = Boolean(recurringCard) || visibleCount !== 0;
 }());

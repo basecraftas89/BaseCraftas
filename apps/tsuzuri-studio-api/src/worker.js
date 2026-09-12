@@ -2,6 +2,7 @@ import {archiveMetadata} from './archive-metadata.js';
 import {articleHtml} from './public-render.js';
 import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
 import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
+import { isCurrentWeekendThumbnail } from './weekend-event.js';
 import {
   normalizeCustomerEmail,
   generateOtpCode,
@@ -936,7 +937,9 @@ async function publicWeekendEvent(env) {
       ORDER BY updated_at DESC, rowid DESC
       LIMIT 1`
   ).first();
-  if (!event) return json({ event: null }, { headers: { "cache-control": "no-store" } });
+  if (!event || !isCurrentWeekendThumbnail(event.updated_at)) {
+    return json({ event: null }, { headers: { "cache-control": "no-store" } });
+  }
   return json({ event: {
     hero_url: safeUrl(event.hero_url, true),
     updated_at: event.updated_at,

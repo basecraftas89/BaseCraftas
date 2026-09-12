@@ -6,6 +6,7 @@ import {resolve,join} from 'node:path';
 import {JSDOM} from 'jsdom';
 import {loadWorker} from './test-support.mjs';
 import {sanitizeBody,safeUrl,requestGuard} from './src/security.js';
+import {isCurrentWeekendThumbnail,latestSaturdayEventEnd} from './src/weekend-event.js';
 const worker=await loadWorker();
 function fixture() {
  const sql=new DatabaseSync(':memory:');sql.exec(readFileSync('apps/tsuzuri-studio-api/schema.sql','utf8'));
@@ -99,12 +100,22 @@ test('public weekend event exposes only the most recently updated published thum
  const f=fixture();
  const older=await f.article({slug:'weekend-older',title:'前の告知',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/older.png'});
  const latest=await f.article({slug:'weekend-latest',title:'最新の告知',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/latest.png'});
- f.sql.prepare("UPDATE articles SET status='published', updated_at='2026-09-12 00:00:00' WHERE id=?").run(older.id);
- f.sql.prepare("UPDATE articles SET status='published', updated_at='2026-09-13 00:00:00' WHERE id=?").run(latest.id);
+ f.sql.prepare("UPDATE articles SET status='published', updated_at='2020-01-01 00:00:00' WHERE id=?").run(older.id);
+ f.sql.prepare("UPDATE articles SET status='published', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(latest.id);
  const response=await f.call('/public-content/weekend-event.json','GET',undefined,'');
  assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
  const body=await response.json();assert.equal(body.event.hero_url,'https://basecraftas.com/column-media/latest.png');
  assert.deepEqual(Object.keys(body.event).sort(),['hero_url','updated_at']);
+});
+
+test('weekend thumbnail expires after Saturday 6:30 JST until the next image is published',()=>{
+ const saturdayBeforeEnd=Date.parse('2026-09-12T06:29:59+09:00');
+ const saturdayAfterEnd=Date.parse('2026-09-12T06:30:00+09:00');
+ assert.equal(latestSaturdayEventEnd(saturdayBeforeEnd),Date.parse('2026-09-05T06:30:00+09:00'));
+ assert.equal(latestSaturdayEventEnd(saturdayAfterEnd),saturdayAfterEnd);
+ assert.equal(isCurrentWeekendThumbnail('2026-09-10 03:00:00',saturdayBeforeEnd),true);
+ assert.equal(isCurrentWeekendThumbnail('2026-09-10 03:00:00',saturdayAfterEnd),false);
+ assert.equal(isCurrentWeekendThumbnail('2026-09-12 00:00:01',saturdayAfterEnd),true);
 });
 
 test('weekend event publication requires only a thumbnail',async()=>{

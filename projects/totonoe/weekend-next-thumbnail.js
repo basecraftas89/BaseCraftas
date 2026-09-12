@@ -11,6 +11,5 @@
       var event=data&&data.event,image=event&&safeUrl(event.hero_url);
       if(!image)return;
       document.getElementById('weekendNextImage').src=image;
-      card.hidden=false;
     }).catch(function(){});
 })();
