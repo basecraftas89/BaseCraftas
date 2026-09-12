@@ -93,7 +93,7 @@ test("curriculum LP shows pricing as a non-purchasable preview", async () => {
   assert.match(html, /class="rejoin-prices"/);
   assert.match(html, /30,000<small>円<\/small>/);
   assert.match(html, /10,000<small>円<\/small>/);
-  assert.match(html, /初月のサブスク料金はかかりません/);
+  assert.match(html, /表示中の料金は提供開始時の案です/);
   assert.match(html, /30日後から/);
   assert.match(script, /audience === config\.campaign\.audience/);
   assert.match(script, /recurringUnit/);

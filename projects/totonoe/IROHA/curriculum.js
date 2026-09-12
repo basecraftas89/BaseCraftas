@@ -134,7 +134,9 @@
         ? `通常${yen.format(originalEntry)}円から${yen.format(entryDiscount)}円割引`
         : `${audience === "therapist" ? "資格確認済みセラピスト" : "一般"}の初回入会費`;
       document.querySelector("#subscriptionStartNote").textContent = `申込日から30日間は${billingLabel}料金0円`;
-      document.querySelector("#priceBreakdown").innerHTML = `<strong>初月のサブスク料金はかかりません。</strong>${campaignApplies ? "資格確認後、" : ""}本日は入会費${yen.format(entry)}円のみお支払いいただき、${billingLabel}${yen.format(recurring)}円は30日後から始まります。`;
+      document.querySelector("#priceBreakdown").innerHTML = config.purchaseEnabled
+        ? `<strong>初月のサブスク料金はかかりません。</strong>${campaignApplies ? "資格確認後、" : ""}本日は入会費${yen.format(entry)}円のみお支払いいただき、${billingLabel}${yen.format(recurring)}円は30日後から始まります。`
+        : `<strong>表示中の料金は提供開始時の案です。</strong>${campaignApplies ? "資格確認後、" : ""}提供開始時は入会費${yen.format(entry)}円、${billingLabel}${yen.format(recurring)}円は利用開始30日後から始まる設計です。`;
       document.querySelectorAll("[data-billing]").forEach((button) => {
         const active = button.dataset.billing === billing;
         button.classList.toggle("is-active", active);
