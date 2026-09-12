@@ -183,6 +183,7 @@
     }
 
     document.querySelector("[data-preview-action]")?.addEventListener("click", () => {
+      if (!config.purchaseEnabled) return;
       const type = audience === "therapist" ? "セラピスト" : "一般";
       const period = billing === "annual" ? "年額29,800円" : "月額2,980円";
       const campaignApplies = billing === config.campaign.plan && audience === config.campaign.audience;

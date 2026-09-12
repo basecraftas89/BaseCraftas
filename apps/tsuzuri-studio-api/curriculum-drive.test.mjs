@@ -80,10 +80,11 @@ test("IROHA direct access stays locked until an IROHA entitlement is confirmed",
   await check({ has_weekly_access: true, has_curriculum_access: true }, false);
 });
 
-test("curriculum LP shows the therapist-only regular entry fee before the campaign price", async () => {
-  const [html, script] = await Promise.all([
+test("curriculum LP shows pricing as a non-purchasable preview", async () => {
+  const [html, script, config] = await Promise.all([
     fs.readFile(path.join(curriculumDir, "index.html"), "utf8"),
-    fs.readFile(path.join(curriculumDir, "curriculum.js"), "utf8")
+    fs.readFile(path.join(curriculumDir, "curriculum.js"), "utf8"),
+    fs.readFile(path.join(curriculumDir, "curriculum-config.js"), "utf8")
   ]);
   assert.match(html, /id="priceOriginal">30,000/);
   assert.match(html, /id="priceDiscount">83% OFF/);
@@ -104,6 +105,10 @@ test("curriculum LP shows the therapist-only regular entry fee before the campai
   assert.match(html, /name="privacy_consent"/);
   assert.match(script, /\/api\/customer\/qualification/);
   assert.match(script, /qualification\.therapist_status !== "verified"/);
+  assert.match(html, /現在は購入できません/);
+  assert.match(html, /disabled aria-disabled="true">現在準備中です/);
+  assert.doesNotMatch(html, /data-preview-action/);
+  assert.match(config, /purchaseEnabled: false/);
 });
 
 

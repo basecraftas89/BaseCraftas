@@ -1,5 +1,6 @@
 window.TOTONOE_CURRICULUM = Object.freeze({
   version: 1,
+  purchaseEnabled: false,
   currency: "JPY",
   plans: Object.freeze({
     weekly: Object.freeze({ monthly: 980 }),
