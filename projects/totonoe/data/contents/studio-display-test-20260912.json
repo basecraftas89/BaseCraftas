@@ -1,0 +1,42 @@
+{
+  "id": "article_fe95e534-0cbe-44a8-84d2-3936a63c2386",
+  "revision": 12,
+  "slug": "studio-display-test-20260912",
+  "title": "【表示確認用テスト】コラム・タグ・アイキャッチの反映確認",
+  "excerpt": "これはスタジオの公開機能を確認するためのテスト記事です。タイトル、タグ、アイキャッチ、本文の表示を確認しています。",
+  "category": "content",
+  "destination": "totonoe",
+  "content_type": "column",
+  "content_type_label": "コラム",
+  "topic_tags": [
+    "ChatGPT",
+    "業務整理",
+    "表示確認テスト"
+  ],
+  "tags": [
+    "ChatGPT",
+    "業務整理",
+    "表示確認テスト"
+  ],
+  "main_actor_id": "shindo-toshiki",
+  "main_actor": {
+    "id": "shindo-toshiki",
+    "name": "神藤 俊希"
+  },
+  "speaker_ids": [],
+  "speakers": [],
+  "media_url": "",
+  "episode_no": null,
+  "source_published_at": "",
+  "source_type": "external",
+  "source_id": "",
+  "public_target": "コラム",
+  "external_link": null,
+  "hero_url": "",
+  "body_html": "<p><strong>この記事は表示確認用のテストです。</strong>正式なサービス案内やニュースではありません。</p><h2>タグの反映確認</h2><p>ChatGPT・業務整理・表示確認テストの3つのタグを設定しています。コラム一覧のタグ表示と絞り込みを確認します。</p><h2>アイキャッチの反映確認</h2><p>既存のToToNoE+画像をアップロードし、一覧と記事冒頭の表示を確認します。</p><ul><li>見出しと段落</li><li>太字と箇条書き</li><li>一覧から記事を開く導線<div class=\"editor-bubble\" data-character=\"mion-thinking\"><div class=\"bubble-avatar\" contenteditable=\"false\"><img class=\"character-icon\" src=\"../assets/characters/mion-thinking.png\" alt=\"ミオン\" /><img class=\"character-nameplate\" src=\"../assets/characters/mion-nameplate.png\" alt=\"ミオン\" /></div><div class=\"bubble-copy\"><p>ここに会話文を入力します。</p></div></div><div class=\"editor-bubble right\" data-character=\"tsugumo-question\"><div class=\"bubble-avatar\" contenteditable=\"false\"><img class=\"character-icon\" src=\"../assets/characters/tsugumo-question.png\" alt=\"ツグモ\" /><img class=\"character-nameplate\" src=\"../assets/characters/tsugumo-nameplate.png\" alt=\"ツグモ\" /></div><div class=\"bubble-copy\"><p>ここに会話文を入力します。<br /></p></div></div></li><li><div class=\"editor-bubble\" data-character=\"hakuto-thinking\"><div class=\"bubble-avatar\" contenteditable=\"false\"><img class=\"character-icon\" src=\"../assets/characters/hakuto-thinking.png\" alt=\"ハクト\" /><img class=\"character-nameplate\" src=\"../assets/characters/hakuto-nameplate.png\" alt=\"ハクト\" /></div><div class=\"bubble-copy\"><p>ここに会話文を入力します。</p></div></div><p><br /></p><p>。</p></li></ul>",
+  "status": "published",
+  "url": "contents/studio-display-test-20260912.html",
+  "absolute_url": "https://basecraftas.com/projects/totonoe/contents/studio-display-test-20260912.html",
+  "published_at": "2026-09-12",
+  "updated_at": "2026-09-12T05:51:56.144Z"
+}
