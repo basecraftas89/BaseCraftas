@@ -34,16 +34,16 @@
   function step(name) {
     emailForm.hidden = name !== "email";
     codeForm.hidden = name !== "code";
-    status.textContent = "";
     window.setTimeout(() => (name === "email" ? emailForm.elements.email : codeForm.elements.code).focus(), 20);
   }
 
   emailForm.addEventListener("submit", async (event) => {
-    event.preventDefault();status.textContent = "";busy(emailForm, true);
+    event.preventDefault();status.textContent = "認証コードを送信しています…";busy(emailForm, true);
     try {
       email = emailForm.elements.email.value.trim();
       const result = await api("/request-code", { email });
       step("code");
+      status.textContent = `${email} へ認証コードを送信しました。10分以内に入力してください。`;
       if (result.dev_code && ["localhost", "127.0.0.1"].includes(location.hostname)) codeForm.elements.code.value = result.dev_code;
     } catch (error) { status.textContent = error.message; }
     finally { busy(emailForm, false); }
@@ -56,5 +56,5 @@
     } catch (error) { status.textContent = error.message; }
     finally { busy(codeForm, false); }
   });
-  document.querySelector("#memberLoginBack").addEventListener("click", () => step("email"));
+  document.querySelector("#memberLoginBack").addEventListener("click", () => { status.textContent = ""; step("email"); });
 })();

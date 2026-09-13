@@ -28,6 +28,8 @@
 - 解説動画：短い動画で理解を深める
 - 会員限定Q&A：ほかの会員の疑問からも学ぶ
 - 優先質問権：知りたいテーマを届ける。解説テーマとして優先検討する仕組みで、個別回答を保証しない
+- 個人プラン：月額980円（税込）。入会金なし、14日間無料。初回10名枠から開始し、管理者が10名単位で追加する
+- 主な対象はセラピスト・産業保健職を中心とした専門職。資格証明の提出は不要
 - 公開LPは `/projects/totonoe/tayori.html`
 - 会員ページは `/projects/totonoe/TAYORI/`。`weekly_access` または `curriculum_all_access` の購入者だけが利用できる
 
@@ -52,6 +54,8 @@
 - 公開LPは `/projects/totonoe/IROHA/`
 - 会員ページは `/projects/totonoe/IROHA/dashboard.html`。`curriculum_all_access` の購入者だけが利用できる
 - IROHA購入者には `curriculum_all_access` と `weekly_access` を付与する。TAYORI単体購入者には `weekly_access` だけを付与する
+- 個人プランは職種共通で、初回入会金9,800円、再入会金4,800円、月額2,980円（すべて税込）。資格確認は行わない
+- 法人プランは準備中とし、先行してメールウェイトリストを受け付ける
 
 TAYORI単体とIROHAは同じものではない。IROHAは学習サービスにTAYORIを内包する。名称変更自体は価格・契約条件・権限・提供開始状況の変更や稼働確認を意味しない。
 

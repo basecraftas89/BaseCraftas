@@ -14,12 +14,13 @@ function stripeFixture(){
   sql.exec(readFileSync('apps/tsuzuri-studio-api/schema.sql','utf8'));
   sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260911_curriculum_foundation.sql','utf8'));
   sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260918_customer_email_auth.sql','utf8'));
+  sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260920_billing_dashboard.sql','utf8'));
   function prepare(query){let args=[];return {bind(...values){args=values;return this;},async first(){return sql.prepare(query).get(...args)||null;},async all(){return {results:sql.prepare(query).all(...args)};},async run(){return {meta:{changes:Number(sql.prepare(query).run(...args).changes)}};}};}
   const secret='whsec_tayori_test';
   const objects=new Map();
   const env={CUSTOMER_AUTH_SECRET:'0123456789abcdef0123456789abcdef',STRIPE_MODE:'test',STRIPE_WEBHOOK_SECRET:secret,DB:{prepare,async batch(items){sql.exec('BEGIN');try{const results=[];for(const item of items)results.push(await item.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}},MEDIA:{async put(key,bytes,metadata){objects.set(key,{bytes,metadata});},async get(key){const value=objects.get(key);return value?{body:value.bytes}:null;},async delete(keys){for(const key of Array.isArray(keys)?keys:[keys])objects.delete(key);}}};
   sql.prepare("INSERT INTO customer_accounts(id,email,email_verified_at) VALUES('customer_tayori','tayori@example.com',CURRENT_TIMESTAMP)").run();
-  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,campaign_code,trial_days,recurring_amount_yen,entry_fee_yen,status,stripe_checkout_session_id) VALUES('attempt_tayori','customer_tayori','checkout:customer_tayori:test','weekly_monthly','general','none','none',0,980,0,'pending','cs_test_tayori')").run();
+  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,campaign_code,trial_days,recurring_amount_yen,entry_fee_yen,status,stripe_checkout_session_id) VALUES('attempt_tayori','customer_tayori','checkout:customer_tayori:test','weekly_monthly','general','none','none',14,980,0,'pending','cs_test_tayori')").run();
   async function send(event){
     const body=JSON.stringify(event);const timestamp=Math.floor(Date.now()/1000);const signature=createHmac('sha256',secret).update(`${timestamp}.${body}`).digest('hex');
     return worker.fetch(new Request('https://test.local/api/totonoe-member/api/stripe/webhook',{method:'POST',headers:{'content-type':'application/json','stripe-signature':`t=${timestamp},v1=${signature}`},body}),env);
@@ -32,33 +33,52 @@ const qualificationPng=Uint8Array.from(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEA
 test('料金はサーバー定義からだけ決まり、クライアント指定金額を使用しない',()=>{
   const quote=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'rejoin',recurringAmountYen:1,entryFeeAmountYen:1});
   assert.equal(quote.recurringAmountYen,2980);
-  assert.equal(quote.entryFeeAmountYen,10000);
-  assert.equal(quote.firstChargeAmountYen,12980);
+  assert.equal(quote.entryFeeAmountYen,4800);
+  assert.equal(quote.firstChargeAmountYen,7780);
   assert.deepEqual(quote.entitlementCodes,['curriculum_all_access','weekly_access']);
-  const weekly=resolveBillingQuote({planCode:'weekly_monthly'});
-  assert.equal(weekly.firstChargeAmountYen,0);
-  assert.equal(weekly.trialPeriodDays,14);
+  assert.equal(resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'first'}).entryFeeAmountYen,9800);
+  assert.equal(resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first'}).entryFeeAmountYen,9800);
+  assert.equal(resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'rejoin'}).entryFeeAmountYen,4800);
+  const weeklyGeneral=resolveBillingQuote({planCode:'weekly_monthly',audienceType:'general'});
+  const weeklyTherapist=resolveBillingQuote({planCode:'weekly_monthly',audienceType:'therapist'});
+  assert.equal(weeklyGeneral.recurringAmountYen,980);
+  assert.equal(weeklyGeneral.recurringPriceEnv,'STRIPE_PRICE_TAYORI_MONTHLY');
+  assert.equal(weeklyGeneral.firstChargeAmountYen,0);
+  assert.equal(weeklyGeneral.trialPeriodDays,14);
+  assert.equal(weeklyTherapist.recurringAmountYen,980);
+  assert.equal(weeklyTherapist.recurringPriceEnv,'STRIPE_PRICE_TAYORI_MONTHLY');
+  assert.equal(weeklyTherapist.firstChargeAmountYen,0);
+  assert.equal(weeklyTherapist.trialPeriodDays,14);
   assert.throws(()=>resolveBillingQuote({planCode:'weekly_monthly',feeType:'first'}),/weekly_has_no_entry_fee/);
   assert.throws(()=>resolveBillingQuote({planCode:'curriculum_annual',feeType:'none'}),/curriculum_fee_required/);
 });
 
-test('初回入会は月額を初月に請求せず、お試し価格は入会費5000円だけを請求する',()=>{
-  const standard=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'first'});
-  assert.equal(standard.firstChargeAmountYen,50000);
-  assert.equal(standard.trialPeriodDays,30);
-  const campaign=resolveBillingQuote({
-    planCode:'curriculum_monthly',
-    audienceType:'therapist',
-    feeType:'first',
-    campaignCode:'trial_entry_5000',
-  });
-  assert.equal(campaign.entryFeeAmountYen,5000);
-  assert.equal(campaign.firstChargeAmountYen,5000);
-  assert.equal(campaign.trialPeriodDays,30);
-  assert.equal(campaign.entryFeePriceEnv,'STRIPE_PRICE_ENTRY_CAMPAIGN_TRIAL');
-  assert.throws(()=>resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'first',campaignCode:'trial_entry_5000'}),/campaign_not_applicable/);
-  assert.throws(()=>resolveBillingQuote({planCode:'curriculum_monthly',feeType:'rejoin',campaignCode:'trial_entry_5000'}),/campaign_not_applicable/);
-  assert.throws(()=>resolveBillingQuote({planCode:'curriculum_annual',feeType:'first',campaignCode:'trial_entry_5000'}),/campaign_not_applicable/);
+test('IROHAの初回入会は9,800円、再入会は4,800円で職種共通',()=>{
+  const general=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'first'});
+  assert.equal(general.recurringAmountYen,2980);
+  assert.equal(general.entryFeeAmountYen,9800);
+  assert.equal(general.firstChargeAmountYen,9800);
+  assert.equal(general.trialPeriodDays,30);
+  const therapist=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first'});
+  assert.equal(therapist.recurringAmountYen,2980);
+  assert.equal(therapist.entryFeeAmountYen,9800);
+  assert.equal(therapist.firstChargeAmountYen,9800);
+  assert.equal(therapist.trialPeriodDays,30);
+  assert.equal(therapist.entryFeePriceEnv,'STRIPE_PRICE_IROHA_FIRST');
+  assert.equal(resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'general',feeType:'rejoin'}).entryFeeAmountYen,4800);
+  assert.throws(()=>resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first',campaignCode:'trial_entry_5000'}),/invalid_campaign/);
+});
+
+test('IROHAは職種共通プランとし、申込APIは準備中の月額設定だけに限定する',()=>{
+  const workerSource=readFileSync('apps/tsuzuri-studio-api/src/worker.js','utf8');
+  const configSource=readFileSync('projects/totonoe/IROHA/curriculum-config.js','utf8');
+  assert.match(workerSource,/\["weekly_monthly", "curriculum_monthly"\]\.includes\(planCode\)/);
+  assert.doesNotMatch(workerSource,/\["weekly_monthly", "curriculum_monthly", "curriculum_annual"\]\.includes\(planCode\)/);
+  assert.match(configSource,/monthly:\s*2980/);
+  assert.match(configSource,/annual:\s*29800/);
+  assert.match(configSource,/annualSavingsMonths:\s*2/);
+  assert.match(configSource,/first:\s*9800/);
+  assert.match(configSource,/rejoin:\s*4800/);
 });
 
 test('第1段階ではStripeテストキーだけを許可する',()=>{
@@ -85,8 +105,8 @@ test('D1にWebhook冪等性とCheckout試行の制約を追加する',()=>{
   sql.prepare("INSERT INTO customer_accounts(id,email) VALUES('customer_1','member@example.com')").run();
   sql.prepare("INSERT INTO stripe_webhook_events(event_id,event_type,livemode) VALUES('evt_1','invoice.paid',0)").run();
   assert.throws(()=>sql.prepare("INSERT INTO stripe_webhook_events(event_id,event_type,livemode) VALUES('evt_1','invoice.paid',0)").run());
-  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen) VALUES('attempt_1','customer_1','checkout_1','curriculum_monthly','general','first',2980,50000)").run();
-  assert.throws(()=>sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen) VALUES('attempt_2','customer_1','checkout_1','curriculum_monthly','general','first',2980,50000)").run());
+  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen) VALUES('attempt_1','customer_1','checkout_1','curriculum_monthly','general','first',2980,48000)").run();
+  assert.throws(()=>sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen) VALUES('attempt_2','customer_1','checkout_1','curriculum_monthly','general','first',2980,48000)").run());
 });
 
 test('認証情報は正規化し、用途別HMACで照合する',async()=>{
@@ -101,10 +121,10 @@ test('認証情報は正規化し、用途別HMACで照合する',async()=>{
 });
 
 test('CheckoutパラメータはサーバーPrice IDとプラン別の無料期間だけから組み立てる',()=>{
-  const quote=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first',campaignCode:'trial_entry_5000'});
+  const quote=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first'});
   const params=buildStripeCheckoutParams({
     quote,
-    env:{STRIPE_PRICE_CURRICULUM_MONTHLY:'price_monthly123',STRIPE_PRICE_ENTRY_CAMPAIGN_TRIAL:'price_entry123'},
+    env:{STRIPE_PRICE_CURRICULUM_MONTHLY:'price_monthly123',STRIPE_PRICE_IROHA_FIRST:'price_entry123'},
     customer:{id:'customer_1',email:'member@example.com',stripe_customer_id:null},
     attemptId:'attempt_1',
     successUrl:'https://basecraftas.com/success',
@@ -117,15 +137,16 @@ test('CheckoutパラメータはサーバーPrice IDとプラン別の無料期�
   assert.equal(params.get('customer_email'),'member@example.com');
   assert.equal(params.get('metadata[attempt_id]'),'attempt_1');
 
-  const tayoriQuote=resolveBillingQuote({planCode:'weekly_monthly'});
+  const tayoriQuote=resolveBillingQuote({planCode:'weekly_monthly',audienceType:'general'});
   const tayoriParams=buildStripeCheckoutParams({
     quote:tayoriQuote,
-    env:{STRIPE_PRICE_WEEKLY_MONTHLY:'price_weekly123'},
+    env:{STRIPE_PRICE_TAYORI_MONTHLY:'price_weekly123'},
     customer:{id:'customer_2',email:'tayori@example.com',stripe_customer_id:null},
     attemptId:'attempt_2',
     successUrl:'https://basecraftas.com/tayori/success',
     cancelUrl:'https://basecraftas.com/tayori/cancel',
   });
+  assert.equal(tayoriParams.get('line_items[0][price]'),'price_weekly123');
   assert.equal(tayoriParams.get('subscription_data[trial_period_days]'),'14');
 });
 
@@ -141,7 +162,7 @@ test('顧客認証テーブルとCheckout URL監査列を追加する',()=>{
   assert.equal(columns.includes('checkout_url'),true);
 });
 
-test('資格画像は非公開R2に保存され、管理者審査後だけセラピスト認証になる',async()=>{
+test('資格確認APIは公開・管理画面のどちらからも利用できない',async()=>{
   const fixture=stripeFixture();
   fixture.env.ALLOW_DEV_AUTH='true';
   fixture.sql.prepare("INSERT INTO members(id,email,role,status) VALUES('admin_qualification','admin@example.com','admin','active')").run();
@@ -155,7 +176,11 @@ test('資格画像は非公開R2に保存され、管理者審査後だけセラ
   form.append('privacy_consent','accepted');
   form.append('file',new File([qualificationPng],'license.png',{type:'image/png'}));
   const submitted=await worker.fetch(new Request('https://test.local/api/totonoe-member/api/customer/qualification',{method:'POST',headers:{cookie:`totonoe_session=${token}`},body:form}),fixture.env);
-  assert.equal(submitted.status,201);
+  assert.equal(submitted.status,404);
+  const disabledAdminHeaders={'x-column-studio-dev-email':'admin@example.com'};
+  const disabledList=await worker.fetch(new Request('https://test.local/api/tsuzuri-studio/api/admin/qualifications',{headers:disabledAdminHeaders}),fixture.env);
+  assert.equal(disabledList.status,404);
+  return;
   const submittedBody=await submitted.json();
   assert.equal(submittedBody.submission.status,'pending');
   assert.equal(Object.hasOwn(submittedBody.submission,'private_r2_object_key'),false);
@@ -193,16 +218,25 @@ test('資格画像は非公開R2に保存され、管理者審査後だけセラ
   assert.ok(fixture.sql.prepare("SELECT purge_after FROM qualification_submissions WHERE id=?").get(submittedBody.submission.id).purge_after);
 });
 
-test('TAYORI LPは区分別料金を案内し、受付開始までCheckoutを提供しない',()=>{
+test('TAYORI LPは980円・14日無料・初回10名とウェイトリストを案内する',()=>{
   const html=readFileSync('projects/totonoe/tayori.html','utf8');
-  assert.match(html,/一般の方/);
-  assert.match(html,/月額 1,480円/);
-  assert.match(html,/資格確認済みセラピスト/);
+  const workerConfig=readFileSync('apps/tsuzuri-studio-api/wrangler.toml','utf8');
   assert.match(html,/月額 980円/);
+  assert.match(html,/14日間無料トライアル/);
+  assert.match(html,/初回先着10名/);
+  assert.match(html,/data-waitlist-form/);
   assert.match(html,/入会金なし/);
-  assert.match(html,/お申し込みを受け付けていません/);
+  assert.doesNotMatch(html,/資格確認済みセラピスト|月額 1,480円/);
   assert.doesNotMatch(html,/data-tayori-checkout/);
+  assert.doesNotMatch(html,/tayoriCheckoutDialog/);
   assert.doesNotMatch(html,/tayori-checkout\.js/);
+  assert.match(workerConfig,/STRIPE_CHECKOUT_ENABLED = "false"/);
+});
+
+test('プライバシーポリシーは公開中の申込サービス表記を維持する',()=>{
+  const privacy=readFileSync('projects/totonoe/privacy.html','utf8');
+  assert.match(privacy,/Peatix \/ Therapis10\.com等の申込サービス/);
+  assert.match(privacy,/最終改定日：2026年8月31日/);
 });
 
 test('署名済みTAYORI Checkout完了通知だけが契約とWeekly権限を付与し、重複通知は安全に無視する',async()=>{
@@ -212,7 +246,7 @@ test('署名済みTAYORI Checkout完了通知だけが契約とWeekly権限を�
   assert.equal(response.status,200);
   assert.equal((await response.json()).status,'processed');
   const subscription=fixture.sql.prepare("SELECT product_code,billing_interval,status,recurring_amount_yen,provider_subscription_id FROM customer_subscriptions WHERE customer_id='customer_tayori'").get();
-  assert.deepEqual({...subscription},{product_code:'weekly',billing_interval:'monthly',status:'active',recurring_amount_yen:980,provider_subscription_id:'sub_tayori'});
+  assert.deepEqual({...subscription},{product_code:'weekly',billing_interval:'monthly',status:'trialing',recurring_amount_yen:980,provider_subscription_id:'sub_tayori'});
   assert.equal(fixture.sql.prepare("SELECT status FROM customer_entitlements WHERE customer_id='customer_tayori' AND entitlement_code='weekly_access'").get().status,'active');
   assert.equal(fixture.sql.prepare("SELECT status FROM stripe_checkout_attempts WHERE id='attempt_tayori'").get().status,'completed');
   const duplicate=await fixture.send(event);
@@ -234,6 +268,30 @@ test('解約WebhookはTAYORI権限を失効し、無効署名とlive通知は拒
   assert.equal(invalid.status,400);
   const live={...deleted,id:'evt_live_rejected',livemode:true};
   assert.equal((await fixture.send(live)).status,400);
+});
+
+test('Stripeの入金・返金Webhookを月次課金台帳に重複なく反映する',async()=>{
+  const fixture=stripeFixture();
+  const created=Math.floor(Date.now()/1000);
+  const complete={id:'evt_billing_seed',object:'event',type:'checkout.session.completed',livemode:false,created,data:{object:{id:'cs_test_tayori',mode:'subscription',status:'complete',customer:'cus_tayori',subscription:'sub_tayori',metadata:{attempt_id:'attempt_tayori',customer_id:'customer_tayori',plan_code:'weekly_monthly'}}}};
+  assert.equal((await fixture.send(complete)).status,200);
+
+  const paid={id:'evt_invoice_paid_tayori',object:'event',type:'invoice.paid',livemode:false,created,data:{object:{id:'in_tayori_202609',subscription:'sub_tayori',currency:'jpy',amount_paid:1480,amount_due:1480,billing_reason:'subscription_cycle',status_transitions:{paid_at:created}}}};
+  assert.equal((await fixture.send(paid)).status,200);
+  assert.equal((await fixture.send(paid)).status,200);
+  const invoiceRow=fixture.sql.prepare("SELECT transaction_type, amount_yen, status FROM billing_transactions WHERE provider_transaction_id='invoice:in_tayori_202609'").get();
+  assert.equal(invoiceRow.transaction_type,'recurring');
+  assert.equal(invoiceRow.amount_yen,1480);
+  assert.equal(invoiceRow.status,'paid');
+  assert.equal(fixture.sql.prepare("SELECT COUNT(*) AS count FROM billing_transactions WHERE stripe_invoice_id='in_tayori_202609'").get().count,1);
+
+  const refunded={id:'evt_charge_refunded_tayori',object:'event',type:'charge.refunded',livemode:false,created:created+60,data:{object:{id:'ch_tayori_202609',invoice:'in_tayori_202609',amount_refunded:480}}};
+  assert.equal((await fixture.send(refunded)).status,200);
+  const refundRow=fixture.sql.prepare("SELECT transaction_type, amount_yen, status FROM billing_transactions WHERE provider_transaction_id='refund:ch_tayori_202609'").get();
+  assert.equal(refundRow.transaction_type,'refund');
+  assert.equal(refundRow.amount_yen,-480);
+  assert.equal(refundRow.status,'refunded');
+  assert.equal(fixture.sql.prepare("SELECT SUM(amount_yen) AS net_yen FROM billing_transactions WHERE stripe_invoice_id='in_tayori_202609' AND status IN ('paid','refunded')").get().net_yen,1000);
 });
 
 test('認証済み会員だけが自分のStripe Customer Portalを作成できる',async()=>{
@@ -287,7 +345,7 @@ test('会員画面は再ログインと契約管理の導線を備える',()=>{
   assert.match(mypageScript,/customer\/auth\/logout/);
 });
 
-test('公開サービス導線はLPに入り、購入者ページは会員区分で保護される',()=>{
+test('IROHA公開導線は準備中になり、購入者ページは会員区分で保護される',()=>{
   const home=readFileSync('projects/totonoe/index.html','utf8');
   const service=readFileSync('projects/totonoe/service.html','utf8');
   const tayoriLp=readFileSync('projects/totonoe/tayori.html','utf8');
@@ -299,12 +357,18 @@ test('公開サービス導線はLPに入り、購入者ページは会員区分
 
   assert.match(home,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
   assert.match(service,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
-  assert.match(tayoriLp,/AI情報に置いていかれないためのサービスです/);
+  assert.match(home,/href="tsuzuri\/" class="btn btn-ghost">つづりを読む/);
+  assert.match(service,/href="tsuzuri\/" class="btn btn-ghost">つづりを読む/);
   assert.doesNotMatch(home,/href="TAYORI\/"/);
   assert.doesNotMatch(service,/href="TAYORI\/"/);
   assert.match(tayoriLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FTAYORI%2F/);
-  assert.match(irohaLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FIROHA%2Fdashboard\.html/);
-  assert.doesNotMatch(irohaLp,/href="dashboard\.html"/);
+  assert.match(service,/class="service-card is-coming-soon" id="iroha"/);
+  assert.doesNotMatch(home,/href="IROHA\/" class="btn/);
+  assert.doesNotMatch(service,/href="IROHA\/" class="btn/);
+  assert.match(irohaLp,/現在、公開に向けて準備中です/);
+  assert.match(irohaLp,/初回 9,800円 ／ 再入会 4,800円/);
+  assert.match(irohaLp,/data-interest="iroha_corporate"/);
+  assert.doesNotMatch(irohaLp,/購入|会員ログイン|href="dashboard\.html"|qualificationForm/);
   assert.match(dashboard,/<html lang="ja" class="member-access-pending">/);
   assert.match(dashboard,/data-page-entitlement="curriculum"/);
   assert.match(mypage,/data-page-entitlement="member"/);

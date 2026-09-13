@@ -3,7 +3,7 @@ window.TOTONOE_CURRICULUM = Object.freeze({
   purchaseEnabled: false,
   currency: "JPY",
   plans: Object.freeze({
-    weekly: Object.freeze({ monthly: Object.freeze({ general: 1480, therapist: 980 }) }),
+    weekly: Object.freeze({ monthly: 980 }),
     curriculum: Object.freeze({
       monthly: 2980,
       annual: 29800,
@@ -11,10 +11,9 @@ window.TOTONOE_CURRICULUM = Object.freeze({
     }),
   }),
   entryFees: Object.freeze({
-    first: Object.freeze({ general: 48000, therapist: 4800 }),
-    rejoin: Object.freeze({ general: 28000, therapist: 9800 }),
+    first: 9800,
+    rejoin: 4800,
   }),
   campaign: null,
   apiBase: "/api/totonoe-member",
-  qualificationRetentionDays: 30,
 });

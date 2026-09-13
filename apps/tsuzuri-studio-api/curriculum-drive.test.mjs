@@ -80,35 +80,15 @@ test("IROHA direct access stays locked until an IROHA entitlement is confirmed",
   await check({ has_weekly_access: true, has_curriculum_access: true }, false);
 });
 
-test("curriculum LP shows pricing as a non-purchasable preview", async () => {
-  const [html, script, config] = await Promise.all([
-    fs.readFile(path.join(curriculumDir, "index.html"), "utf8"),
-    fs.readFile(path.join(curriculumDir, "curriculum.js"), "utf8"),
-    fs.readFile(path.join(curriculumDir, "curriculum-config.js"), "utf8")
-  ]);
-  assert.match(html, /id="priceOriginal">30,000/);
-  assert.match(html, /id="priceDiscount">83% OFF/);
-  assert.match(html, /資格確認済みセラピストだけの特別価格/);
-  assert.match(html, /id="recurringPrice">2,980/);
-  assert.match(html, /class="rejoin-prices"/);
-  assert.match(html, /30,000<small>円<\/small>/);
-  assert.match(html, /10,000<small>円<\/small>/);
-  assert.match(html, /表示中の料金は提供開始時の案です/);
-  assert.match(html, /30日後から/);
-  assert.match(script, /audience === config\.campaign\.audience/);
-  assert.match(script, /recurringUnit/);
-  assert.match(script, /config\.entryFees\.first\[audience\]/);
-  assert.match(script, /Math\.round\(\(1 - entry \/ originalEntry\) \* 100\)/);
-  assert.match(html, /id="qualificationForm"/);
-  assert.match(html, /審査完了から30日後に削除/);
-  assert.match(html, /name="applicant_name"/);
-  assert.match(html, /name="privacy_consent"/);
-  assert.match(script, /\/api\/customer\/qualification/);
-  assert.match(script, /qualification\.therapist_status !== "verified"/);
-  assert.match(html, /現在は購入できません/);
-  assert.match(html, /disabled aria-disabled="true">現在準備中です/);
-  assert.doesNotMatch(html, /data-preview-action/);
-  assert.match(config, /purchaseEnabled: false/);
+test("curriculum LP stays coming-soon and exposes only waitlist registration", async () => {
+  const html = await fs.readFile(path.join(curriculumDir, "index.html"), "utf8");
+  assert.match(html, /<meta name="robots" content="noindex,nofollow">/);
+  assert.match(html, /COMING SOON/);
+  assert.match(html, /現在、公開に向けて準備中です/);
+  assert.match(html, /初回 9,800円 ／ 再入会 4,800円/);
+  assert.match(html, /data-interest="iroha_personal"/);
+  assert.match(html, /data-interest="iroha_corporate"/);
+  assert.doesNotMatch(html, /購入|会員ログイン|qualificationForm|checkoutPreview/);
 });
 
 

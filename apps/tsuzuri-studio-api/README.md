@@ -68,8 +68,6 @@ Worker の環境変数に次を設定してください。
 
 `media_url` に外部URLを入れた場合は公開時にも再取得します。noteリンクで `og:image` が取得できた場合は、手動アイキャッチ未設定のサムネイルとして `hero_url` に反映します。Podcast・動画・アーカイブは `data/contents/index.json` からToToNoE+の対応タブに自動反映します。
 
-「次回開催」でサムネイルを公開すると週末のAI整え習慣ページへ即時反映されます。土曜日06:30（日本時間）を過ぎると公開APIは既定サムネイルへ自動的に戻し、同日09:00の土曜Cronで終了済みサムネイルをアーカイブします。次週の画像を土曜日06:30以降に先行公開した場合は次回分として保持し、09:00のアーカイブ対象にはしません。
-
 4ファイルのGitHub更新は1つのcommitとして反映し、競合した場合は1回だけ最新状態を取得し直します。
 
 必要な設定:
@@ -140,13 +138,14 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 7. `migrations/20260917_stripe_trial_campaign.sql`
 8. `migrations/20260918_customer_email_auth.sql`
 9. `migrations/20260919_weekly_question_sheet_sync.sql`
+10. `migrations/20260920_billing_dashboard.sql`
 
 ## Stripe連携（第2段階：メール認証とCheckout作成）
 
 料金表、顧客用メール認証、Checkout Session作成、Checkout試行履歴、Webhookの重複防止テーブル、Stripe署名検証をローカル実装しています。
-Stripe DashboardのサンドボックスにTAYORI、IROHAに対応する商品（外部保存名もTAYORI・IROHAへ変更済み）および入会・再登録費の商品とPriceを作成し、Price IDを非秘密設定へ登録しています。Webhookによる権限更新はローカル実装・自動テスト済みですが、本番課金はまだ有効化していません。
+Stripe DashboardのサンドボックスにTAYORI、IROHAに対応する商品とPriceを作成済みです。ローカル定義はTAYORI月額980円、IROHA初回入会金9,800円、再入会金4,800円の職種共通プランです。Webhookによる権限更新はローカル実装・自動テスト済みですが、本番課金はまだ有効化していません。
 
-料金はブラウザから送られた金額を使用せず、`src/billing.js` のサーバー定義とD1の会員履歴・資格確認結果から決定します。
+料金はブラウザから送られた金額を使用せず、`src/billing.js` のサーバー定義とD1の会員履歴から決定します。資格確認は行いません。
 StripeのシークレットキーとWebhook署名シークレットは、リポジトリや `wrangler.toml` に書かず、次段階でWorker Secretsへ登録します。
 
 - Secret: `CUSTOMER_AUTH_SECRET`（32文字以上のランダム値）
@@ -155,12 +154,13 @@ StripeのシークレットキーとWebhook署名シークレットは、リポ�
 - Secret: `STRIPE_WEBHOOK_SECRET`
 - 非秘密設定: `STRIPE_MODE=test`
 - 非秘密設定: `RESEND_FROM_EMAIL`（Resendで検証済みの送信元）
+- 登録済みの非秘密設定: `STRIPE_PRICE_ENTRY_GENERAL_FIRST`、`STRIPE_PRICE_ENTRY_THERAPIST_FIRST`、`STRIPE_PRICE_ENTRY_GENERAL_REJOIN`、`STRIPE_PRICE_ENTRY_THERAPIST_REJOIN`
 
-初回入会ではIROHA料金を30日間無料にし、初回決済は入会費だけです。`trial_entry_5000` キャンペーンでは入会費5,000円だけを請求し、30日後から月額2,980円を開始します。再登録には無料期間を付けません。
+IROHAの新規契約は月額プランだけを受け付け、職種共通で月額2,980円（税込）です。初回入会は入会金9,800円とし、継続料金を30日間無料にします。再入会金は4,800円で、無料期間は付けません。資格確認は行いません。法人プランは準備中とし、メールウェイトリストのみ受け付けます。既存データとの互換性のため年額プランの内部定義は保持しますが、新規Checkoutでは選択できません。
 
 顧客認証はスタッフ用Cloudflare Accessと分離しています。6桁コードは10分有効・最大5回、ログインセッションは30日です。D1にはコードとCookieの原文ではなく、`CUSTOMER_AUTH_SECRET`を使った用途別HMACだけを保存します。既存D1には `migrations/20260917_stripe_trial_campaign.sql` の後に `migrations/20260918_customer_email_auth.sql` を一度だけ適用してください。
 
-会員向けCheckout APIは `/api/totonoe-member/api/customer/billing/checkout` です。料金・初回／再登録・キャンペーン・資格割引はWorkerがD1と環境変数から確定し、ブラウザから金額やStripe Price IDは受け取りません。誤課金を防ぐため、Stripeテスト環境でのE2E確認が終わるまでは `STRIPE_CHECKOUT_ENABLED = "false"` のままにします。
+会員向けCheckout APIは `/api/totonoe-member/api/customer/billing/checkout` です。料金・初回／再入会・会員区分はWorkerがD1と環境変数から確定し、ブラウザから金額やStripe Price IDは受け取りません。誤課金を防ぐため、Stripeテスト環境でのE2E確認が終わるまでは `STRIPE_CHECKOUT_ENABLED = "false"` のままにします。
 
 TAYORIの優先質問は日曜から土曜までを1週として、1会員につき1枠です。`submitted` の間は上書きでき、運営側が `in_review` にすると固定されます。回答動画フォルダは `DRIVE_WEEKLY_RESPONSE_FOLDER_ID` で指定し、毎時00分に動画メタデータを確認します。週末資料は毎週土曜日09:00に同期します。フォルダはリンク公開せず、Google Drive用サービスアカウントへだけ「閲覧者」で共有してください。
 
@@ -175,12 +175,12 @@ TAYORIの優先質問は日曜から土曜までを1週として、1会員につ
 静的画面のロックは会員向けの案内表示です。教材ファイル自体を有料会員だけに限定する本番運用では、教材URLを静的JSへ直接置かず、`curriculum_all_access` を検証するWorker API経由で返してください。
 # TAYORI Stripeテスト決済
 
-TAYORI個人プランは `weekly_monthly`（月額980円・入会金なし）として、メール認証後にStripe Checkoutへ進みます。すべての新規申込みに14日間の無料トライアルを付与し、終了後から月額料金を請求します。金額、Price ID、無料期間はサーバー固定で、決済完了画面への遷移だけでは権限を付与せず、署名検証済みWebhookを受信してから `weekly_access` を有効化します。
+TAYORI個人プランは `weekly_monthly`（月額980円、入会金なし）です。すべての新規申込みに14日間の無料トライアルを付与します。初回枠は10名で、運営管理者だけが10名ずつ追加できます。同時申込はD1の予約レコードで上限を保護します。
 
 本番公開前は、次の順番を崩さないでください。
 
 1. Stripeをテストモードにして、Webhookエンドポイントを `https://basecraftas.com/api/totonoe-member/api/stripe/webhook` で作成する。
-2. 受信イベントを `checkout.session.completed`、`checkout.session.expired`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.paid`、`invoice.payment_failed` に限定する。
+2. 受信イベントを `checkout.session.completed`、`checkout.session.expired`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.paid`、`invoice.payment_failed`、`charge.refunded` に限定する。
 3. Workerシークレット `STRIPE_SECRET_KEY` と `STRIPE_WEBHOOK_SECRET` を設定する。値はGit・HTML・READMEへ保存しない。
 4. `STRIPE_MODE=test` と `STRIPE_CHECKOUT_ENABLED=false` のままWorkerと静的サイトを反映する。
 5. Stripeのテストカードで、申込み・権限付与・重複通知・支払失敗・解約を確認する。
@@ -200,6 +200,6 @@ Stripe Dashboardのテスト環境でCustomer Portalを有効化し、次を設�
 - 解約時期: 現在の請求期間の終了時
 - 解約理由の収集: 有効
 - プラン変更・数量変更: TAYORI個人プランでは無効
-- デフォルトの戻り先: `https://basecraftas.com/projects/totonoe/IROHA/mypage.html`
+- デフォルトの戻り先: `https://basecraftas.com/projects/totonoe/curriculum/mypage.html`
 
 Portal Session作成APIは `/api/totonoe-member/api/customer/billing/portal` です。メール認証済みCookie、D1のStripe Customer ID、Stripe契約履歴がすべて揃う場合だけ作成します。解約結果は `customer.subscription.updated` と `customer.subscription.deleted` のWebhookでD1へ反映します。

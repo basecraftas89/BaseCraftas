@@ -124,19 +124,22 @@
             <li>短い解説動画</li>
             <li>会員限定Q&A</li>
           </ul>
-          <div class="tayori-audience-prices" aria-label="個人プランの料金">
-            <div class="tayori-audience-price">
-              <span>一般の方</span>
-              <strong>月額 1,480円<small>（税込）</small></strong>
-              <span class="btn btn-cta btn-disabled" aria-disabled="true">お申し込み準備中</span>
-            </div>
-            <div class="tayori-audience-price is-therapist">
-              <span>資格確認済みセラピスト</span>
-              <strong>月額 980円<small>（税込）</small></strong>
-              <span class="btn btn-ghost btn-disabled" aria-disabled="true">お申し込み準備中</span>
-            </div>
+          <div class="tayori-single-price" aria-label="個人プランの料金">
+            <span>セラピスト・産業保健職を中心とした専門職の方へ</span>
+            <strong>月額 980円<small>（税込）</small></strong>
+            <b>14日間無料トライアル・初回先着10名</b>
           </div>
-          <p class="weekly-payment-note">入会金なし・いつでも解約可能。現在は公開準備中のため、お申し込みを受け付けていません。</p>
+          <p class="enrollment-status" data-enrollment-status>初回枠の空き状況を確認中です。</p>
+          <form class="waitlist-form" data-waitlist-form data-interest="tayori_personal">
+            <label>TAYORIの受付開始をメールで受け取る
+              <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+            </label>
+            <input class="waitlist-honeypot" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <label class="waitlist-consent"><input name="privacy_consent" type="checkbox" required> <a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意する</label>
+            <button class="btn btn-cta" type="submit">ウェイトリストに登録</button>
+            <p class="waitlist-status" role="status" aria-live="polite"></p>
+          </form>
+          <p class="weekly-payment-note">入会金なし・いつでも解約可能。初回10名が満枠後、運営が10名ずつ追加枠を開放します。資格証明の提出は不要です。</p>
         </article>
         <article class="pricing-card weekly-plan-card weekly-plan-card-team" id="team-plan">
           <span class="service-label">TEAM / ORGANIZATION</span>
@@ -181,7 +184,7 @@
     <div class="container">
       <h2 class="final-title">情報を追う時間を減らして、<br>大切な実践へ戻る。</h2>
       <div class="section-cta">
-        <span class="btn btn-cta btn-lg btn-disabled" aria-disabled="true">個人プランはお申し込み準備中</span>
+        <a href="#pricing" class="btn btn-cta btn-lg">受付開始の案内を受け取る</a>
         <a href="#team-plan" class="btn btn-ghost btn-ghost-light">法人で導入する</a>
         <span class="btn btn-ghost btn-ghost-light btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
       </div>
@@ -214,5 +217,6 @@
 </footer>
 
 <script src="common.js?v=20260905a"></script>
+<script src="waitlist.js?v=20260913a"></script>
 </body>
 </html>

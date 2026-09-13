@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>ToToNoE+ Studio</title>
-  <meta name="description" content="ToToNoE+のつづり、動画、次回開催サムネイルを編集・公開するダッシュボード">
+  <meta name="description" content="ToToNoE+のつづり｜TSUZURIと動画コンテンツを編集・公開するダッシュボード">
   <link rel="icon" href="../../images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260913-member-content">
+  <link rel="stylesheet" href="styles.css?v=20260913-billing">
 </head>
 <body>
   <div class="app-shell">
@@ -46,8 +46,8 @@
         <button class="nav-item admin-only" type="button" data-view="members">
           <span class="nav-icon" aria-hidden="true">♙</span><span>メンバー・権限</span>
         </button>
-        <button class="nav-item admin-only" type="button" data-view="qualifications">
-          <span class="nav-icon" aria-hidden="true">✓</span><span>資格審査</span><span class="nav-count" id="qualificationNavCount">0</span>
+        <button class="nav-item admin-only" type="button" data-view="billing">
+          <span class="nav-icon" aria-hidden="true">¥</span><span>課金・会員</span>
         </button>
         <button class="nav-item admin-only" type="button" data-view="settings">
           <span class="nav-icon" aria-hidden="true">⚙</span><span>公開設定</span>
@@ -226,20 +226,57 @@
         </div>
       </section>
 
+      <section class="view" id="view-billing" data-title="課金・会員">
+        <div class="page-wrap billing-wrap">
+          <div class="page-heading billing-heading">
+            <div><p class="eyebrow">BILLING OVERVIEW</p><h1>課金・会員</h1><p>課金者数、月ごとの決済実績、現在の継続課金予定額を確認します。</p></div>
+            <div class="billing-heading-meta"><span class="billing-environment" id="billingEnvironment">確認中</span><small id="billingLastUpdated">最終同期 —</small></div>
+          </div>
+          <div class="billing-filters" aria-label="課金集計の絞り込み">
+            <label>対象月<input type="month" id="billingMonth"></label>
+            <label>表示期間<select id="billingRange"><option value="6m">6か月</option><option value="12m" selected>12か月</option><option value="fiscal">年度</option></select></label>
+            <label>サービス<select id="billingProduct"><option value="all">すべて</option><option value="weekly">TAYORI</option><option value="curriculum">IROHA</option></select></label>
+            <button class="secondary-button" type="button" data-action="refresh-billing">更新</button>
+          </div>
+          <p class="billing-quality" id="billingQuality" role="status">課金情報を読み込んでいます。</p>
+          <div class="billing-kpis">
+            <article class="billing-kpi"><span>現在の有効会員</span><strong id="billingActiveCustomers">—</strong><small id="billingActiveDetail">重複を除いた人数</small></article>
+            <article class="billing-kpi"><span>当月決済額</span><strong id="billingMonthNet">—</strong><small id="billingMonthDetail">支払済み − 返金</small></article>
+            <article class="billing-kpi"><span>継続課金予定額</span><strong id="billingRecurring">—</strong><small id="billingRecurringDetail">現在の契約を月額換算</small></article>
+          </div>
+          <div class="billing-chart-grid">
+            <section class="panel billing-chart-panel">
+              <div class="panel-head"><div><p class="eyebrow">MONTHLY</p><h2>月別決済額と会員数</h2></div><div class="billing-legend"><span class="legend-recurring">継続料金</span><span class="legend-entry">入会金等</span><span class="legend-refund">返金</span><span class="legend-members">会員数</span></div></div>
+              <div class="billing-chart" id="billingMonthlyChart"><div class="empty-state">課金情報を読み込んでいます。</div></div>
+            </section>
+            <section class="panel billing-chart-panel">
+              <div class="panel-head"><div><p class="eyebrow">COMPOSITION</p><h2>継続課金額の構成</h2></div></div>
+              <div class="billing-composition" id="billingComposition"><div class="empty-state">課金情報を読み込んでいます。</div></div>
+            </section>
+          </div>
+          <section class="panel billing-table-panel">
+            <div class="panel-head"><div><p class="eyebrow">PLANS</p><h2>課金プラン別内訳</h2></div></div>
+            <div class="billing-table-scroll"><table class="billing-table"><thead><tr><th>課金プラン</th><th>利用中</th><th>無料期間</th><th>解約予定</th><th>要確認</th><th>継続月額</th></tr></thead><tbody id="billingBreakdown"><tr><td colspan="6">課金情報を読み込んでいます。</td></tr></tbody></table></div>
+          </section>
+          <section class="panel billing-table-panel">
+            <div class="panel-head"><div><p class="eyebrow">CAPACITY</p><h2>TAYORI受付枠</h2></div><button class="secondary-button" type="button" data-action="increase-capacity">10名枠を追加</button></div>
+            <p class="billing-quality" id="enrollmentCapacity">受付枠を読み込んでいます。</p>
+            <small>追加は必ず10名単位で行われ、管理者の操作履歴に残ります。</small>
+          </section>
+          <section class="panel billing-table-panel">
+            <div class="panel-head"><div><p class="eyebrow">WAITLIST</p><h2>ウェイトリスト</h2></div></div>
+            <div class="billing-table-scroll"><table class="billing-table"><thead><tr><th>メールアドレス</th><th>希望プラン</th><th>状態</th><th>登録日</th></tr></thead><tbody id="waitlistEntries"><tr><td colspan="4">登録情報を読み込んでいます。</td></tr></tbody></table></div>
+          </section>
+          <p class="security-note">🔒 この画面は管理者だけが閲覧できます。当月決済額はStripeの支払済み実績、継続課金予定額は現在の契約条件に基づく月額換算です。</p>
+        </div>
+      </section>
+
       <section class="view" id="view-members" data-title="メンバー・権限">
         <div class="page-wrap">
           <div class="page-heading"><div><p class="eyebrow">TEAM &amp; ACCESS</p><h1>メンバー・権限</h1><p>記事を扱える人と、できる操作を管理します。</p></div><button class="primary-button" type="button" data-action="invite">＋ メンバーを登録</button></div>
           <div class="role-cards"><article><span class="role-icon admin">A</span><div><strong>管理者</strong><p>記事の公開、メンバー、公開設定を管理</p></div></article><article><span class="role-icon editor">E</span><div><strong>編集者</strong><p>記事の作成・編集ができます</p></div></article><article><span class="role-icon viewer">V</span><div><strong>閲覧者</strong><p>記事の確認とプレビューのみ</p></div></article></div>
           <div class="panel member-panel"><div class="member-head"><span>メンバー</span><span>権限</span><span>状態</span><span></span></div><div id="memberList"></div></div>
           <p class="security-note">🔒 ここではToToNoE+ Studio内の権限を設定します。新しい人は、Cloudflare Access側でも同じメールアドレスを許可してください。</p>
-        </div>
-      </section>
-
-      <section class="view" id="view-qualifications" data-title="資格審査">
-        <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">THERAPIST VERIFICATION</p><h1>資格審査</h1><p>セラピスト限定価格を利用する申請者の資格証明画像を確認します。</p></div><button class="secondary-button" type="button" data-action="refresh-qualifications">更新</button></div>
-          <p class="security-note">🔒 画像は非公開R2に保存され、管理者だけが閲覧できます。審査完了から30日後に画像を削除し、確認結果だけを保持します。</p>
-          <div class="qualification-admin-list" id="qualificationAdminList"><div class="empty-state">申請情報を読み込んでいます。</div></div>
         </div>
       </section>
 
@@ -278,12 +315,12 @@
   </dialog>
 
   <dialog class="invite-dialog" id="inviteDialog">
-    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option><option value="admin">管理者</option></select></label><p>登録後、Cloudflare Accessでも同じメールアドレスを許可するとログインできます。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
+    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option></select></label><p>管理者は現在の管理者アカウントだけに固定されています。登録後、Cloudflare Accessでも同じメールアドレスを許可してください。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
-  <script src="security.js?v=20260913-member-content"></script>
-  <script src="script.js?v=20260913-member-content"></script>
+  <script src="security.js?v=20260913-billing"></script>
+  <script src="script.js?v=20260913-billing"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ export const BILLING_PLANS = Object.freeze({
     productCode: "weekly",
     billingInterval: "monthly",
     recurringAmountYen: 980,
-    recurringPriceEnv: "STRIPE_PRICE_WEEKLY_MONTHLY",
+    recurringPriceEnv: "STRIPE_PRICE_TAYORI_MONTHLY",
     entitlementCodes: Object.freeze(["weekly_access"]),
   }),
   curriculum_monthly: Object.freeze({
@@ -30,23 +30,11 @@ export const BILLING_PLANS = Object.freeze({
 });
 
 export const CURRICULUM_ENTRY_FEES = Object.freeze({
-  "general:first": Object.freeze({ amountYen: 50000, priceEnv: "STRIPE_PRICE_ENTRY_GENERAL_FIRST" }),
-  "therapist:first": Object.freeze({ amountYen: 30000, priceEnv: "STRIPE_PRICE_ENTRY_THERAPIST_FIRST" }),
-  "general:rejoin": Object.freeze({ amountYen: 30000, priceEnv: "STRIPE_PRICE_ENTRY_GENERAL_REJOIN" }),
-  "therapist:rejoin": Object.freeze({ amountYen: 10000, priceEnv: "STRIPE_PRICE_ENTRY_THERAPIST_REJOIN" }),
+  first: Object.freeze({ amountYen: 9800, priceEnv: "STRIPE_PRICE_IROHA_FIRST" }),
+  rejoin: Object.freeze({ amountYen: 4800, priceEnv: "STRIPE_PRICE_IROHA_REJOIN" }),
 });
 
-export const CURRICULUM_CAMPAIGNS = Object.freeze({
-  trial_entry_5000: Object.freeze({
-    campaignCode: "trial_entry_5000",
-    allowedPlanCodes: Object.freeze(["curriculum_monthly"]),
-    allowedFeeTypes: Object.freeze(["first"]),
-    allowedAudienceTypes: Object.freeze(["therapist"]),
-    entryFeeAmountYen: 5000,
-    entryFeePriceEnv: "STRIPE_PRICE_ENTRY_CAMPAIGN_TRIAL",
-    trialPeriodDays: 30,
-  }),
-});
+export const CURRICULUM_CAMPAIGNS = Object.freeze({});
 
 function billingError(code) {
   return Object.assign(new Error(code), { code, status: 400 });
@@ -66,7 +54,7 @@ export function resolveBillingQuote({ planCode, audienceType = "general", feeTyp
     if (campaign) throw billingError("weekly_campaign_not_allowed");
     return Object.freeze({
       ...plan,
-      audienceType,
+      audienceType: "general",
       feeType: "none",
       entryFeeAmountYen: 0,
       entryFeePriceEnv: null,
@@ -83,12 +71,12 @@ export function resolveBillingQuote({ planCode, audienceType = "general", feeTyp
   }
   const entryFee = campaign
     ? { amountYen: campaign.entryFeeAmountYen, priceEnv: campaign.entryFeePriceEnv }
-    : CURRICULUM_ENTRY_FEES[`${audienceType}:${feeType}`];
+    : CURRICULUM_ENTRY_FEES[feeType];
   if (!entryFee) throw billingError("invalid_entry_fee");
   const trialPeriodDays = campaign?.trialPeriodDays || (feeType === "first" ? 30 : 0);
   return Object.freeze({
     ...plan,
-    audienceType,
+    audienceType: "general",
     feeType,
     entryFeeAmountYen: entryFee.amountYen,
     entryFeePriceEnv: entryFee.priceEnv,

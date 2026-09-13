@@ -77,11 +77,12 @@ test('draft media private; public snapshot required; unpublish revokes it; exist
  assert.equal((await f.call('/api/tsuzuri-studio/media/'+asset.key)).status,404);
 });
 
-test('last admin protected in registration and update; second admin allows intentional demotion',async()=>{
+test('current admin stays fixed and no second admin can be registered or promoted',async()=>{
  const f=fixture();assert.equal((await f.call('/api/members','POST',{email:'admin@example.com',role:'editor'})).status,409);
  assert.equal((await f.call('/api/members/admin','PATCH',{role:'viewer'})).status,409);
- await f.call('/api/members','POST',{email:'second@example.com',role:'admin'});
- assert.equal((await f.call('/api/members','POST',{email:'admin@example.com',role:'editor'})).status,200);
+ assert.equal((await f.call('/api/members','POST',{email:'second@example.com',role:'admin'})).status,409);
+ const editor=await (await f.call('/api/members','POST',{email:'second@example.com',role:'editor'})).json();
+ assert.equal((await f.call('/api/members/'+editor.member.id,'PATCH',{role:'admin'})).status,409);
  assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM members WHERE role='admin' AND status='active'").get().n,1);
 });
 
@@ -152,10 +153,9 @@ test('public build excludes source/config/report files and includes real 404/sec
   assert.match(readFileSync('dist/_headers','utf8'),/script-src 'self'/);
   const dashboard=readFileSync('apps/tsuzuri-studio/index.html','utf8');
   const dashboardScript=readFileSync('apps/tsuzuri-studio/script.js','utf8');
-  assert.match(dashboard,/data-view="qualifications"/);
-  assert.match(dashboard,/id="qualificationAdminList"/);
-  assert.match(dashboardScript,/api\/admin\/qualifications/);
-  assert.match(dashboardScript,/data-qualification-review/);
+  assert.doesNotMatch(dashboard,/data-view="qualifications"|id="qualificationAdminList"/);
+  assert.doesNotMatch(dashboardScript,/api\/admin\/qualifications|data-qualification-review/);
+  assert.match(dashboard,/id="waitlistEntries"/);
 });
 
 for (const contentType of ['column','video']) test(contentType+' publish emits sanitized HTML and fixes public media snapshot only after GitHub commit',async()=>{

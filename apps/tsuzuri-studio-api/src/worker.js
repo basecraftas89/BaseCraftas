@@ -172,8 +172,8 @@ function isPublicMemberRequest(rawPath, normalizedPath, method) {
     "POST /api/customer/auth/logout",
     "POST /api/customer/billing/checkout",
     "POST /api/customer/billing/portal",
-    "GET /api/customer/qualification",
-    "POST /api/customer/qualification",
+    "GET /api/public/enrollment",
+    "POST /api/public/waitlist",
     "POST /api/stripe/webhook",
     "GET /api/customer/profile",
     "PATCH /api/customer/profile",
@@ -779,6 +779,7 @@ function validMemberRole(value) {
 
 const memberChangeGuard = "(NOT (role = 'admin' AND status = 'active') OR (? = 'admin' AND ? = 'active') OR (SELECT COUNT(*) FROM members WHERE role = 'admin' AND status = 'active') > 1)";
 function lastAdminError() { return json({error: "last_admin", message: "最後の管理者は変更・停止できません。"}, {status: 409}); }
+function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は現在の管理者アカウントだけに固定されています。"}, {status: 409}); }
 
 async function createMember(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
@@ -790,7 +791,8 @@ async function createMember(request, env) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: "invalid_email", message: "メールアドレスを確認してください。" }, { status: 400 });
   if (!role) return json({ error: "invalid_role", message: "権限を確認してください。" }, { status: 400 });
 
-  const existing = await env.DB.prepare("SELECT id, name FROM members WHERE lower(email) = ?").bind(email).first();
+  const existing = await env.DB.prepare("SELECT id, name, role, status FROM members WHERE lower(email) = ?").bind(email).first();
+  if (role === "admin" && existing?.role !== "admin") return adminRoleLockedError();
   const id = existing?.id || uid("member");
   const savedName = name || existing?.name || "";
   if (existing) {
@@ -815,6 +817,8 @@ async function updateMember(request, env, id) {
   const role = validMemberRole(payload?.role || current.role);
   const status = payload?.status || current.status;
   if (!role || !["active", "disabled"].includes(status)) return json({ error: "invalid_member", message: "権限または状態を確認してください。" }, { status: 400 });
+  if (current.role === "admin" && (role !== "admin" || status !== "active")) return adminRoleLockedError();
+  if (current.role !== "admin" && role === "admin") return adminRoleLockedError();
 
   const updated = await env.DB.prepare("UPDATE members SET role = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND " + memberChangeGuard).bind(role, status, id, role, status).run();
   if (!updated.meta.changes) return lastAdminError();
@@ -2199,6 +2203,113 @@ function checkoutSiteOrigin(request, env) {
   return configured;
 }
 
+async function weeklyEnrollmentAvailability(env) {
+  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
+  const capacity = await env.DB.prepare(
+    "SELECT capacity, increment_size FROM plan_capacity WHERE plan_code = 'weekly_monthly'"
+  ).first();
+  if (!capacity) throw Object.assign(new Error("plan_capacity_not_configured"), { status: 503 });
+  const occupied = await env.DB.prepare(
+    `SELECT COUNT(DISTINCT customer_id) AS count FROM customer_subscriptions
+      WHERE product_code = 'weekly' AND livemode = ?
+        AND status IN ('trialing', 'active', 'past_due', 'paused')`
+  ).bind(livemode).first();
+  const reserved = await env.DB.prepare(
+    `SELECT COUNT(*) AS count FROM plan_capacity_reservations
+      WHERE plan_code = 'weekly_monthly' AND status = 'reserved' AND datetime(expires_at) > datetime('now')`
+  ).first();
+  const used = Number(occupied?.count || 0) + Number(reserved?.count || 0);
+  const total = Number(capacity.capacity || 10);
+  return {
+    plan_code: "weekly_monthly",
+    capacity: total,
+    used,
+    remaining: Math.max(0, total - used),
+    full: used >= total,
+    increment_size: Number(capacity.increment_size || 10),
+  };
+}
+
+async function publicEnrollment(request, env) {
+  const planCode = new URL(request.url).searchParams.get("plan") || "weekly_monthly";
+  if (planCode !== "weekly_monthly") return json({ error: "invalid_plan" }, { status: 400 });
+  try {
+    return json(await weeklyEnrollmentAvailability(env));
+  } catch (error) {
+    if (/no such table/i.test(String(error.message || error))) return json({ error: "enrollment_not_configured" }, { status: 503 });
+    throw error;
+  }
+}
+
+async function joinWaitlist(request, env) {
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  if (String(payload.website || "").trim()) return json({ ok: true }, { status: 202 });
+  const email = normalizeCustomerEmail(payload.email);
+  const interest = String(payload.interest || "");
+  if (!["tayori_personal", "iroha_personal", "iroha_corporate"].includes(interest)) {
+    return json({ error: "invalid_interest" }, { status: 400 });
+  }
+  if (payload.privacy_consent !== true) return json({ error: "privacy_consent_required" }, { status: 400 });
+  const ip = String(request.headers.get("cf-connecting-ip") || "unknown").slice(0, 80);
+  const requestKey = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "waitlist-request", ip);
+  await incrementCustomerAuthLimit(env, `waitlist:${requestKey}`, 8);
+  const id = uid("waitlist");
+  await env.DB.prepare(
+    `INSERT INTO waitlist_entries(id, email, interest, status, source, consent_at)
+     VALUES (?, ?, ?, 'waiting', ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(email, interest) DO UPDATE SET
+       status = CASE WHEN waitlist_entries.status = 'joined' THEN 'joined' ELSE 'waiting' END,
+       source = excluded.source,
+       consent_at = excluded.consent_at,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(id, email, interest, String(payload.source || "website").slice(0, 80)).run();
+  return json({ ok: true, interest }, { status: 201 });
+}
+
+async function reserveWeeklyCapacity(env, customerId, attemptId) {
+  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
+  await env.DB.prepare(
+    "UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE status = 'reserved' AND datetime(expires_at) <= datetime('now')"
+  ).run();
+  const result = await env.DB.prepare(
+    `INSERT INTO plan_capacity_reservations(id, plan_code, customer_id, checkout_attempt_id, status, expires_at)
+     SELECT ?, 'weekly_monthly', ?, ?, 'reserved', datetime('now', '+30 minutes')
+     FROM plan_capacity pc
+     WHERE pc.plan_code = 'weekly_monthly'
+       AND (
+         (SELECT COUNT(DISTINCT customer_id) FROM customer_subscriptions
+           WHERE product_code = 'weekly' AND livemode = ?
+             AND status IN ('trialing', 'active', 'past_due', 'paused'))
+         +
+         (SELECT COUNT(*) FROM plan_capacity_reservations
+           WHERE plan_code = 'weekly_monthly' AND status = 'reserved' AND datetime(expires_at) > datetime('now'))
+       ) < pc.capacity`
+  ).bind(uid("capacity_reservation"), customerId, attemptId, livemode).run();
+  return Number(result.meta?.changes || 0) > 0;
+}
+
+async function listWaitlistAdmin(request, env) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const result = await env.DB.prepare(
+    "SELECT id, email, interest, status, source, consent_at, created_at, updated_at FROM waitlist_entries ORDER BY datetime(created_at) DESC LIMIT 500"
+  ).all();
+  return json({ entries: result.results || [], enrollment: await weeklyEnrollmentAvailability(env) });
+}
+
+async function increasePlanCapacity(request, env) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const payload = await readJson(request);
+  if (!payload || payload.plan_code !== "weekly_monthly") return json({ error: "invalid_plan" }, { status: 400 });
+  await env.DB.prepare(
+    "UPDATE plan_capacity SET capacity = capacity + increment_size, updated_at = CURRENT_TIMESTAMP WHERE plan_code = 'weekly_monthly'"
+  ).run();
+  await audit(env, auth.email, "plan_capacity.increase", "plan_capacity", "weekly_monthly", { increment: 10 });
+  return json(await weeklyEnrollmentAvailability(env));
+}
+
 async function createCustomerCheckout(request, env) {
   if (env.STRIPE_CHECKOUT_ENABLED !== "true") return json({ error: "stripe_checkout_not_enabled" }, { status: 503 });
   const auth = await requireCustomerIdentity(request, env);
@@ -2206,13 +2317,10 @@ async function createCustomerCheckout(request, env) {
   const payload = await readJson(request);
   if (!payload) return json({ error: "invalid_json" }, { status: 400 });
   const planCode = String(payload.plan_code || "");
-  if (!["weekly_monthly", "curriculum_monthly", "curriculum_annual"].includes(planCode)) {
+  if (!["weekly_monthly", "curriculum_monthly"].includes(planCode)) {
     return json({ error: "invalid_plan" }, { status: 400 });
   }
-  const audienceType = payload.audience_type === "therapist" ? "therapist" : "general";
-  if (audienceType === "therapist" && auth.customer.therapist_status !== "verified") {
-    return json({ error: "therapist_verification_required" }, { status: 409 });
-  }
+  const audienceType = "general";
   const requestId = String(payload.request_id || "");
   if (!/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "invalid_request_id" }, { status: 400 });
   const idempotencyKey = `checkout:${auth.customer.id}:${requestId}`;
@@ -2234,9 +2342,7 @@ async function createCustomerCheckout(request, env) {
     "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND product_code = 'curriculum' LIMIT 1"
   ).bind(auth.customer.id).first();
   const feeType = planCode === "weekly_monthly" ? "none" : (history ? "rejoin" : "first");
-  const campaignCode = feeType === "first" && planCode === "curriculum_monthly" && audienceType === "therapist"
-    ? String(env.STRIPE_CAMPAIGN_CODE || "none")
-    : "none";
+  const campaignCode = "none";
   const quote = resolveBillingQuote({ planCode, audienceType, feeType, campaignCode });
   const attemptId = uid("checkout_attempt");
   await env.DB.prepare(
@@ -2246,6 +2352,13 @@ async function createCustomerCheckout(request, env) {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')`
   ).bind(attemptId, auth.customer.id, idempotencyKey, quote.planCode, quote.audienceType, quote.feeType,
     quote.campaignCode, quote.trialPeriodDays, quote.recurringAmountYen, quote.entryFeeAmountYen).run();
+
+  if (quote.planCode === "weekly_monthly" && !(await reserveWeeklyCapacity(env, auth.customer.id, attemptId))) {
+    await env.DB.prepare(
+      "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = 'plan_full', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(attemptId).run();
+    return json({ error: "plan_full", waitlist_interest: "tayori_personal" }, { status: 409 });
+  }
 
   const origin = checkoutSiteOrigin(request, env);
   const isWeeklyPlan = quote.planCode === "weekly_monthly";
@@ -2280,6 +2393,9 @@ async function createCustomerCheckout(request, env) {
       },
     }, { status: 201 });
   } catch (error) {
+    await env.DB.prepare(
+      "UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'"
+    ).bind(attemptId).run();
     await env.DB.prepare(
       "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
     ).bind(String(error.detail || error.message || "stripe_error").slice(0, 200), attemptId).run();
@@ -2337,6 +2453,113 @@ function planDetails(planCode) {
   return null;
 }
 
+function stripeEventTime(event) {
+  return stripeTimestamp(event?.created) || new Date().toISOString();
+}
+
+async function recordSubscriptionStatusEvent(env, event, subscription) {
+  const details = planDetails(subscription.plan_code);
+  if (!details || !subscription.subscriptionId || !subscription.customer_id) return;
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO subscription_status_events
+      (id, stripe_event_id, subscription_id, customer_id, product_code, audience_type, status,
+       cancel_at_period_end, effective_at, livemode)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    `subscription_status_${event.id}_${subscription.subscriptionId}`,
+    event.id,
+    subscription.subscriptionId,
+    subscription.customer_id,
+    details.productCode,
+    subscription.audience_type,
+    subscription.status,
+    subscription.cancel_at_period_end ? 1 : 0,
+    stripeEventTime(event),
+    event.livemode ? 1 : 0
+  ).run();
+}
+
+function invoiceTransactionType(invoice, attempt) {
+  if (invoice?.billing_reason === "subscription_cycle") return "recurring";
+  if (invoice?.billing_reason === "subscription_create" && Number(attempt.entry_fee_yen || 0) > 0 && Number(attempt.trial_days || 0) > 0) return "entry_fee";
+  return "adjustment";
+}
+
+async function recordInvoiceTransaction(env, event, invoice, row, status) {
+  const details = planDetails(row.plan_code);
+  const invoiceId = String(invoice?.id || "");
+  if (!details || !/^in_[A-Za-z0-9_]+$/.test(invoiceId)) return;
+  const currency = String(invoice.currency || "jpy").toLowerCase();
+  if (currency !== "jpy") throw Object.assign(new Error("unsupported_billing_currency"), { status: 400 });
+  const amount = status === "paid" ? Number(invoice.amount_paid || 0) : Number(invoice.amount_due || 0);
+  if (!Number.isSafeInteger(amount) || amount < 0) throw Object.assign(new Error("invalid_invoice_amount"), { status: 400 });
+  const paidAt = stripeTimestamp(invoice?.status_transitions?.paid_at) || stripeEventTime(event);
+  const providerTransactionId = `invoice:${invoiceId}`;
+  await env.DB.prepare(
+    `INSERT INTO billing_transactions
+      (id, provider_transaction_id, stripe_invoice_id, stripe_event_id, customer_id, subscription_id,
+       product_code, audience_type, transaction_type, amount_yen, status, occurred_at, livemode)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(provider_transaction_id) DO UPDATE SET
+       stripe_event_id = excluded.stripe_event_id,
+       amount_yen = excluded.amount_yen,
+       status = excluded.status,
+       occurred_at = excluded.occurred_at,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(
+    `billing_${invoiceId}`,
+    providerTransactionId,
+    invoiceId,
+    event.id,
+    row.customer_id,
+    row.local_subscription_id,
+    details.productCode,
+    row.audience_type,
+    invoiceTransactionType(invoice, row),
+    amount,
+    status,
+    paidAt,
+    event.livemode ? 1 : 0
+  ).run();
+}
+
+async function recordRefundTransaction(env, event, charge) {
+  const invoiceId = typeof charge?.invoice === "string" ? charge.invoice : String(charge?.invoice?.id || "");
+  const chargeId = String(charge?.id || "");
+  if (!/^in_[A-Za-z0-9_]+$/.test(invoiceId) || !/^ch_[A-Za-z0-9_]+$/.test(chargeId)) return "ignored";
+  const source = await env.DB.prepare(
+    "SELECT customer_id, subscription_id, product_code, audience_type FROM billing_transactions WHERE stripe_invoice_id = ? AND status = 'paid' ORDER BY created_at LIMIT 1"
+  ).bind(invoiceId).first();
+  if (!source) return "ignored";
+  const amount = Number(charge.amount_refunded || 0);
+  if (!Number.isSafeInteger(amount) || amount < 0) throw Object.assign(new Error("invalid_refund_amount"), { status: 400 });
+  const providerTransactionId = `refund:${chargeId}`;
+  await env.DB.prepare(
+    `INSERT INTO billing_transactions
+      (id, provider_transaction_id, stripe_invoice_id, stripe_event_id, customer_id, subscription_id,
+       product_code, audience_type, transaction_type, amount_yen, status, occurred_at, livemode)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'refund', ?, 'refunded', ?, ?)
+     ON CONFLICT(provider_transaction_id) DO UPDATE SET
+       stripe_event_id = excluded.stripe_event_id,
+       amount_yen = excluded.amount_yen,
+       occurred_at = excluded.occurred_at,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(
+    `billing_refund_${chargeId}`,
+    providerTransactionId,
+    invoiceId,
+    event.id,
+    source.customer_id,
+    source.subscription_id,
+    source.product_code,
+    source.audience_type,
+    -amount,
+    stripeEventTime(event),
+    event.livemode ? 1 : 0
+  ).run();
+  return "processed";
+}
+
 async function setSubscriptionEntitlements(env, subscription, status) {
   const details = planDetails(subscription.plan_code);
   if (!details) return;
@@ -2389,8 +2612,8 @@ async function upsertStripeSubscription(env, attempt, object, forcedStatus = "")
     `INSERT INTO customer_subscriptions
       (id, customer_id, product_code, billing_interval, audience_type, status, provider_subscription_id,
        provider_price_id, recurring_amount_yen, entry_fee_yen, fee_type, current_period_start,
-       current_period_end, cancel_at_period_end, canceled_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       current_period_end, cancel_at_period_end, canceled_at, livemode)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(provider_subscription_id) DO UPDATE SET
        status = excluded.status,
        provider_price_id = CASE WHEN excluded.provider_price_id = '' THEN customer_subscriptions.provider_price_id ELSE excluded.provider_price_id END,
@@ -2398,17 +2621,27 @@ async function upsertStripeSubscription(env, attempt, object, forcedStatus = "")
        current_period_end = COALESCE(excluded.current_period_end, customer_subscriptions.current_period_end),
        cancel_at_period_end = excluded.cancel_at_period_end,
        canceled_at = COALESCE(excluded.canceled_at, customer_subscriptions.canceled_at),
+       livemode = excluded.livemode,
        updated_at = CURRENT_TIMESTAMP`
   ).bind(
     subscriptionId, attempt.customer_id, details.productCode, details.billingInterval, attempt.audience_type,
     status, providerSubscriptionId, priceId, attempt.recurring_amount_yen, attempt.entry_fee_yen,
-    attempt.fee_type, currentPeriodStart, currentPeriodEnd, object.cancel_at_period_end ? 1 : 0, canceledAt
+    attempt.fee_type, currentPeriodStart, currentPeriodEnd, object.cancel_at_period_end ? 1 : 0, canceledAt,
+    Number(attempt.livemode || 0)
   ).run();
   if (/^cus_[A-Za-z0-9_]+$/.test(customerId)) {
     await env.DB.prepare("UPDATE customer_accounts SET stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(customerId, attempt.customer_id).run();
   }
   await setSubscriptionEntitlements(env, { ...attempt, id: subscriptionId }, status);
-  return { subscriptionId, status, customerId };
+  return {
+    subscriptionId,
+    status,
+    customerId,
+    customer_id: attempt.customer_id,
+    plan_code: attempt.plan_code,
+    audience_type: attempt.audience_type,
+    cancel_at_period_end: object.cancel_at_period_end ? 1 : 0,
+  };
 }
 
 async function processStripeEvent(env, event) {
@@ -2417,6 +2650,7 @@ async function processStripeEvent(env, event) {
   if (event.type === "checkout.session.expired") {
     if (metadata.attemptId) {
       await env.DB.prepare("UPDATE stripe_checkout_attempts SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(metadata.attemptId).run();
+      await env.DB.prepare("UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'").bind(metadata.attemptId).run();
     }
     return "processed";
   }
@@ -2430,10 +2664,14 @@ async function processStripeEvent(env, event) {
       throw Object.assign(new Error("checkout_metadata_mismatch"), { status: 400 });
     }
     const subscription = await upsertStripeSubscription(env, attempt, object, Number(attempt.trial_days || 0) > 0 ? "trialing" : "active");
+    await recordSubscriptionStatusEvent(env, event, subscription);
     await env.DB.prepare(
       `UPDATE stripe_checkout_attempts SET status = 'completed', stripe_checkout_session_id = ?,
        stripe_customer_id = ?, stripe_subscription_id = ?, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
     ).bind(object.id, subscription.customerId, subscription.subscriptionId ? String(object.subscription || "") : "", attempt.id).run();
+    await env.DB.prepare(
+      "UPDATE plan_capacity_reservations SET status = 'converted', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'"
+    ).bind(attempt.id).run();
     return "processed";
   }
   if (["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
@@ -2441,7 +2679,8 @@ async function processStripeEvent(env, event) {
     const attempt = await findStripeAttempt(env, metadata, subscriptionStripeId);
     if (!attempt) return "ignored";
     if (metadata.customerId && metadata.customerId !== attempt.customer_id) throw Object.assign(new Error("subscription_metadata_mismatch"), { status: 400 });
-    await upsertStripeSubscription(env, attempt, object, stripeSubscriptionStatus(object.status, event.type.endsWith(".deleted")));
+    const subscription = await upsertStripeSubscription(env, attempt, object, stripeSubscriptionStatus(object.status, event.type.endsWith(".deleted")));
+    await recordSubscriptionStatusEvent(env, event, subscription);
     await env.DB.prepare("UPDATE stripe_checkout_attempts SET stripe_subscription_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(subscriptionStripeId, attempt.id).run();
     return "processed";
   }
@@ -2449,7 +2688,7 @@ async function processStripeEvent(env, event) {
     const subscriptionStripeId = typeof object.subscription === "string" ? object.subscription : String(object.subscription?.id || "");
     if (!subscriptionStripeId) return "ignored";
     const row = await env.DB.prepare(
-      `SELECT cs.id AS local_subscription_id, sca.* FROM customer_subscriptions cs
+      `SELECT cs.id AS local_subscription_id, cs.cancel_at_period_end, sca.* FROM customer_subscriptions cs
        JOIN stripe_checkout_attempts sca ON sca.stripe_subscription_id = cs.provider_subscription_id
        WHERE cs.provider_subscription_id = ? LIMIT 1`
     ).bind(subscriptionStripeId).first();
@@ -2457,9 +2696,199 @@ async function processStripeEvent(env, event) {
     const status = event.type === "invoice.paid" ? "active" : "past_due";
     await env.DB.prepare("UPDATE customer_subscriptions SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE provider_subscription_id = ?").bind(status, subscriptionStripeId).run();
     await setSubscriptionEntitlements(env, { ...row, id: row.local_subscription_id }, status);
+    await recordInvoiceTransaction(env, event, object, row, event.type === "invoice.paid" ? "paid" : "failed");
+    await recordSubscriptionStatusEvent(env, event, {
+      subscriptionId: row.local_subscription_id,
+      customer_id: row.customer_id,
+      plan_code: row.plan_code,
+      audience_type: row.audience_type,
+      status,
+      cancel_at_period_end: row.cancel_at_period_end,
+    });
     return "processed";
   }
+  if (event.type === "charge.refunded") return recordRefundTransaction(env, event, object);
   return "ignored";
+}
+
+function currentJapanMonth() {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 7);
+}
+
+function validBillingMonth(value) {
+  const month = String(value || currentJapanMonth());
+  return /^20\d{2}-(?:0[1-9]|1[0-2])$/.test(month) ? month : null;
+}
+
+function monthStartUtc(month) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, 1) - 9 * 60 * 60 * 1000);
+}
+
+function addMonths(month, amount) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1 + amount, 1)).toISOString().slice(0, 7);
+}
+
+function billingMonths(selectedMonth, range) {
+  if (range === "fiscal") {
+    const [year, monthNumber] = selectedMonth.split("-").map(Number);
+    const fiscalStart = `${monthNumber >= 4 ? year : year - 1}-04`;
+    return Array.from({ length: 12 }, (_, index) => addMonths(fiscalStart, index));
+  }
+  const length = range === "6m" ? 6 : 12;
+  return Array.from({ length }, (_, index) => addMonths(selectedMonth, index - length + 1));
+}
+
+function monthForJapanTimestamp(value) {
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? new Date(time + 9 * 60 * 60 * 1000).toISOString().slice(0, 7) : "";
+}
+
+function distinctCustomerCount(rows) {
+  return new Set(rows.map((row) => row.customer_id)).size;
+}
+
+function subscriptionMatches(row, product, audience) {
+  return (product === "all" || row.product_code === product) && (audience === "all" || row.audience_type === audience);
+}
+
+function monthlyRecurringAmount(row) {
+  const amount = Number(row.recurring_amount_yen || 0);
+  return row.billing_interval === "annual" ? Math.round(amount / 12) : amount;
+}
+
+function monthEndActiveCustomers(events, month, product, audience) {
+  const end = monthStartUtc(addMonths(month, 1)).toISOString();
+  const latest = new Map();
+  for (const event of events) {
+    if (event.effective_at >= end || !subscriptionMatches(event, product, audience)) continue;
+    const current = latest.get(event.subscription_id);
+    if (!current || current.effective_at < event.effective_at) latest.set(event.subscription_id, event);
+  }
+  if (!latest.size) return null;
+  return distinctCustomerCount([...latest.values()].filter((event) => ["active", "trialing"].includes(event.status)));
+}
+
+async function billingSummary(request, env) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  const url = new URL(request.url);
+  const selectedMonth = validBillingMonth(url.searchParams.get("month"));
+  const range = ["6m", "12m", "fiscal"].includes(url.searchParams.get("range")) ? url.searchParams.get("range") : "12m";
+  const product = ["all", "weekly", "curriculum"].includes(url.searchParams.get("product")) ? url.searchParams.get("product") : "all";
+  const audience = ["all", "general", "therapist"].includes(url.searchParams.get("audience")) ? url.searchParams.get("audience") : "all";
+  if (!selectedMonth) return json({ error: "invalid_month" }, { status: 400 });
+  const months = billingMonths(selectedMonth, range);
+  const rangeStart = monthStartUtc(months[0]).toISOString();
+  const rangeEnd = monthStartUtc(addMonths(months.at(-1), 1)).toISOString();
+  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
+
+  let subscriptionRows;
+  let transactionRows;
+  let statusEventRows;
+  let qualityRows;
+  try {
+    [subscriptionRows, transactionRows, statusEventRows, qualityRows] = await Promise.all([
+      env.DB.prepare(
+        `SELECT id, customer_id, product_code, billing_interval, audience_type, status,
+                recurring_amount_yen, cancel_at_period_end, current_period_end, created_at, updated_at
+         FROM customer_subscriptions WHERE provider = 'stripe' AND livemode = ?`
+      ).bind(livemode).all(),
+      env.DB.prepare(
+        `SELECT product_code, audience_type, transaction_type, amount_yen, status, occurred_at
+         FROM billing_transactions
+         WHERE livemode = ? AND occurred_at >= ? AND occurred_at < ?`
+      ).bind(livemode, rangeStart, rangeEnd).all(),
+      env.DB.prepare(
+        `SELECT subscription_id, customer_id, product_code, audience_type, status, effective_at
+         FROM subscription_status_events WHERE livemode = ? AND effective_at < ? ORDER BY effective_at`
+      ).bind(livemode, rangeEnd).all(),
+      env.DB.prepare(
+        `SELECT
+           SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed_count,
+           MAX(CASE WHEN status = 'processed' THEN processed_at ELSE NULL END) AS last_processed_at
+         FROM stripe_webhook_events WHERE livemode = ?`
+      ).bind(livemode).all(),
+    ]);
+  } catch (error) {
+    if (/no such table/i.test(String(error.message || error))) {
+      return json({ error: "billing_dashboard_not_configured", message: "課金集計用のデータベース更新が必要です。" }, { status: 503 });
+    }
+    throw error;
+  }
+
+  const subscriptions = (subscriptionRows.results || []).filter((row) => subscriptionMatches(row, product, audience));
+  const transactions = (transactionRows.results || []).filter((row) => subscriptionMatches(row, product, audience));
+  const statusEvents = statusEventRows.results || [];
+  const activeSubscriptions = subscriptions.filter((row) => ["active", "trialing"].includes(row.status));
+  const attentionSubscriptions = subscriptions.filter((row) => ["past_due", "unpaid", "paused"].includes(row.status));
+  const monthly = months.map((month) => ({
+    month,
+    recurring_yen: 0,
+    entry_fee_yen: 0,
+    adjustment_yen: 0,
+    refund_yen: 0,
+    net_yen: 0,
+    month_end_active_customers: monthEndActiveCustomers(statusEvents, month, product, audience),
+  }));
+  const monthlyByKey = new Map(monthly.map((item) => [item.month, item]));
+  for (const transaction of transactions) {
+    const item = monthlyByKey.get(monthForJapanTimestamp(transaction.occurred_at));
+    if (!item || !["paid", "refunded"].includes(transaction.status)) continue;
+    const amount = Number(transaction.amount_yen || 0);
+    if (transaction.transaction_type === "recurring") item.recurring_yen += amount;
+    else if (transaction.transaction_type === "entry_fee") item.entry_fee_yen += amount;
+    else if (transaction.transaction_type === "refund") item.refund_yen += amount;
+    else item.adjustment_yen += amount;
+    item.net_yen += amount;
+  }
+  if (monthlyByKey.has(currentJapanMonth())) {
+    monthlyByKey.get(currentJapanMonth()).month_end_active_customers = distinctCustomerCount(activeSubscriptions);
+  }
+
+  const groups = [
+    { product_code: "weekly", label: "TAYORI 個人" },
+    { product_code: "curriculum", label: "IROHA 個人" },
+  ].filter((group) => subscriptionMatches(group, product, audience));
+  const breakdown = groups.map((group) => {
+    const rows = subscriptions.filter((row) => row.product_code === group.product_code);
+    const active = rows.filter((row) => row.status === "active");
+    const trialing = rows.filter((row) => row.status === "trialing");
+    const recurringRows = rows.filter((row) => ["active", "trialing"].includes(row.status));
+    return {
+      ...group,
+      active_customers: distinctCustomerCount(active),
+      trialing_customers: distinctCustomerCount(trialing),
+      cancel_scheduled_customers: distinctCustomerCount(recurringRows.filter((row) => Number(row.cancel_at_period_end) === 1)),
+      attention_customers: distinctCustomerCount(rows.filter((row) => ["past_due", "unpaid", "paused"].includes(row.status))),
+      recurring_monthly_yen: recurringRows.reduce((sum, row) => sum + monthlyRecurringAmount(row), 0),
+    };
+  });
+  const selected = monthlyByKey.get(selectedMonth) || { net_yen: 0 };
+  const quality = qualityRows.results?.[0] || {};
+  return json({
+    generated_at: new Date().toISOString(),
+    environment: livemode ? "live" : "test",
+    filters: { month: selectedMonth, range, product, audience },
+    kpis: {
+      active_customers: distinctCustomerCount(activeSubscriptions),
+      selected_month_net_yen: selected.net_yen,
+      recurring_monthly_yen: activeSubscriptions.reduce((sum, row) => sum + monthlyRecurringAmount(row), 0),
+      trialing_customers: distinctCustomerCount(activeSubscriptions.filter((row) => row.status === "trialing")),
+      cancel_scheduled_customers: distinctCustomerCount(activeSubscriptions.filter((row) => Number(row.cancel_at_period_end) === 1)),
+      attention_customers: distinctCustomerCount(attentionSubscriptions),
+    },
+    monthly,
+    breakdown,
+    quality: {
+      failed_webhook_count: Number(quality.failed_count || 0),
+      last_processed_at: quality.last_processed_at || null,
+      has_transaction_history: transactions.length > 0,
+      has_subscription_history: statusEvents.length > 0,
+      current_month_partial: selectedMonth === currentJapanMonth(),
+    },
+  });
 }
 
 async function handleStripeWebhook(request, env) {
@@ -3024,6 +3453,8 @@ const worker = {
     if (request.method === "OPTIONS") return new Response(null, { status: 204 });
     if (path === "/api/health") return json({ ok: true, service: "tsuzuri-studio-api" });
     if (path === "/api/public/weekend-event" && request.method === "GET") return publicWeekendEvent(env);
+    if (path === "/api/public/enrollment" && request.method === "GET") return publicEnrollment(request, env);
+    if (path === "/api/public/waitlist" && request.method === "POST") return joinWaitlist(request, env);
 
     if (path === "/api/me") {
       const email = await getActorEmail(request, env);
@@ -3048,12 +3479,6 @@ const worker = {
     }
     if (path === "/api/customer/billing/portal" && request.method === "POST") {
       return createCustomerPortal(request, env);
-    }
-    if (path === "/api/customer/qualification" && request.method === "GET") {
-      return getCustomerQualification(request, env);
-    }
-    if (path === "/api/customer/qualification" && request.method === "POST") {
-      return submitCustomerQualification(request, env);
     }
     if (path === "/api/stripe/webhook" && request.method === "POST") {
       return handleStripeWebhook(request, env);
@@ -3104,11 +3529,9 @@ const worker = {
     const memberMatch = path.match(/^\/api\/members\/([^/]+)$/);
     if (memberMatch && request.method === "PATCH") return updateMember(request, env, memberMatch[1]);
 
-    if (path === "/api/admin/qualifications" && request.method === "GET") return listQualificationsAdmin(request, env);
-    const qualificationImageMatch = path.match(/^\/api\/admin\/qualifications\/([^/]+)\/image$/);
-    if (qualificationImageMatch && request.method === "GET") return openQualificationImageAdmin(request, env, qualificationImageMatch[1]);
-    const qualificationReviewMatch = path.match(/^\/api\/admin\/qualifications\/([^/]+)$/);
-    if (qualificationReviewMatch && request.method === "PATCH") return reviewQualificationAdmin(request, env, qualificationReviewMatch[1]);
+    if (path === "/api/admin/billing-summary" && request.method === "GET") return billingSummary(request, env);
+    if (path === "/api/admin/waitlist" && request.method === "GET") return listWaitlistAdmin(request, env);
+    if (path === "/api/admin/plan-capacity/increase" && request.method === "POST") return increasePlanCapacity(request, env);
 
     if (path === "/api/articles" && request.method === "GET") {
       const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
