@@ -52,7 +52,8 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
       ...(item.external_link?{external_link:{...item.external_link,url:safeUrl(item.external_link.url),image:safeUrl(item.external_link.image)}}:{})};
     if((article.content_type||'column')==='column'){
       article.content_type_label='つづり｜TSUZURI';article.public_target='つづり｜TSUZURI';
-      article.url='tsuzuri/'+article.slug+'.html';article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
+      const characterStory=article.category==='character-story';
+      article.url='tsuzuri/'+article.slug+(characterStory?'/':'.html');article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
     }else if(['video','learning'].includes(article.content_type)){
       if(article.content_type==='learning')article.content_type_label='つまみ｜TSUMAMI';
       article.public_target='つまみ｜TSUMAMI';
@@ -69,6 +70,10 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     await writeFile(dest,JSON.stringify(article,null,2)+'\n');
     const directory=article.content_type==='column'?'tsuzuri':(['video','learning'].includes(article.content_type)?'tsumami':'contents');
     await mkdir(path.join(out,'projects/totonoe',directory),{recursive:true});
-    await writeFile(path.join(out,'projects/totonoe',directory,article.slug+'.html'),articleHtml(article));
+    const articlePath=article.category==='character-story'
+      ? path.join(out,'projects/totonoe',directory,article.slug,'index.html')
+      : path.join(out,'projects/totonoe',directory,article.slug+'.html');
+    await mkdir(path.dirname(articlePath),{recursive:true});
+    await writeFile(articlePath,articleHtml(article));
   }
 }
