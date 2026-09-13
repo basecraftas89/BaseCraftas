@@ -8,6 +8,11 @@
   border-color:var(--sun);
   box-shadow:0 0 0 4px rgba(214,106,69,.2),0 16px 32px rgba(26,51,44,.18);
 }
+.recurring-seminar-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.recurring-seminar-badge{
+  display:inline-flex;align-items:center;min-height:24px;padding:4px 9px;border-radius:999px;
+  background:var(--teal-deep);color:#fff;font-size:.7rem;font-weight:900;line-height:1;letter-spacing:.05em;
+}
 .recurring-seminar-note{
   display:block;margin-top:auto;padding-top:8px;border-top:1px solid rgba(61,107,94,.2);
   color:var(--teal-deep);font-size:.78rem;font-weight:700;line-height:1.65;

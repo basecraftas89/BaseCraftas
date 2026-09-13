@@ -9,9 +9,11 @@
 
   cards.forEach(function (card) {
     var startsAt = Date.parse(card.getAttribute('data-seminar-start') || '');
-    var isUpcoming = Number.isFinite(startsAt) && startsAt > now;
-    card.hidden = !isUpcoming;
-    if (isUpcoming) visibleCount += 1;
+    var endsAt = Date.parse(card.getAttribute('data-seminar-end') || '');
+    var displayUntil = Number.isFinite(endsAt) ? endsAt : startsAt;
+    var isUnfinished = Number.isFinite(startsAt) && displayUntil > now;
+    card.hidden = !isUnfinished;
+    if (isUnfinished) visibleCount += 1;
   });
 
   var emptyMessage = document.getElementById('latestSeminarEmpty');
