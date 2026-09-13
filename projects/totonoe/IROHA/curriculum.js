@@ -110,7 +110,7 @@
     }
 
     function update() {
-      const campaignApplies = billing === config.campaign.plan && audience === config.campaign.audience;
+      const campaignApplies = Boolean(config.campaign) && billing === config.campaign.plan && audience === config.campaign.audience;
       const entry = campaignApplies ? config.campaign.entryFee : config.entryFees.first[audience];
       const recurring = config.plans.curriculum[billing];
       const audienceLabel = campaignApplies
@@ -188,8 +188,8 @@
       if (!config.purchaseEnabled) return;
       const type = audience === "therapist" ? "セラピスト" : "一般";
       const period = billing === "annual" ? "年額29,800円" : "月額2,980円";
-      const campaignApplies = billing === config.campaign.plan && audience === config.campaign.audience;
-      const campaignText = campaignApplies ? "・セラピスト初回限定 入会金5,000円" : "";
+      const campaignApplies = Boolean(config.campaign) && billing === config.campaign.plan && audience === config.campaign.audience;
+      const campaignText = campaignApplies ? `・セラピスト初回限定 入会金${yen.format(config.campaign.entryFee)}円` : "";
       document.querySelector("#checkoutSummary").textContent = `${type}・${period}${campaignText}のお申し込みです。`;
       checkoutRequestId = crypto.randomUUID();
       setAuthStep("email");

@@ -25,6 +25,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260905g">
 <link rel="stylesheet" href="editorial.css?v=20260908a">
+<link rel="stylesheet" href="tayori-pricing.css?v=20260913a">
 </head>
 <body>
 
@@ -116,19 +117,25 @@
         <article class="pricing-card weekly-plan-card">
           <span class="service-label">PERSONAL</span>
           <h3>個人プラン</h3>
-          <p class="price-main">月額 980円（税込）</p>
           <p>毎週のAI情報を、仕事に使える形で受け取りたい方向けのプランです。</p>
           <ul class="weekly-plan-list">
             <li>毎週の整理メモ</li>
             <li>短い解説動画</li>
             <li>会員限定Q&A</li>
           </ul>
-          <div class="weekly-price-summary" aria-label="料金の概要">
-            <strong>初回から月額980円</strong>
-            <span>入会金なし・いつでも解約可能</span>
+          <div class="tayori-audience-prices" aria-label="個人プランの料金">
+            <div class="tayori-audience-price">
+              <span>一般の方</span>
+              <strong>月額 1,480円<small>（税込）</small></strong>
+              <span class="btn btn-cta btn-disabled" aria-disabled="true">お申し込み準備中</span>
+            </div>
+            <div class="tayori-audience-price is-therapist">
+              <span>資格確認済みセラピスト</span>
+              <strong>月額 980円<small>（税込）</small></strong>
+              <span class="btn btn-ghost btn-disabled" aria-disabled="true">お申し込み準備中</span>
+            </div>
           </div>
-          <button type="button" class="btn btn-cta" data-tayori-checkout>個人で購読する</button>
-          <p class="weekly-payment-note">メール認証後、Stripeの安全な決済画面へ移動します。</p>
+          <p class="weekly-payment-note">入会金なし・いつでも解約可能。現在は公開準備中のため、お申し込みを受け付けていません。</p>
         </article>
         <article class="pricing-card weekly-plan-card weekly-plan-card-team" id="team-plan">
           <span class="service-label">TEAM / ORGANIZATION</span>
@@ -173,40 +180,13 @@
     <div class="container">
       <h2 class="final-title">情報を追う時間を減らして、<br>大切な実践へ戻る。</h2>
       <div class="section-cta">
-        <button type="button" class="btn btn-cta btn-lg" data-tayori-checkout>個人で購読する</button>
+        <span class="btn btn-cta btn-lg btn-disabled" aria-disabled="true">個人プランはお申し込み準備中</span>
         <a href="#team-plan" class="btn btn-ghost btn-ghost-light">法人で導入する</a>
         <span class="btn btn-ghost btn-ghost-light btn-disabled" aria-disabled="true">法人向け支援は準備中</span>
       </div>
     </div>
   </section>
 </main>
-
-<dialog class="tayori-checkout-dialog" id="tayoriCheckoutDialog" aria-labelledby="tayoriCheckoutTitle">
-  <div class="tayori-checkout-body">
-    <button type="button" class="tayori-dialog-close" aria-label="閉じる" data-tayori-dialog-close>×</button>
-    <p class="eyebrow">SECURE APPLICATION</p>
-    <h2 id="tayoriCheckoutTitle">TAYORIを購読する</h2>
-    <div class="tayori-checkout-summary">
-      <strong>月額980円（税込）</strong>
-      <span>入会金なし・申込時から月額課金</span>
-    </div>
-    <form id="tayoriEmailForm" class="tayori-auth-step">
-      <label for="tayoriAuthEmail">メールアドレス</label>
-      <input id="tayoriAuthEmail" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
-      <p class="tayori-field-help">会員ページへのログインにも使用します。今後も確認できるアドレスをご入力ください。</p>
-      <button class="btn btn-cta" type="submit">認証コードを送る</button>
-    </form>
-    <form id="tayoriCodeForm" class="tayori-auth-step" hidden>
-      <label for="tayoriAuthCode">メールに届いた6桁の認証コード</label>
-      <input id="tayoriAuthCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" required minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
-      <p class="tayori-field-help">確認後、Stripeの決済画面へ移動します。カード情報は当サイトでは保持しません。</p>
-      <button class="btn btn-cta" type="submit">認証して決済へ進む</button>
-      <button class="tayori-back-button" type="button" data-tayori-auth-back>メールアドレスを変更</button>
-    </form>
-    <p class="tayori-auth-error" id="tayoriAuthError" role="alert" aria-live="polite"></p>
-    <p class="tayori-legal-links">お申し込み前に、<a href="privacy.html">プライバシーポリシー</a>・<a href="legal.html">特定商取引法に基づく表記</a>・<a href="cancellation.html">解約ポリシー</a>をご確認ください。</p>
-  </div>
-</dialog>
 
 <footer class="site-footer">
   <div class="container footer-grid">
@@ -233,6 +213,5 @@
 </footer>
 
 <script src="common.js?v=20260905a"></script>
-<script src="tayori-checkout.js?v=20260912a"></script>
 </body>
 </html>
