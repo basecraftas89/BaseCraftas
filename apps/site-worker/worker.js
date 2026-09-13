@@ -1,5 +1,11 @@
 const PROFILE_PATH = "/api/totonoe-member/api/customer/profile";
 
+function isPrivateSource(pathname) {
+  return /^\/(?:scripts|tests?)(?:\/|$)/.test(pathname)
+    || /^\/apps\/(?:site-worker|tsuzuri-studio-api)(?:\/|$)/.test(pathname)
+    || /(?:^|\/)\.(?:git|wrangler)(?:\/|$)/.test(pathname);
+}
+
 function requiredEntitlement(pathname) {
   if (/^\/projects\/totonoe\/TAYORI\/(?:index\.html)?$/.test(pathname)) return "weekly";
   if (/^\/projects\/totonoe\/IROHA\/(?:dashboard|lesson)(?:\.html)?$/.test(pathname)) return "curriculum";
@@ -35,6 +41,7 @@ async function loadProfile(request) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (isPrivateSource(url.pathname)) return new Response("Not Found", { status: 404 });
     const required = requiredEntitlement(url.pathname);
     if (!required) return env.ASSETS.fetch(request);
 
@@ -50,4 +57,4 @@ export default {
   }
 };
 
-export { requiredEntitlement };
+export { isPrivateSource, requiredEntitlement };

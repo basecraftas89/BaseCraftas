@@ -13,6 +13,22 @@ function profileResponse(profile) {
 
 test.afterEach(() => { globalThis.fetch = originalFetch; });
 
+test("static site denies stale internal source assets even if they remain in Cloudflare storage", async () => {
+  for (const pathname of [
+    "/apps/site-worker/worker.js",
+    "/apps/tsuzuri-studio-api/src/worker.js",
+    "/scripts/build-site.mjs",
+    "/tests/example.test.mjs",
+    "/.git/config",
+  ]) {
+    const response = await siteWorker.fetch(new Request(`https://basecraftas.com${pathname}`), env);
+    assert.equal(response.status, 404, pathname);
+  }
+
+  const publicResponse = await siteWorker.fetch(new Request("https://basecraftas.com/projects/totonoe/characters/"), env);
+  assert.equal(publicResponse.status, 200);
+});
+
 test("static site returns TAYORI pages only to Weekly or IROHA purchasers", async () => {
   profileResponse(null);
   let response = await siteWorker.fetch(new Request("https://basecraftas.com/projects/totonoe/TAYORI/"), env);
