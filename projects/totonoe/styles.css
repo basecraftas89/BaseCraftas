@@ -127,6 +127,12 @@ strong{color:inherit}
   display:inline-flex;margin-left:6px;padding:2px 7px;border-radius:999px;
   background:#fff;color:var(--teal-deep);font-size:.68rem;font-weight:900;
 }
+/* IROHA is not publicly available yet. Covers service-page headers that are
+   intentionally kept as compact, generated single-line HTML files. */
+.nav-menu a[href="IROHA/"],.nav-menu a[href="../IROHA/"]{
+  pointer-events:none;cursor:not-allowed;color:rgba(35,48,43,.56);background:rgba(232,240,237,.54);
+}
+.nav-menu a[href="IROHA/"]::after,.nav-menu a[href="../IROHA/"]::after{content:"準備中";margin-left:6px;font-size:.68rem;font-weight:900;color:var(--teal-deep)}
 .header-cta{padding:11px 22px;font-size:.92rem}
 .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
 .nav-toggle span{width:24px;height:2.5px;background:var(--ink);border-radius:2px;transition:.25s}
