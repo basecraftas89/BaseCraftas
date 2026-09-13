@@ -196,6 +196,12 @@ assert.equal(w.document.getElementById('imageDrop').closest('.setting-block').cl
 assert.match(w.document.getElementById('imageDrop').textContent,/表示枠\s*1200\s*×\s*630px/);
 assert.match(readFileSync(resolve(root,'apps/tsuzuri-studio/styles.css'),'utf8'),/\.image-drop\{aspect-ratio:1200\/630/);
 t.openContentView('column');t.blankPost(false);
+assert.equal(t.els.destination.value,'tsuzuri');
+t.els.destination.value='characters';t.els.destination.dispatchEvent(new w.Event('change',{bubbles:true}));
+t.els.mainActor.value='mion';
+const characterDraft=t.collect();assert.equal(characterDraft.destination,'characters');assert.equal(characterDraft.category,'character-story');assert.equal(characterDraft.main_actor_id,'mion');
+t.els.destination.value='tsuzuri';t.els.destination.dispatchEvent(new w.Event('change',{bubbles:true}));
+assert.equal(t.collect().category,'content');
 t.els.title.value='new draft';t.els.title.dispatchEvent(new w.Event('input',{bubbles:true}));
 assert.ok(t.state.editingId);assert.equal(t.state.posts[0].title,'new draft');
 assert.match(w.document.getElementById('saveState').textContent,/この端末/);

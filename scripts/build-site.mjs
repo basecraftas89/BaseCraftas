@@ -51,8 +51,10 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     const article={...item,source_id:safeSourceId(item.source_id),url:safeUrl(item.url,true),body_html:body.publicHtml,has_member_section:Boolean(item.has_member_section||body.hasMemberSection),media_url:safeUrl(item.media_url),hero_url:safeUrl(item.hero_url,true),
       ...(item.external_link?{external_link:{...item.external_link,url:safeUrl(item.external_link.url),image:safeUrl(item.external_link.image)}}:{})};
     if((article.content_type||'column')==='column'){
-      article.content_type_label='つづり｜TSUZURI';article.public_target='つづり｜TSUZURI';
-      const characterStory=article.category==='character-story';
+      const characterStory=article.destination==='characters'||article.category==='character-story';
+      article.destination=characterStory?'characters':'tsuzuri';
+      article.category=characterStory?'character-story':article.category;
+      article.content_type_label=characterStory?'キャラクター':'つづり｜TSUZURI';article.public_target=characterStory?'キャラクター':'つづり｜TSUZURI';
       article.url='tsuzuri/'+article.slug+(characterStory?'/':'.html');article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
     }else if(['video','learning'].includes(article.content_type)){
       if(article.content_type==='learning')article.content_type_label='つまみ｜TSUMAMI';
@@ -70,12 +72,13 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     await writeFile(dest,JSON.stringify(article,null,2)+'\n');
     const directory=article.content_type==='column'?'tsuzuri':(['video','learning'].includes(article.content_type)?'tsumami':'contents');
     await mkdir(path.join(out,'projects/totonoe',directory),{recursive:true});
-    const articlePath=article.category==='character-story'
+    const characterStory=article.destination==='characters'||article.category==='character-story';
+    const articlePath=characterStory
       ? path.join(out,'projects/totonoe',directory,article.slug,'index.html')
       : path.join(out,'projects/totonoe',directory,article.slug+'.html');
     await mkdir(path.dirname(articlePath),{recursive:true});
     const renderedArticle=articleHtml(article);
-    const depthAdjustedArticle=article.category==='character-story'
+    const depthAdjustedArticle=characterStory
       ? renderedArticle.replaceAll('="../','="../../')
       : renderedArticle;
     await writeFile(articlePath,depthAdjustedArticle);

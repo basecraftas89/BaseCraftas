@@ -139,6 +139,7 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 8. `migrations/20260918_customer_email_auth.sql`
 9. `migrations/20260919_weekly_question_sheet_sync.sql`
 10. `migrations/20260920_billing_dashboard.sql`
+11. `migrations/20260921_character_studio_articles.sql`（既存のキャラクター記事4本をStudioへ登録）
 
 ## Stripe連携（第2段階：メール認証とCheckout作成）
 

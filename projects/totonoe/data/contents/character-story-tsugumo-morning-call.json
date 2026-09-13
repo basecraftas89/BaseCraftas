@@ -3,9 +3,9 @@
   "slug": "tsugumo-morning-call",
   "revision": 1,
   "status": "published",
-  "destination": "totonoe",
+  "destination": "characters",
   "content_type": "column",
-  "content_type_label": "つづり｜TSUZURI",
+  "content_type_label": "キャラクター",
   "category": "character-story",
   "title": "朝を届けられなかった日",
   "excerpt": "たくさんの仕事を抱え、一番大切な朝を届けられなかったツグモ。ハクトから受け取った一枚のカードが、もう一度朝へ戻る小さなきっかけになります。",
@@ -15,6 +15,8 @@
     "id": "tsugumo",
     "name": "ツグモ"
   },
+  "main_actor_id": "tsugumo",
+  "speaker_ids": [],
   "speakers": [],
   "tags": [
     "キャラクター",

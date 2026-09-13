@@ -366,7 +366,7 @@
     TSUZURI_ITEMS.forEach(function (c) { existing[c.url] = true; });
     (items || [])
       .filter(function (item) {
-        return item.status === 'published' && (item.content_type || 'column') === 'column';
+        return item.status === 'published' && (item.content_type || 'column') === 'column' && item.destination !== 'characters' && item.category !== 'character-story';
       })
       .forEach(function (item) {
         var url = item.url || ('tsuzuri/' + item.slug + '.html');

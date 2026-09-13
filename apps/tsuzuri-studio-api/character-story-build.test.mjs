@@ -22,6 +22,8 @@ test("nested character stories resolve shared styles, scripts, navigation, and i
     assert.match(html, /src="\.\.\/\.\.\/assets\/characters\/stories\//);
     assert.match(html, /src="\.\.\/\.\.\/common\.js\?/);
     assert.match(html, /src="\.\.\/\.\.\/article-actions\.js\?/);
+    assert.match(html, /<p class="eyebrow">キャラクター \/ 2026-09-13<\/p>/);
+    assert.match(html, /href="\.\.\/\.\.\/characters\/">← キャラクター一覧へ戻る<\/a>/);
     assert.doesNotMatch(html, /(?:href|src)="\.\.\/(?!\.\.\/)/);
   }
 });

@@ -7,7 +7,8 @@ function escHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
-function publicSection(contentType) {
+function publicSection(contentType, destination) {
+  if (contentType === "column" && destination === "characters") return { href: "../characters/", label: "キャラクター" };
   if (contentType === "podcast") return { href: "../weekend-ai.html#podcast", label: "ポッドキャスト" };
   if (contentType === "archive") return { href: "../weekend-ai.html#archive", label: "アーカイブ動画" };
   if (contentType === "seminar") return { href: "../index.html#latest", label: "セミナー" };
@@ -34,7 +35,7 @@ export function articleHtml(articleData) {
   const mediaLink = articleData.media_url
     ? `<p class="content-media-link"><a href="${escHtml(safeUrl(articleData.media_url))}" target="_blank" rel="noopener">${escHtml(linkLabel)} ↗</a></p>`
     : "";
-  const section = publicSection(articleData.content_type);
+  const section = publicSection(articleData.content_type, articleData.destination);
   return `<!DOCTYPE html>
 <html lang="ja">
 <head>

@@ -77,6 +77,12 @@ const TOTONOE_MEMBERS = [
   { id: "kojima-ken", name: "小島 健" },
   { id: "kaigaishi-shogo", name: "貝ヶ石 祥吾" },
 ];
+const CONTENT_CHARACTERS = [
+  { id: "mion", name: "ミオン" },
+  { id: "tsugumo", name: "ツグモ" },
+  { id: "hakuto", name: "ハクト" },
+  { id: "mion-tsugumo-hakuto", name: "ミオン・ツグモ・ハクト" },
+];
 const CONTENT_TYPES = {
   column: "つづり｜TSUZURI",
   podcast: "Podcast",
@@ -323,7 +329,8 @@ function externalLinkLabel(contentType, url) {
   return "元コンテンツを見る";
 }
 
-function publicSection(contentType) {
+function publicSection(contentType, destination = "tsuzuri") {
+  if (contentType === "column" && destination === "characters") return { href: "../characters/", label: "キャラクター" };
   if (contentType === "podcast") return { href: "../weekend-ai.html#podcast", label: "ポッドキャスト" };
   if (contentType === "archive") return { href: "../weekend-ai.html#archive", label: "アーカイブ動画" };
   if (contentType === "weekend") return { href: "../weekend-ai.html#schedule", label: "週末のAI整え習慣・次回開催" };
@@ -398,12 +405,16 @@ function publishedDate() {
 }
 
 function findTotonoEPerson(id) {
-  return TOTONOE_MEMBERS.find((person) => person.id === id) || TOTONOE_MEMBERS[0];
+  return TOTONOE_MEMBERS.concat(CONTENT_CHARACTERS).find((person) => person.id === id) || TOTONOE_MEMBERS[0];
 }
 
 function normalizeMainActorId(id) {
   const value = String(id || "").trim();
-  return TOTONOE_MEMBERS.some((person) => person.id === value) ? value : "";
+  return TOTONOE_MEMBERS.concat(CONTENT_CHARACTERS).some((person) => person.id === value) ? value : "";
+}
+
+function normalizeDestination(value, category = "") {
+  return value === "characters" || category === "character-story" ? "characters" : "tsuzuri";
 }
 
 function normalizeContentType(type) {
@@ -460,6 +471,18 @@ function publicArticleDirectory(contentType) {
   return "contents";
 }
 
+function publishedArticlePaths(article) {
+  const directory = publicArticleDirectory(article.content_type);
+  const characterArticle = normalizeDestination(article.destination, article.category) === "characters";
+  const primary = `projects/totonoe/${directory}/${article.slug}${characterArticle ? "/index.html" : ".html"}`;
+  const alternatives = [
+    `projects/totonoe/${directory}/${article.slug}.html`,
+    `projects/totonoe/${directory}/${article.slug}/index.html`,
+    `projects/totonoe/contents/${article.slug}.html`,
+  ].filter((path, index, paths) => path !== primary && paths.indexOf(path) === index);
+  return { primary, alternatives, characterArticle };
+}
+
 function publicAssetUrl(request, key) {
   const url = new URL(request.url);
   if (url.hostname === "basecraftas.com") {
@@ -474,16 +497,18 @@ function articleJson(article, publishedAt, linkPreview = null) {
   const mainActor = findTotonoEPerson(article.main_actor_id);
   const speakerIds = normalizePersonIds(article.speaker_ids);
   const contentType = normalizeContentType(article.content_type);
+  const destination = contentType === "column" ? normalizeDestination(article.destination, article.category) : "tsuzuri";
   const heroUrl = safeUrl(article.hero_url || (linkPreview && linkPreview.image), true);
   const sourceType = article.source_type || (linkPreview && linkPreview.kind) || externalLinkKind(article.media_url);
   const sourceId = safeSourceId(article.source_id || (linkPreview && linkPreview.source_id) || sourceProfile(article.media_url).source_id);
   const publicDirectory = publicArticleDirectory(contentType);
+  const characterArticle = contentType === "column" && destination === "characters";
   const publicUrl = contentType === "weekend"
     ? "../weekend-ai.html#schedule"
-    : `${publicDirectory}/${article.slug}.html`;
+    : `${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
   const absoluteUrl = contentType === "weekend"
     ? "https://basecraftas.com/projects/totonoe/weekend-ai.html#schedule"
-    : `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}.html`;
+    : `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
   return {
     id: article.id,
     revision: article.revision || 1,
@@ -491,9 +516,9 @@ function articleJson(article, publishedAt, linkPreview = null) {
     title: article.title,
     excerpt: article.excerpt,
     category: article.category,
-    destination: article.destination,
+    destination,
     content_type: contentType,
-    content_type_label: CONTENT_TYPES[contentType],
+    content_type_label: destination === "characters" ? "キャラクター" : CONTENT_TYPES[contentType],
     topic_tags: topicTags,
     tags: topicTags,
     main_actor_id: mainActor.id,
@@ -505,7 +530,7 @@ function articleJson(article, publishedAt, linkPreview = null) {
     source_published_at: article.source_published_at || (linkPreview && linkPreview.published_at) || "",
     source_type: sourceType,
     source_id: sourceId,
-    public_target: publicSection(contentType).label,
+    public_target: publicSection(contentType, destination).label,
     external_link: linkPreview ? {
       url: linkPreview.url,
       kind: linkPreview.kind,
@@ -627,8 +652,7 @@ async function publishArticleToGitHub(env, article) {
   const linkPreview = await fetchLinkPreview(article.media_url);
   const data = articleJson(article, publishedAt, linkPreview);
   const articleJsonPath = `projects/totonoe/data/contents/${article.slug}.json`;
-  const articleHtmlPath = `projects/totonoe/${publicArticleDirectory(article.content_type)}/${article.slug}.html`;
-  const legacyArticleHtmlPath = `projects/totonoe/contents/${article.slug}.html`;
+  const {primary: articleHtmlPath, alternatives: alternateArticleHtmlPaths, characterArticle} = publishedArticlePaths(data);
   const indexPath = "projects/totonoe/data/contents/index.json";
   const indexHtmlPath = "projects/totonoe/contents/index.html";
   const message = `Publish content: ${article.title}`;
@@ -640,6 +664,7 @@ async function publishArticleToGitHub(env, article) {
     title: data.title,
     excerpt: data.excerpt,
     category: data.category,
+    destination: data.destination,
     content_type: data.content_type,
     content_type_label: data.content_type_label,
     topic_tags: data.topic_tags,
@@ -667,9 +692,9 @@ async function publishArticleToGitHub(env, article) {
     const branch = branchName.split("/").map(encodeURIComponent).join("/");
     const ref = await githubRequest(env, `/git/ref/heads/${branch}`);
     const baseSha = ref.object.sha;
-    const [currentIndex, legacyHtml] = await Promise.all([
+    const [currentIndex, ...alternateHtmlFiles] = await Promise.all([
       fetchGitHubFile(env, indexPath, baseSha),
-      articleHtmlPath === legacyArticleHtmlPath ? null : fetchGitHubFile(env, legacyArticleHtmlPath, baseSha),
+      ...alternateArticleHtmlPaths.map((path) => fetchGitHubFile(env, path, baseSha)),
     ]);
     let index = { updated_at: null, articles: [] };
     if (currentIndex && currentIndex.content) {
@@ -684,11 +709,11 @@ async function publishArticleToGitHub(env, article) {
     try {
       const files = [
         { path: articleJsonPath, content: `${JSON.stringify(data, null, 2)}\n` },
-        { path: articleHtmlPath, content: articleHtml(data) },
+        { path: articleHtmlPath, content: characterArticle ? articleHtml(data).replaceAll('="../', '="../../') : articleHtml(data) },
         { path: indexHtmlPath, content: contentIndexHtml() },
         { path: indexPath, content: `${JSON.stringify(index, null, 2)}\n` },
       ];
-      if (legacyHtml) files.push({ path: legacyArticleHtmlPath, delete: true });
+      alternateHtmlFiles.forEach((file, index) => { if (file) files.push({ path: alternateArticleHtmlPaths[index], delete: true }); });
       const commitSha = await commitGitHubFiles(env, files, message, baseSha);
       return { commitSha, liveUrl: data.absolute_url };
     } catch (error) {
@@ -700,8 +725,7 @@ async function publishArticleToGitHub(env, article) {
 
 async function removeArticleFromGitHub(env, article) {
   const articleJsonPath = `projects/totonoe/data/contents/${article.slug}.json`;
-  const articleHtmlPath = `projects/totonoe/${publicArticleDirectory(article.content_type)}/${article.slug}.html`;
-  const legacyArticleHtmlPath = `projects/totonoe/contents/${article.slug}.html`;
+  const {primary: articleHtmlPath, alternatives: alternateArticleHtmlPaths} = publishedArticlePaths(article);
   const indexPath = "projects/totonoe/data/contents/index.json";
   const message = `Unpublish content: ${article.title}`;
 
@@ -710,11 +734,11 @@ async function removeArticleFromGitHub(env, article) {
     const branch = branchName.split("/").map(encodeURIComponent).join("/");
     const ref = await githubRequest(env, `/git/ref/heads/${branch}`);
     const baseSha = ref.object.sha;
-    const [currentIndex, currentJson, currentHtml, legacyHtml] = await Promise.all([
+    const [currentIndex, currentJson, currentHtml, ...alternateHtmlFiles] = await Promise.all([
       fetchGitHubFile(env, indexPath, baseSha),
       fetchGitHubFile(env, articleJsonPath, baseSha),
       fetchGitHubFile(env, articleHtmlPath, baseSha),
-      articleHtmlPath === legacyArticleHtmlPath ? null : fetchGitHubFile(env, legacyArticleHtmlPath, baseSha),
+      ...alternateArticleHtmlPaths.map((path) => fetchGitHubFile(env, path, baseSha)),
     ]);
     let index = { updated_at: null, articles: [] };
     if (currentIndex?.content) {
@@ -730,10 +754,10 @@ async function removeArticleFromGitHub(env, article) {
     const files = [{ path: indexPath, content: `${JSON.stringify(index, null, 2)}\n` }];
     if (currentJson) files.push({ path: articleJsonPath, delete: true });
     if (currentHtml) files.push({ path: articleHtmlPath, delete: true });
-    if (legacyHtml) files.push({ path: legacyArticleHtmlPath, delete: true });
+    alternateHtmlFiles.forEach((file, index) => { if (file) files.push({ path: alternateArticleHtmlPaths[index], delete: true }); });
     try {
       const commitSha = await commitGitHubFiles(env, files, message, baseSha);
-      return { commitSha, removed: { index: previous.length !== index.articles.length, json: Boolean(currentJson), html: Boolean(currentHtml || legacyHtml) } };
+      return { commitSha, removed: { index: previous.length !== index.articles.length, json: Boolean(currentJson), html: Boolean(currentHtml || alternateHtmlFiles.some(Boolean)) } };
     } catch (error) {
       if (error.status !== 422 || attempt === 1) throw error;
     }
@@ -853,13 +877,15 @@ function normalizeArticle(input, fallback = {}) {
   const tags = parseJsonArray(tagInput).map((tag) => String(tag).trim()).filter(Boolean);
   const contentType = normalizeContentType(input.content_type || input.contentType || fallback.content_type);
   const speakerIds = normalizePersonIds(input.speaker_ids || input.speakerIds || fallback.speaker_ids);
+  const requestedCategory = String(input.category || fallback.category || "content").trim();
+  const destination = contentType === "column" ? normalizeDestination(input.destination || fallback.destination, requestedCategory) : "tsuzuri";
 
   return {
     slug: String(input.slug || fallback.slug || "").trim(),
     title: String(input.title || fallback.title || "Untitled").trim(),
     excerpt: String(input.excerpt || fallback.excerpt || "").trim(),
-    category: String(input.category || fallback.category || "content").trim(),
-    destination: "totonoe",
+    category: destination === "characters" ? "character-story" : (requestedCategory === "character-story" ? "content" : requestedCategory),
+    destination,
     content_type: contentType,
     tags: JSON.stringify(tags),
     main_actor_id: normalizeMainActorId(input.main_actor_id || input.mainActorId || fallback.main_actor_id),
@@ -1146,7 +1172,7 @@ async function publicationStatus(request, env, id) {
     const root = "https://basecraftas.com/projects/totonoe/";
     const responses = await Promise.all([
       fetch(root + "data/contents/index.json?check=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) }),
-      fetch(root + publicArticleDirectory(article.content_type) + "/" + encodeURIComponent(article.slug) + ".html?check=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) })
+      fetch(root + publicArticleDirectory(article.content_type) + "/" + encodeURIComponent(article.slug) + (normalizeDestination(article.destination, article.category) === "characters" ? "/" : ".html") + "?check=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) })
     ]);
     if (!responses.every((res) => res.ok)) return json({ stage: "deploying", job, has_unpublished_changes });
     const [index, html] = await Promise.all([readTextLimit(responses[0], 5 * 1024 * 1024).then(JSON.parse), readTextLimit(responses[1], 1024 * 1024)]);

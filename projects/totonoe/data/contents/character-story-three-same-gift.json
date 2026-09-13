@@ -3,9 +3,9 @@
   "slug": "three-characters-same-gift",
   "revision": 1,
   "status": "published",
-  "destination": "totonoe",
+  "destination": "characters",
   "content_type": "column",
-  "content_type_label": "つづり｜TSUZURI",
+  "content_type_label": "キャラクター",
   "category": "character-story",
   "title": "同じ人から、もらったもの",
   "excerpt": "カードとボイスレコーダーをきっかけに、初めて同じ場所へ集まったミオン、ツグモ、ハクト。違う整え方を持つ3人の習慣が始まります。",
@@ -15,6 +15,8 @@
     "id": "mion-tsugumo-hakuto",
     "name": "ミオン・ツグモ・ハクト"
   },
+  "main_actor_id": "mion-tsugumo-hakuto",
+  "speaker_ids": [],
   "speakers": [],
   "tags": [
     "キャラクター",
