@@ -1,5 +1,6 @@
 const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
 const STRIPE_SIGNATURE_MAX_LENGTH = 4096;
+export const TAYORI_TRIAL_PERIOD_DAYS = 14;
 
 export const BILLING_PLANS = Object.freeze({
   weekly_monthly: Object.freeze({
@@ -69,9 +70,9 @@ export function resolveBillingQuote({ planCode, audienceType = "general", feeTyp
       feeType: "none",
       entryFeeAmountYen: 0,
       entryFeePriceEnv: null,
-      firstChargeAmountYen: plan.recurringAmountYen,
+      firstChargeAmountYen: 0,
       campaignCode: "none",
-      trialPeriodDays: 0,
+      trialPeriodDays: TAYORI_TRIAL_PERIOD_DAYS,
       currency: "jpy",
     });
   }

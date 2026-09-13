@@ -35,6 +35,9 @@ test('料金はサーバー定義からだけ決まり、クライアント指�
   assert.equal(quote.entryFeeAmountYen,10000);
   assert.equal(quote.firstChargeAmountYen,12980);
   assert.deepEqual(quote.entitlementCodes,['curriculum_all_access','weekly_access']);
+  const weekly=resolveBillingQuote({planCode:'weekly_monthly'});
+  assert.equal(weekly.firstChargeAmountYen,0);
+  assert.equal(weekly.trialPeriodDays,14);
   assert.throws(()=>resolveBillingQuote({planCode:'weekly_monthly',feeType:'first'}),/weekly_has_no_entry_fee/);
   assert.throws(()=>resolveBillingQuote({planCode:'curriculum_annual',feeType:'none'}),/curriculum_fee_required/);
 });
@@ -97,7 +100,7 @@ test('認証情報は正規化し、用途別HMACで照合する',async()=>{
   assert.equal(timingSafeTextEqual(first,other),false);
 });
 
-test('CheckoutパラメータはサーバーPrice IDとセラピスト初回30日無料だけから組み立てる',()=>{
+test('CheckoutパラメータはサーバーPrice IDとプラン別の無料期間だけから組み立てる',()=>{
   const quote=resolveBillingQuote({planCode:'curriculum_monthly',audienceType:'therapist',feeType:'first',campaignCode:'trial_entry_5000'});
   const params=buildStripeCheckoutParams({
     quote,
@@ -113,6 +116,17 @@ test('CheckoutパラメータはサーバーPrice IDとセラピスト初回30�
   assert.equal(params.get('subscription_data[trial_period_days]'),'30');
   assert.equal(params.get('customer_email'),'member@example.com');
   assert.equal(params.get('metadata[attempt_id]'),'attempt_1');
+
+  const tayoriQuote=resolveBillingQuote({planCode:'weekly_monthly'});
+  const tayoriParams=buildStripeCheckoutParams({
+    quote:tayoriQuote,
+    env:{STRIPE_PRICE_WEEKLY_MONTHLY:'price_weekly123'},
+    customer:{id:'customer_2',email:'tayori@example.com',stripe_customer_id:null},
+    attemptId:'attempt_2',
+    successUrl:'https://basecraftas.com/tayori/success',
+    cancelUrl:'https://basecraftas.com/tayori/cancel',
+  });
+  assert.equal(tayoriParams.get('subscription_data[trial_period_days]'),'14');
 });
 
 test('顧客認証テーブルとCheckout URL監査列を追加する',()=>{
