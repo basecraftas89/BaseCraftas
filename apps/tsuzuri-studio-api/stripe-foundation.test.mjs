@@ -179,16 +179,16 @@ test('資格画像は非公開R2に保存され、管理者審査後だけセラ
   assert.ok(fixture.sql.prepare("SELECT purge_after FROM qualification_submissions WHERE id=?").get(submittedBody.submission.id).purge_after);
 });
 
-test('TAYORI LPは問い合わせではなくメール認証付き月額980円Checkoutへ進む',()=>{
+test('TAYORI LPは区分別料金を案内し、受付開始までCheckoutを提供しない',()=>{
   const html=readFileSync('projects/totonoe/tayori.html','utf8');
-  const script=readFileSync('projects/totonoe/tayori-checkout.js','utf8');
-  assert.match(html,/data-tayori-checkout/);
-  assert.match(html,/月額980円/);
+  assert.match(html,/一般の方/);
+  assert.match(html,/月額 1,480円/);
+  assert.match(html,/資格確認済みセラピスト/);
+  assert.match(html,/月額 980円/);
   assert.match(html,/入会金なし/);
-  assert.doesNotMatch(html,/href="\.\.\/\.\.\/contact\.html" class="btn btn-cta">個人で購読する/);
-  assert.match(script,/plan_code:\s*"weekly_monthly"/);
-  assert.match(script,/customer\/auth\/request-code/);
-  assert.match(script,/customer\/auth\/verify-code/);
+  assert.match(html,/お申し込みを受け付けていません/);
+  assert.doesNotMatch(html,/data-tayori-checkout/);
+  assert.doesNotMatch(html,/tayori-checkout\.js/);
 });
 
 test('署名済みTAYORI Checkout完了通知だけが契約とWeekly権限を付与し、重複通知は安全に無視する',async()=>{
