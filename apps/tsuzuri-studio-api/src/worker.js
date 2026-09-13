@@ -1,6 +1,6 @@
 import {archiveMetadata} from './archive-metadata.js';
 import {articleHtml} from './public-render.js';
-import { sanitizeBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
+import { sanitizeBody, splitMemberBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
 import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
 import { isCurrentWeekendThumbnail, latestSaturdayEventEnd } from './weekend-event.js';
 import {
@@ -183,6 +183,7 @@ function isPublicMemberRequest(rawPath, normalizedPath, method) {
     "POST /api/weekly/priority-question",
     "GET /api/weekly/answer-videos",
   ]);
+  if (method === "GET" && /^\/api\/member\/articles\/[^/]+\/body$/.test(normalizedPath)) return true;
   const key = `${method} ${normalizedPath}`;
   if (allowed.has(key)) return true;
   if (method === "GET" && /^\/api\/weekly\/materials\/[^/]+\/open$/.test(normalizedPath)) return true;
@@ -468,6 +469,7 @@ function publicAssetUrl(request, key) {
 }
 
 function articleJson(article, publishedAt, linkPreview = null) {
+  const body = splitMemberBody(normalizePublishedBody(article.body_html));
   const topicTags = parseJsonArray(article.tags);
   const mainActor = findTotonoEPerson(article.main_actor_id);
   const speakerIds = normalizePersonIds(article.speaker_ids);
@@ -513,7 +515,8 @@ function articleJson(article, publishedAt, linkPreview = null) {
       provider: linkPreview.provider,
     } : null,
     hero_url: heroUrl,
-    body_html: normalizePublishedBody(article.body_html),
+    body_html: body.publicHtml,
+    has_member_section: body.hasMemberSection,
     status: "published",
     url: publicUrl,
     absolute_url: absoluteUrl,
@@ -653,6 +656,7 @@ async function publishArticleToGitHub(env, article) {
     public_target: data.public_target,
     external_link: data.external_link,
     hero_url: data.hero_url,
+    has_member_section: data.has_member_section,
     status: "published",
     url: data.url,
     published_at: data.published_at,
@@ -2508,6 +2512,32 @@ async function requireCustomerMember(request, env) {
   return auth;
 }
 
+async function getPublishedMemberArticleBody(request, env, id) {
+  const auth = await requireCustomerMember(request, env);
+  if (auth.error) return auth.error;
+  const revision = Number(new URL(request.url).searchParams.get("revision"));
+  if (!Number.isInteger(revision) || revision < 1) return json({ error: "invalid_revision" }, { status: 400 });
+  const snapshot = await env.DB.prepare(
+    `SELECT av.body_html
+       FROM article_versions av
+       JOIN publish_jobs pj
+         ON pj.article_id = av.article_id
+        AND pj.article_revision = av.revision
+        AND pj.status = 'published'
+       JOIN articles a ON a.id = av.article_id
+      WHERE av.article_id = ?
+        AND av.revision = ?
+        AND a.status = 'published'
+        AND a.deleted_at IS NULL
+      ORDER BY datetime(pj.updated_at) DESC
+      LIMIT 1`
+  ).bind(id, revision).first();
+  if (!snapshot) return json({ error: "not_found" }, { status: 404 });
+  const body = splitMemberBody(normalizePublishedBody(snapshot.body_html));
+  if (!body.hasMemberSection) return json({ error: "not_found" }, { status: 404 });
+  return json({ article_id: id, revision, body_html: body.memberHtml });
+}
+
 function serializeWeeklyMaterial(row) {
   return {
     id: row.id,
@@ -3063,6 +3093,10 @@ const worker = {
     }
     if (path === "/api/customer/profile" && request.method === "PATCH") {
       return updateCustomerProfile(request, env);
+    }
+    const memberArticleMatch = path.match(/^\/api\/member\/articles\/([^/]+)\/body$/);
+    if (memberArticleMatch && request.method === "GET") {
+      return getPublishedMemberArticleBody(request, env, memberArticleMatch[1]);
     }
 
     if (path === "/api/members" && request.method === "GET") return listMembers(request, env);

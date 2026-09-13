@@ -166,7 +166,7 @@ w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
 w.HTMLDialogElement.prototype.close=function(){this.open=false;};
 w.document.execCommand=(command,_,value)=>{if(command==='insertHTML')w.document.getElementById('articleEditor').insertAdjacentHTML('beforeend',value);};
 w.eval(readFileSync(resolve(root,'apps/tsuzuri-studio/security.js'),'utf8'));
-w.eval(js.replace(/\}\)\(\);\s*$/, 'window.editorTest={bootRemote,uploadHero,state,els,blankPost,collect,editPost,scheduleSave,syncRemoteArticle,sourceFromUrl,analyzeLink,setHeroPreview,showHistory,publish,insertBubble,openTextLinkDialog,applyTextLink,removeTextLink,checkpoint,api,openLatest,changeLifecycle,openContentView,setCloud:(value)=>{cloudReady=value;},setApi:(value)=>{API_BASE=value;}};})();'));
+w.eval(js.replace(/\}\)\(\);\s*$/, 'window.editorTest={bootRemote,uploadHero,state,els,blankPost,collect,editPost,scheduleSave,syncRemoteArticle,sourceFromUrl,analyzeLink,setHeroPreview,showHistory,publish,insertBubble,insertMemberBoundary,openTextLinkDialog,applyTextLink,removeTextLink,checkpoint,api,openLatest,changeLifecycle,openContentView,setCloud:(value)=>{cloudReady=value;},setApi:(value)=>{API_BASE=value;}};})();'));
 const t=w.editorTest;
 assert.equal(w.document.title,'ToToNoE+ Studio');
 assert.equal(w.document.querySelector('.brand span').textContent.trim(),'ToToNoE+ Studio');
@@ -209,6 +209,7 @@ w.document.getElementById('changeBubble').click();w.document.querySelector('#bub
 assert.equal(bubble.dataset.character,'hakuto-thinking');assert.equal(bubble.querySelector('p').textContent,'keep words');
 w.document.getElementById('flipBubble').click();assert.ok(bubble.classList.contains('right'));
 w.document.getElementById('removeBubble').click();assert.equal(t.els.editor.querySelectorAll('.editor-bubble').length,0);
+t.insertMemberBoundary();assert.equal(t.els.editor.querySelectorAll('.member-content-boundary').length,1);assert.match(t.collect().body,/ここから会員限定/);
 const linkParagraph=w.document.createElement('p');linkParagraph.textContent='選択した文字にリンク';t.els.editor.replaceChildren(linkParagraph);
 const linkRange=w.document.createRange();linkRange.setStart(linkParagraph.firstChild,7);linkRange.setEnd(linkParagraph.firstChild,10);
 const linkSelection=w.getSelection();linkSelection.removeAllRanges();linkSelection.addRange(linkRange);t.openTextLinkDialog();

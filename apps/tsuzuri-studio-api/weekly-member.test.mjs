@@ -116,6 +116,19 @@ test("カリキュラム会員はWeeklyも利用でき、Weekly単体会員と�
   assert.equal(weeklyPayload.membership.has_curriculum_access, false);
 });
 
+test("公開済み版の会員限定本文は有効会員だけが取得できる", async () => {
+  const active = fixture();
+  active.seed();
+  active.sql.prepare("INSERT INTO articles (id, slug, title, body_html, status, revision) VALUES ('article-member', 'member-test', '会員記事', '<p>無料</p><div class=\"member-content-boundary\" contenteditable=\"false\"><strong>ここから会員限定</strong></div><p>限定本文</p>', 'published', 1)").run();
+  active.sql.prepare("INSERT INTO article_versions (id, article_id, revision, title, body_html, status) VALUES ('version-member', 'article-member', 1, '会員記事', '<p>無料</p><div class=\"member-content-boundary\" contenteditable=\"false\"><strong>ここから会員限定</strong></div><p>限定本文</p>', 'draft')").run();
+  active.sql.prepare("INSERT INTO publish_jobs (id, article_id, article_revision, status) VALUES ('publish-member', 'article-member', 1, 'published')").run();
+  const response = await active.call("/api/totonoe-member/api/member/articles/article-member/body?revision=1");
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.match(payload.body_html, /限定本文/);assert.doesNotMatch(payload.body_html, /無料/);
+  assert.equal((await active.call("/api/totonoe-member/api/member/articles/article-member/body?revision=1", "")).status, 401);
+});
+
 test("会員プロフィールを保存して再取得できる", async () => {
   const active = fixture();
   active.seed();

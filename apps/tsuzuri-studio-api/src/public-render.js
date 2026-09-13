@@ -1,4 +1,4 @@
-import {safeUrl,sanitizeBody} from './security.js';
+import {safeUrl,splitMemberBody} from './security.js';
 function escHtml(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -23,6 +23,8 @@ function externalLinkLabel(type, url) {
   return '元コンテンツを見る';
 }
 export function articleHtml(articleData) {
+  const body = splitMemberBody(articleData.body_html);
+  const hasMemberSection = Boolean(articleData.has_member_section || body.hasMemberSection);
   const tags = (articleData.tags || []).map((tag) => `<span>${escHtml(tag)}</span>`).join("");
   const speakers = (articleData.speakers || []).map((person) => escHtml(person.name)).join("、") || "—";
   const hero = articleData.hero_url
@@ -75,6 +77,9 @@ export function articleHtml(articleData) {
 .character-nameplate{display:block;width:110px;max-width:110px;margin:.35rem 0 0 50%;transform:translateX(-50%)}
 .bubble-copy{padding:1.2rem 1.4rem;border:1px solid var(--line);border-radius:14px;background:var(--sky-2)}
 .column-back{display:inline-block;margin-top:3rem;color:var(--teal-deep);font-weight:700}
+.member-content-gate{margin:2.5rem 0 0;padding:1.5rem;border:1px solid rgba(61,107,94,.24);border-radius:16px;background:linear-gradient(135deg,#f3f8f5,#fffaf4);text-align:center}
+.member-content-gate strong,.member-content-gate span{display:block}.member-content-gate strong{color:var(--teal-deep);font-size:1.08rem}.member-content-gate span{margin:.45rem 0 1rem;color:var(--ink-soft);font-size:.88rem}.member-content-gate button{display:inline-flex;justify-content:center;align-items:center;min-height:42px;padding:.65rem 1.1rem;border:0;border-radius:999px;background:var(--teal-deep);color:#fff;font:700 .86rem/1.3 inherit;cursor:pointer}.member-content-status{margin:.8rem 0 0!important;font-size:.78rem!important;color:var(--ink-soft)!important}
+.article-share{margin:3.3rem 0 0;padding-top:1.5rem;border-top:1px solid var(--line)}.article-share h2{margin:0 0 .35rem!important;font-size:1rem!important}.article-share p{margin:0 0 .9rem;color:var(--ink-soft);font-size:.82rem}.article-share-buttons{display:flex;flex-wrap:wrap;gap:.55rem}.article-share-buttons button{min-height:40px;padding:.55rem .9rem;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--teal-deep);font-weight:700;cursor:pointer}.article-share-buttons button:hover{border-color:var(--sage);background:var(--sky-2)}
 @media(max-width:700px){.column-hero{padding:7rem 2rem 3rem}.column-wrap{width:min(100% - 32px,880px)}.editor-bubble,.editor-bubble.right{grid-template-columns:1fr}.editor-bubble.right .bubble-avatar{order:0}}
 </style>
 </head>
@@ -120,7 +125,9 @@ export function articleHtml(articleData) {
     </section>
     <section class="section">
       <div class="container column-article-body column-body-inner">
-        ${sanitizeBody(articleData.body_html) || "<p>本文はまだありません。</p>"}
+        ${body.publicHtml || (hasMemberSection ? "" : "<p>本文はまだありません。</p>")}
+        ${hasMemberSection ? `<section class="member-content-gate" data-member-article-id="${escHtml(articleData.id)}" data-member-revision="${escHtml(articleData.revision)}"><strong>ここから先は会員限定です</strong><span>ToToNoE+の会員としてログインすると、続きからお読みいただけます。</span><button type="button" data-member-unlock>会員限定部分を表示</button><p class="member-content-status" role="status" data-member-status></p></section><div data-member-content hidden></div>` : ""}
+        <section class="article-share" aria-labelledby="articleShareTitle"><h2 id="articleShareTitle">この記事を共有する</h2><p>気づきを、必要な人へ届ける。</p><div class="article-share-buttons"><button type="button" data-share="x">X</button><button type="button" data-share="threads">Threads</button><button type="button" data-share="instagram">Instagram</button><button type="button" data-share="copy">リンクをコピー</button></div><p class="member-content-status" role="status" data-share-status></p></section>
         <a class="column-back" href="${section.href}">← ${section.label}一覧へ戻る</a>
       </div>
     </section>
@@ -150,6 +157,7 @@ export function articleHtml(articleData) {
   </div>
 </footer>
 <script src="../common.js?v=20260905a"></script>
+<script src="../article-actions.js?v=20260913a"></script>
 </body>
 </html>
 `;

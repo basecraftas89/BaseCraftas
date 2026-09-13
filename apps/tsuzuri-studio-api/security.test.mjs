@@ -5,7 +5,7 @@ import {readFileSync,existsSync,readdirSync} from 'node:fs';
 import {resolve,join} from 'node:path';
 import {JSDOM} from 'jsdom';
 import {loadWorker} from './test-support.mjs';
-import {sanitizeBody,safeUrl,requestGuard} from './src/security.js';
+import {sanitizeBody,splitMemberBody,safeUrl,requestGuard} from './src/security.js';
 import {isCurrentWeekendThumbnail,latestSaturdayEventEnd} from './src/weekend-event.js';
 const worker=await loadWorker();
 function fixture() {
@@ -30,6 +30,11 @@ test('stored XSS, encoded URL schemes and dangerous markup are removed; speech b
  const r=await f.call('/api/articles/'+a.id,'PATCH',{expected_revision:a.revision,body_html:''});assert.equal((await r.json()).article.body_html,'');
  f.sql.prepare('UPDATE articles SET body_html=? WHERE id=?').run(payload,a.id);
  assert.doesNotMatch((await (await f.call('/api/articles')).json()).articles[0].body_html,/<script|onerror/);
+});
+
+test('member boundary splits sanitized public and protected bodies without leaking scripts',()=>{
+ const body=splitMemberBody('<p>無料</p><div class="member-content-boundary" contenteditable="false"><strong>ここから会員限定</strong></div><p>限定</p><script>alert(1)</script>');
+ assert.equal(body.hasMemberSection,true);assert.match(body.publicHtml,/無料/);assert.doesNotMatch(body.publicHtml,/限定/);assert.match(body.memberHtml,/限定/);assert.doesNotMatch(body.memberHtml,/script|alert/);
 });
 
 test('browser sanitizer blocks DOM XSS and unsafe paste markup',()=>{
@@ -143,7 +148,7 @@ test('preview redirects are validated before contacting next host',async()=>{
 
 test('public build excludes source/config/report files and includes real 404/security headers',()=>{
  for(const file of ['apps/tsuzuri-studio-api/src/worker.js','apps/tsuzuri-studio-api/schema.sql','apps/tsuzuri-studio-api/wrangler.toml','README.md','package.json','package-lock.json','scripts/build-site.mjs','apps/tsuzuri-studio/security-entry.js'])assert.equal(existsSync(join('dist',file)),false,file);
- for(const file of ['index.html','404.html','_headers','apps/tsuzuri-studio/security.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
+ for(const file of ['index.html','404.html','_headers','apps/tsuzuri-studio/security.js','projects/totonoe/article-actions.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
   assert.match(readFileSync('dist/_headers','utf8'),/script-src 'self'/);
   const dashboard=readFileSync('apps/tsuzuri-studio/index.html','utf8');
   const dashboardScript=readFileSync('apps/tsuzuri-studio/script.js','utf8');
@@ -154,7 +159,8 @@ test('public build excludes source/config/report files and includes real 404/sec
 });
 
 for (const contentType of ['column','video']) test(contentType+' publish emits sanitized HTML and fixes public media snapshot only after GitHub commit',async()=>{
- const f=fixture(),a=await f.article({content_type:contentType,media_url:contentType==='video'?'https://youtu.be/8ubAUePSwY8':'',body_html:'<p>published</p><img src=x onerror="alert(1)">'});
+ const sourceBody=contentType==='column'?'<p>published</p><div class="member-content-boundary" contenteditable="false"><strong>ここから会員限定</strong></div><p>protected words</p><img src=x onerror="alert(1)">':'<p>published</p><img src=x onerror="alert(1)">';
+ const f=fixture(),a=await f.article({content_type:contentType,media_url:contentType==='video'?'https://youtu.be/8ubAUePSwY8':'',body_html:sourceBody});
  const asset=(await (await f.call('/api/assets','POST',upload(a.id))).json()).asset;
  await f.call('/api/articles/'+a.id,'PATCH',{expected_revision:1,hero_url:'https://basecraftas.com/column-media/'+asset.key});
  f.env.GITHUB_TOKEN='test-only';f.env.GITHUB_REPOSITORY='test/repo';let tree;const blobs=new Map();
@@ -177,6 +183,9 @@ for (const contentType of ['column','video']) test(contentType+' publish emits s
   assert.equal(articleEntry.path,`projects/totonoe/${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);
   const html=blobs.get(articleEntry.sha);
   assert.doesNotMatch(html,/onerror/);assert.match(html,/<p>published<\/p>/);
+  if(contentType==='column'){assert.doesNotMatch(html,/protected words/);assert.match(html,/ここから先は会員限定/);assert.match(html,/data-share="threads"/);}
+  const publicArticle=JSON.parse(blobs.get(tree.tree.find(x=>x.path.endsWith(`/data/contents/${a.slug}.json`)).sha));
+  if(contentType==='column'){assert.equal(publicArticle.has_member_section,true);assert.doesNotMatch(publicArticle.body_html,/protected words/);}
   const index=JSON.parse(blobs.get(tree.tree.find(x=>x.path.endsWith('data/contents/index.json')).sha));
   assert.equal(index.articles[0].content_type,contentType);
   assert.equal(index.articles[0].url,`${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);

@@ -2,7 +2,7 @@ import {cp, mkdir, readdir, rm, readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {build} from 'esbuild';
-import {sanitizeBody,safeUrl,safeSourceId} from '../apps/tsuzuri-studio-api/src/security.js';
+import {safeUrl,safeSourceId,splitMemberBody} from '../apps/tsuzuri-studio-api/src/security.js';
 import {articleHtml} from '../apps/tsuzuri-studio-api/src/public-render.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -47,7 +47,8 @@ console.log(`Built ${copied.length} public files in dist; internal source, SQL, 
 for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0-9-]+\.json$/.test(file))) {
   const dest=path.join(out,file);const data=JSON.parse(await readFile(dest,'utf8'));
   const clean = item => {
-    const article={...item,source_id:safeSourceId(item.source_id),url:safeUrl(item.url,true),body_html:sanitizeBody(item.body_html || ''),media_url:safeUrl(item.media_url),hero_url:safeUrl(item.hero_url,true),
+    const body=splitMemberBody(item.body_html || '');
+    const article={...item,source_id:safeSourceId(item.source_id),url:safeUrl(item.url,true),body_html:body.publicHtml,has_member_section:Boolean(item.has_member_section||body.hasMemberSection),media_url:safeUrl(item.media_url),hero_url:safeUrl(item.hero_url,true),
       ...(item.external_link?{external_link:{...item.external_link,url:safeUrl(item.external_link.url),image:safeUrl(item.external_link.image)}}:{})};
     if((article.content_type||'column')==='column'){
       article.content_type_label='つづり｜TSUZURI';article.public_target='つづり｜TSUZURI';

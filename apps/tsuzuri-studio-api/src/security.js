@@ -27,7 +27,7 @@ export function sanitizeBody(value) {
       img: ['src','alt','width','height','class','loading'],
       ol: ['start'],
     },
-    allowedClasses: {'*': ['editor-bubble','right','bubble-avatar','bubble-copy','character-icon','character-nameplate']},
+    allowedClasses: {'*': ['editor-bubble','right','bubble-avatar','bubble-copy','character-icon','character-nameplate','member-content-boundary']},
     allowedStyles: {'*': {
       color: [/^#[0-9a-f]{3,8}$/i, /^rgb\([\d\s,.%]+\)$/i],
       'background-color': [/^#[0-9a-f]{3,8}$/i, /^rgb\([\d\s,.%]+\)$/i],
@@ -47,6 +47,19 @@ export function sanitizeBody(value) {
       },
     },
   });
+}
+
+const MEMBER_BOUNDARY_PATTERN = /<div\b[^>]*class="[^"]*\bmember-content-boundary\b[^"]*"[^>]*>[\s\S]*?<\/div>/i;
+
+export function splitMemberBody(value) {
+  const clean = sanitizeBody(value);
+  const match = MEMBER_BOUNDARY_PATTERN.exec(clean);
+  if (!match) return { publicHtml: clean, memberHtml: "", hasMemberSection: false };
+  return {
+    publicHtml: clean.slice(0, match.index),
+    memberHtml: clean.slice(match.index + match[0].length),
+    hasMemberSection: true,
+  };
 }
 
 export async function readBytes(request, limit) {
