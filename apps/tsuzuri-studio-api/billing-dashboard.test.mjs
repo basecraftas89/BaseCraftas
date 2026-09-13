@@ -35,22 +35,18 @@ test('現在の管理者だけを維持し、新規管理者・昇格・管理�
   assert.equal(response.status,409);
 });
 
-test('ウェイトリストは公開受付し、受付枠は管理者だけ10名単位で追加できる',async()=>{
+test('ウェイトリストは人数上限なしで公開受付し、管理者一覧に反映する',async()=>{
   const {sql,env}=fixture();
-  const join=await worker.fetch(new Request('https://test.local/api/totonoe-member/api/public/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'wait@example.com',interest:'iroha_corporate',privacy_consent:true,source:'test'})}),env);
-  assert.equal(join.status,201);
-  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM waitlist_entries WHERE email='wait@example.com'").get().count,1);
-  let response=await call(env,'/api/admin/waitlist');
+  for(let index=0;index<12;index+=1){
+    const join=await worker.fetch(new Request('https://test.local/api/totonoe-member/api/public/waitlist',{method:'POST',headers:{'content-type':'application/json','cf-connecting-ip':`203.0.113.${index+1}`},body:JSON.stringify({email:`wait${index}@example.com`,interest:'tayori_personal',privacy_consent:true,source:'test'})}),env);
+    assert.equal(join.status,201);
+  }
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM waitlist_entries WHERE interest='tayori_personal'").get().count,12);
+  const response=await call(env,'/api/admin/waitlist');
   assert.equal(response.status,200);
-  let data=await response.json();
-  assert.equal(data.enrollment.capacity,10);
-  assert.equal(data.entries.length,1);
-  response=await call(env,'/api/admin/plan-capacity/increase','POST',{plan_code:'weekly_monthly'});
-  assert.equal(response.status,200);
-  data=await response.json();
-  assert.equal(data.capacity,20);
-  response=await call(env,'/api/admin/plan-capacity/increase','POST',{plan_code:'weekly_monthly'},'editor@example.com');
-  assert.equal(response.status,403);
+  const data=await response.json();
+  assert.equal(data.entries.length,12);
+  assert.equal('enrollment' in data,false);
 });
 
 test('課金集計は管理者限定で、人数・当月実績・継続月額を同じ絞り込みで返す',async()=>{
@@ -90,7 +86,8 @@ test('Studioに管理者限定の課金画面と実データ未取得時の表�
   assert.match(html,/月別決済額と会員数/);
   assert.match(script,/\/api\/admin\/billing-summary/);
   assert.match(script,/\/api\/admin\/waitlist/);
-  assert.match(html,/10名枠を追加/);
+  assert.doesNotMatch(html,/TAYORI受付枠|10名枠を追加|enrollmentCapacity/);
+  assert.doesNotMatch(script,/plan-capacity|increaseCapacity|enrollmentCapacity/);
   assert.match(script,/決済履歴はまだありません/);
   assert.doesNotMatch(html,/メンバー・担当マップ|今週のフォーカス|決定ログ/);
 });

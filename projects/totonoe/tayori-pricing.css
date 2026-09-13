@@ -34,7 +34,6 @@
 .tayori-single-price>strong{font-size:1.8rem;color:var(--teal-deep)}
 .tayori-single-price>strong small{font-size:.7rem;color:var(--ink-soft)}
 .tayori-single-price>b{font-size:.82rem;color:var(--teal-deep)}
-.enrollment-status{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:#fff7df;font-size:.8rem;font-weight:700;color:var(--ink-soft)}
 .waitlist-form{display:grid;gap:10px;margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .waitlist-form label{display:grid;gap:7px;font-size:.78rem;font-weight:700;color:var(--ink-soft)}
 .waitlist-form input[type="email"]{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit}

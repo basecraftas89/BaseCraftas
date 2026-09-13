@@ -178,7 +178,6 @@ function isPublicMemberRequest(rawPath, normalizedPath, method) {
     "POST /api/customer/auth/logout",
     "POST /api/customer/billing/checkout",
     "POST /api/customer/billing/portal",
-    "GET /api/public/enrollment",
     "POST /api/public/waitlist",
     "POST /api/stripe/webhook",
     "GET /api/customer/profile",
@@ -2229,44 +2228,6 @@ function checkoutSiteOrigin(request, env) {
   return configured;
 }
 
-async function weeklyEnrollmentAvailability(env) {
-  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
-  const capacity = await env.DB.prepare(
-    "SELECT capacity, increment_size FROM plan_capacity WHERE plan_code = 'weekly_monthly'"
-  ).first();
-  if (!capacity) throw Object.assign(new Error("plan_capacity_not_configured"), { status: 503 });
-  const occupied = await env.DB.prepare(
-    `SELECT COUNT(DISTINCT customer_id) AS count FROM customer_subscriptions
-      WHERE product_code = 'weekly' AND livemode = ?
-        AND status IN ('trialing', 'active', 'past_due', 'paused')`
-  ).bind(livemode).first();
-  const reserved = await env.DB.prepare(
-    `SELECT COUNT(*) AS count FROM plan_capacity_reservations
-      WHERE plan_code = 'weekly_monthly' AND status = 'reserved' AND datetime(expires_at) > datetime('now')`
-  ).first();
-  const used = Number(occupied?.count || 0) + Number(reserved?.count || 0);
-  const total = Number(capacity.capacity || 10);
-  return {
-    plan_code: "weekly_monthly",
-    capacity: total,
-    used,
-    remaining: Math.max(0, total - used),
-    full: used >= total,
-    increment_size: Number(capacity.increment_size || 10),
-  };
-}
-
-async function publicEnrollment(request, env) {
-  const planCode = new URL(request.url).searchParams.get("plan") || "weekly_monthly";
-  if (planCode !== "weekly_monthly") return json({ error: "invalid_plan" }, { status: 400 });
-  try {
-    return json(await weeklyEnrollmentAvailability(env));
-  } catch (error) {
-    if (/no such table/i.test(String(error.message || error))) return json({ error: "enrollment_not_configured" }, { status: 503 });
-    throw error;
-  }
-}
-
 async function joinWaitlist(request, env) {
   const payload = await readJson(request);
   if (!payload) return json({ error: "invalid_json" }, { status: 400 });
@@ -2293,47 +2254,13 @@ async function joinWaitlist(request, env) {
   return json({ ok: true, interest }, { status: 201 });
 }
 
-async function reserveWeeklyCapacity(env, customerId, attemptId) {
-  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
-  await env.DB.prepare(
-    "UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE status = 'reserved' AND datetime(expires_at) <= datetime('now')"
-  ).run();
-  const result = await env.DB.prepare(
-    `INSERT INTO plan_capacity_reservations(id, plan_code, customer_id, checkout_attempt_id, status, expires_at)
-     SELECT ?, 'weekly_monthly', ?, ?, 'reserved', datetime('now', '+30 minutes')
-     FROM plan_capacity pc
-     WHERE pc.plan_code = 'weekly_monthly'
-       AND (
-         (SELECT COUNT(DISTINCT customer_id) FROM customer_subscriptions
-           WHERE product_code = 'weekly' AND livemode = ?
-             AND status IN ('trialing', 'active', 'past_due', 'paused'))
-         +
-         (SELECT COUNT(*) FROM plan_capacity_reservations
-           WHERE plan_code = 'weekly_monthly' AND status = 'reserved' AND datetime(expires_at) > datetime('now'))
-       ) < pc.capacity`
-  ).bind(uid("capacity_reservation"), customerId, attemptId, livemode).run();
-  return Number(result.meta?.changes || 0) > 0;
-}
-
 async function listWaitlistAdmin(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
   if (auth.error) return auth.error;
   const result = await env.DB.prepare(
     "SELECT id, email, interest, status, source, consent_at, created_at, updated_at FROM waitlist_entries ORDER BY datetime(created_at) DESC LIMIT 500"
   ).all();
-  return json({ entries: result.results || [], enrollment: await weeklyEnrollmentAvailability(env) });
-}
-
-async function increasePlanCapacity(request, env) {
-  const auth = await requireRole(request, env, ["admin"]);
-  if (auth.error) return auth.error;
-  const payload = await readJson(request);
-  if (!payload || payload.plan_code !== "weekly_monthly") return json({ error: "invalid_plan" }, { status: 400 });
-  await env.DB.prepare(
-    "UPDATE plan_capacity SET capacity = capacity + increment_size, updated_at = CURRENT_TIMESTAMP WHERE plan_code = 'weekly_monthly'"
-  ).run();
-  await audit(env, auth.email, "plan_capacity.increase", "plan_capacity", "weekly_monthly", { increment: 10 });
-  return json(await weeklyEnrollmentAvailability(env));
+  return json({ entries: result.results || [] });
 }
 
 async function createCustomerCheckout(request, env) {
@@ -2379,13 +2306,6 @@ async function createCustomerCheckout(request, env) {
   ).bind(attemptId, auth.customer.id, idempotencyKey, quote.planCode, quote.audienceType, quote.feeType,
     quote.campaignCode, quote.trialPeriodDays, quote.recurringAmountYen, quote.entryFeeAmountYen).run();
 
-  if (quote.planCode === "weekly_monthly" && !(await reserveWeeklyCapacity(env, auth.customer.id, attemptId))) {
-    await env.DB.prepare(
-      "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = 'plan_full', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-    ).bind(attemptId).run();
-    return json({ error: "plan_full", waitlist_interest: "tayori_personal" }, { status: 409 });
-  }
-
   const origin = checkoutSiteOrigin(request, env);
   const isWeeklyPlan = quote.planCode === "weekly_monthly";
   const params = buildStripeCheckoutParams({
@@ -2419,9 +2339,6 @@ async function createCustomerCheckout(request, env) {
       },
     }, { status: 201 });
   } catch (error) {
-    await env.DB.prepare(
-      "UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'"
-    ).bind(attemptId).run();
     await env.DB.prepare(
       "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
     ).bind(String(error.detail || error.message || "stripe_error").slice(0, 200), attemptId).run();
@@ -2676,7 +2593,6 @@ async function processStripeEvent(env, event) {
   if (event.type === "checkout.session.expired") {
     if (metadata.attemptId) {
       await env.DB.prepare("UPDATE stripe_checkout_attempts SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(metadata.attemptId).run();
-      await env.DB.prepare("UPDATE plan_capacity_reservations SET status = 'released', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'").bind(metadata.attemptId).run();
     }
     return "processed";
   }
@@ -2695,9 +2611,6 @@ async function processStripeEvent(env, event) {
       `UPDATE stripe_checkout_attempts SET status = 'completed', stripe_checkout_session_id = ?,
        stripe_customer_id = ?, stripe_subscription_id = ?, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
     ).bind(object.id, subscription.customerId, subscription.subscriptionId ? String(object.subscription || "") : "", attempt.id).run();
-    await env.DB.prepare(
-      "UPDATE plan_capacity_reservations SET status = 'converted', updated_at = CURRENT_TIMESTAMP WHERE checkout_attempt_id = ? AND status = 'reserved'"
-    ).bind(attempt.id).run();
     return "processed";
   }
   if (["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
@@ -3479,7 +3392,6 @@ const worker = {
     if (request.method === "OPTIONS") return new Response(null, { status: 204 });
     if (path === "/api/health") return json({ ok: true, service: "tsuzuri-studio-api" });
     if (path === "/api/public/weekend-event" && request.method === "GET") return publicWeekendEvent(env);
-    if (path === "/api/public/enrollment" && request.method === "GET") return publicEnrollment(request, env);
     if (path === "/api/public/waitlist" && request.method === "POST") return joinWaitlist(request, env);
 
     if (path === "/api/me") {
@@ -3557,7 +3469,6 @@ const worker = {
 
     if (path === "/api/admin/billing-summary" && request.method === "GET") return billingSummary(request, env);
     if (path === "/api/admin/waitlist" && request.method === "GET") return listWaitlistAdmin(request, env);
-    if (path === "/api/admin/plan-capacity/increase" && request.method === "POST") return increasePlanCapacity(request, env);
 
     if (path === "/api/articles" && request.method === "GET") {
       const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);

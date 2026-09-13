@@ -218,18 +218,19 @@ test('資格確認APIは公開・管理画面のどちらからも利用でき�
   assert.ok(fixture.sql.prepare("SELECT purge_after FROM qualification_submissions WHERE id=?").get(submittedBody.submission.id).purge_after);
 });
 
-test('TAYORI LPは980円・14日無料・初回10名とウェイトリストを案内する',()=>{
+test('TAYORI LPは980円・14日無料・人数上限なしのウェイトリストを案内する',()=>{
   const html=readFileSync('projects/totonoe/tayori.html','utf8');
+  const workerSource=readFileSync('apps/tsuzuri-studio-api/src/worker.js','utf8');
   const workerConfig=readFileSync('apps/tsuzuri-studio-api/wrangler.toml','utf8');
   assert.match(html,/月額 980円/);
   assert.match(html,/14日間無料トライアル/);
-  assert.match(html,/初回先着10名/);
   assert.match(html,/data-waitlist-form/);
-  assert.match(html,/入会金なし/);
+  assert.doesNotMatch(html,/初回先着10名|現在の受付枠|残り\d+名|入会金なし|いつでも解約可能|資格証明|10名ずつ追加枠/);
   assert.doesNotMatch(html,/資格確認済みセラピスト|月額 1,480円/);
   assert.doesNotMatch(html,/data-tayori-checkout/);
   assert.doesNotMatch(html,/tayoriCheckoutDialog/);
   assert.doesNotMatch(html,/tayori-checkout\.js/);
+  assert.doesNotMatch(workerSource,/plan_full|reserveWeeklyCapacity|\/api\/public\/enrollment|\/api\/admin\/plan-capacity\/increase/);
   assert.match(workerConfig,/STRIPE_CHECKOUT_ENABLED = "false"/);
 });
 

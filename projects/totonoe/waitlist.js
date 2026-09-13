@@ -22,8 +22,4 @@
       } finally { button.disabled = false; }
     });
   });
-  const enrollment = document.querySelector("[data-enrollment-status]");
-  if (enrollment) request("/api/public/enrollment?plan=weekly_monthly").then((data) => {
-    enrollment.textContent = data.full ? `現在${data.capacity}名の枠が満員です。次の10名枠の開放をお待ちください。` : `現在の受付枠は${data.capacity}名、残り${data.remaining}名です。`;
-  }).catch(() => { enrollment.textContent = "現在は受付準備中です。ウェイトリストからご案内を受け取れます。"; });
 })();
