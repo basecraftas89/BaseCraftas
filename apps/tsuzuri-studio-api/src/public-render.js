@@ -101,6 +101,7 @@ export function articleHtml(articleData) {
           <a href="../IROHA/">いろは｜IROHA</a>
         </div>
       </div>
+      <a href="../characters/">キャラクター</a>
       <a href="../team.html">チーム</a>
       <a href="../faq.html">FAQ</a>
     </nav>

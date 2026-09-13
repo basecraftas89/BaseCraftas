@@ -1,4 +1,114 @@
 {
-  "updated_at": "2026-09-12T06:26:51.470Z",
-  "articles": []
+  "generated_at": "2026-09-13T00:00:00.000Z",
+  "article_count": 4,
+  "articles": [
+    {
+      "id": "character-story-tsugumo-morning-call",
+      "slug": "tsugumo-morning-call",
+      "revision": 1,
+      "status": "published",
+      "destination": "totonoe",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "category": "character-story",
+      "title": "朝を届けられなかった日",
+      "excerpt": "たくさんの仕事を抱え、一番大切な朝を届けられなかったツグモ。ハクトから受け取った一枚のカードが、もう一度朝へ戻る小さなきっかけになります。",
+      "main_actor": {
+        "id": "tsugumo",
+        "name": "ツグモ"
+      },
+      "speakers": [],
+      "tags": [
+        "キャラクター",
+        "ツグモ"
+      ],
+      "hero_url": "../assets/characters/stories/tsugumo/01-1_capable-before-dawn.png",
+      "url": "tsuzuri/tsugumo-morning-call.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/tsugumo-morning-call.html",
+      "published_at": "2026-09-13",
+      "updated_at": "2026-09-13T00:00:00.000Z",
+      "has_member_section": false
+    },
+    {
+      "id": "character-story-hakuto-beyond-window",
+      "slug": "hakuto-story-beyond-window",
+      "revision": 1,
+      "status": "published",
+      "destination": "totonoe",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "category": "character-story",
+      "title": "窓の外にある物語",
+      "excerpt": "過去の成功と記録の中に閉じこもり、物語を書けなくなったハクト。ツグモとミオンが運ぶ外の世界から、再び一行を書き始めます。",
+      "main_actor": {
+        "id": "hakuto",
+        "name": "ハクト"
+      },
+      "speakers": [],
+      "tags": [
+        "キャラクター",
+        "ハクト"
+      ],
+      "hero_url": "../assets/characters/stories/hakuto/02-1_successful-writer.png",
+      "url": "tsuzuri/hakuto-story-beyond-window.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/hakuto-story-beyond-window.html",
+      "published_at": "2026-09-13",
+      "updated_at": "2026-09-13T00:00:00.000Z",
+      "has_member_section": false
+    },
+    {
+      "id": "character-story-mion-which-shadow",
+      "slug": "mion-which-shadow",
+      "revision": 1,
+      "status": "published",
+      "destination": "totonoe",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "category": "character-story",
+      "title": "今日は、どの影を追う？",
+      "excerpt": "気になるものすべてへ飛び込み、疲れても止まれないミオン。前夜に残した自分の声を手がかりに、今日追う一つを選び始めます。",
+      "main_actor": {
+        "id": "mion",
+        "name": "ミオン"
+      },
+      "speakers": [],
+      "tags": [
+        "キャラクター",
+        "ミオン"
+      ],
+      "hero_url": "../assets/characters/stories/mion/03-1_chasing-everything.png",
+      "url": "tsuzuri/mion-which-shadow.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/mion-which-shadow.html",
+      "published_at": "2026-09-13",
+      "updated_at": "2026-09-13T00:00:00.000Z",
+      "has_member_section": false
+    },
+    {
+      "id": "character-story-three-same-gift",
+      "slug": "three-characters-same-gift",
+      "revision": 1,
+      "status": "published",
+      "destination": "totonoe",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "category": "character-story",
+      "title": "同じ人から、もらったもの",
+      "excerpt": "カードとボイスレコーダーをきっかけに、初めて同じ場所へ集まったミオン、ツグモ、ハクト。違う整え方を持つ3人の習慣が始まります。",
+      "main_actor": {
+        "id": "mion-tsugumo-hakuto",
+        "name": "ミオン・ツグモ・ハクト"
+      },
+      "speakers": [],
+      "tags": [
+        "キャラクター",
+        "ミオン・ツグモ・ハクト"
+      ],
+      "hero_url": "../assets/characters/stories/trio/04-1_tools-connect-them.png",
+      "url": "tsuzuri/three-characters-same-gift.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/three-characters-same-gift.html",
+      "published_at": "2026-09-13",
+      "updated_at": "2026-09-13T00:00:00.000Z",
+      "has_member_section": false
+    }
+  ]
 }
