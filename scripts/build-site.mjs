@@ -74,6 +74,10 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
       ? path.join(out,'projects/totonoe',directory,article.slug,'index.html')
       : path.join(out,'projects/totonoe',directory,article.slug+'.html');
     await mkdir(path.dirname(articlePath),{recursive:true});
-    await writeFile(articlePath,articleHtml(article));
+    const renderedArticle=articleHtml(article);
+    const depthAdjustedArticle=article.category==='character-story'
+      ? renderedArticle.replaceAll('="../','="../../')
+      : renderedArticle;
+    await writeFile(articlePath,depthAdjustedArticle);
   }
 }
