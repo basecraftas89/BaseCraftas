@@ -193,7 +193,8 @@ assert.equal(w.document.getElementById('contentListTitle').textContent,'つま�
 assert.match(w.document.getElementById('breadcrumb').textContent,/ToToNoE\+ Studio/);
 assert.equal(t.els.contentType.value,'video');assert.ok(w.document.getElementById('view-editor').classList.contains('source-only-editor'));
 assert.equal(w.document.getElementById('imageDrop').closest('.setting-block').classList.contains('source-only-hidden'),false);
-assert.match(w.document.getElementById('imageDrop').textContent,/1200\s*×\s*630px/);
+assert.match(w.document.getElementById('imageDrop').textContent,/表示枠\s*1200\s*×\s*630px/);
+assert.match(readFileSync(resolve(root,'apps/tsuzuri-studio/styles.css'),'utf8'),/\.image-drop\{aspect-ratio:1200\/630/);
 t.openContentView('column');t.blankPost(false);
 t.els.title.value='new draft';t.els.title.dispatchEvent(new w.Event('input',{bubbles:true}));
 assert.ok(t.state.editingId);assert.equal(t.state.posts[0].title,'new draft');

@@ -190,7 +190,7 @@
     document.getElementById('episodeNoField').classList.remove('source-only-hidden');
     document.getElementById('sourceDateLabel').textContent='開催日・公開日';
     document.getElementById('imageFieldLabel').textContent=type==='weekend'?'次回開催サムネイル':'アイキャッチ';
-    document.getElementById('imageFieldHelp').textContent=type==='weekend'?'推奨 16:9・2MB以下':'推奨 1200 × 630px';
+    document.getElementById('imageFieldHelp').textContent=type==='weekend'?'表示枠 1200 × 630px・2MB以下':'表示枠 1200 × 630px';
     document.querySelector('[data-setting-tab="style"]').classList.toggle('source-only-hidden',sourceOnly);
     if(sourceOnly){document.querySelector('[data-setting-tab="post"]').click();}
   }
