@@ -16,7 +16,7 @@ function loginResponse(url) {
 function salesResponse(url, required) {
   const pathname = required === "curriculum"
     ? "/projects/totonoe/IROHA/"
-    : "/projects/totonoe/weekly.html";
+    : "/projects/totonoe/tayori.html";
   return new Response(null, { status: 302, headers: { location: new URL(pathname, url.origin).href, "cache-control": "no-store" } });
 }
 

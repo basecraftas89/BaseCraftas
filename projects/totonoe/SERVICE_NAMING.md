@@ -28,7 +28,7 @@
 - 解説動画：短い動画で理解を深める
 - 会員限定Q&A：ほかの会員の疑問からも学ぶ
 - 優先質問権：知りたいテーマを届ける。解説テーマとして優先検討する仕組みで、個別回答を保証しない
-- 公開LPは `/projects/totonoe/weekly.html`
+- 公開LPは `/projects/totonoe/tayori.html`
 - 会員ページは `/projects/totonoe/TAYORI/`。`weekly_access` または `curriculum_all_access` の購入者だけが利用できる
 
 ## TSUMAMI

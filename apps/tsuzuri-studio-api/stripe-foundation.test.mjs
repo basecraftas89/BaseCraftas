@@ -180,7 +180,7 @@ test('資格画像は非公開R2に保存され、管理者審査後だけセラ
 });
 
 test('TAYORI LPは問い合わせではなくメール認証付き月額980円Checkoutへ進む',()=>{
-  const html=readFileSync('projects/totonoe/weekly.html','utf8');
+  const html=readFileSync('projects/totonoe/tayori.html','utf8');
   const script=readFileSync('projects/totonoe/tayori-checkout.js','utf8');
   assert.match(html,/data-tayori-checkout/);
   assert.match(html,/月額980円/);
@@ -276,15 +276,16 @@ test('会員画面は再ログインと契約管理の導線を備える',()=>{
 test('公開サービス導線はLPに入り、購入者ページは会員区分で保護される',()=>{
   const home=readFileSync('projects/totonoe/index.html','utf8');
   const service=readFileSync('projects/totonoe/service.html','utf8');
-  const tayoriLp=readFileSync('projects/totonoe/weekly.html','utf8');
+  const tayoriLp=readFileSync('projects/totonoe/tayori.html','utf8');
   const irohaLp=readFileSync('projects/totonoe/IROHA/index.html','utf8');
   const dashboard=readFileSync('projects/totonoe/IROHA/dashboard.html','utf8');
   const mypage=readFileSync('projects/totonoe/IROHA/mypage.html','utf8');
   const shell=readFileSync('projects/totonoe/IROHA/member-shell.js','utf8');
   const loginScript=readFileSync('projects/totonoe/TAYORI/login.js','utf8');
 
-  assert.match(home,/href="weekly\.html" class="btn btn-ghost">詳細・料金を見る/);
-  assert.match(service,/href="weekly\.html" class="btn btn-ghost">詳細・料金を見る/);
+  assert.match(home,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
+  assert.match(service,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
+  assert.match(tayoriLp,/AI情報に置いていかれないためのサービスです/);
   assert.doesNotMatch(home,/href="TAYORI\/"/);
   assert.doesNotMatch(service,/href="TAYORI\/"/);
   assert.match(tayoriLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FTAYORI%2F/);
