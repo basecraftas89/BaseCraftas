@@ -58,12 +58,13 @@ export function articleHtml(articleData) {
 .content-media-link a{display:inline-flex;align-items:center;gap:.4rem;padding:.72rem 1rem;border-radius:999px;background:var(--teal-deep);color:#fff;font-weight:700;text-decoration:none}
 .column-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.3rem}
 .column-tags span{padding:.3rem .6rem;border-radius:999px;background:rgba(61,107,94,.12);color:var(--teal-deep);font-size:.74rem}
-.column-hero-image{margin-top:2rem}
-.column-hero-image img{width:100%;border-radius:18px;box-shadow:var(--shadow-sm)}
+.column-hero-image{margin:0 0 2.25rem}
+.column-hero-image img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:18px;background:#fff;box-shadow:var(--shadow-sm)}
 .column-body-inner{font-size:1rem;line-height:2.08}
 .column-body-inner h2{margin:2.8rem 0 1rem;font-size:1.65rem;color:var(--teal-deep)}
 .column-body-inner h3{margin:2rem 0 .8rem;font-size:1.28rem;color:var(--teal-deep)}
 .column-body-inner p+p{margin-top:1.1rem}
+.column-body-inner a{color:var(--sage);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
 .column-body-inner mark{background:#fff0a8;padding:.05em .22em;border-radius:.2em}
 .column-body-inner blockquote{margin:2rem 0;padding:1.3rem 1.5rem;border-left:4px solid var(--sun);background:var(--sky-2)}
 .editor-bubble{display:grid;grid-template-columns:92px minmax(0,1fr);gap:1rem;align-items:start;margin:2rem 0}
@@ -108,13 +109,13 @@ export function articleHtml(articleData) {
   <article class="column-article">
     <section class="column-article-hero">
       <div class="container">
+        ${hero}
         <p class="eyebrow">${escHtml(articleData.content_type_label)} / ${escHtml(articleData.published_at)}</p>
         <h1>${escHtml(articleData.title)}</h1>
         <p class="column-lead">${escHtml(articleData.excerpt)}</p>
         <p class="column-actor">Main Actor <strong>${escHtml(articleData.main_actor.name)}</strong> / Speaker <strong>${speakers}</strong></p>
         ${mediaLink}
         <div class="column-tags">${tags}</div>
-        ${hero}
       </div>
     </section>
     <section class="section">

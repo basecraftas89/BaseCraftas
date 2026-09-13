@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260913-studio-name">
+  <link rel="stylesheet" href="styles.css?v=20260913-image-link">
 </head>
 <body>
   <div class="app-shell">
@@ -168,7 +168,7 @@
                 <button type="button" data-command="insertUnorderedList" aria-label="箇条書き">☷</button>
                 <button type="button" data-command="insertOrderedList" aria-label="番号付きリスト">☰</button>
                 <button type="button" data-command="blockquote" aria-label="引用">“</button>
-                <button type="button" data-command="link" aria-label="リンク">⌁</button>
+                <button type="button" data-command="link" aria-label="リンクを設定・解除" aria-haspopup="dialog" aria-controls="textLinkDialog">⌁</button>
                 <span class="tool-divider"></span>
                 <button type="button" class="bubble-tool" data-action="bubble-picker" aria-controls="bubblePicker" aria-expanded="false"><span class="bubble-tool-icon">💬</span><span>キャラクター会話</span></button>
               </div>
@@ -213,7 +213,7 @@
                 <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
                 <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
-                <div class="setting-block"><span id="imageFieldLabel">アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small id="imageFieldHelp">推奨 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
+                <div class="setting-block"><span id="imageFieldLabel">アイキャッチ</span><button class="image-drop" id="imageDrop" type="button"><span>＋</span><strong>画像を選ぶ</strong><small id="imageFieldHelp">表示枠 1200 × 630px</small></button><input type="file" id="imageInput" accept="image/*" hidden></div>
               </div>
               <div class="setting-content" id="setting-style">
                 <label>マーカー色<select id="markerColor"><option value="#fff0a8">やわらかい黄</option><option value="#dcefe8">セージ</option><option value="#f8ddd3">テラコッタ</option><option value="#dfe8f7">ブルー</option></select></label>
@@ -261,7 +261,19 @@
 
   <dialog class="preview-dialog" id="previewDialog">
     <div class="preview-bar"><div><span></span><b>記事プレビュー</b><small>公開前の見え方</small></div><button type="button" data-action="close-preview">×</button></div>
-    <article class="preview-article"><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　Speaker：<span id="previewSpeakers">—</span>　／　<span id="previewDate"></span></div><p class="preview-media" id="previewMediaUrl"></p><div class="preview-body" id="previewBody"></div></article>
+    <article class="preview-article"><figure class="preview-hero" id="previewHero" hidden></figure><p class="preview-category" id="previewCategory"></p><h1 id="previewTitle"></h1><p class="preview-lead" id="previewLead"></p><div class="preview-meta">Main Actor：<span id="previewMainActor">神藤 俊希</span>　／　Speaker：<span id="previewSpeakers">—</span>　／　<span id="previewDate"></span></div><p class="preview-media" id="previewMediaUrl"></p><div class="preview-body" id="previewBody"></div></article>
+    <style>.preview-hero{margin:0 0 32px}.preview-hero img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:12px;background:#fff;box-shadow:var(--shadow-sm)}</style>
+  </dialog>
+
+  <dialog class="text-link-dialog" id="textLinkDialog">
+    <form method="dialog" id="textLinkForm">
+      <div class="dialog-head"><div><p class="eyebrow">TEXT LINK</p><h2>テキストにリンクを設定</h2></div><button type="button" data-action="close-text-link" aria-label="閉じる">×</button></div>
+      <p class="text-link-selection" id="textLinkSelection"></p>
+      <label for="textLinkUrl">リンク先URL</label>
+      <input id="textLinkUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com">
+      <p class="text-link-help">本文でリンクにしたい文字を選択してから設定します。</p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" id="removeTextLink" data-action="remove-text-link">リンクを解除</button><button type="button" class="primary-button" data-action="apply-text-link">設定する</button></div>
+    </form>
   </dialog>
 
   <dialog class="invite-dialog" id="inviteDialog">
@@ -271,6 +283,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260911"></script>
-  <script src="script.js?v=20260913-studio-name"></script>
+  <script src="script.js?v=20260913-image-link"></script>
 </body>
 </html>
