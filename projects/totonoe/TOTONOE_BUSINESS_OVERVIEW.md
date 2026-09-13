@@ -142,7 +142,7 @@ Base Craftas
 | TAYORI会員画面 | `projects/totonoe/TAYORI/` | `https://basecraftas.com/projects/totonoe/TAYORI/` |
 | TSUZURI | `projects/totonoe/tsuzuri/` | `https://basecraftas.com/projects/totonoe/tsuzuri/` |
 | TSUMAMI | `projects/totonoe/tsumami/` | `https://basecraftas.com/projects/totonoe/tsumami/` |
-| IROHA | `projects/totonoe/IROHA/` | 現在は `service.html#iroha` へ転送 |
+| IROHA | `projects/totonoe/IROHA/` | 準備中の料金案内と個人・法人ウェイトリストを公開 |
 | 法人向け | `projects/totonoe/corporate.html` | `https://basecraftas.com/projects/totonoe/corporate.html` |
 | 運営チーム | `projects/totonoe/team.html` | `https://basecraftas.com/projects/totonoe/team.html` |
 | FAQ | `projects/totonoe/faq.html` | `https://basecraftas.com/projects/totonoe/faq.html` |

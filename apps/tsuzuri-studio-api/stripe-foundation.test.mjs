@@ -363,8 +363,8 @@ test('IROHA公開導線は準備中になり、購入者ページは会員区分
   assert.doesNotMatch(service,/href="TAYORI\/"/);
   assert.match(tayoriLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FTAYORI%2F/);
   assert.match(service,/class="service-card is-coming-soon" id="iroha"/);
-  assert.doesNotMatch(home,/href="IROHA\/" class="btn/);
-  assert.doesNotMatch(service,/href="IROHA\/" class="btn/);
+  assert.match(home,/href="IROHA\/#iroha-waitlist"/);
+  assert.match(service,/href="IROHA\/#iroha-waitlist"/);
   assert.match(irohaLp,/現在、公開に向けて準備中です/);
   assert.match(irohaLp,/初回 9,800円 ／ 再入会 4,800円/);
   assert.match(irohaLp,/data-interest="iroha_corporate"/);
