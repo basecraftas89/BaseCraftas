@@ -200,6 +200,6 @@ Stripe Dashboardのテスト環境でCustomer Portalを有効化し、次を設�
 - 解約時期: 現在の請求期間の終了時
 - 解約理由の収集: 有効
 - プラン変更・数量変更: TAYORI個人プランでは無効
-- デフォルトの戻り先: `https://basecraftas.com/projects/totonoe/curriculum/mypage.html`
+- デフォルトの戻り先: `https://basecraftas.com/projects/totonoe/IROHA/mypage.html`
 
 Portal Session作成APIは `/api/totonoe-member/api/customer/billing/portal` です。メール認証済みCookie、D1のStripe Customer ID、Stripe契約履歴がすべて揃う場合だけ作成します。解約結果は `customer.subscription.updated` と `customer.subscription.deleted` のWebhookでD1へ反映します。
