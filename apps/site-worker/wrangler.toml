@@ -2,6 +2,13 @@ name = "basecraftas"
 main = "worker.js"
 compatibility_date = "2026-09-11"
 
+# Always rebuild the complete public asset manifest before a direct Wrangler
+# deployment. Character stories are generated from Studio JSON during this
+# step, so deploying a stale dist directory would otherwise remove their URLs.
+[build]
+command = "npm run build"
+cwd = "."
+
 [assets]
 directory = "../../dist"
 binding = "ASSETS"

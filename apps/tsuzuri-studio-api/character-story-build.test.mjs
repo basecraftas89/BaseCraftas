@@ -27,3 +27,10 @@ test("nested character stories resolve shared styles, scripts, navigation, and i
     assert.doesNotMatch(html, /(?:href|src)="\.\.\/(?!\.\.\/)/);
   }
 });
+
+test("a direct site Worker deployment rebuilds generated character stories", async () => {
+  const config = await readFile(path.join(root, "apps/site-worker/wrangler.toml"), "utf8");
+
+  assert.match(config, /\[build\][\s\S]*command\s*=\s*"npm run build"/);
+  assert.match(config, /\[build\][\s\S]*cwd\s*=\s*"\."/);
+});
