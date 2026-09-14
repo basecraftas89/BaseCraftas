@@ -800,9 +800,18 @@ function validMemberRole(value) {
   return ["admin", "editor", "viewer"].includes(value) ? value : null;
 }
 
+const FIXED_ADMIN_EMAILS = new Set([
+  "kansai89414@gmail.com",
+  "toshiki.kanto.workspace@gmail.com",
+]);
+
+function isFixedAdminEmail(email) {
+  return FIXED_ADMIN_EMAILS.has(String(email || "").trim().toLowerCase());
+}
+
 const memberChangeGuard = "(NOT (role = 'admin' AND status = 'active') OR (? = 'admin' AND ? = 'active') OR (SELECT COUNT(*) FROM members WHERE role = 'admin' AND status = 'active') > 1)";
 function lastAdminError() { return json({error: "last_admin", message: "最後の管理者は変更・停止できません。"}, {status: 409}); }
-function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は現在の管理者アカウントだけに固定されています。"}, {status: 409}); }
+function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は指定された2つのアカウントに固定されています。"}, {status: 409}); }
 
 async function createMember(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
@@ -815,7 +824,7 @@ async function createMember(request, env) {
   if (!role) return json({ error: "invalid_role", message: "権限を確認してください。" }, { status: 400 });
 
   const existing = await env.DB.prepare("SELECT id, name, role, status FROM members WHERE lower(email) = ?").bind(email).first();
-  if (role === "admin" && existing?.role !== "admin") return adminRoleLockedError();
+  if (role === "admin" && !isFixedAdminEmail(email)) return adminRoleLockedError();
   const id = existing?.id || uid("member");
   const savedName = name || existing?.name || "";
   if (existing) {
@@ -840,8 +849,8 @@ async function updateMember(request, env, id) {
   const role = validMemberRole(payload?.role || current.role);
   const status = payload?.status || current.status;
   if (!role || !["active", "disabled"].includes(status)) return json({ error: "invalid_member", message: "権限または状態を確認してください。" }, { status: 400 });
-  if (current.role === "admin" && (role !== "admin" || status !== "active")) return adminRoleLockedError();
-  if (current.role !== "admin" && role === "admin") return adminRoleLockedError();
+  if (isFixedAdminEmail(current.email) && (role !== "admin" || status !== "active")) return adminRoleLockedError();
+  if (role === "admin" && !isFixedAdminEmail(current.email)) return adminRoleLockedError();
 
   const updated = await env.DB.prepare("UPDATE members SET role = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND " + memberChangeGuard).bind(role, status, id, role, status).run();
   if (!updated.meta.changes) return lastAdminError();
@@ -2830,6 +2839,42 @@ async function billingSummary(request, env) {
   });
 }
 
+async function resetTestBillingData(request, env) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  if (env.STRIPE_MODE !== "test") {
+    return json({ error: "test_mode_required", message: "テストモードでのみリセットできます。" }, { status: 409 });
+  }
+  const results = await env.DB.batch([
+    env.DB.prepare("DELETE FROM customer_entitlements WHERE source_subscription_id IN (SELECT id FROM customer_subscriptions WHERE livemode = 0)"),
+    env.DB.prepare("DELETE FROM billing_transactions WHERE livemode = 0"),
+    env.DB.prepare("DELETE FROM subscription_status_events WHERE livemode = 0"),
+    env.DB.prepare("DELETE FROM plan_capacity_reservations WHERE checkout_attempt_id IN (SELECT id FROM stripe_checkout_attempts WHERE livemode = 0)"),
+    env.DB.prepare("DELETE FROM customer_subscriptions WHERE livemode = 0"),
+    env.DB.prepare("DELETE FROM stripe_checkout_attempts WHERE livemode = 0"),
+    env.DB.prepare(
+      `INSERT INTO audit_events (id, actor_email, action, entity_type, entity_id, metadata)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(
+      uid("audit"),
+      auth.email,
+      "billing.test_data.reset",
+      "billing",
+      "test",
+      JSON.stringify({ scope: "test_billing_data" })
+    ),
+  ]);
+  const deleted = {
+    entitlements: Number(results[0]?.meta?.changes || 0),
+    transactions: Number(results[1]?.meta?.changes || 0),
+    status_events: Number(results[2]?.meta?.changes || 0),
+    capacity_reservations: Number(results[3]?.meta?.changes || 0),
+    subscriptions: Number(results[4]?.meta?.changes || 0),
+    checkout_attempts: Number(results[5]?.meta?.changes || 0),
+  };
+  return json({ ok: true, environment: "test", deleted });
+}
+
 async function handleStripeWebhook(request, env) {
   if (request.method !== "POST") return json({ error: "not_found" }, { status: 404 });
   if (!/^application\/json(?:;|$)/i.test(request.headers.get("content-type") || "")) return json({ error: "unsupported_content_type" }, { status: 415 });
@@ -3468,6 +3513,7 @@ const worker = {
     if (memberMatch && request.method === "PATCH") return updateMember(request, env, memberMatch[1]);
 
     if (path === "/api/admin/billing-summary" && request.method === "GET") return billingSummary(request, env);
+    if (path === "/api/admin/billing-test-data/reset" && request.method === "POST") return resetTestBillingData(request, env);
     if (path === "/api/admin/waitlist" && request.method === "GET") return listWaitlistAdmin(request, env);
 
     if (path === "/api/articles" && request.method === "GET") {

@@ -48,7 +48,7 @@ Worker の環境変数に次を設定してください。
 
 ## メンバー・権限
 
-管理者はダッシュボードからD1のメンバーを登録し、管理者・編集者・閲覧者を設定できます。最後の有効な管理者は変更・停止できません。
+管理者はダッシュボードからD1のメンバーを登録し、編集者・閲覧者を設定できます。管理者は `kansai89414@gmail.com` と `toshiki.kanto.workspace@gmail.com` の2アカウントに固定し、変更・停止できません。
 
 この登録はCloudflare Accessの許可ポリシー自体を変更せず、招待メールも送信しません。新しいメンバーはAccess側でも同じメールアドレスを許可してください。
 
@@ -140,6 +140,9 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 9. `migrations/20260919_weekly_question_sheet_sync.sql`
 10. `migrations/20260920_billing_dashboard.sql`
 11. `migrations/20260921_character_studio_articles.sql`（既存のキャラクター記事4本をStudioへ登録）
+12. `migrations/20260922_fixed_admin_accounts.sql`（指定2アカウントを管理者へ固定し、旧管理者を編集者へ変更）
+
+課金画面がテストデータを表示している場合だけ、「テスト表示をリセット」を利用できます。`POST /api/admin/billing-test-data/reset` は管理者限定かつ `STRIPE_MODE=test` 限定です。テスト契約、テスト売上、契約状態履歴、Checkout試行、テスト契約由来の会員権限をD1の一括処理で削除します。本番データ、顧客アカウント、ウェイトリスト、コンテンツ、Stripe Webhookの受信監査履歴は保持します。
 
 ## Stripe連携（第2段階：メール認証とCheckout作成）
 

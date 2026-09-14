@@ -230,7 +230,7 @@
         <div class="page-wrap billing-wrap">
           <div class="page-heading billing-heading">
             <div><p class="eyebrow">BILLING OVERVIEW</p><h1>課金・会員</h1><p>課金者数、月ごとの決済実績、現在の継続課金予定額を確認します。</p></div>
-            <div class="billing-heading-meta"><span class="billing-environment" id="billingEnvironment">確認中</span><small id="billingLastUpdated">最終同期 —</small></div>
+            <div class="billing-heading-meta"><span class="billing-environment" id="billingEnvironment">確認中</span><small id="billingLastUpdated">最終同期 —</small><button class="secondary-button billing-reset-button" id="billingTestReset" type="button" data-action="reset-billing-test" hidden>テスト表示をリセット</button></div>
           </div>
           <div class="billing-filters" aria-label="課金集計の絞り込み">
             <label>対象月<input type="month" id="billingMonth"></label>
@@ -310,7 +310,7 @@
   </dialog>
 
   <dialog class="invite-dialog" id="inviteDialog">
-    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option></select></label><p>管理者は現在の管理者アカウントだけに固定されています。登録後、Cloudflare Accessでも同じメールアドレスを許可してください。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
+    <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option></select></label><p>管理者は指定された2つのアカウントに固定されています。登録後、Cloudflare Accessでも同じメールアドレスを許可してください。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>

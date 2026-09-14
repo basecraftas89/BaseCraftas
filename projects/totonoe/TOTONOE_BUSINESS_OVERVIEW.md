@@ -162,11 +162,11 @@ Base Craftas
 | 基盤 | 担うこと | 主な技術・保管先 | 現状 |
 |---|---|---|---|
 | 公開サイト | サービス説明、無料コンテンツ、参加・相談導線 | 静的HTML/CSS/JS、Cloudflare | 主要ページを公開中 |
-| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開 | Cloudflare Access、Worker、D1、R2、GitHub | 運営基盤あり。公開動線ごとの確認が必要 |
+| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開 | Cloudflare Access、Worker、D1、R2、GitHub | 運営基盤あり。2026年9月14日から指定2アカウントだけを固定管理者として扱う。公開動線ごとの確認が必要 |
 | 公開朝活情報 | 次回サムネイルと情報を匿名閲覧者へ配信 | `/public-content/weekend-event.json` | 2026年9月13日確認時HTTP 200、`event:null` で既定表示 |
 | TAYORI会員基盤 | ログイン、契約権限、週次資料、質問、回答動画、プロフィール | メール認証、D1、Google Drive、Google Sheets、Worker | メール認証APIは本番稼働中。課金は14日無料設定まで本番Workerへ反映済みだが、販売は未開始 |
 | IROHA学習基盤 | 教材、週間計画、進捗、振り返り | D1、制限付きDrive、Worker | 資格確認導線はローカルで廃止。実Drive同期・本番データ・公開導線は未完了 |
-| 課金・売上管理 | Checkout、Webhook、権限付与、解約、返金、売上サマリ | Stripeサンドボックス、D1、Worker、運営ダッシュボード | TAYORIの14日無料設定は本番Worker反映済み。`STRIPE_MODE=test`、`STRIPE_CHECKOUT_ENABLED=false`のため本番売上を生む状態ではない |
+| 課金・売上管理 | Checkout、Webhook、権限付与、解約、返金、売上サマリ | Stripeサンドボックス、D1、Worker、運営ダッシュボード | TAYORIの14日無料設定と管理者限定のテスト表示リセットは本番Worker反映済み。`STRIPE_MODE=test`、`STRIPE_CHECKOUT_ENABLED=false`のため本番売上を生む状態ではない |
 | コンテンツ配信 | 週次資料、回答動画、朝活アーカイブ、期限管理 | 毎時同期、土曜9:00 JST同期、Drive、D1 | 2つのCron設定。本番の各フローは別途通し確認が必要 |
 
 ## 10. Base Craftasとの関係

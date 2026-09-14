@@ -13,26 +13,36 @@ function fixture(){
   sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260920_billing_dashboard.sql','utf8'));
   function prepare(query){let args=[];return {bind(...values){args=values;return this;},async first(){return sql.prepare(query).get(...args)||null;},async all(){return {results:sql.prepare(query).all(...args)};},async run(){return {meta:{changes:Number(sql.prepare(query).run(...args).changes)}};}};}
   const env={ALLOW_DEV_AUTH:'true',STRIPE_MODE:'test',CUSTOMER_AUTH_SECRET:'0123456789abcdef0123456789abcdef',DB:{prepare,async batch(items){sql.exec('BEGIN');try{const results=[];for(const item of items)results.push(await item.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}}};
-  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin','owner@example.com','Owner','admin','active')").run();
+  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin_primary','kansai89414@gmail.com','神藤 俊希','admin','active')").run();
+  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin_workspace','toshiki.kanto.workspace@gmail.com','神藤 俊希','admin','active')").run();
   sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('editor','editor@example.com','Editor','editor','active')").run();
   return {sql,env};
 }
 
-function call(env,path,method='GET',body=null,email='owner@example.com'){
+function call(env,path,method='GET',body=null,email='kansai89414@gmail.com'){
   return worker.fetch(new Request('https://test.local/api/tsuzuri-studio'+path,{method,headers:{'x-column-studio-dev-email':email,'content-type':'application/json'},body:body?JSON.stringify(body):undefined}),env);
 }
 
-test('現在の管理者だけを維持し、新規管理者・昇格・管理者停止を拒否する',async()=>{
-  const {env}=fixture();
+test('指定された2アカウントだけを固定管理者として維持する',async()=>{
+  const {sql,env}=fixture();
   let response=await call(env,'/api/members','POST',{name:'Second Admin',email:'second@example.com',role:'admin'});
   assert.equal(response.status,409);
   assert.equal((await response.json()).error,'admin_role_locked');
   response=await call(env,'/api/members/editor','PATCH',{role:'admin',status:'active'});
   assert.equal(response.status,409);
-  response=await call(env,'/api/members/admin','PATCH',{role:'admin',status:'disabled'});
+  response=await call(env,'/api/members/admin_primary','PATCH',{role:'admin',status:'disabled'});
   assert.equal(response.status,409);
-  response=await call(env,'/api/members/admin','PATCH',{role:'editor',status:'active'});
+  response=await call(env,'/api/members/admin_workspace','PATCH',{role:'editor',status:'active'});
   assert.equal(response.status,409);
+  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
+});
+
+test('管理者マイグレーションは指定2アカウントを有効化し、旧管理者を編集者へ戻す',()=>{
+  const {sql}=fixture();
+  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('legacy_admin','legacy@example.com','Legacy','admin','active')").run();
+  sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260922_fixed_admin_accounts.sql','utf8'));
+  assert.equal(sql.prepare("SELECT role FROM members WHERE id='legacy_admin'").get().role,'editor');
+  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
 });
 
 test('ウェイトリストは人数上限なしで公開受付し、管理者一覧に反映する',async()=>{
@@ -76,6 +86,44 @@ test('課金集計は管理者限定で、人数・当月実績・継続月額�
   assert.equal(response.status,403);
 });
 
+test('テスト表示リセットはテスト課金データだけを削除し、本番・顧客・ウェイトリスト・監査履歴を保持する',async()=>{
+  const {sql,env}=fixture();
+  sql.prepare("INSERT INTO customer_accounts(id,email) VALUES('customer_test','test@example.com')").run();
+  sql.prepare("INSERT INTO customer_accounts(id,email) VALUES('customer_live','live@example.com')").run();
+  sql.prepare("INSERT INTO customer_subscriptions(id,customer_id,product_code,billing_interval,audience_type,status,provider_subscription_id,recurring_amount_yen,fee_type,livemode) VALUES('sub_test','customer_test','weekly','monthly','general','active','sub_test_reset',980,'none',0)").run();
+  sql.prepare("INSERT INTO customer_subscriptions(id,customer_id,product_code,billing_interval,audience_type,status,provider_subscription_id,recurring_amount_yen,fee_type,livemode) VALUES('sub_live','customer_live','weekly','monthly','general','active','sub_live_keep',980,'none',1)").run();
+  sql.prepare("INSERT INTO customer_entitlements(id,customer_id,entitlement_code,source_subscription_id,status,starts_at) VALUES('ent_test','customer_test','weekly_access','sub_test','active','2026-09-01T00:00:00Z')").run();
+  sql.prepare("INSERT INTO customer_entitlements(id,customer_id,entitlement_code,source_subscription_id,status,starts_at) VALUES('ent_live','customer_live','weekly_access','sub_live','active','2026-09-01T00:00:00Z')").run();
+  sql.prepare("INSERT INTO billing_transactions(id,provider_transaction_id,stripe_event_id,customer_id,subscription_id,product_code,audience_type,transaction_type,amount_yen,status,occurred_at,livemode) VALUES('tx_test','invoice:test','evt_test','customer_test','sub_test','weekly','general','recurring',980,'paid','2026-09-05T00:00:00Z',0)").run();
+  sql.prepare("INSERT INTO billing_transactions(id,provider_transaction_id,stripe_event_id,customer_id,subscription_id,product_code,audience_type,transaction_type,amount_yen,status,occurred_at,livemode) VALUES('tx_live','invoice:live','evt_live','customer_live','sub_live','weekly','general','recurring',980,'paid','2026-09-05T00:00:00Z',1)").run();
+  sql.prepare("INSERT INTO subscription_status_events(id,stripe_event_id,subscription_id,customer_id,product_code,audience_type,status,effective_at,livemode) VALUES('status_test','evt_test','sub_test','customer_test','weekly','general','active','2026-09-01T00:00:00Z',0)").run();
+  sql.prepare("INSERT INTO subscription_status_events(id,stripe_event_id,subscription_id,customer_id,product_code,audience_type,status,effective_at,livemode) VALUES('status_live','evt_live','sub_live','customer_live','weekly','general','active','2026-09-01T00:00:00Z',1)").run();
+  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen,livemode,status) VALUES('attempt_test','customer_test','reset:test','weekly_monthly','general','none',980,0,0,'completed')").run();
+  sql.prepare("INSERT INTO stripe_checkout_attempts(id,customer_id,idempotency_key,plan_code,audience_type,fee_type,recurring_amount_yen,entry_fee_yen,livemode,status) VALUES('attempt_live','customer_live','reset:live','weekly_monthly','general','none',980,0,1,'completed')").run();
+  sql.prepare("INSERT INTO plan_capacity_reservations(id,plan_code,customer_id,checkout_attempt_id,status,expires_at) VALUES('reservation_test','weekly_monthly','customer_test','attempt_test','converted','2026-09-30T00:00:00Z')").run();
+  sql.prepare("INSERT INTO stripe_webhook_events(event_id,event_type,livemode,status) VALUES('evt_test_audit','checkout.session.completed',0,'processed')").run();
+  sql.prepare("INSERT INTO waitlist_entries(id,email,interest,status,source,consent_at) VALUES('wait_keep','wait@example.com','tayori_personal','waiting','test','2026-09-01T00:00:00Z')").run();
+
+  let response=await call(env,'/api/admin/billing-test-data/reset','POST',{},'editor@example.com');
+  assert.equal(response.status,403);
+  env.STRIPE_MODE='live';
+  response=await call(env,'/api/admin/billing-test-data/reset','POST',{});
+  assert.equal(response.status,409);
+  env.STRIPE_MODE='test';
+  response=await call(env,'/api/admin/billing-test-data/reset','POST',{});
+  assert.equal(response.status,200);
+  const data=await response.json();
+  assert.equal(data.deleted.subscriptions,1);
+  assert.equal(data.deleted.transactions,1);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM customer_subscriptions WHERE livemode=0").get().count,0);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM customer_subscriptions WHERE livemode=1").get().count,1);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM customer_accounts").get().count,2);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM waitlist_entries").get().count,1);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM stripe_webhook_events WHERE event_id='evt_test_audit'").get().count,1);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM customer_entitlements WHERE id='ent_live'").get().count,1);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE action='billing.test_data.reset'").get().count,1);
+});
+
 test('Studioに管理者限定の課金画面と実データ未取得時の表示がある',()=>{
   const html=readFileSync('apps/tsuzuri-studio/index.html','utf8');
   const script=readFileSync('apps/tsuzuri-studio/script.js','utf8');
@@ -86,6 +134,9 @@ test('Studioに管理者限定の課金画面と実データ未取得時の表�
   assert.match(html,/月別決済額と会員数/);
   assert.match(script,/\/api\/admin\/billing-summary/);
   assert.match(script,/\/api\/admin\/waitlist/);
+  assert.match(html,/テスト表示をリセット/);
+  assert.match(script,/\/api\/admin\/billing-test-data\/reset/);
+  assert.match(script,/本番データ、顧客アカウント、ウェイトリスト、コンテンツ/);
   assert.doesNotMatch(html,/TAYORI受付枠|10名枠を追加|enrollmentCapacity/);
   assert.doesNotMatch(script,/plan-capacity|increaseCapacity|enrollmentCapacity/);
   assert.match(script,/決済履歴はまだありません/);

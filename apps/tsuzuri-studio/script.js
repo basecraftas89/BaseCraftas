@@ -19,7 +19,8 @@
   var defaults={
     posts:[],
     members:[
-      {name:'神藤 和宏',email:'k.shindo@basecraftas.com',role:'admin',status:'参加中',initial:'KS'},
+      {name:'神藤 俊希',email:'kansai89414@gmail.com',role:'admin',status:'参加中',initial:'神藤'},
+      {name:'神藤 俊希',email:'toshiki.kanto.workspace@gmail.com',role:'admin',status:'参加中',initial:'神藤'},
       {name:'編集メンバー',email:'editor@basecraftas.com',role:'editor',status:'参加中',initial:'ED'},
       {name:'確認メンバー',email:'viewer@basecraftas.com',role:'viewer',status:'招待中',initial:'VW'}
     ],role:'admin',editingId:null
@@ -301,6 +302,7 @@ state.members=[memberFromApi(me.member)];
     var kpis=data.kpis||{},quality=data.quality||{};
     document.getElementById('billingEnvironment').textContent=data.environment==='live'?'本番データ':'テストデータ';
     document.getElementById('billingEnvironment').className='billing-environment '+(data.environment==='live'?'live':'test');
+    document.getElementById('billingTestReset').hidden=data.environment!=='test';
     document.getElementById('billingLastUpdated').textContent='画面更新 '+new Date(data.generated_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
     document.getElementById('billingActiveCustomers').textContent=Number(kpis.active_customers||0).toLocaleString('ja-JP')+'人';
     document.getElementById('billingActiveDetail').textContent='無料期間 '+Number(kpis.trialing_customers||0)+'人 ／ 解約予定 '+Number(kpis.cancel_scheduled_customers||0)+'人';
@@ -317,6 +319,20 @@ state.members=[memberFromApi(me.member)];
   function renderWaitlist(data){
     var labels={tayori_personal:'TAYORI 個人',iroha_personal:'IROHA 個人',iroha_corporate:'IROHA 法人'};
     document.getElementById('waitlistEntries').innerHTML=(data.entries||[]).map(function(item){return '<tr><th scope="row">'+esc(item.email)+'</th><td>'+esc(labels[item.interest]||item.interest)+'</td><td>'+esc(item.status==='joined'?'案内済み':'待機中')+'</td><td>'+esc(String(item.created_at||'').slice(0,16))+'</td></tr>';}).join('')||'<tr><td colspan="4">現在の登録はありません。</td></tr>';
+  }
+  async function resetBillingTestData(button){
+    if(state.role!=='admin'||button.disabled)return;
+    var confirmed=window.confirm('テスト課金データをリセットします。\n\n削除対象：テスト契約、テスト売上、契約履歴、テスト契約に紐づく会員権限\n保持対象：本番データ、顧客アカウント、ウェイトリスト、コンテンツ、Webhook監査履歴\n\nこの操作を実行しますか？');
+    if(!confirmed)return;
+    button.disabled=true;
+    try{
+      var result=await api('/api/admin/billing-test-data/reset',{method:'POST',body:'{}'});
+      var deleted=result.deleted||{};
+      billingLoaded=false;
+      await loadBilling();
+      toast('テスト表示をリセットしました（契約 '+Number(deleted.subscriptions||0)+'件、決済 '+Number(deleted.transactions||0)+'件）');
+    }catch(error){toast(error.message||'テスト表示をリセットできませんでした');}
+    finally{button.disabled=false;}
   }
   async function loadBilling(){
     if(billingLoading)return;
@@ -548,7 +564,7 @@ state.members=[memberFromApi(me.member)];
     if(API_BASE&&state.posts.some(function(p){return p.pending;})){event.preventDefault();event.returnValue='';}
   });
 
-  document.addEventListener('click',function(e){var lifecycle=e.target.closest('[data-lifecycle]');if(lifecycle){changeLifecycle(lifecycle.dataset.articleId,lifecycle.dataset.lifecycle);return;}var contentView=e.target.closest('[data-content-view]');if(contentView){openContentView(contentView.dataset.contentView);return;}var view=e.target.closest('[data-view]');if(view){showView(view.dataset.view);return;}var edit=e.target.closest('[data-edit]');if(edit){editPost(edit.dataset.edit);return;}var typeFilter=e.target.closest('[data-type-filter]');if(typeFilter){currentTypeFilter=typeFilter.dataset.typeFilter;document.querySelectorAll('[data-type-filter]').forEach(function(b){b.classList.toggle('active',b===typeFilter);});renderPosts();return;}var action=e.target.closest('[data-action]');if(action){var a=action.dataset.action;if(a==='logout')logout();if(a==='new-post')blankPost(false);if(a==='new-template')blankPost(true);if(a==='save-draft')saveDraft();if(a==='publish')publish();if(a==='preview')preview();if(a==='analyze-link')analyzeLink();if(a==='sync-weekly')syncWeekly(action).catch(function(error){toast(error.message);});if(a==='refresh-billing'){billingLoaded=false;loadBilling();}if(a==='close-preview')document.getElementById('previewDialog').close();if(a==='bubble-picker'){bubbleChange=false;toggleBubblePicker();}if(a==='member-boundary')insertMemberBoundary();if(a==='close-bubble')closeBubblePicker();if(a==='close-text-link')closeTextLinkDialog();if(a==='apply-text-link')applyTextLink();if(a==='remove-text-link')removeTextLink();if(a==='invite')document.getElementById('inviteDialog').showModal();if(a==='save-settings')toast('公開設定を保存しました');if(a==='open-site')window.open('../../projects/totonoe/index.html','_blank');return;}var command=e.target.closest('[data-command]');if(command){format(command.dataset.command);return;}var topicTag=e.target.closest('#topicTagSuggestions [data-topic-tag]');if(topicTag){toggleTopicTag(topicTag.dataset.topicTag);return;}var character=e.target.closest('#bubblePicker [data-character]');if(character){insertBubble(character.dataset.character);return;}var role=e.target.closest('[data-role-preview]');if(role){if(API_BASE)toast('本番ではログイン中の権限が適用されます');else applyRole(role.dataset.rolePreview);return;}if(!e.target.closest('#bubblePicker')&&!e.target.closest('[data-action="bubble-picker"]'))closeBubblePicker();if(!e.target.closest('#accountMenu')&&!e.target.closest('#accountButton'))document.getElementById('accountMenu').classList.remove('open');});
+  document.addEventListener('click',function(e){var lifecycle=e.target.closest('[data-lifecycle]');if(lifecycle){changeLifecycle(lifecycle.dataset.articleId,lifecycle.dataset.lifecycle);return;}var contentView=e.target.closest('[data-content-view]');if(contentView){openContentView(contentView.dataset.contentView);return;}var view=e.target.closest('[data-view]');if(view){showView(view.dataset.view);return;}var edit=e.target.closest('[data-edit]');if(edit){editPost(edit.dataset.edit);return;}var typeFilter=e.target.closest('[data-type-filter]');if(typeFilter){currentTypeFilter=typeFilter.dataset.typeFilter;document.querySelectorAll('[data-type-filter]').forEach(function(b){b.classList.toggle('active',b===typeFilter);});renderPosts();return;}var action=e.target.closest('[data-action]');if(action){var a=action.dataset.action;if(a==='logout')logout();if(a==='new-post')blankPost(false);if(a==='new-template')blankPost(true);if(a==='save-draft')saveDraft();if(a==='publish')publish();if(a==='preview')preview();if(a==='analyze-link')analyzeLink();if(a==='sync-weekly')syncWeekly(action).catch(function(error){toast(error.message);});if(a==='refresh-billing'){billingLoaded=false;loadBilling();}if(a==='reset-billing-test')resetBillingTestData(action);if(a==='close-preview')document.getElementById('previewDialog').close();if(a==='bubble-picker'){bubbleChange=false;toggleBubblePicker();}if(a==='member-boundary')insertMemberBoundary();if(a==='close-bubble')closeBubblePicker();if(a==='close-text-link')closeTextLinkDialog();if(a==='apply-text-link')applyTextLink();if(a==='remove-text-link')removeTextLink();if(a==='invite')document.getElementById('inviteDialog').showModal();if(a==='save-settings')toast('公開設定を保存しました');if(a==='open-site')window.open('../../projects/totonoe/index.html','_blank');return;}var command=e.target.closest('[data-command]');if(command){format(command.dataset.command);return;}var topicTag=e.target.closest('#topicTagSuggestions [data-topic-tag]');if(topicTag){toggleTopicTag(topicTag.dataset.topicTag);return;}var character=e.target.closest('#bubblePicker [data-character]');if(character){insertBubble(character.dataset.character);return;}var role=e.target.closest('[data-role-preview]');if(role){if(API_BASE)toast('本番ではログイン中の権限が適用されます');else applyRole(role.dataset.rolePreview);return;}if(!e.target.closest('#bubblePicker')&&!e.target.closest('[data-action="bubble-picker"]'))closeBubblePicker();if(!e.target.closest('#accountMenu')&&!e.target.closest('#accountButton'))document.getElementById('accountMenu').classList.remove('open');});
   document.getElementById('accountButton').addEventListener('click',function(){var menu=document.getElementById('accountMenu');menu.classList.toggle('open');this.setAttribute('aria-expanded',menu.classList.contains('open'));});
   document.getElementById('mobileMenu').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open');});
   document.getElementById('postSearch').addEventListener('input',renderPosts);
