@@ -486,8 +486,12 @@
         renderTsumami();
         renderArchiveRangeButtons();
         renderArchive();
+        renderContentSidebar();
       })
-      .catch(function () {});
+      .catch(function () {
+        var latest = document.getElementById('tsuzuriLatest');
+        if (latest) latest.textContent = '記事を読み込めませんでした。つづりの一覧をご確認ください。';
+      });
   }
 
   var TSUZURI_ORDER_KEY = 'wa_tsuzuri_order_v1';
@@ -1046,6 +1050,54 @@
     });
   }
 
+  // The sidebar always shows the latest three; list-page sort preferences do not apply.
+  function renderContentSidebar() {
+    [{ id: 'tsuzuriLatest', items: TSUZURI_ITEMS }, { id: 'tsumamiLatest', items: CONTENTS }].forEach(function (group) {
+      var target = document.getElementById(group.id);
+      if (!target) return;
+      var limit = Math.min(3, Math.max(1, Number(target.dataset.latestLimit) || 3));
+      var latest = group.items.slice().sort(function (a, b) {
+        return (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0);
+      }).slice(0, limit);
+      target.replaceChildren();
+      if (!latest.length) {
+        var emptyNote = document.createElement('p');
+        emptyNote.className = 'contents-empty';
+        emptyNote.textContent = '公開記事を準備しています。';
+        target.appendChild(emptyNote);
+      }
+      latest.forEach(function (item) {
+        var link = document.createElement(item.youtubeId ? 'button' : 'a');
+        link.className = 'contents-latest-item';
+        if (item.youtubeId) {
+          link.type = 'button';
+          link.addEventListener('click', function () { openVideoModal(item); });
+        } else {
+          // Published URLs are sanitized upstream; reject executable URL schemes here as well.
+          try {
+            var url = new URL(item.url, window.location.href);
+            if (!/^https?:$/.test(url.protocol)) return;
+            link.href = url.href;
+            if (url.origin !== window.location.origin) { link.target = '_blank'; link.rel = 'noopener'; }
+          } catch (e) { return; }
+        }
+        var image = document.createElement('img');
+        var imageUrl = item.image || (item.youtubeId ? ytThumbUrl(item.youtubeId) : 'assets/service-tsuzuri.png');
+        // Studio thumbnails use article-relative paths; resolve against the article directory.
+        if (imageUrl.indexOf('../assets/') === 0) imageUrl = imageUrl.slice(3);
+        image.src = imageUrl;
+        image.alt = ''; image.loading = 'lazy'; image.width = 96; image.height = 64;
+        var text = document.createElement('span');
+        var date = document.createElement('time');
+        date.dateTime = String(item.date || '').slice(0, 10);
+        date.textContent = formatDate(date.dateTime);
+        var title = document.createElement('strong'); title.textContent = item.title;
+        text.append(date, title); link.append(image, text); target.appendChild(link);
+      });
+    });
+  }
+
+  renderContentSidebar();
   initPodcastRanges();
   setupPodcastSort();
   setupSlider({ trackId: 'podList', prevId: 'podPrev', nextId: 'podNext', cardSelector: '.pod-card', hintId: 'podHint' });

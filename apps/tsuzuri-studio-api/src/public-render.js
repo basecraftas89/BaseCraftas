@@ -53,7 +53,7 @@ export function articleHtml(articleData) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=20260905g">
+<link rel="stylesheet" href="../styles.css?v=20260916-content-hub">
 <style>
 .column-actor{display:flex;align-items:center;gap:.75rem;margin-top:1.2rem;color:var(--ink-soft);font-size:.9rem}
 .column-actor strong{color:var(--teal-deep)}
@@ -93,15 +93,7 @@ export function articleHtml(articleData) {
     <nav class="site-nav" id="siteNav">
       <a href="../index.html">TOP</a>
       <a href="../weekend-ai.html">週末のAI整え習慣</a>
-      <div class="nav-dropdown">
-        <a href="../service.html" class="nav-main">サービス</a>
-        <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="../tayori.html">たより｜TAYORI</a>
-          <a href="../tsuzuri/">つづり｜TSUZURI</a>
-          <a href="../tsumami/">つまみ｜TSUMAMI</a>
-          <a href="../IROHA/">いろは｜IROHA</a>
-        </div>
-      </div>
+      <div class="nav-dropdown"><a href="../service.html" class="nav-main">サービス</a><div class="nav-menu" aria-label="サービスメニュー"><a href="../tayori.html">たより｜TAYORI</a><span class="nav-disabled" aria-disabled="true">いろは｜IROHA <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">法人研修 <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">プロダクト <small>準備中</small></span></div></div><div class="nav-dropdown"><a href="../contents.html" class="nav-main active">コンテンツ</a><div class="nav-menu" aria-label="コンテンツメニュー"><a href="../tsuzuri/">コラム</a><a href="../tsumami/">動画コンテンツ</a><a href="../contents.html#archive">アーカイブ</a><a href="../contents.html#podcast">ポッドキャスト</a><a href="../contents.html#seminars">セミナー</a></div></div>
       <a href="../characters/">キャラクター</a>
       <a href="../team.html">チーム</a>
       <a href="../faq.html">FAQ</a>
@@ -146,7 +138,7 @@ export function articleHtml(articleData) {
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <a href="../index.html">TOP</a>
       <a href="../weekend-ai.html">週末のAI整え習慣</a>
-      <a href="../service.html">サービス</a>
+      <a href="../service.html">サービス</a><a href="../contents.html">コンテンツ</a>
       <a href="../team.html">チーム</a>
       <a href="../faq.html">FAQ</a>
     </nav>

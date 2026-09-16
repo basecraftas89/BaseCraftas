@@ -237,7 +237,7 @@ test('TAYORI LPは980円・14日無料・人数上限なしのウェイトリス
 test('プライバシーポリシーは公開中の申込サービス表記を維持する',()=>{
   const privacy=readFileSync('projects/totonoe/privacy.html','utf8');
   assert.match(privacy,/Peatix \/ Therapis10\.com等の申込サービス/);
-  assert.match(privacy,/最終改定日：2026年8月31日/);
+  assert.match(privacy,/最終改定日：2026年9月17日/);
 });
 
 test('署名済みTAYORI Checkout完了通知だけが契約とWeekly権限を付与し、重複通知は安全に無視する',async()=>{
@@ -358,14 +358,14 @@ test('IROHA公開導線は準備中になり、購入者ページは会員区分
 
   assert.match(home,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
   assert.match(service,/href="tayori\.html" class="btn btn-ghost">たよりを見る/);
-  assert.match(home,/href="tsuzuri\/" class="btn btn-ghost">つづりを読む/);
-  assert.match(service,/href="tsuzuri\/" class="btn btn-ghost">つづりを読む/);
+  assert.match(home,/href="tsuzuri\/" class="btn btn-ghost">コラムを読む/);
+  assert.match(service,/href="contents\.html"/);
   assert.doesNotMatch(home,/href="TAYORI\/"/);
   assert.doesNotMatch(service,/href="TAYORI\/"/);
   assert.match(tayoriLp,/TAYORI\/login\.html\?return=%2Fprojects%2Ftotonoe%2FTAYORI%2F/);
   assert.match(service,/class="service-card is-coming-soon" id="iroha"/);
-  assert.match(home,/href="IROHA\/#iroha-waitlist"/);
-  assert.match(service,/href="IROHA\/#iroha-waitlist"/);
+  assert.doesNotMatch(home,/href="IROHA\/#iroha-waitlist"/);
+  assert.doesNotMatch(service,/href="IROHA\/#iroha-waitlist"/);
   assert.match(irohaLp,/現在、公開に向けて準備中です/);
   assert.match(irohaLp,/初回 9,800円 ／ 再入会 4,800円/);
   assert.match(irohaLp,/data-interest="iroha_corporate"/);

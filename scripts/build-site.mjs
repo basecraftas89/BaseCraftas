@@ -14,6 +14,8 @@ const extensions = new Set(['.html','.css','.js','.png','.jpg','.jpeg','.webp','
 // Only these public trees can enter a deployment. Never traverse apps/API or tools.
 const trees = ['css','js','images','services','projects','apps/tsuzuri-studio'];
 const blocked = /(?:^|\/)(?:node_modules|\.git|\.wrangler|\.pet-runs|scripts|tests?)(?:\/|$)|(?:\.test\.|security-entry\.js$)/;
+// Retain forthcoming service drafts locally; never ship their LPs.
+const unpublishedPages = new Set(['projects/totonoe/IROHA/index.html', 'projects/totonoe/corporate.html', 'projects/totonoe/products.html']);
 const copied=[];
 async function copyFile(relative) {
   await mkdir(path.dirname(path.join(out,relative)),{recursive:true});
@@ -22,7 +24,7 @@ async function copyFile(relative) {
 async function walk(relative) {
   for(const entry of await readdir(path.join(root,relative),{withFileTypes:true})) {
     const name=path.posix.join(relative,entry.name);
-    if(entry.name.startsWith('.')||blocked.test(name)||entry.isSymbolicLink())continue;
+    if(entry.name.startsWith('.')||blocked.test(name)||entry.isSymbolicLink()||unpublishedPages.has(name))continue;
     if(entry.isDirectory()){await walk(name);continue;}
     const publicJson=/^projects\/totonoe\/data\/(columns|contents)\/[a-z0-9-]+\.json$/.test(name);
     if(extensions.has(path.extname(name))||publicJson)await copyFile(name);

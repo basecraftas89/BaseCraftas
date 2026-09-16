@@ -101,58 +101,44 @@ test('weekend page keeps the standard thumbnail and guidance when no current eve
   } finally {dom.window.close();}
 });
 
-test('homepage labels the section as seminars and shows only seminars that have not ended', async () => {
+test('homepage shares seminar data, keeps the weekly event first and separates service readiness', async () => {
   const html=readFileSync('projects/totonoe/index.html','utf8');
-  const script=readFileSync('projects/totonoe/home-seminars.js','utf8');
-  const dom=new JSDOM(html,{runScripts:'outside-only'});
-  try {
-    const d=dom.window.document;
-    const latest=d.querySelector('#latest');
-    assert.equal(latest.querySelector('.content-strip-title').textContent,'セミナー');
-    assert.equal(latest.querySelectorAll('.latest-visual-card').length,3);
-    const recurring=latest.querySelector('.latest-visual-card');
-    assert.ok(recurring.classList.contains('recurring-seminar-card'));
-    assert.equal(recurring.querySelector('.recurring-seminar-badge').textContent,'定期開催');
-    assert.equal(recurring.href,'https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu');
-    assert.match(recurring.querySelector('img').src,/assets\/weekend-ai-default-thumbnail\.webp$/);
-    assert.match(recurring.textContent,/参加者のニーズに合わせて設計します/);
-    assert.doesNotMatch(latest.textContent,/ポッドキャスト|アーカイブ動画/);
-    dom.window.TOTONOE_NOW=Date.parse('2026-09-12T00:00:00+09:00');
-    dom.window.eval(script);
-    assert.equal(latest.querySelectorAll('.latest-visual-card:not([hidden])').length,3);
-    assert.equal(d.querySelectorAll('.service-content-grid .service-hub-card').length,4);
-    for(const name of ['たより｜TAYORI','つづり｜TSUZURI','つまみ｜TSUMAMI','いろは｜IROHA'])assert.match(d.querySelector('.service-content-grid').textContent,new RegExp(name));
-  } finally {dom.window.close();}
-
-  const duringFirst=new JSDOM(html,{runScripts:'outside-only'});
-  try {
-    duringFirst.window.TOTONOE_NOW=Date.parse('2026-09-14T21:30:00+09:00');
-    duringFirst.window.eval(script);
-    assert.equal(duringFirst.window.document.querySelectorAll('#latest .latest-visual-card:not([hidden])').length,3);
-  } finally {duringFirst.window.close();}
-
-  const afterFirst=new JSDOM(html,{runScripts:'outside-only'});
-  try {
-    afterFirst.window.TOTONOE_NOW=Date.parse('2026-09-14T22:00:00+09:00');
-    afterFirst.window.eval(script);
-    const visible=[...afterFirst.window.document.querySelectorAll('#latest .latest-visual-card:not([hidden])')];
-    assert.equal(visible.length,2);
-    assert.match(visible[0].textContent,/週末のAI整え習慣/);
-    assert.match(visible[1].textContent,/2026\.09\.28/);
-  } finally {afterFirst.window.close();}
-
-  const afterAll=new JSDOM(html,{runScripts:'outside-only'});
-  try {
-    afterAll.window.TOTONOE_NOW=Date.parse('2026-09-28T21:00:00+09:00');
-    afterAll.window.eval(script);
-    assert.equal(afterAll.window.document.querySelectorAll('#latest .latest-visual-card:not([hidden])').length,1);
-    assert.equal(afterAll.window.document.querySelector('#latestSeminarEmpty').hidden,true);
-  } finally {afterAll.window.close();}
-  for(const slug of ['ai-yohaku','weekend-cycle','team-learning'])assert.equal(existsSync(`projects/totonoe/tsuzuri/${slug}.html`),false);
-  assert.match(readFileSync('projects/totonoe/weekend-ai.html','utf8'),/毎週水曜頃までにテーマを確定し、サムネイルを差し替えます/);
-  assert.match(readFileSync('projects/totonoe/recurring-seminar-highlight.css','utf8'),/\.recurring-seminar-card\{/);
+  const script=readFileSync('projects/totonoe/seminars.js','utf8');
+  for(const [date,expected] of [['2026-09-12T00:00:00+09:00',3],['2026-09-14T21:30:00+09:00',3],['2026-09-14T22:00:00+09:00',2],['2026-09-28T21:00:00+09:00',1]]) {
+    const dom=new JSDOM(html,{url:'https://example.com/projects/totonoe/',runScripts:'outside-only'});
+    try {
+      dom.window.Date.now=()=>Date.parse(date);
+      dom.window.fetch=async()=>({ok:true,json:async()=>({articles:[]})});
+      dom.window.eval(script);
+      await new Promise(resolve=>setTimeout(resolve,20));
+      const d=dom.window.document;
+      assert.equal(d.querySelectorAll('#semGrid .sem-card').length,expected,date);
+      assert.ok(d.querySelector('#semGrid').firstElementChild.classList.contains('contents-recurring-card'));
+      assert.match(d.querySelector('#semGrid img').src,/weekend-ai-default-thumbnail/);
+      assert.equal(d.querySelector('#semEmpty').hidden,true);
+      for(const name of ['たより｜TAYORI','いろは｜IROHA','法人研修','プロダクト']) assert.ok(d.querySelector('.home-services').textContent.includes(name));
+      assert.equal(d.querySelectorAll('.home-coming').length,3);
+      assert.equal(d.querySelectorAll('.home-coming a').length,0);
+      assert.match(d.querySelector('.home-tayori').textContent,/お申し込みは準備中/);
+      assert.equal(d.querySelectorAll('.home-learning-grid .home-learning').length,2);
+      dom.window.eval(readFileSync('projects/totonoe/service-content.js','utf8'));
+      await new Promise(resolve=>setTimeout(resolve,20));
+      assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,3);
+      dom.window.eval(readFileSync('projects/totonoe/home-learning-tabs.js','utf8'));
+      assert.equal(d.querySelector('#home-panel-video').hidden,true);
+      d.querySelector('#home-tab-video').click();
+      assert.equal(d.querySelector('#home-panel-video').hidden,false);
+      assert.equal(d.querySelector('#home-panel-column').hidden,true);
+      d.querySelector('#home-tab-video').dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
+      assert.equal(d.querySelector('#home-panel-column').hidden,false);
+      assert.equal(d.activeElement.id,'home-tab-column');
+      assert.equal(d.querySelector('.home-media-links'),null);
+      assert.ok(d.querySelector('.home-world-image[href="characters/"] img'));
+      assert.equal(d.querySelector('.home-hero-copy'),null);
+      assert.match(d.querySelector('#tsuzuriLatest').textContent,/公開記事を準備/);
+    } finally {dom.window.close();}
+  }
 });
-
 
 test('studio video edits replace existing cards and preserve the selected thumbnail; new TSUZURI articles appear', async () => {
   const baseline=await page('tsumami/index.html','service-content.js',[]);
@@ -176,4 +162,34 @@ test('studio video edits replace existing cards and preserve the selected thumbn
   const tsuzuri=await page('tsuzuri/index.html','service-content.js',generated);
   try { assert.match(tsuzuri.window.document.body.textContent,/追加したつづり/); }
   finally { tsuzuri.window.close(); }
+});
+
+test('seminar grids promote published weekly thumbnails and adapt to one, two or three events', async () => {
+  for (const file of ['index.html','contents.html']) {
+    for (const [hero, extra, columns] of [[null,0,'1'],['https://example.com/week.png',0,'2'],['https://example.com/week.png',3,'3'],[null,3,'3'],['javascript:alert(1)',0,'1']]) {
+      const dom=new JSDOM(readFileSync('projects/totonoe/'+file,'utf8'),{url:'https://example.com/projects/totonoe/'+file,runScripts:'outside-only'});
+      try {
+        dom.window.Date.now=()=>Date.parse('2026-09-17T12:00:00+09:00');
+        dom.window.fetch=async url=>({ok:true,json:async()=>String(url).includes('weekend-event') ? {event:hero?{hero_url:hero}:null} : {articles:Array.from({length:extra},(_,i)=>({status:'published',content_type:'seminar',title:'追加セミナー'+i,media_url:'https://example.com/seminar/'+i,source_published_at:'2026-10-01',hero_url:'https://example.com/thumb.png'}))}});
+        dom.window.eval(readFileSync('projects/totonoe/seminars.js','utf8'));
+        await new Promise(resolve=>setTimeout(resolve,20));
+        const d=dom.window.document, grid=d.querySelector('#semGrid');
+        assert.equal(grid.dataset.columns,columns);
+        const promoted=!!hero&&hero.startsWith('https:');
+        assert.equal(grid.firstElementChild.classList.contains('sem-weekly-featured'),promoted);
+        assert.equal(grid.querySelectorAll('.sem-weekly-featured').length,promoted?1:0);
+        if(file==='index.html') assert.ok(grid.querySelectorAll('.sem-card:not(.contents-recurring-card)').length<=3);
+        if(promoted){
+          assert.equal(grid.querySelector('img').src,hero);
+          grid.querySelector('img').dispatchEvent(new dom.window.Event('error'));
+          assert.ok(grid.firstElementChild.classList.contains('contents-recurring-card'));
+          assert.match(grid.querySelector('img').src,/weekend-ai-default-thumbnail/);
+        }
+        if(file==='contents.html'){
+          d.querySelector('[data-sem-status="past"]').click();
+          assert.equal(grid.querySelector('.sem-weekly-featured,.contents-recurring-card'),null);
+        }
+      } finally {dom.window.close();}
+    }
+  }
 });

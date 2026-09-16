@@ -23,9 +23,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260913a">
+<link rel="stylesheet" href="styles.css?v=20260916-content-hub">
 <link rel="stylesheet" href="editorial.css?v=20260908a">
-<link rel="stylesheet" href="recurring-seminar-highlight.css?v=20260913a">
+<link rel="stylesheet" href="home-page.css?v=20260917c">
 </head>
 <body class="editorial-page">
 
@@ -37,15 +37,7 @@
     <nav class="site-nav" id="siteNav">
       <a href="index.html" class="active">TOP</a>
       <a href="weekend-ai.html">週末のAI整え習慣</a>
-      <div class="nav-dropdown">
-        <a href="service.html" class="nav-main">サービス</a>
-        <div class="nav-menu" aria-label="サービスメニュー">
-          <a href="tayori.html">たより｜TAYORI</a>
-          <a href="tsuzuri/">つづり｜TSUZURI</a>
-          <a href="tsumami/">つまみ｜TSUMAMI</a>
-          <span class="nav-disabled" aria-disabled="true">いろは｜IROHA <small>準備中</small></span>
-        </div>
-      </div>
+      <div class="nav-dropdown"><a href="service.html" class="nav-main">サービス</a><div class="nav-menu" aria-label="サービスメニュー"><a href="tayori.html">たより｜TAYORI</a><span class="nav-disabled" aria-disabled="true">いろは｜IROHA <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">法人研修 <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">プロダクト <small>準備中</small></span></div></div><div class="nav-dropdown"><a href="contents.html" class="nav-main">コンテンツ</a><div class="nav-menu" aria-label="コンテンツメニュー"><a href="tsuzuri/">コラム</a><a href="tsumami/">動画コンテンツ</a><a href="contents.html#archive">アーカイブ</a><a href="contents.html#podcast">ポッドキャスト</a><a href="contents.html#seminars">セミナー</a></div></div>
       <a href="characters/">キャラクター</a>
       <a href="team.html">チーム</a>
       <a href="faq.html">FAQ</a>
@@ -57,65 +49,57 @@
   </div>
 </header>
 
-<section class="hero totonoe-hero" id="hero">
-  <div class="hero-inner">
-    <div class="hero-copy">
-      <div class="hero-actions">
-        <a href="weekend-ai.html" class="btn btn-cta">無料の朝活を知る</a>
-        <a href="#latest" class="btn btn-ghost">最新情報を見る</a>
-      </div>
+<main class="home-page">
+<section class="home-hero" id="hero"><div class="container home-hero-inner">
+  <h1 class="home-visually-hidden">ToToNoE+ — 本質に向き合い、整える習慣を。</h1>
+  <figure class="home-hero-visual"><img src="assets/totonoe-main-visual.jpg" alt="ToToNoE+ 本質に向き合い、整える習慣を。医療・介護を原点に、専門性を社会へひらく。" fetchpriority="high" decoding="async" width="1672" height="941"></figure>
+  <div class="home-actions"><a class="btn btn-cta" href="contents.html">コンテンツを見る</a><a class="btn btn-ghost" href="service.html">サービスを見る</a></div>
+</div></section>
+<div class="container home-layout">
+  <div class="home-main">
+    <section class="home-block" id="latest" aria-labelledby="home-seminar-title"><div class="home-section-head"><div><p class="eyebrow">SEMINARS</p><h2 id="home-seminar-title">開催予定のセミナー</h2></div><a class="home-more" href="contents.html#seminars">セミナー一覧へ →</a></div>
+<template id="recurringSeminarTemplate">
+  <article class="sem-card contents-recurring-card">
+    <a class="sem-card-thumb" href="weekend-ai.html" aria-label="週末のAI整え習慣の詳細を見る">
+      <img src="assets/weekend-ai-default-thumbnail.webp" alt="毎週土曜朝6時開催 週末のAI整え習慣" width="1600" height="900" loading="eager" decoding="async">
+      <span class="sem-badge sem-badge-live">毎週開催</span>
+    </a>
+    <div class="sem-card-body">
+      <p class="sem-card-date">毎週土曜 朝6:00〜6:30 ／ 参加無料</p>
+      <h3 class="sem-card-title">週末のAI整え習慣</h3>
+      <p class="contents-recurring-description">1週間のAIの変化を整理し、来週の仕事で試すことを考える30分。</p>
+      <div class="sem-card-actions"><a class="btn btn-cta" href="weekend-ai.html">開催内容・参加方法を見る</a></div>
     </div>
+  </article>
+</template>
+      <div class="sem-grid home-seminars" id="semGrid" data-default-status="upcoming" data-preview-limit="3"></div><p id="semEmpty" hidden>現在、開催予定のセミナーはありません。</p>
+    </section>
+    <section class="home-block" id="contents" aria-labelledby="home-learning-title"><div class="home-section-head"><div><p class="eyebrow">CONTENTS</p><h2 id="home-learning-title">自分のペースで学ぶ</h2></div></div>
+      <div class="home-learning-tabs" role="tablist" aria-label="新着コンテンツの種類">
+<button type="button" id="home-tab-column" role="tab" aria-controls="home-panel-column" aria-selected="true" data-learning-tab="column">コラム</button>
+<button type="button" id="home-tab-video" role="tab" aria-controls="home-panel-video" aria-selected="false" tabindex="-1" data-learning-tab="video">動画コンテンツ</button>
+</div><div class="home-learning-grid">
+        <article class="home-learning" id="home-panel-column" role="tabpanel" aria-labelledby="home-tab-column" tabindex="0"><p class="eyebrow">COLUMN</p><h3>コラム</h3><p>AIと専門職の働き方を、読みやすい記事で。</p><div id="tsuzuriLatest" data-latest-limit="3" aria-live="polite"><p class="home-empty">読み込み中です。</p></div><a href="tsuzuri/" class="btn btn-ghost">コラムを読む</a></article>
+        <article class="home-learning" id="home-panel-video" role="tabpanel" aria-labelledby="home-tab-video" tabindex="0" hidden><p class="eyebrow">VIDEO</p><h3>動画コンテンツ</h3><p>今すぐ試せるヒントを、短い動画で。</p><div id="tsumamiLatest" data-latest-limit="3" aria-live="polite"><p class="home-empty">読み込み中です。</p></div><a href="tsumami/" class="btn btn-ghost">動画を見る</a></article>
+      </div>
+      <a class="home-more" href="contents.html">コンテンツ一覧を見る →</a>
+    </section>
   </div>
-</section>
-
-<main>
-  <div class="container editorial-intro"><h1>医療・介護・産業保健の専門職へ。</h1><p>AIを仕事に活かす学びと実践を届けます。</p></div>
-  <section class="home-content-strip" id="latest">
-    <div class="content-strip-inner">
-      <div class="content-strip-head">
-        <div>
-          <p class="eyebrow">SEMINARS</p>
-          <h2 class="content-strip-title">セミナー</h2>
-        </div>
-      </div>
-      <div class="latest-visual-groups">
-        <section class="latest-visual-group active" aria-label="セミナー">
-          <div class="latest-card-grid">
-            <a class="latest-visual-card recurring-seminar-card" href="https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu" target="_blank" rel="noopener noreferrer">
-              <img src="assets/weekend-ai-default-thumbnail.webp" alt="毎週土曜朝6時開催 週末のAI整え習慣" width="1600" height="900" loading="eager" decoding="async">
-              <span class="recurring-seminar-meta"><span class="recurring-seminar-badge">定期開催</span><span class="peek-date">毎週土曜 / 朝6:00</span></span>
-              <strong>週末のAI整え習慣</strong>
-              <span class="recurring-seminar-note">今週のテーマは、参加者のニーズに合わせて設計します。</span>
-            </a>
-            <a class="latest-visual-card" href="https://therapis10.com/seminars/cmt2f9fwk04up35z0nqc469up" target="_blank" rel="noopener" data-seminar-start="2026-09-14T21:00:00+09:00" data-seminar-end="2026-09-14T22:00:00+09:00" hidden>
-              <img src="assets/seminar-2026-09-14-ai-zadankai-daily.jpg" alt="AI普段使い座談会 日常編のサムネイル" loading="lazy" decoding="async">
-              <span class="peek-date">2026.09.14 / 21:00</span><strong>AI普段使い座談会｜日常編</strong>
-            </a>
-            <a class="latest-visual-card" href="https://therapis10.com/seminars/cmtd27exs0kn2eu0v76rxrjnf" target="_blank" rel="noopener" data-seminar-start="2026-09-28T20:00:00+09:00" data-seminar-end="2026-09-28T21:00:00+09:00" hidden>
-              <img src="assets/seminar-2026-09-28-chatgpt-work.jpg" alt="ChatGPT Workセミナーのサムネイル" loading="lazy" decoding="async">
-              <span class="peek-date">2026.09.28 / 20:00</span><strong>AIをあなたの理解者に。ChatGPT Workでできること。</strong>
-            </a>
-          </div>
-          <p class="latest-seminar-empty" id="latestSeminarEmpty" hidden>現在、開催予定のセミナーはありません。</p>
-        </section>
-      </div>
-    </div>
-  </section>
-
-  <section class="section home-service-priority" id="products">
-    <div class="container">
-      <p class="eyebrow">SERVICE</p>
-      <h2 class="section-title">読む、試す。<br><span class="accent">自分のペースでAIに触れる。</span></h2>
-      <p class="section-lead">たより、つづり、つまみ、いろは。目的に合わせて選べる4つのサービスです。</p>
-      <div class="totonoe-service-hub service-content-grid">
-        <article class="totonoe-project-card service-hub-card"><img src="assets/service-tayori.png" alt="たより｜TAYORI" width="1254" height="1254" loading="lazy" decoding="async"><div><span class="project-status">DELIVER</span><h3>たより｜TAYORI</h3><p class="service-concept-line">情報を整える。</p><p>知っておきたいAIの変化を、実務につながる視点で整理して届けます。</p><a href="tayori.html" class="btn btn-ghost">たよりを見る</a></div></article>
-        <article class="totonoe-project-card service-hub-card"><img src="assets/service-tsuzuri.png" alt="つづり｜TSUZURI" width="1254" height="1254" loading="lazy" decoding="async"><div><span class="project-status">READ</span><h3>つづり｜TSUZURI</h3><p class="service-concept-line">考えを、ことばに。</p><p>ToToNoE+の考え方や、AIと専門職の働き方を記事で届けます。</p><a href="tsuzuri/" class="btn btn-ghost">つづりを読む</a></div></article>
-        <article class="totonoe-project-card service-hub-card"><img src="assets/service-tsumami.png" alt="つまみ｜TSUMAMI" width="1254" height="1254" loading="lazy" decoding="async"><div><span class="project-status">LEARN</span><h3>つまみ｜TSUMAMI</h3><p class="service-concept-line">気になるAIを、ひとつまみ。</p><p>今すぐ試せるAIの要点を、短い動画や資料で届けます。</p><a href="tsumami/" class="btn btn-ghost">つまみを見る</a></div></article>
-        <article class="totonoe-project-card service-hub-card is-coming-soon"><img src="assets/service-iroha.png" alt="いろは｜IROHA" width="1254" height="1254" loading="lazy" decoding="async"><div><span class="project-status">COMING SOON</span><h3>いろは｜IROHA</h3><p class="service-concept-line">現在、公開に向けて準備中です。</p><p>個人・法人の受付開始案内をメールで受け取れます。</p><a class="btn btn-ghost" href="IROHA/#iroha-waitlist">受付開始の案内を受け取る</a></div></article>
-      </div>
-    </div>
-  </section>
-
+  <aside class="home-services" id="products" aria-labelledby="home-services-title"><p class="eyebrow">SERVICE</p><h2 id="home-services-title">学びを、実践へ。</h2><p class="home-services-lead">継続して学びたい方へ。</p>
+    <article class="home-tayori"><a class="home-tayori-image" href="tayori.html" aria-label="たよりのサービス詳細を見る"><img src="assets/service-tayori.png" width="1254" height="1254" alt="たより｜TAYORI" loading="lazy"></a><span class="home-service-badge">有料サービス</span><h3>たより｜TAYORI</h3><p>知っておきたいAIの変化を、実務につながる視点で整理して届けます。</p><a href="tayori.html" class="btn btn-ghost">たよりを見る</a><p class="home-service-status">サービス案内公開中<br>お申し込みは準備中です</p></article>
+    <article class="home-coming"><div><h3>いろは｜IROHA</h3><span>準備中</span></div><p>AIを体系的に学び、実践につなげる学習サービス。</p></article>
+    <article class="home-coming"><div><h3>法人研修</h3><span>準備中</span></div><p>組織の学びと実践を支える研修。</p></article>
+    <article class="home-coming"><div><h3>プロダクト</h3><span>準備中</span></div><p>公開に向けて準備しています。</p></article>
+    <a class="home-more" href="service.html">サービス一覧を見る →</a>
+  </aside>
+</div>
+<section class="home-world" aria-labelledby="home-world-title"><div class="container home-world-inner">
+<a class="home-world-image" href="characters/" aria-label="ToToNoE+のキャラクターと世界観を見る"><img src="assets/characters/stories/trio/04-3_first-time-together.png" alt="海と灯台の見える小屋で出会う、ハクト・ツグモ・ミオン" width="1672" height="941" loading="lazy" decoding="async"></a>
+<div><p class="eyebrow">OUR WORLD</p><h2 id="home-world-title">この世界観を知る。</h2><p>立ち止まる。自分の声を聴く。大切なものを選び直す。<br>ミオン、ツグモ、ハクトの3人と、整えながら進む物語へ。</p><a class="btn btn-cta" href="characters/">キャラクターを見る</a></div>
+</div></section>
+<section class="home-about"><div class="container home-about-inner"><div><p class="eyebrow">ABOUT US</p><h2>大切な仕事へ戻れる、余白を。</h2><p>ToToNoE+が大切にする考え方と、学びを届けるチーム。</p></div><div class="home-actions"><a href="team.html" class="btn btn-ghost">チームを見る</a></div></div></section>
+<div class="sem-modal" id="semModal" role="dialog" aria-modal="true" aria-label="セミナー詳細" aria-hidden="true"><div class="sem-modal-backdrop" data-sem-close></div><div class="sem-modal-box"><button type="button" class="sem-modal-close" id="semModalClose" aria-label="閉じる">×</button><div class="sem-modal-inner" id="semModalBody"></div></div></div>
+<div class="cv-modal" id="cvModal" aria-hidden="true"><div class="cv-modal-backdrop"></div><div class="cv-modal-box" role="dialog" aria-modal="true"><button class="cv-modal-close" id="cvModalClose" aria-label="閉じる">×</button><div class="cv-modal-inner" id="cvModalBody"></div></div></div>
 </main>
 
 <footer class="site-footer">
@@ -129,7 +113,7 @@
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <a href="index.html">TOP</a>
       <a href="weekend-ai.html">週末のAI整え習慣</a>
-      <a href="service.html">サービス</a>
+      <a href="service.html">サービス</a><a href="contents.html">コンテンツ</a>
       <a href="team.html">チーム</a>
       <a href="faq.html">FAQ</a>
     </nav>
@@ -143,6 +127,8 @@
 </footer>
 
 <script src="common.js?v=20260905a"></script>
-<script src="home-seminars.js?v=20260913a"></script>
+<script src="seminars.js?v=20260917c"></script>
+<script src="service-content.js?v=20260917-home"></script>
+<script src="home-learning-tabs.js?v=20260917a"></script>
 </body>
 </html>

@@ -59,3 +59,11 @@
 @media (max-width: 980px) { .character-grid { grid-template-columns: 1fr; max-width: 720px; margin-left: auto; margin-right: auto; } .character-card { display: grid; grid-template-columns: 44% 56%; } .character-card > img { height: 100%; aspect-ratio: auto; } }
 @media (max-width: 720px) { .hero-stage { min-height: 580px; } .hero-scene { inset: 0; transform-origin: center; } .hero-vignette { background: linear-gradient(0deg, rgba(9,27,22,.92) 0%, rgba(9,27,22,.63) 47%, rgba(9,27,22,.12) 78%); } .hero-stage-inner { align-items: end; padding-bottom: 118px; } .hero-copy-stack { width: 100%; min-height: 390px; } .hero-copy h1, .hero-copy h2 { font-size: clamp(2.55rem, 12vw, 3.4rem); } .hero-copy > p:not(.hero-kicker) { max-width: 31em; font-size: .9rem; line-height: 1.85; } .hero-progress { right: 18px; bottom: 28px; left: 18px; justify-content: space-between; gap: 8px; } .hero-progress li { min-width: 42px; } .hero-scroll-cue { display: none; } .hero-scroll-markers > div { height: 78svh; min-height: 500px; } .world-section, .character-section, .stories-section { padding: 72px 0; } .world-grid { gap: 24px; } .world-copy { padding-top: 22px; } .character-card { display: block; } .character-card > img { aspect-ratio: 16 / 10; } .stories-grid { grid-template-columns: 1fr; } .stories-heading { display: block; } .stories-heading .text-link { margin-top: 18px; } .story-card a { grid-template-columns: 1fr; } .story-card img { aspect-ratio: 16 / 9; min-height: 0; } }
 @media (prefers-reduced-motion: reduce) { .hero-scene, .hero-copy, .hero-progress li { transition: none; } .hero-scene, .hero-scene.is-active, .hero-scene.is-past { transform: none; } }
+
+.sticker-section{padding:72px 0;background:#edf3ed;border-top:1px solid var(--line)}
+.sticker-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.sticker-inner h2{font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.5;margin:12px 0 18px}
+.sticker-inner p{line-height:1.9;color:var(--ink-soft)}
+.sticker-purchase .btn{width:100%;gap:12px;white-space:normal;text-align:center}
+.sticker-purchase p{font-size:.78rem;margin:14px 0 0}
+@media(max-width:720px){.sticker-section{padding:48px 0}.sticker-inner{grid-template-columns:1fr;gap:24px}.sticker-purchase .btn{font-size:.85rem}}

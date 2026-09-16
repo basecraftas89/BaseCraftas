@@ -147,22 +147,40 @@
       .catch(function () {});
   }
 
-  function isPast(dateStr) {
-    var d = new Date(dateStr + 'T23:59:59');
-    return d.getTime() < Date.now();
+  function isPast(dateStr, timeLabel) {
+    var end = String(timeLabel || '').match(/[〜~–-](\d{1,2}:\d{2})/);
+    var clock = end ? end[1].padStart(5, '0') + ':00' : '23:59:59';
+    return new Date(dateStr + 'T' + clock + '+09:00').getTime() <= Date.now();
   }
 
   /* ---------- 並び替え・開催状況の絞り込み ---------- */
+  var recurringTemplate = document.getElementById('recurringSeminarTemplate');
+  var weeklyImage = '';
+  function loadWeeklyImage() {
+    if (!recurringTemplate || !window.fetch) return Promise.resolve();
+    return fetch('/public-content/weekend-event.json', {cache:'no-store', credentials:'omit'})
+      .then(function (res) { return res.ok ? res.json() : {}; })
+      .then(function (data) {
+        var event = data && data.event;
+        if (!event || !event.hero_url) return;
+        var url = new URL(event.hero_url, location.href);
+        if (/^https?:$/.test(url.protocol)) weeklyImage = url.href;
+      }).catch(function () {});
+  }
   var ORDER_KEY = 'wa_seminars_order_v1';
   var STATUS_KEY = 'wa_seminars_status_v1';
   var TAG_KEY = 'wa_seminars_tag_v1';
   var semOrder = (function () {
     try { return localStorage.getItem(ORDER_KEY) || 'newest'; } catch (e) { return 'newest'; }
   })();
+  var pageDefaultStatus = (document.getElementById('semGrid') || {}).dataset;
+  pageDefaultStatus = pageDefaultStatus && pageDefaultStatus.defaultStatus;
   var semStatus = (function () {
+    if (pageDefaultStatus === 'upcoming') return 'upcoming';
     try { return localStorage.getItem(STATUS_KEY) || 'all'; } catch (e) { return 'all'; }
   })();
   var semTag = (function () {
+    if (pageDefaultStatus) return 'all';
     try { return localStorage.getItem(TAG_KEY) || 'all'; } catch (e) { return 'all'; }
   })();
 
@@ -180,11 +198,11 @@
     var statusWrap = document.getElementById('semStatusFilter');
     if (!statusWrap) return;
 
-    var upcomingCount = SEMINARS.filter(function (s) { return !isPast(s.date); }).length;
-    var pastCount = SEMINARS.filter(function (s) { return isPast(s.date); }).length;
+    var upcomingCount = SEMINARS.filter(function (s) { return !isPast(s.date, s.time); }).length + (recurringTemplate ? 1 : 0);
+    var pastCount = SEMINARS.filter(function (s) { return isPast(s.date, s.time); }).length;
 
     statusWrap.innerHTML =
-      '<button type="button" class="range-btn" data-sem-status="all">すべて<span class="range-count">' + SEMINARS.length + '</span></button>' +
+      '<button type="button" class="range-btn" data-sem-status="all">すべて<span class="range-count">' + (SEMINARS.length + (recurringTemplate ? 1 : 0)) + '</span></button>' +
       '<button type="button" class="range-btn" data-sem-status="upcoming">開催予定<span class="range-count">' + upcomingCount + '</span></button>' +
       '<button type="button" class="range-btn" data-sem-status="past">開催終了<span class="range-count">' + pastCount + '</span></button>';
 
@@ -249,7 +267,7 @@
 
   function openModal(sem) {
     if (!modal || !modalBody) return;
-    var past = isPast(sem.date);
+    var past = isPast(sem.date, sem.time);
     modalBody.innerHTML =
       '<figure class="sem-modal-thumb">' +
         '<img src="' + escapeHtml(sem.thumb) + '" alt="' + escapeHtml(sem.title) + '">' +
@@ -312,25 +330,33 @@
     });
 
     var ordered = SEMINARS.slice();
-    if (semStatus === 'upcoming') ordered = ordered.filter(function (s) { return !isPast(s.date); });
-    else if (semStatus === 'past') ordered = ordered.filter(function (s) { return isPast(s.date); });
+    if (semStatus === 'upcoming') ordered = ordered.filter(function (s) { return !isPast(s.date, s.time); });
+    else if (semStatus === 'past') ordered = ordered.filter(function (s) { return isPast(s.date, s.time); });
     if (semTag !== 'all') {
       ordered = ordered.filter(function (s) { return (s.tags || []).indexOf(semTag) !== -1; });
     }
 
     ordered.sort(function (a, b) {
       // 開催予定（0）を常に開催終了（1）より先＝左に表示する
-      var aPast = isPast(a.date) ? 1 : 0;
-      var bPast = isPast(b.date) ? 1 : 0;
+      var aPast = isPast(a.date, a.time) ? 1 : 0;
+      var bPast = isPast(b.date, b.time) ? 1 : 0;
       if (aPast !== bPast) return aPast - bPast;
       var diff = new Date(a.date) - new Date(b.date);
       return semOrder === 'oldest' ? diff : -diff;
     });
 
-    var countEl = document.getElementById('semCount');
-    if (countEl) countEl.textContent = ordered.length ? ('全' + ordered.length + '件') : '';
+    var previewLimit = Number(grid.dataset.previewLimit);
+    if (previewLimit > 0) ordered = ordered.slice(0, Math.max(0, previewLimit - (weeklyImage && recurringTemplate && semStatus !== 'past' ? 1 : 0)));
 
-    if (!ordered.length) {
+    // The weekly event stays first in upcoming/all, independent of sort and topic filters.
+    var showRecurring = recurringTemplate && semStatus !== 'past';
+    var visibleCount = ordered.length + (showRecurring ? 1 : 0);
+    var featuredCount = ordered.length + (showRecurring && weeklyImage ? 1 : 0);
+    grid.dataset.columns = String(Math.min(3, Math.max(1, featuredCount)));
+    var countEl = document.getElementById('semCount');
+    if (countEl) countEl.textContent = visibleCount ? ('全' + visibleCount + '件') : '';
+
+    if (!visibleCount) {
       grid.innerHTML = '';
       if (empty) empty.hidden = false;
       return;
@@ -338,8 +364,25 @@
     if (empty) empty.hidden = true;
 
     grid.innerHTML = '';
+    if (showRecurring) {
+      var fragment = recurringTemplate.content.cloneNode(true);
+      if (weeklyImage) {
+        var weeklyCard = fragment.querySelector('.sem-card');
+        weeklyCard.classList.remove('contents-recurring-card');
+        weeklyCard.classList.add('sem-weekly-featured');
+        var weeklyImg = weeklyCard.querySelector('img');
+        weeklyImg.src = weeklyImage;
+        weeklyImg.alt = '週末のAI整え習慣 今週のテーマ';
+        weeklyImg.addEventListener('error', function () {
+          weeklyImage = '';
+          render();
+        }, {once:true});
+        weeklyCard.querySelector('.sem-badge').textContent = '開催予定';
+      }
+      grid.appendChild(fragment);
+    }
     ordered.forEach(function (sem) {
-      var past = isPast(sem.date);
+      var past = isPast(sem.date, sem.time);
       var card = document.createElement('article');
       card.className = 'sem-card' + (past ? ' is-past' : '');
       var tagChips = (sem.tags || []).slice(0, 4).map(function (tag) {
@@ -372,7 +415,7 @@
     });
   }
 
-  loadGeneratedSeminars().then(function () {
+  Promise.all([loadGeneratedSeminars(), loadWeeklyImage()]).then(function () {
     initSemToolbar();
     render();
   });

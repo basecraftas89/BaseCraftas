@@ -11,12 +11,13 @@ https://basecraftas.com/projects/totonoe/
 
 | ページ | 役割 |
 |---|---|
-| `index.html` | ToToNoE+トップ。チームの思想・目指す姿・プロジェクト入口 |
+| `index.html` | TOP。大きなヒーロー画像と2ボタン。左に開催予定・コラム／動画の新着各3件タブ、右にサービス。下部に世界観の画像導線。スマホでは縦に配置 |
 | `weekend-ai.html` | 週末のAI整え習慣。企画概要・参加特典・参加方法を統合したページ |
-| `seminars.html` | セミナー一覧・申込導線 |
+| `seminars.html` | `contents.html#seminars` への旧URL転送 |
+| `service.html` | たより・いろは・法人研修・プロダクトのサービス一覧。たより以外は準備中 |
 | `benefits.html` | 旧URL用のリダイレクト（`weekend-ai.html#benefits` へ移動） |
 | `join.html` | 旧URL用のリダイレクト（`weekend-ai.html#join` へ移動） |
-| `contents.html` | **開催・配信コンテンツと、つづり・ツマミをまとめたコンテンツページ** |
+| `contents.html` | **左にセミナー・ポッドキャスト・アーカイブのタブ、右につづり・つまみの新着各3件。初期表示は開催予定セミナー** |
 | `team.html` | 運営メンバー／運営について |
 | `faq.html` | よくある質問（カテゴリ別） |
 | `privacy.html` | プライバシーポリシー |
@@ -26,7 +27,7 @@ https://basecraftas.com/projects/totonoe/
 
 ### ヘッダーナビの並び
 
-トップ / 週末のAI整え習慣 / セミナー / コンテンツ / 運営メンバー / FAQ（6項目）
+TOP / 週末のAI整え習慣 / サービス / コンテンツ / キャラクター / チーム / FAQ（7項目）
 
 旧サイトにあった独立の「Podcast」ページは廃止し、`contents.html` 内の1セクション（`#podcast`）に統合しました。
 外部やブックマークから `podcast.html` を開いた場合に備えて、**`podcast.html` はリダイレクト用の小さなページとして復活**させています
@@ -443,3 +444,9 @@ FAQも「参加について／内容について／セミナーについて／�
 - URL限定公開のstand.fmエピソードは「URLを知っていれば誰でも再生できる」状態です
 
 ---
+
+## 2026年9月16日の再編（ローカル実装）
+
+IROHA/index.html、corporate.html、products.htmlは下書きとして保持し、配信ビルドから除外。直接URLはサービス一覧へ転送します。公開反映状況は `TOTONOE_BUSINESS_OVERVIEW.md` を確認してください。
+
+TOPは `home-page.css` で構成し、セミナーを `seminars.js`、新着を `service-content.js` から表示します。旧 `home-seminars.js` は現行TOPから読み込みません。
