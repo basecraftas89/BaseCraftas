@@ -63,9 +63,10 @@ export function articleHtml(articleData) {
 .column-tags span{padding:.3rem .6rem;border-radius:999px;background:rgba(61,107,94,.12);color:var(--teal-deep);font-size:.74rem}
 .column-hero-image{margin:0 0 2.25rem}
 .column-hero-image img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:18px;background:#fff;box-shadow:var(--shadow-sm)}
-.column-body-inner{font-size:1rem;line-height:2.08}
+.column-body-inner{font-size:1rem;line-height:2.08;overflow-wrap:anywhere}
 .column-body-inner h2{margin:2.8rem 0 1rem;font-size:1.65rem;color:var(--teal-deep)}
 .column-body-inner h3{margin:2rem 0 .8rem;font-size:1.28rem;color:var(--teal-deep)}
+.column-body-inner figure{margin:1.8rem 0}.column-body-inner figure img{display:block;width:100%;height:auto}.column-body-inner figcaption{margin-top:.65rem;font-size:.8rem;line-height:1.7;color:var(--ink-soft)}
 .column-body-inner p+p{margin-top:1.1rem}
 .column-body-inner a{color:var(--sage);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
 .column-body-inner mark{background:#fff0a8;padding:.05em .22em;border-radius:.2em}
