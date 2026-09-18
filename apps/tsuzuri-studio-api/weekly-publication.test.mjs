@@ -31,11 +31,13 @@ test('published dashboard metadata replaces legacy cards without duplication; dr
   const dom=await page('weekend-ai.html','service-content.js',articles);
   try {
     const d=dom.window.document;
-    assert.equal(d.querySelectorAll('.pod-card').length,16);
-    assert.equal(d.querySelectorAll('.archive-card').length,16);
-    assert.match(d.querySelector('.pod-card').textContent,/更新したPodcast/);
-    assert.match(d.querySelector('.archive-card').textContent,/更新したアーカイブ/);
-    assert.equal(d.querySelector('.pod-card iframe').getAttribute('src'),'https://stand.fm/embed/episodes/6aa47d67279752ae5dd1c9c7');
+    assert.equal(d.querySelectorAll('.pod-card').length,17);
+    assert.equal(d.querySelectorAll('.archive-card').length,17);
+    const updatedPodcast=d.querySelector('.pod-card iframe[src="https://stand.fm/embed/episodes/6aa47d67279752ae5dd1c9c7"]').closest('.pod-card');
+    const updatedArchive=[...d.querySelectorAll('.archive-card')].find(card=>card.textContent.includes('更新したアーカイブ'));
+    assert.match(updatedPodcast.textContent,/更新したPodcast/);
+    assert.match(updatedArchive.textContent,/更新したアーカイブ/);
+    assert.equal(updatedPodcast.querySelector('iframe').getAttribute('src'),'https://stand.fm/embed/episodes/6aa47d67279752ae5dd1c9c7');
     assert.doesNotMatch(d.body.textContent,/未公開の回/);
   } finally {dom.window.close();}
 });
@@ -45,10 +47,13 @@ test('weekend page reflects edited and newly published episodes in descending or
   const dom=await page('weekend-ai.html','service-content.js',[...articles,next]);
   try {
     const cards=[...dom.window.document.querySelectorAll('.pod-card')];
-    assert.equal(cards.length,17);
+    assert.equal(cards.length,18);
     assert.match(cards[0].textContent,/第17回/);
-    assert.match(cards[1].textContent,/更新したPodcast/);
-    assert.match(cards[2].textContent,/第15回/);
+    assert.match(cards[0].textContent,/第17回/);
+    assert.match(cards.find(card=>card.textContent.includes('次の回')).textContent,/次の回/);
+    assert.match(cards.find(card=>card.textContent.includes('AIが面接')).textContent,/AIが面接/);
+    assert.match(cards.find(card=>card.textContent.includes('更新したPodcast')).textContent,/更新したPodcast/);
+    assert.match(cards.find(card=>card.textContent.includes('第15回')).textContent,/第15回/);
   } finally {dom.window.close();}
 });
 

@@ -46,6 +46,7 @@
     { url: 'https://stand.fm/episodes/6a921025ce0a6c53375389d8', no: 14, theme: 'Claude公式講座が日本語対応！1日10分で学べる最新AI活用術', date: '8/29' },
     { url: 'https://stand.fm/episodes/6a9b459df67f3111cf58409f', no: 15, theme: 'ChatGPT Workを活かすフォルダリング術！', date: '9/5' },
     { url: 'https://stand.fm/episodes/6aa47d67279752ae5dd1c9c7', no: 16, theme: 'ChatGPT image2.5 背景削除とGIF動画作成', date: '9/12' },
+    { url: 'https://stand.fm/episodes/6aadbc20b6f9fb1381e597a5', no: 17, theme: 'AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ', date: '9/19' },
   ];
   // 既定の表示順： 'newest'（新しい回が上＝降順）/ 'oldest'（第1回が上＝昇順）
   var POD_ORDER = 'newest';
@@ -689,6 +690,8 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
+    { no: 17, date: '2026-09-19', driveId: '1c4FYxTu2-o_HIsT1hKJE56sE4W-0Ma-A',
+      title: 'AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ' },
     { no: 16, date: '2026-09-12', driveId: '1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo',
       title: 'ChatGPT image2.5 背景削除とGIF動画作成' },
     { no: 15, date: '2026-09-05', driveId: '1Nes5adTlWH5A4EhdJ4Lb2BWRuVg-mj0C',
