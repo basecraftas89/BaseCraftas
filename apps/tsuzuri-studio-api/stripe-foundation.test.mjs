@@ -237,7 +237,7 @@ test('TAYORI LPは980円・14日無料・人数上限なしのウェイトリス
 test('プライバシーポリシーは公開中の申込サービス表記を維持する',()=>{
   const privacy=readFileSync('projects/totonoe/privacy.html','utf8');
   assert.match(privacy,/Peatix \/ Therapis10\.com等の申込サービス/);
-  assert.match(privacy,/最終改定日：2026年9月17日/);
+  assert.match(privacy,/最終改定日：2026年9月22日/);
 });
 
 test('署名済みTAYORI Checkout完了通知だけが契約とWeekly権限を付与し、重複通知は安全に無視する',async()=>{

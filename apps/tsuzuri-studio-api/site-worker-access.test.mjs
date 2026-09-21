@@ -13,6 +13,30 @@ function profileResponse(profile) {
 
 test.afterEach(() => { globalThis.fetch = originalFetch; });
 
+test("encoded and extensionless member URLs cannot bypass authorization", async () => {
+  profileResponse(null);
+  for (const path of ["/projects/totonoe/TAYORI", "/projects/totonoe/TAYORI/index", "/projects/totonoe/%54AYORI/index.html", "/projects/totonoe/IROHA/dashboard/", "/projects/totonoe/IROHA/lesson", "/projects//totonoe/IROHA/mypage"]) {
+    const response = await siteWorker.fetch(new Request("https://basecraftas.com" + path), env);
+    assert.equal(response.status, 302, path);
+    assert.match(response.headers.get("cache-control"), /private, no-store/);
+  }
+  const blocked = await siteWorker.fetch(new Request("https://basecraftas.com/apps/%74suzuri-studio-api/src/worker.js"), env);
+  assert.equal(blocked.status, 404);
+});
+
+test("authorized HTML is never cached and profile failures fail closed", async () => {
+  profileResponse({has_weekly_access:true});
+  const response = await siteWorker.fetch(new Request("https://basecraftas.com/projects/totonoe/TAYORI/"), env);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "private, no-store");
+  assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+  globalThis.fetch = async () => { throw new Error("unavailable"); };
+  const failure = await siteWorker.fetch(new Request("https://basecraftas.com/projects/totonoe/TAYORI/"), env);
+  assert.equal(failure.status, 503);
+  assert.match(failure.headers.get("cache-control"), /no-store/);
+  assert.equal(failure.headers.get("x-frame-options"), "DENY");
+});
+
 test("static site denies stale internal source assets even if they remain in Cloudflare storage", async () => {
   for (const pathname of [
     "/apps/site-worker/worker.js",

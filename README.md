@@ -2,11 +2,14 @@
 
 Base Craftas official static website.
 
-## Cloudflare Pages
+## Cloudflare Workers production deployment
 
-- Build command: `npm ci && npm run build`
-- Build output directory: `dist`
-- Root directory: none, when this repository root is connected directly
+- Build command: `npm run build` (install locked dependencies with `npm ci` in a fresh checkout)
+- Deploy command: `npx wrangler deploy --config apps/site-worker/wrangler.toml`
+- Public assets directory: `dist`; authorization Worker: `apps/site-worker/worker.js`
+- Git-connected production build root: `/`; branch: `main`.
+- Always specify the config path, including in Workers Builds. An unconfigured root deployment can publish internal source and bypass the authorization Worker. The production trigger was corrected on 2026-09-22.
+- Verify `x-basecraftas-release`, anonymous member redirects and internal-source 404s after the Git-triggered build finishes, not just after a manual deployment.
 
 ## Public URL
 
@@ -40,7 +43,7 @@ they are not primary service pages.
 Do not deploy the repository root. `npm run build` creates `dist` from public files only.
 Internal API sources, SQL, settings, tests, and reports must never be deployed as static assets.
 Run `npm test` and see `docs/SECURITY_RELEASE_2026-09-11.md` before releasing the security changes.
-The build settings above are required settings, not a claim that the Cloudflare dashboard has been updated.
+The production build trigger was read back and verified on 2026-09-22. See `docs/SITE_AUDIT_2026-09-22.md` for findings and remaining operational checks.
 
 ## サービス名の参照
 
