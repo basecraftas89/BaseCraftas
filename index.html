@@ -33,6 +33,9 @@
   object-fit:cover;
   opacity:.76;
 }
+.home-hero-video {
+  z-index:0;
+}
 .home-hero-inner {
   position:relative;
   z-index:2;
@@ -454,7 +457,9 @@
 
 <!-- ══ HERO ══ -->
 <section class="home-hero">
-  <img src="images/08_custom/home-hero-image2.jpg" alt="医療・介護の現場価値を整理するBase Craftasのイメージ" class="home-hero-img">
+  <video class="home-hero-img home-hero-video" autoplay muted loop playsinline preload="metadata" poster="images/08_custom/home-hero-image2.jpg" aria-hidden="true">
+    <source src="images/08_custom/home-hero-video.mp4" type="video/mp4">
+  </video>
   <div class="home-hero-inner">
     <div class="reveal">
       <span class="home-kicker">Base Craftas</span>
