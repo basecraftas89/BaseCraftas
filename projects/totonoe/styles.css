@@ -2488,5 +2488,5 @@ body.cv-lock{overflow:hidden}
 
 @media(max-width:860px){.site-nav.open{max-height:calc(100dvh - 66px);overflow-y:auto;overscroll-behavior:contain}}
 
-.editorial-page.hub-page .service-card img{width:min(100%,300px);align-self:center;margin-bottom:16px}
+.editorial-page.hub-page .service-card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;align-self:center;margin-bottom:16px}
 @media(min-width:681px){.editorial-page.hub-page .service-card-grid-four{grid-template-columns:repeat(2,minmax(0,1fr))}}
