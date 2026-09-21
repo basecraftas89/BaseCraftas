@@ -187,6 +187,96 @@
   font-size:.9rem;
   line-height:1.9;
 }
+.home-difference {
+  padding:5.5rem 5rem;
+  background:var(--cream);
+}
+.home-difference-inner,
+.home-proof-inner {
+  max-width:1120px;
+  margin:0 auto;
+}
+.home-difference-head,
+.home-proof-head {
+  max-width:720px;
+  margin-bottom:2.4rem;
+}
+.home-difference-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1rem;
+}
+.home-difference-card {
+  padding:1.6rem 1.5rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:rgba(255,255,255,.64);
+}
+.home-difference-num {
+  display:block;
+  margin-bottom:.9rem;
+  color:var(--terra);
+  font-family:'Montserrat',sans-serif;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.16em;
+}
+.home-difference-card h3 {
+  margin-bottom:.55rem;
+  color:var(--green);
+  font-size:1.05rem;
+}
+.home-difference-card p {
+  color:var(--text-sub);
+  font-size:.87rem;
+  line-height:1.9;
+}
+.home-difference-action {
+  margin-top:2rem;
+}
+.home-proof {
+  padding:5.5rem 5rem;
+  background:var(--mist);
+}
+.home-proof-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1rem;
+}
+.home-proof-card {
+  padding:1.5rem;
+  border-left:3px solid var(--terra);
+  background:#fff;
+  box-shadow:0 8px 24px rgba(26,51,44,.05);
+}
+.home-proof-label {
+  display:block;
+  margin-bottom:.55rem;
+  color:var(--sage);
+  font-family:'Montserrat',sans-serif;
+  font-size:.67rem;
+  font-weight:700;
+  letter-spacing:.12em;
+}
+.home-proof-card h3 {
+  margin-bottom:.45rem;
+  color:var(--green);
+  font-size:1.05rem;
+}
+.home-proof-card p {
+  color:var(--text-sub);
+  font-size:.87rem;
+  line-height:1.9;
+}
+.home-proof-note {
+  margin-top:1.2rem;
+  color:var(--text-sub);
+  font-size:.78rem;
+  line-height:1.8;
+}
+.home-proof-action {
+  margin-top:1.7rem;
+}
 .home-services {
   padding:6rem 5rem;
   background:#fff;
@@ -369,9 +459,11 @@
   }
   .home-guide { max-width:620px; }
   .home-service-grid,
-  .home-about-points {
+  .home-about-points,
+  .home-difference-grid {
     grid-template-columns:1fr 1fr;
   }
+  .home-proof-grid { grid-template-columns:1fr; }
 }
 @media(max-width:768px) {
   .home-hero {
@@ -415,6 +507,8 @@
     font-size:.78rem;
   }
   .home-intro,
+  .home-difference,
+  .home-proof,
   .home-services,
   .home-about-band,
   .home-projects {
@@ -426,7 +520,9 @@
   }
   .home-service-grid,
   .home-about-points,
-  .home-project-grid {
+  .home-project-grid,
+  .home-difference-grid,
+  .home-proof-grid {
     grid-template-columns:1fr;
   }
   .home-service-card img {
@@ -518,6 +614,38 @@
   </div>
 </section>
 
+<!-- ══ DIFFERENCE ══ -->
+<section class="home-difference">
+  <div class="home-difference-inner">
+    <div class="home-difference-head reveal">
+      <span class="sec-eyebrow">Why Base Craftas</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">現場の価値を、続けられる形にする。</h2>
+      <p class="home-section-copy">手段を先に決めず、現場の課題と残したい状態を整理してから、必要な支援を組み立てます。</p>
+    </div>
+    <div class="home-difference-grid">
+      <article class="home-difference-card reveal">
+        <span class="home-difference-num">01 / FIELD FIRST</span>
+        <h3>医療現場の実感から考える</h3>
+        <p>理学療法士としての現場理解を起点に、経営と実務の両方から課題を見立てます。</p>
+      </article>
+      <article class="home-difference-card reveal">
+        <span class="home-difference-num">02 / RIGHT TOOL</span>
+        <h3>必要な手段だけを選ぶ</h3>
+        <p>採用、AI、健康施策を目的にせず、今の課題に必要な順序と範囲を整理します。</p>
+      </article>
+      <article class="home-difference-card reveal">
+        <span class="home-difference-num">03 / STAY IN HOUSE</span>
+        <h3>続けられる仕組みを残す</h3>
+        <p>発信やツールを納品して終わらせず、院内で改善を続けられる人と仕組みを整えます。</p>
+      </article>
+    </div>
+    <div class="home-difference-action reveal">
+      <a href="services/index.html" class="btn-secondary">3つのサービスを見る</a>
+    </div>
+  </div>
+</section>
+
 <!-- ══ SERVICES ══ -->
 <section class="home-services">
   <div class="home-services-head reveal">
@@ -556,6 +684,34 @@
         <span class="home-text-link">View Service</span>
       </div>
     </a>
+  </div>
+</section>
+
+<!-- ══ PROOF ══ -->
+<section class="home-proof">
+  <div class="home-proof-inner">
+    <div class="home-proof-head reveal">
+      <span class="sec-eyebrow">Work In Practice</span>
+      <span class="sage-rule"></span>
+      <h2 class="sec-ttl">実績から見る、支援のかたち。</h2>
+      <p class="home-section-copy">Craft Flowでは、業務で使うWebアプリの開発・導入と、現場に残るマニュアル整備まで実践しています。</p>
+    </div>
+    <div class="home-proof-grid">
+      <article class="home-proof-card reveal">
+        <span class="home-proof-label">CRAFT FLOW / DEVELOPMENT</span>
+        <h3>勤怠管理Webアプリ</h3>
+        <p>Google Apps Script（GAS）を活用した勤怠管理のWebアプリを開発・導入し、マニュアルまで整えました。</p>
+      </article>
+      <article class="home-proof-card reveal">
+        <span class="home-proof-label">CRAFT FLOW / DEVELOPMENT</span>
+        <h3>シフト作成Webアプリ</h3>
+        <p>現場の運用に合わせたシフト作成ツールを開発・導入し、仕組みが属人化しないよう共有方法も設計しました。</p>
+      </article>
+    </div>
+    <p class="home-proof-note reveal">※掲載内容はCraft Flowにおける開発・導入実績です。対応範囲や費用は、業務内容を確認したうえで個別にご案内します。</p>
+    <div class="home-proof-action reveal">
+      <a href="services/visit.html#development-cases" class="btn-secondary">Craft Flowの実績を見る</a>
+    </div>
   </div>
 </section>
 
