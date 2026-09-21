@@ -46,12 +46,20 @@
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:0;
-  transition:opacity .8s ease;
+  opacity:.76;
 }
-.home-hero-video.is-active { opacity:.76; }
+.home-hero-loop-shield {
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:var(--green);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .7s ease;
+}
+.home-hero-loop-shield.is-visible { opacity:.92; }
 @media(prefers-reduced-motion:reduce) {
-  .home-hero-video { transition:none; }
+  .home-hero-loop-shield { transition:none; }
 }
 .home-hero-inner {
   position:relative;
@@ -475,12 +483,10 @@
 <!-- ══ HERO ══ -->
 <section class="home-hero">
   <div class="home-hero-video-wrap" aria-hidden="true">
-    <video id="homeHeroVideoA" class="home-hero-video is-active" autoplay muted playsinline preload="auto" poster="images/08_custom/home-hero-image2.jpg">
+    <video id="homeHeroVideo" class="home-hero-video" autoplay muted playsinline preload="auto" poster="images/08_custom/home-hero-image2.jpg">
       <source src="images/08_custom/home-hero-video.mp4" type="video/mp4">
     </video>
-    <video id="homeHeroVideoB" class="home-hero-video" muted playsinline preload="auto">
-      <source src="images/08_custom/home-hero-video.mp4" type="video/mp4">
-    </video>
+    <span id="homeHeroLoopShield" class="home-hero-loop-shield"></span>
   </div>
   <div class="home-hero-inner">
     <div class="reveal">
@@ -682,31 +688,29 @@ const ro = new IntersectionObserver((entries) => {
   });
 }, { threshold: .07, rootMargin:'0px 0px -30px 0px' });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-const heroVideos=[document.getElementById('homeHeroVideoA'),document.getElementById('homeHeroVideoB')];
-let activeHeroVideo=0;
-let heroCrossfading=false;
-const heroCrossfadeDuration=.8;
-const startHeroVideo=video=>{const play=video.play();if(play&&typeof play.catch==='function')play.catch(()=>{});};
-const crossfadeHeroVideo=()=>{
-  if(heroCrossfading)return;
-  heroCrossfading=true;
-  const current=heroVideos[activeHeroVideo];
-  const next=heroVideos[1-activeHeroVideo];
-  next.currentTime=0;
-  startHeroVideo(next);
-  requestAnimationFrame(()=>next.classList.add('is-active'));
+const heroVideo=document.getElementById('homeHeroVideo');
+const heroLoopShield=document.getElementById('homeHeroLoopShield');
+let heroLoopResetting=false;
+const startHeroVideo=()=>{const play=heroVideo.play();if(play&&typeof play.catch==='function')play.catch(()=>{});};
+const resetHeroVideo=()=>{
+  if(heroLoopResetting)return;
+  heroLoopResetting=true;
+  heroLoopShield.classList.add('is-visible');
   window.setTimeout(()=>{
-    current.classList.remove('is-active');
-    current.pause();
-    current.currentTime=0;
-    activeHeroVideo=1-activeHeroVideo;
-    heroCrossfading=false;
-  },heroCrossfadeDuration*1000);
+    heroVideo.pause();
+    heroVideo.currentTime=0;
+    startHeroVideo();
+    window.setTimeout(()=>{
+      heroLoopShield.classList.remove('is-visible');
+      heroLoopResetting=false;
+    },180);
+  },620);
 };
-heroVideos.forEach(video=>video.addEventListener('timeupdate',()=>{
-  if(video===heroVideos[activeHeroVideo]&&video.duration&&video.currentTime>=video.duration-heroCrossfadeDuration)crossfadeHeroVideo();
-}));
-if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){heroVideos.forEach(video=>video.pause());}else{startHeroVideo(heroVideos[0]);}
+heroVideo.addEventListener('timeupdate',()=>{
+  if(heroVideo.duration&&heroVideo.currentTime>=heroVideo.duration-.72)resetHeroVideo();
+});
+heroVideo.addEventListener('ended',resetHeroVideo);
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)heroVideo.pause();else startHeroVideo();
 </script>
 <script src="js/site-motion.js"></script>
 </body>
