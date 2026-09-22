@@ -105,6 +105,7 @@
               <section class="panel quick-panel">
                 <p class="eyebrow">QUICK START</p><h2>何から始めますか？</h2>
                 <button type="button" data-action="new-post"><span>✎</span><div><strong>まっさらな記事を書く</strong><small>自由に文章を組み立てる</small></div><b>›</b></button>
+                <button type="button" data-action="new-post" data-create-type="video"><span>▶</span><div><strong>YouTube動画をつまみに追加</strong><small>リンクから情報を取得してそのまま公開</small></div><b>›</b></button>
                 <button type="button" data-action="new-template"><span>▦</span><div><strong>型から書き始める</strong><small>導入・本題・まとめを自動準備</small></div><b>›</b></button>
               </section>
               <section class="tip-card"><span>編集のヒント</span><p>文章を選択して、ツールバーの「マーカー」や「太字」を押すだけで装飾できます。</p></section>
@@ -115,7 +116,7 @@
 
       <section class="view" id="view-posts" data-title="コンテンツ">
         <div class="page-wrap">
-          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">つづり｜TSUZURI・つまみ｜TSUMAMIを管理します。</p></div><button class="primary-button" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
+          <div class="page-heading"><div><p class="eyebrow">CONTENTS</p><h1 id="contentListTitle">すべてのコンテンツ</h1><p id="contentListCopy">つづり｜TSUZURI・つまみ｜TSUMAMIを管理します。</p></div><button class="primary-button" id="contentCreateButton" type="button" data-action="new-post">＋ 新しいコンテンツ</button></div>
           <div class="list-toolbar">
             <label class="search-box"><span>⌕</span><input type="search" id="postSearch" placeholder="タイトルやキーワードで検索"></label>
             <div class="filter-tabs" role="tablist"><button type="button" class="active" data-filter="all">すべて</button><button type="button" data-filter="published">公開中</button><button type="button" data-filter="draft">下書き</button><button type="button" data-filter="archived">非公開</button><button type="button" data-filter="trash">ゴミ箱</button></div>

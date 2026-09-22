@@ -4,6 +4,24 @@ import {existsSync,readFileSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {archiveMetadata} from './src/archive-metadata.js';
 
+test('TSUZURI and TSUMAMI detail pages reuse the approved wide visuals', () => {
+  const expected={
+    'tsuzuri/index.html':['service-tsuzuri-home.webp','つづり｜TSUZURI'],
+    'tsumami/index.html':['service-tsumami-home.webp','つまみ｜TSUMAMI'],
+  };
+  for(const [file,[asset,label]] of Object.entries(expected)){
+    const dom=new JSDOM(readFileSync('projects/totonoe/'+file,'utf8'));
+    const hero=dom.window.document.querySelector('.service-detail-hero-wide');
+    assert.ok(hero,file+' has a wide hero');
+    const image=hero.querySelector('img');
+    assert.match(image.getAttribute('src'),new RegExp(asset.replace('.','\\.')));
+    assert.equal(image.getAttribute('width'),'1280');
+    assert.equal(image.getAttribute('height'),'720');
+    assert.match(image.getAttribute('alt'),new RegExp(label));
+    dom.window.close();
+  }
+});
+
 test('archive dates use the event filename and Japan time, with calendar validation', () => {
   assert.deepEqual(archiveMetadata('第16回 9/12.m4a', '2026-09-11T22:19:01Z'), {title:'第16回 9/12',episodeNo:16,sourceDate:'2026-09-12'});
   assert.equal(archiveMetadata('EP17.mp4','2026-09-18T22:00:00Z').sourceDate,'2026-09-19');
