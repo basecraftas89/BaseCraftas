@@ -147,7 +147,8 @@ test('homepage shares seminar data, keeps the weekly event first and separates s
       assert.equal(d.querySelectorAll('.home-learning-grid .home-learning').length,2);
       dom.window.eval(readFileSync('projects/totonoe/service-content.js','utf8'));
       await new Promise(resolve=>setTimeout(resolve,20));
-      assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,3);
+      assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,0);
+      assert.match(d.querySelector('#tsumamiLatest').textContent,/公開動画を準備/);
       dom.window.eval(readFileSync('projects/totonoe/home-learning-tabs.js','utf8'));
       assert.equal(d.querySelector('#home-panel-video').hidden,true);
       d.querySelector('#home-tab-video').click();
@@ -164,9 +165,10 @@ test('homepage shares seminar data, keeps the weekly event first and separates s
   }
 });
 
-test('studio video edits replace existing cards and preserve the selected thumbnail; new TSUZURI articles appear', async () => {
+test('TSUMAMI has no fixed legacy videos and renders only Studio-published videos; new TSUZURI articles appear', async () => {
   const baseline=await page('tsumami/index.html','service-content.js',[]);
   const videoCount=baseline.window.document.querySelectorAll('#tsumamiGrid .content-card-video').length;baseline.window.close();
+  assert.equal(videoCount,0);
   const generated=[
     {id:'video-edit',status:'published',content_type:'video',title:'更新された動画',media_url:'https://www.youtube.com/watch?v=8ubAUePSwY8',source_type:'video',source_id:'8ubAUePSwY8',hero_url:'https://example.com/custom.jpg'},
     {id:'new-column',slug:'new-column',status:'published',content_type:'column',title:'追加したつづり',excerpt:'つづり概要'},
@@ -177,7 +179,7 @@ test('studio video edits replace existing cards and preserve the selected thumbn
     const d=dom.window.document;
     const cards=[...d.querySelectorAll('#tsumamiGrid .content-card-video')];
     const edited=cards.filter(card=>card.textContent.includes('更新された動画'));
-    assert.equal(cards.length,videoCount);assert.equal(edited.length,1);
+    assert.equal(cards.length,1);assert.equal(edited.length,1);
     assert.equal(edited[0].querySelector('img').src,'https://example.com/custom.jpg');
     assert.doesNotMatch(d.body.textContent,/未公開動画/);
     edited[0].querySelector('button').click();

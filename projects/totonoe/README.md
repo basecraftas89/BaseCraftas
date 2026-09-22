@@ -250,25 +250,15 @@ PDF・スライドなどのカードには、タグが小さなラベルとし�
 
 ### 動画を追加する（YouTube運用・サムネイル付きカード表示）
 
-動画は **YouTube** で管理します（2026-07-29よりGoogleドライブ運用から切替）。
-`youtubeId` を持つエントリにすると、YouTubeのサムネイル画像を使ったカードになり、
-タップするとその場でポップアップ再生されます（セミナーページの詳細ポップアップと同じ構造）。
+動画は **YouTube** で管理し、ToToNoE+ Studio（`/apps/tsuzuri-studio/`）の
+「つまみ｜TSUMAMI」→「YouTube動画を追加」から公開します。
 
-```js
-{
-  title:     '動画のタイトル',
-  desc:      '概要（2文程度。カード面にそのまま表示されるので短くまとめる）',
-  tags:      ['AIリテラシー'],
-  date:      '2026-08-10',
-  type:      '動画',
-  youtubeId: 'YouTube動画のID（例: 8ubAUePSwY8）',
-  source:    '出典・回のメモなど（任意）'
-}
-```
+1. YouTube動画のURLを貼り付けて「情報を取得」を押す。
+2. 自動取得されたタイトルとサムネイルを確認し、紹介文とタグを必要に応じて入力する。
+3. 「つまみに公開する」を押し、公開状況とつまみページのカード・直接再生URLを確認する。
 
-動画ID は `https://youtu.be/【ここがID】` または `https://www.youtube.com/watch?v=【ここがID】` の
-IDの部分です。アップロード・サムネイル設定はYouTube Studioで行います。
-チャンネルダッシュボード：https://studio.youtube.com/channel/UCBaZSkwcG8jsj8_gEaHrQ4w
+固定の動画データを `service-content.js` へ追加する運用は終了しています。Studioの公開JSONを表示元とし、
+動画URLは `tsumami/?video=YouTube動画ID` の直接再生URLになります。アップロードとサムネイル設定はYouTube Studioで行います。
 
 **動画カードの面に表示されるのは「サムネイル・タイトル・概要（2文程度）・アップロード日」**です
 （2026-08-15より、並び替えの基準が分かるようdateも表示するようにしました）。

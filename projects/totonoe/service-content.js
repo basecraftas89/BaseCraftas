@@ -295,34 +295,8 @@
     //   source: '出典・回のメモなど（任意）'
     // },
 
-    // ▼ 追加済みの動画（date はYouTube側のアップロード日時をJST換算した実際の値です）
-    {
-      title: 'AI時代の"見えてしまう情報"',
-      desc: 'Claudeなどの共有設定を誤ると、社内資料やお客様情報が検索エンジンから見つかる状態になってしまうことがあります。投稿前のチェックポイントや権限範囲の見直し方を紹介します。',
-      tags: ['AIリテラシー'],
-      date: '2026-07-29',
-      type: '動画',
-      youtubeId: '8ubAUePSwY8',
-      source: '週末のAI整え習慣 今週のトピック③'
-    },
-    {
-      // ※ desc はYouTube側に説明文が未設定だったため、タイトルから作成した仮の文章です。内容と違う場合は書き換えてください。
-      title: 'デスクトップに癒しを！｜ペット機能で作業も効率化',
-      desc: 'ChatGPTのCodexに追加された、デスクトップで動くペット機能を紹介します。癒されながら作業効率化にもつながる、ユニークな新機能です。',
-      tags: ['ChatGPT', 'Codex'],
-      date: '2026-08-14',
-      type: '動画',
-      youtubeId: 'BngbUoU48uM'
-    },
-    {
-      // ※ desc はYouTube側に説明文が未設定だったため、タイトルから作成した仮の文章です。内容と違う場合は書き換えてください。
-      title: 'AIで書いた文章がバレる時代へ。｜Claudeで生成した文章に透かし識別情報付与!?',
-      desc: 'Claudeが生成した文章に透かし（識別情報）を付与する新機能について解説します。AIで書いた文章だと判別されやすくなる時代の変化と、現場での注意点を紹介します。',
-      tags: ['AIリテラシー', 'Claude'],
-      date: '2026-08-14',
-      type: '動画',
-      youtubeId: '8bExAMcMfyc'
-    },
+    // 公開する動画はToToNoE+ Studioから登録します。
+    // 旧固定データは持たず、公開JSONを唯一の表示元にします。
   ];
   /* date は「YouTube Studio → 動画の詳細」に表示されるアップロード日時（日本時間換算）を入れてください。
      新しい回を追加するときも、この date を基準に新しい順／古い順の並び替えが決まります。 */
@@ -1078,7 +1052,7 @@
       if (!latest.length) {
         var emptyNote = document.createElement('p');
         emptyNote.className = 'contents-empty';
-        emptyNote.textContent = '公開記事を準備しています。';
+        emptyNote.textContent = group.id === 'tsumamiLatest' ? '公開動画を準備しています。' : '公開記事を準備しています。';
         target.appendChild(emptyNote);
       }
       latest.forEach(function (item) {

@@ -207,7 +207,9 @@
   function applyLinkPreview(preview){
     if(['podcast','archive'].includes(preview.recommended_content_type)){clearLinkPreview('Podcast・アーカイブはスタジオ外で管理してください。');return;}els.contentType.value=normalizeType(preview.recommended_content_type);els.sourceType.value=preview.kind||'external';els.sourceId.value=preview.source_id||'';
     [['title',preview.title],['excerpt',preview.description],['sourceDate',preview.published_at],['episodeNo',preview.episode_no]].forEach(function(pair){
-      var field=els[pair[0]];if(!field.value&&pair[1]){field.value=pair[1];sourceValues[pair[0]]=String(pair[1]);}
+      var field=els[pair[0]],current=String(field.value||'');
+      var canReplace=!current||(pair[0]==='title'&&current==='無題のコンテンツ')||sourceValues[pair[0]]===current;
+      if(canReplace&&pair[1]){field.value=pair[1];sourceValues[pair[0]]=String(pair[1]);}
     });
     if(!pendingHero&&preview.image){setHeroPreview(preview.image);sourceValues.hero=preview.image;}
     lastAnalyzedUrl=els.mediaUrl.value.trim();renderLinkPreview(preview);

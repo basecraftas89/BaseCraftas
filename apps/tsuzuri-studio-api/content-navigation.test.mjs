@@ -79,7 +79,8 @@ test('empty published article feed shows an honest sidebar empty state', async (
     await new Promise(resolve=>setTimeout(resolve,30));
     const d=dom.window.document;
     assert.match(d.querySelector('#tsuzuriLatest').textContent,/公開記事を準備/);
-    assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,3);
+    assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,0);
+    assert.match(d.querySelector('#tsumamiLatest').textContent,/公開動画を準備/);
     assert.equal(d.querySelector('#archive').hidden,false);
   } finally {dom.window.close();}
 });
