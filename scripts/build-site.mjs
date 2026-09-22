@@ -61,7 +61,7 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     }else if(['video','learning'].includes(article.content_type)){
       if(article.content_type==='learning')article.content_type_label='つまみ｜TSUMAMI';
       article.public_target='つまみ｜TSUMAMI';
-      article.url='tsumami/'+article.slug+'.html';article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
+      article.url='tsumami/?video='+encodeURIComponent(article.source_id);article.absolute_url='https://basecraftas.com/projects/totonoe/'+article.url;
     }
     return article;
   };
@@ -72,6 +72,7 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     if(!/^[a-z0-9][a-z0-9-]*$/.test(article.slug)||!article.main_actor)throw new Error('Invalid published article: '+file);
     article.body_html=article.body_html.replaceAll('../../../apps/tsuzuri-studio/assets/characters/','../assets/characters/');
     await writeFile(dest,JSON.stringify(article,null,2)+'\n');
+    if(['video','learning'].includes(article.content_type))continue;
     const directory=article.content_type==='column'?'tsuzuri':(['video','learning'].includes(article.content_type)?'tsumami':'contents');
     await mkdir(path.join(out,'projects/totonoe',directory),{recursive:true});
     const characterStory=article.destination==='characters'||article.category==='character-story';
