@@ -4,11 +4,12 @@
 
 対象：事業、サービス、マネタイズ、ホームページ、運営基盤
 
-## 2026年9月22日：つまみのYouTube公開フロー（ローカル実装・未公開）
+## 2026年9月22日：つまみのYouTube公開フロー（本番反映済み）
 
 - StudioでYouTube URLを登録した動画は、TSUZURIと同じコラムHTMLを生成せず、つまみ｜TSUMAMIの動画カードへ直接反映する構成に変更。
 - 共有URLは `tsumami/?video=YouTube動画ID` とし、開いたときに該当動画の再生画面を表示する。タイトルとサムネイルはYouTube oEmbedから取得し、説明・タグは必要な場合だけStudioで補足する。
-- 公開確認は個別コラムHTMLではなく、公開JSONのリビジョンとつまみ一覧ページを対象にする。コードとテストのローカル反映のみで、GitHub・Worker・本番サイトには未反映。
+- 公開確認は個別コラムHTMLではなく、公開JSONのリビジョンとつまみ一覧ページを対象にする。GitHub・API Worker・サイトWorkerへ本番反映済み。
+- 動画「Anthropic公式コンテンツ！Claude Academyの活用方法」を、つまみの動画カードと `tsumami/?video=rAnUjlcZhW8` の直接再生URLで公開。
 
 ## 2026年9月22日：安全性とポリシーの点検（本番反映済み）
 

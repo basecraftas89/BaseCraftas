@@ -21,8 +21,9 @@ test('character statement is stacked and its title has no forced line break',()=
 
 test('the four published character stories are Studio-ready and seeded without overwriting edits',()=>{
   const index=JSON.parse(read('projects/totonoe/data/contents/index.json'));
-  assert.equal(index.articles.length,4);
-  for(const article of index.articles){
+  const characterStories=index.articles.filter(article=>article.destination==='characters');
+  assert.equal(characterStories.length,4);
+  for(const article of characterStories){
     assert.equal(article.destination,'characters');
     assert.equal(article.category,'character-story');
     assert.ok(article.main_actor_id);

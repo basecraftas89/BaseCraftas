@@ -1,0 +1,50 @@
+{
+  "id": "article_dd1b4c22-bb5e-43d3-8fdc-03d1ecb0ebba",
+  "revision": 23,
+  "slug": "content-1790033960584",
+  "title": "Anthropic公式コンテンツ！Claude Academyの活用方法",
+  "excerpt": "Claudeを使っているけれど、体系的に学べる場所が分からない方へ。 今回は、Anthropicの公式学習環境「Claude Academy」を紹介します。 Claude Academyでは、Claudeの基本的な使い方から、AIとの協働、AIリテラシー、開発や業務での活用まで、さまざまな学習コンテンツを確認できます。  動画では、実際の画面を見ながら、 ・Claude Academyとはどのようなサービスか ・どこから利用できるのか ・どんなコースや教材があるのか ・実際にどのように使うのか ・Claudeを学びたい人にどう役立つのか   を、短時間で分かりやすく解説します。 「Claudeをもう少し使いこなしたい」 「公式の学習コンテンツで学びたい」 「AIについて、信頼できる情報から少しずつ学びたい」 という方は、ぜひ参考にしてみてください。  ▼Claude Academy https://academy.claude.com/",
+  "category": "content",
+  "destination": "tsuzuri",
+  "content_type": "video",
+  "content_type_label": "動画",
+  "topic_tags": [
+    "AIリテラシー",
+    "AI活用",
+    "Claude"
+  ],
+  "tags": [
+    "AIリテラシー",
+    "AI活用",
+    "Claude"
+  ],
+  "main_actor_id": "shindo-toshiki",
+  "main_actor": {
+    "id": "shindo-toshiki",
+    "name": "神藤 俊希"
+  },
+  "speaker_ids": [],
+  "speakers": [],
+  "media_url": "https://youtu.be/rAnUjlcZhW8",
+  "episode_no": null,
+  "source_published_at": "",
+  "source_type": "video",
+  "source_id": "rAnUjlcZhW8",
+  "public_target": "つまみ｜TSUMAMI",
+  "external_link": {
+    "url": "https://youtu.be/rAnUjlcZhW8",
+    "kind": "video",
+    "title": "Anthropic公式コンテンツ！Claude Academyの活用方法",
+    "description": "",
+    "image": "https://i.ytimg.com/vi/rAnUjlcZhW8/hqdefault.jpg",
+    "provider": "YouTube"
+  },
+  "hero_url": "https://basecraftas.com/column-media/contents/2026/09/5c76f3dc-ef3b-455f-b9e5-956994a6f2f9-totonoe-youtube-thumbnail-claude-academy-v13-simple-logo-frame.png",
+  "body_html": "",
+  "has_member_section": false,
+  "status": "published",
+  "url": "tsumami/?video=rAnUjlcZhW8",
+  "absolute_url": "https://basecraftas.com/projects/totonoe/tsumami/?video=rAnUjlcZhW8",
+  "published_at": "2026-09-22",
+  "updated_at": "2026-09-22T00:27:21.000Z"
+}
