@@ -1064,6 +1064,21 @@ body.sem-lock{overflow:hidden}
 .photo-hero .eyebrow{color:var(--teal-deep)}
 .photo-hero .page-hero-title{max-width:650px;font-size:clamp(2rem,4.6vw,3.25rem);text-shadow:0 1px 0 rgba(255,255,255,.8)}
 .photo-hero .page-hero-lead{max-width:620px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.72);border-radius:18px;padding:18px 20px;backdrop-filter:blur(6px)}
+.tayori-editor-hero{padding:140px 0 64px;background:#f5f4ed;border-bottom:1px solid var(--line)}
+.tayori-editor-hero-inner{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.25fr);align-items:center;gap:36px}
+.tayori-editor-copy{min-width:0}
+.weekly-lp .tayori-editor-hero .page-hero-title{font-size:clamp(1.8rem,3vw,2.8rem);line-height:1.4;text-align:left}
+.weekly-lp .tayori-editor-hero .page-hero-lead{color:var(--ink);text-align:left;background:none;box-shadow:none}
+.tayori-editor-hero .page-hero-actions{justify-content:flex-start;flex-wrap:wrap}
+.tayori-editor-visual{margin:0;min-width:0}
+.tayori-editor-visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:20px;border:1px solid #d4ddce;box-shadow:0 14px 40px rgba(35,62,46,.12)}
+.tayori-editor-visual figcaption{margin-top:12px;color:var(--ink-soft);font-size:.8rem;line-height:1.8;text-align:center}
+@media(max-width:900px){
+  .tayori-editor-hero{padding:112px 0 44px}
+  .tayori-editor-hero-inner{grid-template-columns:1fr;gap:28px}
+  .weekly-lp .tayori-editor-hero .page-hero-title{font-size:clamp(1.8rem,6vw,2.8rem)}
+  .tayori-editor-visual img{border-radius:14px}
+}
 .service-overview-figure{width:min(100%,980px);margin:30px auto 0}
 .service-overview-figure img{width:100%;border-radius:22px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff}
 .service-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:32px}
@@ -1330,6 +1345,7 @@ body.sem-lock{overflow:hidden}
 .weekly-lp-slide{
   background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
 }
+.weekly-summary-grid .weekly-summary-seminar{grid-column:1/-1;background:#e8f2eb}
 .weekly-benefit-slide{
   margin:30px auto 0;padding:12px;border:1px solid rgba(61,107,94,.16);
   border-radius:18px;background:#fff;box-shadow:var(--shadow-sm);

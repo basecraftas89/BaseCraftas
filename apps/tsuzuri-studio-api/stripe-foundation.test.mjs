@@ -224,6 +224,12 @@ test('TAYORI LPは980円・14日無料・人数上限なしのウェイトリス
   const workerConfig=readFileSync('apps/tsuzuri-studio-api/wrangler.toml','utf8');
   assert.match(html,/月額 980円/);
   assert.match(html,/14日間無料トライアル/);
+  assert.match(html,/運営が指定した対象の有料セミナー/);
+  assert.doesNotMatch(html,/全有料セミナー/);
+  assert.match(html,/tayori-editor-hero-1600\.webp/);
+  assert.match(html,/tayori-editor-hero-800\.webp/);
+  assert.match(html,/totonoe-tayori-benefits-v3\.webp/);
+  assert.doesNotMatch(html,/weekly-lp-intro/);
   assert.match(html,/data-waitlist-form/);
   assert.doesNotMatch(html,/初回先着10名|現在の受付枠|残り\d+名|入会金なし|いつでも解約可能|資格証明|10名ずつ追加枠/);
   assert.doesNotMatch(html,/資格確認済みセラピスト|月額 1,480円/);
