@@ -1,8 +1,57 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-09-22T00:27:21.000Z",
+  "updated_at": "2026-09-22T14:50:18.557Z",
   "articles": [
+    {
+      "id": "article_cbabb7ff-65d2-492d-8450-05cc9c718620",
+      "revision": 3,
+      "slug": "content-1790056202543",
+      "title": "権限管理大丈夫？意外と知らないArtifactの重要設計！",
+      "excerpt": "ClaudeのチャットやArtifactが意図せず公開状態になっていないかを確認する方法を紹介します。共有中の項目と公開範囲を見直し、機密情報を守るための基本を整理します。",
+      "category": "content",
+      "destination": "tsuzuri",
+      "content_type": "video",
+      "content_type_label": "動画",
+      "topic_tags": [
+        "AIリテラシー",
+        "Claude",
+        "情報管理"
+      ],
+      "tags": [
+        "AIリテラシー",
+        "Claude",
+        "情報管理"
+      ],
+      "main_actor_id": "shindo-toshiki",
+      "main_actor": {
+        "id": "shindo-toshiki",
+        "name": "神藤 俊希"
+      },
+      "speaker_ids": [],
+      "speakers": [],
+      "media_url": "https://youtu.be/ICu95mMyCFg",
+      "episode_no": null,
+      "source_published_at": "",
+      "source_type": "video",
+      "source_id": "ICu95mMyCFg",
+      "public_target": "つまみ｜TSUMAMI",
+      "external_link": {
+        "url": "https://youtu.be/ICu95mMyCFg",
+        "kind": "video",
+        "title": "権限管理大丈夫？意外と知らないartifactの重要設計！",
+        "description": "",
+        "image": "https://i.ytimg.com/vi/ICu95mMyCFg/hqdefault.jpg",
+        "provider": "YouTube"
+      },
+      "hero_url": "https://i.ytimg.com/vi/ICu95mMyCFg/hqdefault.jpg",
+      "has_member_section": false,
+      "status": "published",
+      "url": "tsumami/?video=ICu95mMyCFg",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsumami/?video=ICu95mMyCFg",
+      "published_at": "2026-09-22",
+      "updated_at": "2026-09-22T14:50:17.647Z"
+    },
     {
       "id": "article_dd1b4c22-bb5e-43d3-8fdc-03d1ecb0ebba",
       "revision": 23,
