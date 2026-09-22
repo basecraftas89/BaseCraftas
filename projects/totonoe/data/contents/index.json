@@ -1,8 +1,55 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-09-22T14:50:18.557Z",
+  "updated_at": "2026-09-22T14:50:46.254Z",
   "articles": [
+    {
+      "id": "article_faf90ebe-0025-4401-a57e-2a36a3cc763c",
+      "revision": 4,
+      "slug": "content-1790056161287",
+      "title": "デスクトップを彩る相棒！Codexのペット機能の作り方！",
+      "excerpt": "Codexのデスクトップに動くペットを表示する方法を紹介します。作業環境を楽しく整えながら、AIとの日々の作業を身近にするヒントをまとめます。",
+      "category": "content",
+      "destination": "tsuzuri",
+      "content_type": "video",
+      "content_type_label": "動画",
+      "topic_tags": [
+        "Codex",
+        "AI活用"
+      ],
+      "tags": [
+        "Codex",
+        "AI活用"
+      ],
+      "main_actor_id": "shindo-toshiki",
+      "main_actor": {
+        "id": "shindo-toshiki",
+        "name": "神藤 俊希"
+      },
+      "speaker_ids": [],
+      "speakers": [],
+      "media_url": "https://youtu.be/0oVl1m7wBbk",
+      "episode_no": null,
+      "source_published_at": "",
+      "source_type": "video",
+      "source_id": "0oVl1m7wBbk",
+      "public_target": "つまみ｜TSUMAMI",
+      "external_link": {
+        "url": "https://youtu.be/0oVl1m7wBbk",
+        "kind": "video",
+        "title": "デスクトップを彩る相棒！Codexのペット機能の作り方！",
+        "description": "",
+        "image": "https://i.ytimg.com/vi/0oVl1m7wBbk/hqdefault.jpg",
+        "provider": "YouTube"
+      },
+      "hero_url": "https://i.ytimg.com/vi/0oVl1m7wBbk/hqdefault.jpg",
+      "has_member_section": false,
+      "status": "published",
+      "url": "tsumami/?video=0oVl1m7wBbk",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsumami/?video=0oVl1m7wBbk",
+      "published_at": "2026-09-22",
+      "updated_at": "2026-09-22T14:50:45.585Z"
+    },
     {
       "id": "article_cbabb7ff-65d2-492d-8450-05cc9c718620",
       "revision": 3,
