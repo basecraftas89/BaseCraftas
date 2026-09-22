@@ -57,7 +57,7 @@
   function contentTypeLabel(type){return CONTENT_TYPES[normalizeType(type)];}
   function normalizeDestination(value,category){return value==='characters'||category==='character-story'?'characters':'tsuzuri';}
   function destinationLabel(post){return normalizeDestination(post.destination,post.category)==='characters'?'キャラクター':'つづり｜TSUZURI';}
-  function publicArticlePath(post){var type=normalizeType(post.content_type);if(type==='weekend')return '/weekend-ai.html#schedule';var directory=type==='column'?'tsuzuri':(['video','learning'].includes(type)?'tsumami':'contents');return '/'+directory+'/'+post.slug+(normalizeDestination(post.destination,post.category)==='characters'?'/':'.html');}
+  function publicArticlePath(post){var type=normalizeType(post.content_type);if(type==='weekend')return '/weekend-ai.html#schedule';if(['video','learning'].includes(type)){var videoId=post.source_id||sourceFromUrl(post.media_url).source_id;return '/tsumami/?video='+encodeURIComponent(videoId);}var directory=type==='column'?'tsuzuri':'contents';return '/'+directory+'/'+post.slug+(normalizeDestination(post.destination,post.category)==='characters'?'/':'.html');}
   function postState(post){if(post.deleted_at)return {key:'trash',label:'ゴミ箱'};if(post.status==='published')return {key:'published',label:'公開中'};if(post.status==='archived')return {key:'archived',label:'非公開'};return {key:'draft',label:'下書き'};}
   function managedPost(post){return !['podcast','archive'].includes(post.content_type);}
   function matchesContentView(post,type){if(!managedPost(post))return false;var actual=normalizeType(post.content_type);if(type==='all')return true;if(type==='column')return actual==='column';if(type==='video')return actual==='video'||actual==='learning';return actual===type;}

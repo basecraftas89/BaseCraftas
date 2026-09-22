@@ -358,6 +358,20 @@ async function fetchLinkPreview(url) {
   };
   if (!canFetchPreview(target.href)) return base;
   try {
+    if (profile.kind === "video" && profile.source_id) {
+      const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(target.href)}&format=json`, {
+        signal: AbortSignal.timeout(8000),
+        headers: { accept: "application/json" },
+      });
+      if (!response.ok) return base;
+      const metadata = JSON.parse(await readTextLimit(response, 64 * 1024));
+      return {
+        ...base,
+        title: String(metadata.title || "").trim(),
+        image: safeUrl(metadata.thumbnail_url, true) || base.image,
+        provider: String(metadata.provider_name || "YouTube").trim() || "YouTube",
+      };
+    }
     let res;
     for (let hop = 0; hop < 4; hop++) {
       if (target.protocol !== "https:" || target.username || target.password || target.port || !canFetchPreview(target.href)) return base;
@@ -502,12 +516,17 @@ function articleJson(article, publishedAt, linkPreview = null) {
   const sourceId = safeSourceId(article.source_id || (linkPreview && linkPreview.source_id) || sourceProfile(article.media_url).source_id);
   const publicDirectory = publicArticleDirectory(contentType);
   const characterArticle = contentType === "column" && destination === "characters";
+  const videoContent = ["video", "learning"].includes(contentType);
   const publicUrl = contentType === "weekend"
     ? "../weekend-ai.html#schedule"
-    : `${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
+    : videoContent
+      ? `tsumami/?video=${encodeURIComponent(sourceId)}`
+      : `${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
   const absoluteUrl = contentType === "weekend"
     ? "https://basecraftas.com/projects/totonoe/weekend-ai.html#schedule"
-    : `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
+    : videoContent
+      ? `https://basecraftas.com/projects/totonoe/tsumami/?video=${encodeURIComponent(sourceId)}`
+      : `https://basecraftas.com/projects/totonoe/${publicDirectory}/${article.slug}${characterArticle ? "/" : ".html"}`;
   return {
     id: article.id,
     revision: article.revision || 1,
@@ -652,6 +671,7 @@ async function publishArticleToGitHub(env, article) {
   const data = articleJson(article, publishedAt, linkPreview);
   const articleJsonPath = `projects/totonoe/data/contents/${article.slug}.json`;
   const {primary: articleHtmlPath, alternatives: alternateArticleHtmlPaths, characterArticle} = publishedArticlePaths(data);
+  const videoContent = ["video", "learning"].includes(data.content_type);
   const indexPath = "projects/totonoe/data/contents/index.json";
   const indexHtmlPath = "projects/totonoe/contents/index.html";
   const message = `Publish content: ${article.title}`;
@@ -683,6 +703,7 @@ async function publishArticleToGitHub(env, article) {
     has_member_section: data.has_member_section,
     status: "published",
     url: data.url,
+    absolute_url: data.absolute_url,
     published_at: data.published_at,
     updated_at: data.updated_at,
   };
@@ -691,8 +712,9 @@ async function publishArticleToGitHub(env, article) {
     const branch = branchName.split("/").map(encodeURIComponent).join("/");
     const ref = await githubRequest(env, `/git/ref/heads/${branch}`);
     const baseSha = ref.object.sha;
-    const [currentIndex, ...alternateHtmlFiles] = await Promise.all([
+    const [currentIndex, currentArticleHtml, ...alternateHtmlFiles] = await Promise.all([
       fetchGitHubFile(env, indexPath, baseSha),
+      fetchGitHubFile(env, articleHtmlPath, baseSha),
       ...alternateArticleHtmlPaths.map((path) => fetchGitHubFile(env, path, baseSha)),
     ]);
     let index = { updated_at: null, articles: [] };
@@ -708,10 +730,14 @@ async function publishArticleToGitHub(env, article) {
     try {
       const files = [
         { path: articleJsonPath, content: `${JSON.stringify(data, null, 2)}\n` },
-        { path: articleHtmlPath, content: characterArticle ? articleHtml(data).replaceAll('="../', '="../../') : articleHtml(data) },
         { path: indexHtmlPath, content: contentIndexHtml() },
         { path: indexPath, content: `${JSON.stringify(index, null, 2)}\n` },
       ];
+      if (videoContent) {
+        if (currentArticleHtml) files.push({ path: articleHtmlPath, delete: true });
+      } else {
+        files.push({ path: articleHtmlPath, content: characterArticle ? articleHtml(data).replaceAll('="../', '="../../') : articleHtml(data) });
+      }
       alternateHtmlFiles.forEach((file, index) => { if (file) files.push({ path: alternateArticleHtmlPaths[index], delete: true }); });
       const commitSha = await commitGitHubFiles(env, files, message, baseSha);
       return { commitSha, liveUrl: data.absolute_url };
@@ -1178,14 +1204,20 @@ async function publicationStatus(request, env, id) {
   // Verify the published revision, not a newer draft.
   try {
     const root = "https://basecraftas.com/projects/totonoe/";
+    const contentType = normalizeContentType(article.content_type);
+    const videoContent = ["video", "learning"].includes(contentType);
+    const videoId = safeSourceId(article.source_id || sourceProfile(article.media_url).source_id);
+    const publicPage = videoContent
+      ? `tsumami/?video=${encodeURIComponent(videoId)}&check=${Date.now()}`
+      : publicArticleDirectory(contentType) + "/" + encodeURIComponent(article.slug) + (normalizeDestination(article.destination, article.category) === "characters" ? "/" : ".html") + "?check=" + Date.now();
     const responses = await Promise.all([
       fetch(root + "data/contents/index.json?check=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) }),
-      fetch(root + publicArticleDirectory(article.content_type) + "/" + encodeURIComponent(article.slug) + (normalizeDestination(article.destination, article.category) === "characters" ? "/" : ".html") + "?check=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) })
+      fetch(root + publicPage, { cache: "no-store", signal: AbortSignal.timeout(8000) })
     ]);
     if (!responses.every((res) => res.ok)) return json({ stage: "deploying", job, has_unpublished_changes });
     const [index, html] = await Promise.all([readTextLimit(responses[0], 5 * 1024 * 1024).then(JSON.parse), readTextLimit(responses[1], 1024 * 1024)]);
     const entry = (index.articles || []).find((item) => item.id === id);
-    const verified = entry && entry.revision === publishedRevision && findMetaContent(html, "content-revision") === String(publishedRevision);
+    const verified = entry && entry.revision === publishedRevision && (videoContent ? html.includes('id="tsumamiGrid"') : findMetaContent(html, "content-revision") === String(publishedRevision));
     return json({ stage: verified ? "live" : "deploying", job, has_unpublished_changes });
   } catch (_error) { return json({ stage: "deploying", job, has_unpublished_changes }); }
 }
@@ -1202,10 +1234,17 @@ async function enqueuePublish(request, env, id) {
   if (!normalizeMainActorId(article.main_actor_id)) {
     return json({ error: "main_actor_required", message: "Main Actorを選択してください。" }, { status: 400 });
   }
-  if (["podcast", "video", "archive", "seminar"].includes(normalizeContentType(article.content_type)) && !article.media_url) {
+  const contentType = normalizeContentType(article.content_type);
+  if (["podcast", "video", "archive", "seminar"].includes(contentType) && !article.media_url) {
     return json({ error: "media_url_required", message: "このコンテンツ種別は元コンテンツURLが必要です。" }, { status: 400 });
   }
-  if (normalizeContentType(article.content_type) === "weekend") {
+  if (["video", "learning"].includes(contentType)) {
+    const video = sourceProfile(article.media_url);
+    if (video.kind !== "video" || !video.source_id) {
+      return json({ error: "youtube_url_required", message: "有効なYouTube動画URLを入力してください。" }, { status: 400 });
+    }
+  }
+  if (contentType === "weekend") {
     if (!safeUrl(article.hero_url, true)) {
       return json({ error: "event_thumbnail_required", message: "次回開催のサムネイル画像を設定してください。" }, { status: 400 });
     }

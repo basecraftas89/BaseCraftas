@@ -631,6 +631,9 @@
   var cvModal = document.getElementById('cvModal');
   var cvModalBody = document.getElementById('cvModalBody');
   var cvModalClose = document.getElementById('cvModalClose');
+  var requestedVideoId = '';
+  var requestedVideoOpened = false;
+  try { requestedVideoId = new URL(window.location.href).searchParams.get('video') || ''; } catch (e) {}
 
   function openVideoModal(c) {
     if (!cvModal || !cvModalBody) return;
@@ -656,6 +659,14 @@
     cvModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('cv-lock');
     if (cvModalBody) cvModalBody.innerHTML = ''; // 再生停止
+  }
+
+  function openRequestedVideo() {
+    if (!requestedVideoId || requestedVideoOpened) return;
+    var content = CONTENTS.find(function (item) { return item.youtubeId === requestedVideoId; });
+    if (!content) return;
+    requestedVideoOpened = true;
+    openVideoModal(content);
   }
 
   if (cvModalClose) cvModalClose.addEventListener('click', closeVideoModal);
@@ -1051,6 +1062,7 @@
       }
       grid.appendChild(card);
     });
+    openRequestedVideo();
   }
 
   // The sidebar always shows the latest three; list-page sort preferences do not apply.

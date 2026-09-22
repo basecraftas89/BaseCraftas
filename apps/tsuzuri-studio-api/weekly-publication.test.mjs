@@ -18,7 +18,8 @@ const articles = [
   {status:'draft',content_type:'podcast',episode_no:17,title:'未公開の回',media_url:'https://stand.fm/episodes/draft17'},
 ];
 async function page(file, script, data) {
-  const dom = new JSDOM(readFileSync('projects/totonoe/'+file,'utf8'),{url:'https://local.test/projects/totonoe/'+file,runScripts:'outside-only',pretendToBeVisual:true});
+  const path = file.split('?')[0];
+  const dom = new JSDOM(readFileSync('projects/totonoe/'+path,'utf8'),{url:'https://local.test/projects/totonoe/'+file,runScripts:'outside-only',pretendToBeVisual:true});
   dom.window.fetch=async()=>({ok:true,json:async()=>({articles:data})});
   dom.window.matchMedia=()=>({matches:false,addEventListener(){}});
   dom.window.scrollTo=()=>{};
@@ -167,6 +168,20 @@ test('studio video edits replace existing cards and preserve the selected thumbn
   const tsuzuri=await page('tsuzuri/index.html','service-content.js',generated);
   try { assert.match(tsuzuri.window.document.body.textContent,/追加したつづり/); }
   finally { tsuzuri.window.close(); }
+});
+
+test('a shared TSUMAMI video URL opens the requested video instead of a column page', async () => {
+  const generated=[
+    {id:'shared-video',status:'published',content_type:'video',title:'共有動画',excerpt:'動画の概要',media_url:'https://youtu.be/rAnUjlcZhW8',source_type:'video',source_id:'rAnUjlcZhW8'}
+  ];
+  const dom=await page('tsumami/index.html?video=rAnUjlcZhW8','service-content.js',generated);
+  try {
+    const d=dom.window.document;
+    assert.equal(d.querySelector('#cvModal').getAttribute('aria-hidden'),'false');
+    assert.match(d.querySelector('#cvModal iframe').src,/youtube-nocookie\.com\/embed\/rAnUjlcZhW8/);
+    assert.match(d.querySelector('#cvModal').textContent,/共有動画/);
+    assert.equal(d.querySelector('.column-article'),null);
+  } finally {dom.window.close();}
 });
 
 test('seminar grids promote published weekly thumbnails and adapt to one, two or three events', async () => {

@@ -147,6 +147,20 @@ test('preview redirects are validated before contacting next host',async()=>{
  }finally{globalThis.fetch=original;}
 });
 
+test('YouTube preview uses oEmbed for the title and thumbnail',async()=>{
+ const f=fixture(),calls=[],original=globalThis.fetch;
+ try {
+  globalThis.fetch=async(url)=>{calls.push(String(url));return Response.json({title:'Anthropic公式コンテンツ！Claude Academyの活用方法',provider_name:'YouTube',thumbnail_url:'https://i.ytimg.com/vi/rAnUjlcZhW8/hqdefault.jpg'});};
+  const response=await f.call('/api/link-preview','POST',{url:'https://youtu.be/rAnUjlcZhW8'});
+  assert.equal(response.status,200);
+  const preview=(await response.json()).preview;
+  assert.equal(preview.title,'Anthropic公式コンテンツ！Claude Academyの活用方法');
+  assert.equal(preview.source_id,'rAnUjlcZhW8');
+  assert.equal(preview.image,'https://i.ytimg.com/vi/rAnUjlcZhW8/hqdefault.jpg');
+  assert.match(calls[0],/^https:\/\/www\.youtube\.com\/oembed\?/);
+ }finally{globalThis.fetch=original;}
+});
+
 test('public build excludes source/config/report files and includes real 404/security headers',()=>{
  for(const file of ['apps/tsuzuri-studio-api/src/worker.js','apps/tsuzuri-studio-api/schema.sql','apps/tsuzuri-studio-api/wrangler.toml','README.md','package.json','package-lock.json','scripts/build-site.mjs','apps/tsuzuri-studio/security-entry.js'])assert.equal(existsSync(join('dist',file)),false,file);
  for(const file of ['index.html','404.html','_headers','apps/tsuzuri-studio/security.js','projects/totonoe/article-actions.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
@@ -158,7 +172,7 @@ test('public build excludes source/config/report files and includes real 404/sec
   assert.match(dashboard,/id="waitlistEntries"/);
 });
 
-for (const contentType of ['column','video']) test(contentType+' publish emits sanitized HTML and fixes public media snapshot only after GitHub commit',async()=>{
+for (const contentType of ['column','video']) test(contentType+' publish creates the expected public artifact and fixes the media snapshot only after GitHub commit',async()=>{
  const sourceBody=contentType==='column'?'<p>published</p><div class="member-content-boundary" contenteditable="false"><strong>ここから会員限定</strong></div><p>protected words</p><img src=x onerror="alert(1)">':'<p>published</p><img src=x onerror="alert(1)">';
  const f=fixture(),a=await f.article({content_type:contentType,media_url:contentType==='video'?'https://youtu.be/8ubAUePSwY8':'',body_html:sourceBody});
  const asset=(await (await f.call('/api/assets','POST',upload(a.id))).json()).asset;
@@ -180,16 +194,18 @@ for (const contentType of ['column','video']) test(contentType+' publish emits s
   const r=await f.call('/api/articles/'+a.id+'/publish','POST',{expected_revision:2});
   assert.equal(r.status,200,await r.clone().text());
   assert.ok(tree);const articleEntry=tree.tree.find(x=>x.path.endsWith(a.slug+'.html'));
-  assert.equal(articleEntry.path,`projects/totonoe/${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);
-  const html=blobs.get(articleEntry.sha);
-  assert.doesNotMatch(html,/onerror/);assert.match(html,/<p>published<\/p>/);
-  if(contentType==='column'){assert.doesNotMatch(html,/protected words/);assert.match(html,/ここから先は会員限定/);assert.match(html,/data-share="threads"/);}
+  if(contentType==='column'){
+    assert.equal(articleEntry.path,`projects/totonoe/tsuzuri/${a.slug}.html`);
+    const html=blobs.get(articleEntry.sha);
+    assert.doesNotMatch(html,/onerror/);assert.match(html,/<p>published<\/p>/);
+    assert.doesNotMatch(html,/protected words/);assert.match(html,/ここから先は会員限定/);assert.match(html,/data-share="threads"/);
+  }else assert.equal(articleEntry,undefined);
   const publicArticle=JSON.parse(blobs.get(tree.tree.find(x=>x.path.endsWith(`/data/contents/${a.slug}.json`)).sha));
   if(contentType==='column'){assert.equal(publicArticle.has_member_section,true);assert.doesNotMatch(publicArticle.body_html,/protected words/);}
   const index=JSON.parse(blobs.get(tree.tree.find(x=>x.path.endsWith('data/contents/index.json')).sha));
   assert.equal(index.articles[0].content_type,contentType);
-  assert.equal(index.articles[0].url,`${contentType==='column'?'tsuzuri':'tsumami'}/${a.slug}.html`);
-  if(contentType==='video'){assert.equal(index.articles[0].source_id,'8ubAUePSwY8');assert.match(html,/href="https:\/\/youtu.be\/8ubAUePSwY8"/);}
+  assert.equal(index.articles[0].url,contentType==='column'?`tsuzuri/${a.slug}.html`:'tsumami/?video=8ubAUePSwY8');
+  if(contentType==='video'){assert.equal(index.articles[0].source_id,'8ubAUePSwY8');assert.equal(index.articles[0].absolute_url,'https://basecraftas.com/projects/totonoe/tsumami/?video=8ubAUePSwY8');}
   assert.equal((await f.call('/column-media/'+asset.key,'GET',undefined,'')).status,200);
  }finally{globalThis.fetch=original;}
 });
