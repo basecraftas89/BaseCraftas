@@ -1,0 +1,48 @@
+{
+  "id": "article_7ab773e0-6e8f-43e6-a5d4-1f188fdabafb",
+  "revision": 4,
+  "slug": "content-1790053810894",
+  "title": "AIで生成したものはバレる!? 文章への見えない透かし記号",
+  "excerpt": "AI生成文に付与される「見えない識別情報」を取り上げ、教育や業務での扱われ方を考えます。AIの出力をそのまま使うことと、考えを深めるために活用することの違いを整理します。",
+  "category": "content",
+  "destination": "tsuzuri",
+  "content_type": "video",
+  "content_type_label": "動画",
+  "topic_tags": [
+    "AIリテラシー",
+    "Claude"
+  ],
+  "tags": [
+    "AIリテラシー",
+    "Claude"
+  ],
+  "main_actor_id": "shindo-toshiki",
+  "main_actor": {
+    "id": "shindo-toshiki",
+    "name": "神藤 俊希"
+  },
+  "speaker_ids": [],
+  "speakers": [],
+  "media_url": "https://youtu.be/BMhHEeAj6-I",
+  "episode_no": null,
+  "source_published_at": "",
+  "source_type": "video",
+  "source_id": "BMhHEeAj6-I",
+  "public_target": "つまみ｜TSUMAMI",
+  "external_link": {
+    "url": "https://youtu.be/BMhHEeAj6-I",
+    "kind": "video",
+    "title": "AIで生成したものはバレる!? 文章への見えない透かし記号",
+    "description": "",
+    "image": "https://i.ytimg.com/vi/BMhHEeAj6-I/hqdefault.jpg",
+    "provider": "YouTube"
+  },
+  "hero_url": "https://i.ytimg.com/vi/BMhHEeAj6-I/hqdefault.jpg",
+  "body_html": "",
+  "has_member_section": false,
+  "status": "published",
+  "url": "tsumami/?video=BMhHEeAj6-I",
+  "absolute_url": "https://basecraftas.com/projects/totonoe/tsumami/?video=BMhHEeAj6-I",
+  "published_at": "2026-09-22",
+  "updated_at": "2026-09-22T14:52:57.992Z"
+}
