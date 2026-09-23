@@ -378,5 +378,5 @@ ToToNoE+の独自性は、専門職コミュニティ、週次の発信と学習
 - ToToNoE+ StudioへCloudflare Web Analyticsを統合し、正規URLを `/apps/totonoe-studio/` へ変更。旧 `/apps/tsuzuri-studio/` と `/apps/column-studio/` は互換URLとして維持し、認証後に正規URLへ転送する。
 - 7日・30日・90日・任意期間で、媒体別流入、入口ページ、日別推移、日付と媒体のヒートマップ、日付・媒体・入口ページ別の訪問数、サイト内のページ移動を表示。直前の同期間比較、自然文の要約、CSV出力に対応。
 - 施策の実施日、媒体、種類、誘導先、目的、仮説、10名から選ぶ主担当・共同担当、振り返り、学び、次のアクション、確認日をD1へ保存。担当者絞り込み、グラフ上の施策マーカー、前後7日が揃う場合の参考差分を表示する。
-- D1へ `20260923_analytics_initiatives.sql` を適用し、Cloudflare Analytics読み取り専用トークンをWorker Secretへ登録。静的サイトWorker `d0cc38a6-4f5d-46a9-b863-28049ccb0f66`、API Worker `10b4c4be-7862-4830-9558-ce07c9fa924e` を本番へ反映した。
+- D1へ `20260923_analytics_initiatives.sql` を適用し、Cloudflare Analytics読み取り専用トークンをWorker Secretへ登録。静的サイトWorker `d0cc38a6-4f5d-46a9-b863-28049ccb0f66`、API Worker `10b4c4be-7862-4830-9558-ce07c9fa924e` を本番へ反映した。検証済みSecret版は `772239cf-ed06-42cb-bc6a-095add5805fa` で、本番Studioから直近30日の流入元・入口ページ・日別媒体・ページ遷移を取得できることを確認済み。
 - 本番で編集者としてログインした場合も、メンバー・権限、課金・会員、公開設定の所在を管理メニューに表示する。各項目には管理者ラベルを付け、編集者・閲覧者が選択した場合は管理者アカウントでの再ログインを案内し、API権限は従来どおり管理者だけに限定する。
