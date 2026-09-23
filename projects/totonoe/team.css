@@ -1,0 +1,27 @@
+/* Keep the philosophy slides tucked away until the user explores a tab. */
+.philosophy-slide-frame{
+  max-height:0;
+  margin-top:0;
+  padding-top:0;
+  padding-bottom:0;
+  border-top-width:0;
+  border-bottom-width:0;
+  opacity:0;
+  overflow:hidden;
+  pointer-events:none;
+  transition:max-height .3s ease,margin-top .3s ease,padding .3s ease,border-color .3s ease,opacity .2s ease;
+}
+.philosophy-switcher:hover .philosophy-slide-frame,
+.philosophy-switcher:focus-within .philosophy-slide-frame{
+  max-height:1200px;
+  margin-top:22px;
+  padding-top:12px;
+  padding-bottom:12px;
+  border-top-width:1px;
+  border-bottom-width:1px;
+  opacity:1;
+  pointer-events:auto;
+}
+@media (prefers-reduced-motion:reduce){
+  .philosophy-slide-frame{transition:none}
+}

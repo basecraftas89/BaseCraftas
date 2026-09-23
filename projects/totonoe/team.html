@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260916-content-hub">
 <link rel="stylesheet" href="editorial.css?v=20260908a">
+<link rel="stylesheet" href="team.css?v=20260923-philosophy-collapsed">
 </head>
 <body>
 
@@ -55,7 +56,7 @@
 
       <div class="philosophy-switcher" data-philosophy-switcher>
         <div class="philosophy-tabs" role="tablist" aria-label="理念を選択">
-          <button class="philosophy-tab is-active" type="button" role="tab" aria-selected="true" data-philosophy-image="assets/philosophy/mission.jpg" data-philosophy-alt="ToToNoE+のミッション">
+          <button class="philosophy-tab" type="button" role="tab" aria-selected="false" data-philosophy-image="assets/philosophy/mission.jpg" data-philosophy-alt="ToToNoE+のミッション">
             <span class="philosophy-tab-label">Mission</span>
             <span class="philosophy-tab-copy">なぜ、ToToNoE+は存在するのか</span>
           </button>
@@ -77,13 +78,16 @@
           const root = document.querySelector('[data-philosophy-switcher]');
           if (!root) return;
           const image = root.querySelector('[data-philosophy-image-output]');
-          root.querySelectorAll('[data-philosophy-image]').forEach((button) => {
-            button.addEventListener('click', () => {
+          const select = (button) => {
               root.querySelectorAll('[data-philosophy-image]').forEach((item) => item.setAttribute('aria-selected', String(item === button)));
               root.querySelectorAll('[data-philosophy-image]').forEach((item) => item.classList.toggle('is-active', item === button));
               image.src = button.dataset.philosophyImage;
               image.alt = button.dataset.philosophyAlt;
-            });
+          };
+          root.querySelectorAll('[data-philosophy-image]').forEach((button) => {
+            button.addEventListener('click', () => select(button));
+            button.addEventListener('mouseenter', () => select(button));
+            button.addEventListener('focus', () => select(button));
           });
         })();
       </script>
@@ -156,10 +160,16 @@
           <p class="member-lead-en">Movement & Performance Design Lead</p>
         </article>
         <article class="team-member-card" tabindex="0">
-          <span class="member-avatar member-avatar-placeholder">小</span>
+          <img class="member-avatar" src="assets/member-kojima-profile.png" alt="小島 健のプロフィール画像" width="330" height="330" loading="lazy" decoding="async">
           <h3>小島 健</h3>
           <p class="member-role">ブランディング・マネジメント設計領域リード</p>
           <p class="member-lead-en">Branding & Management Design Lead</p>
+          <div class="member-sns" aria-label="小島 健のSNS・プロフィール">
+            <a href="https://x.com/kojimanabot?s=11" target="_blank" rel="noopener noreferrer" aria-label="小島 健のX（新しいタブで開きます）">X</a>
+            <a href="https://note.com/k_kojima_pt" target="_blank" rel="noopener noreferrer" aria-label="小島 健のnote（新しいタブで開きます）">note</a>
+            <a href="https://my.prairie.cards/u/k.kojima.pt" target="_blank" rel="noopener noreferrer" aria-label="小島 健のプレイリーカード（新しいタブで開きます）">プレイリーカード</a>
+            <a href="https://8card.net/virtual_cards/jsCgFoB2_L8qy9r0PX86gQ" target="_blank" rel="noopener noreferrer" aria-label="小島 健のEightカード（新しいタブで開きます）">Eight</a>
+          </div>
         </article>
         <article class="team-member-card" tabindex="0">
           <span class="member-avatar member-avatar-placeholder">貝</span>
