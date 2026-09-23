@@ -238,7 +238,7 @@ Base Craftas
 | 基盤 | 担うこと | 主な技術・保管先 | 現状 |
 |---|---|---|---|
 | 公開サイト | サービス説明、無料コンテンツ、参加・相談導線 | 静的HTML/CSS/JS、Cloudflare | 主要ページを公開中 |
-| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開、アクセス解析 | Cloudflare Access、Worker、D1、R2、GitHub、Cloudflare Web Analytics | 運営基盤あり。2026年9月14日から指定2アカウントだけを固定管理者として扱う。アクセス解析ビューを2026年9月23日に本番公開 |
+| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開、アクセス解析 | Cloudflare Access、Worker、D1、R2、GitHub、Cloudflare Web Analytics | 運営基盤あり。2026年9月23日から指定3アカウントを固定管理者として扱う。アクセス解析ビューを2026年9月23日に本番公開 |
 | 公開朝活情報 | 次回サムネイルと情報を匿名閲覧者へ配信 | `/public-content/weekend-event.json` | 2026年9月13日確認時HTTP 200、`event:null` で既定表示 |
 | TAYORI会員基盤 | ログイン、契約権限、週次資料、質問、回答動画、プロフィール | メール認証、D1、Google Drive、Google Sheets、Worker | メール認証APIは本番稼働中。課金は14日無料設定まで本番Workerへ反映済みだが、販売は未開始 |
 | IROHA学習基盤 | 教材、週間計画、進捗、振り返り | D1、制限付きDrive、Worker | 資格確認導線はローカルで廃止。実Drive同期・本番データ・公開導線は未完了 |
@@ -380,3 +380,4 @@ ToToNoE+の独自性は、専門職コミュニティ、週次の発信と学習
 - 施策の実施日、媒体、種類、誘導先、目的、仮説、10名から選ぶ主担当・共同担当、振り返り、学び、次のアクション、確認日をD1へ保存。担当者絞り込み、グラフ上の施策マーカー、前後7日が揃う場合の参考差分を表示する。
 - D1へ `20260923_analytics_initiatives.sql` を適用し、Cloudflare Analytics読み取り専用トークンをWorker Secretへ登録。静的サイトWorker `d0cc38a6-4f5d-46a9-b863-28049ccb0f66`、API Worker `10b4c4be-7862-4830-9558-ce07c9fa924e` を本番へ反映した。検証済みSecret版は `772239cf-ed06-42cb-bc6a-095add5805fa` で、本番Studioから直近30日の流入元・入口ページ・日別媒体・ページ遷移を取得できることを確認済み。
 - 本番で編集者としてログインした場合も、メンバー・権限、課金・会員、公開設定の所在を管理メニューに表示する。各項目には管理者ラベルを付け、編集者・閲覧者が選択した場合は管理者アカウントでの再ログインを案内し、API権限は従来どおり管理者だけに限定する。
+- `toshiki.kanto.workspace@gmail.com`、`kansai89414@gmail.com`、`base.craftas478@gmail.com` の3アカウントを固定管理者として扱い、それ以外のアカウントを管理者へ変更できない構成に更新。

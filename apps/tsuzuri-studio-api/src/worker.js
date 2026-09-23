@@ -827,6 +827,7 @@ function validMemberRole(value) {
 }
 
 const FIXED_ADMIN_EMAILS = new Set([
+  "base.craftas478@gmail.com",
   "kansai89414@gmail.com",
   "toshiki.kanto.workspace@gmail.com",
 ]);
@@ -837,7 +838,7 @@ function isFixedAdminEmail(email) {
 
 const memberChangeGuard = "(NOT (role = 'admin' AND status = 'active') OR (? = 'admin' AND ? = 'active') OR (SELECT COUNT(*) FROM members WHERE role = 'admin' AND status = 'active') > 1)";
 function lastAdminError() { return json({error: "last_admin", message: "最後の管理者は変更・停止できません。"}, {status: 409}); }
-function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は指定された2つのアカウントに固定されています。"}, {status: 409}); }
+function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は指定された3つのアカウントに固定されています。"}, {status: 409}); }
 
 async function createMember(request, env) {
   const auth = await requireRole(request, env, ["admin"]);

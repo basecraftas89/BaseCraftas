@@ -15,6 +15,7 @@ function fixture(){
   const env={ALLOW_DEV_AUTH:'true',STRIPE_MODE:'test',CUSTOMER_AUTH_SECRET:'0123456789abcdef0123456789abcdef',DB:{prepare,async batch(items){sql.exec('BEGIN');try{const results=[];for(const item of items)results.push(await item.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}}};
   sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin_primary','kansai89414@gmail.com','神藤 俊希','admin','active')").run();
   sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin_workspace','toshiki.kanto.workspace@gmail.com','神藤 俊希','admin','active')").run();
+  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('admin_base','base.craftas478@gmail.com','Base Craftas','admin','active')").run();
   sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('editor','editor@example.com','Editor','editor','active')").run();
   return {sql,env};
 }
@@ -23,7 +24,7 @@ function call(env,path,method='GET',body=null,email='kansai89414@gmail.com'){
   return worker.fetch(new Request('https://test.local/api/tsuzuri-studio'+path,{method,headers:{'x-column-studio-dev-email':email,'content-type':'application/json'},body:body?JSON.stringify(body):undefined}),env);
 }
 
-test('指定された2アカウントだけを固定管理者として維持する',async()=>{
+test('指定された3アカウントだけを固定管理者として維持する',async()=>{
   const {sql,env}=fixture();
   let response=await call(env,'/api/members','POST',{name:'Second Admin',email:'second@example.com',role:'admin'});
   assert.equal(response.status,409);
@@ -34,15 +35,18 @@ test('指定された2アカウントだけを固定管理者として維持す�
   assert.equal(response.status,409);
   response=await call(env,'/api/members/admin_workspace','PATCH',{role:'editor',status:'active'});
   assert.equal(response.status,409);
-  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
+  response=await call(env,'/api/members/admin_base','PATCH',{role:'viewer',status:'active'});
+  assert.equal(response.status,409);
+  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['base.craftas478@gmail.com','kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
 });
 
-test('管理者マイグレーションは指定2アカウントを有効化し、旧管理者を編集者へ戻す',()=>{
+test('管理者マイグレーションは指定3アカウントを有効化し、旧管理者を編集者へ戻す',()=>{
   const {sql}=fixture();
+  sql.prepare("UPDATE members SET role='editor', status='active' WHERE id='admin_base'").run();
   sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('legacy_admin','legacy@example.com','Legacy','admin','active')").run();
-  sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260922_fixed_admin_accounts.sql','utf8'));
+  sql.exec(readFileSync('apps/tsuzuri-studio-api/migrations/20260923_three_fixed_admin_accounts.sql','utf8'));
   assert.equal(sql.prepare("SELECT role FROM members WHERE id='legacy_admin'").get().role,'editor');
-  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
+  assert.deepEqual(sql.prepare("SELECT email FROM members WHERE role='admin' AND status='active' ORDER BY email").all().map((row)=>row.email),['base.craftas478@gmail.com','kansai89414@gmail.com','toshiki.kanto.workspace@gmail.com']);
 });
 
 test('ウェイトリストは人数上限なしで公開受付し、管理者一覧に反映する',async()=>{

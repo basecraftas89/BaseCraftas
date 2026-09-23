@@ -48,7 +48,7 @@ Worker の環境変数に次を設定してください。
 
 ## メンバー・権限
 
-管理者はダッシュボードからD1のメンバーを登録し、編集者・閲覧者を設定できます。管理者は `kansai89414@gmail.com` と `toshiki.kanto.workspace@gmail.com` の2アカウントに固定し、変更・停止できません。
+管理者はダッシュボードからD1のメンバーを登録し、編集者・閲覧者を設定できます。管理者は `toshiki.kanto.workspace@gmail.com`、`kansai89414@gmail.com`、`base.craftas478@gmail.com` の3アカウントに固定し、変更・停止できません。
 
 この登録はCloudflare Accessの許可ポリシー自体を変更せず、招待メールも送信しません。新しいメンバーはAccess側でも同じメールアドレスを許可してください。
 
@@ -141,7 +141,8 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 10. `migrations/20260920_billing_dashboard.sql`
 11. `migrations/20260921_character_studio_articles.sql`（既存のキャラクター記事4本をStudioへ登録）
 12. `migrations/20260922_fixed_admin_accounts.sql`（指定2アカウントを管理者へ固定し、旧管理者を編集者へ変更）
-13. `migrations/20260923_analytics_initiatives.sql`（アクセス解析の施策、担当者、振り返りを保存）
+13. `migrations/20260923_three_fixed_admin_accounts.sql`（指定3アカウントを管理者へ固定し、`base.craftas478@gmail.com` を管理者へ変更）
+14. `migrations/20260923_analytics_initiatives.sql`（アクセス解析の施策、担当者、振り返りを保存）
 
 課金画面がテストデータを表示している場合だけ、「テスト表示をリセット」を利用できます。`POST /api/admin/billing-test-data/reset` は管理者限定かつ `STRIPE_MODE=test` 限定です。テスト契約、テスト売上、契約状態履歴、Checkout試行、テスト契約由来の会員権限をD1の一括処理で削除します。本番データ、顧客アカウント、ウェイトリスト、コンテンツ、Stripe Webhookの受信監査履歴は保持します。
 
