@@ -142,7 +142,8 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 11. `migrations/20260921_character_studio_articles.sql`（既存のキャラクター記事4本をStudioへ登録）
 12. `migrations/20260922_fixed_admin_accounts.sql`（指定2アカウントを管理者へ固定し、旧管理者を編集者へ変更）
 13. `migrations/20260923_three_fixed_admin_accounts.sql`（指定3アカウントを管理者へ固定し、`base.craftas478@gmail.com` を管理者へ変更）
-14. `migrations/20260923_analytics_initiatives.sql`（アクセス解析の施策、担当者、振り返りを保存）
+14. `migrations/20260923_three_fixed_admin_accounts_cleanup.sql`（メールアドレスの大文字・小文字違いで生じた重複を既存メンバーへ統合）
+15. `migrations/20260923_analytics_initiatives.sql`（アクセス解析の施策、担当者、振り返りを保存）
 
 課金画面がテストデータを表示している場合だけ、「テスト表示をリセット」を利用できます。`POST /api/admin/billing-test-data/reset` は管理者限定かつ `STRIPE_MODE=test` 限定です。テスト契約、テスト売上、契約状態履歴、Checkout試行、テスト契約由来の会員権限をD1の一括処理で削除します。本番データ、顧客アカウント、ウェイトリスト、コンテンツ、Stripe Webhookの受信監査履歴は保持します。
 
