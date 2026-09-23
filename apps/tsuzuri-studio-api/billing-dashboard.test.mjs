@@ -142,3 +142,10 @@ test('Studioに管理者限定の課金画面と実データ未取得時の表�
   assert.match(script,/決済履歴はまだありません/);
   assert.doesNotMatch(html,/メンバー・担当マップ|今週のフォーカス|決定ログ/);
 });
+
+test('管理メニューは全権限で場所を確認でき、操作は管理者だけに制限する',()=>{
+  const html=readFileSync('apps/tsuzuri-studio/index.html','utf8');
+  const script=readFileSync('apps/tsuzuri-studio/script.js','utf8');
+  for(const view of ['members','billing','settings']) assert.match(html,new RegExp(`class="nav-item admin-nav-item"[^>]+data-view="${view}"`));
+  assert.match(script,/この画面は管理者専用です。管理者アカウントで再ログインしてください。/);
+});
