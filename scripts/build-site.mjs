@@ -31,6 +31,8 @@ async function walk(relative) {
   }
 }
 for(const tree of trees)await walk(tree);
+await cp(path.join(out,'apps/tsuzuri-studio'),path.join(out,'apps/totonoe-studio'),{recursive:true});
+await rm(path.join(out,'apps/tsuzuri-studio'),{recursive:true,force:true});
 for(const entry of await readdir(root,{withFileTypes:true})) {
   if(entry.isFile() && (entry.name.endsWith('.html')||['_headers','_redirects','robots.txt','sitemap.xml'].includes(entry.name)))await copyFile(entry.name);
 }

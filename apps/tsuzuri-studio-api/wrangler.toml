@@ -28,6 +28,12 @@ DRIVE_WEEKLY_FOLDER_ID = "18Ahx_o5GwHH_BjyLK1e4NItNBKoWc8uy"
 DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "1QLSGk2uVnlM7Fu01pnM9yAjs7-J2XUC1"
 WEEKLY_QUESTION_SPREADSHEET_ID = "1v0TwwXE2zzJmsCCFV1B6bdsyUnkDAsuK7Cjlfx0eAHg"
 WEEKLY_QUESTION_SHEET_NAME = "質問管理"
+CLOUDFLARE_ACCOUNT_ID = "142982627bdfc09489c4aeeb2e3465a7"
+CLOUDFLARE_WEB_ANALYTICS_SITE_TAG = "6bef29ed560744e1b70f163d6c62f74f"
+
+[[routes]]
+pattern = "basecraftas.com/api/totonoe-studio/*"
+zone_name = "basecraftas.com"
 
 [[routes]]
 pattern = "basecraftas.com/api/tsuzuri-studio/*"

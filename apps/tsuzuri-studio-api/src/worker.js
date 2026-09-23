@@ -149,7 +149,7 @@ function uid(prefix) {
 
 function normalizePath(pathname) {
   const rawPath = pathname.replace(/\/+$/, "") || "/";
-  const basePaths = ["/api/tsuzuri-studio", "/api/column-studio", "/api/totonoe-member"];
+  const basePaths = ["/api/totonoe-studio", "/api/tsuzuri-studio", "/api/column-studio", "/api/totonoe-member"];
   const mediaBasePath = "/column-media";
   const publicContentBasePath = "/public-content";
   for (const basePath of basePaths) {
@@ -2878,6 +2878,183 @@ async function billingSummary(request, env) {
   });
 }
 
+function analyticsJapanDate(daysAgo = 0) {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000 - daysAgo * 86400000).toISOString().slice(0, 10);
+}
+
+function analyticsPageLabel(path) {
+  const clean = String(path || "").replace(/\/+$/, "") || "/";
+  const labels = {
+    "/": "Base Craftas トップ", "/projects": "Base Craftas プロジェクト一覧", "/projects/totonoe": "ToToNoE+ トップ",
+    "/projects/totonoe/service": "サービス", "/projects/totonoe/contents": "コンテンツ", "/projects/totonoe/team": "運営チーム",
+    "/projects/totonoe/faq": "FAQ", "/projects/totonoe/tayori": "たより｜TAYORI", "/projects/totonoe/tayori/login": "TAYORI ログイン",
+    "/projects/totonoe/tsuzuri": "つづり｜TSUZURI", "/projects/totonoe/tsumami": "つまみ｜TSUMAMI", "/projects/totonoe/characters": "キャラクター",
+    "/projects/totonoe/weekend-ai": "週末のAI整え習慣", "/projects/totonoe/privacy": "プライバシーポリシー", "/projects/totonoe/legal": "特定商取引法表記",
+  };
+  if (labels[clean]) return labels[clean];
+  if (clean.startsWith("/projects/totonoe/tsuzuri/")) return `TSUZURI記事：${clean.split("/").filter(Boolean).at(-1)}`;
+  return clean;
+}
+
+function analyticsSourceLabel(host) {
+  const value = String(host || "").toLowerCase();
+  if (!value) return "直接・判別不能";
+  if (value === "t.co" || value.endsWith(".x.com") || value === "x.com") return "X";
+  if (value.includes("instagram.com")) return "Instagram";
+  if (value.includes("facebook.com")) return "Facebook";
+  if (value.includes("youtube.com") || value === "youtu.be") return "YouTube";
+  if (value.includes("google.")) return "Google検索";
+  if (value === "my.prairie.cards") return "Prairie Card";
+  if (value === "chatgpt.com" || value === "chat.openai.com") return "ChatGPT";
+  if (value.endsWith("perplexity.ai")) return "Perplexity";
+  if (value.endsWith("claude.ai")) return "Claude";
+  if (value === "gemini.google.com") return "Gemini";
+  if (value === "copilot.microsoft.com") return "Microsoft Copilot";
+  return value;
+}
+
+function analyticsAggregate(rows, labelField, valueField = "visits") {
+  const totals = new Map();
+  for (const row of rows) totals.set(row[labelField], (totals.get(row[labelField]) || 0) + Number(row[valueField] || 0));
+  return [...totals].map(([label, visits]) => ({ label, visits })).sort((left, right) => right.visits - left.visits || left.label.localeCompare(right.label, "ja"));
+}
+
+const ANALYTICS_INITIATIVE_CHANNELS = new Set(["x", "instagram", "youtube", "email", "event", "website", "ai", "other"]);
+const ANALYTICS_INITIATIVE_TYPES = new Set(["social_post", "article", "video", "email", "event", "site_update", "advertising", "other"]);
+const ANALYTICS_RESULT_STATUSES = new Set(["pending", "success", "partial", "hold", "improve"]);
+const ANALYTICS_MEMBER_IDS = new Set(TOTONOE_MEMBERS.map((person) => person.id));
+
+function validAnalyticsDate(value) {
+  const text = String(value || "");
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(text)) return false;
+  return new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
+}
+
+function normalizeAnalyticsInitiative(input, fallback = {}) {
+  const occurredOn = String(input.occurred_on ?? fallback.occurred_on ?? "").trim();
+  const title = String(input.title ?? fallback.title ?? "").trim().slice(0, 120);
+  const channel = String(input.channel ?? fallback.channel ?? "other").trim().toLowerCase();
+  const initiativeType = String(input.initiative_type ?? fallback.initiative_type ?? "other").trim().toLowerCase();
+  const rawDestination = String(input.destination_path ?? fallback.destination_path ?? "").trim();
+  const destinationPath = rawDestination && /^\/[A-Za-z0-9._~!$&'()*+,;=:@%/-]{1,299}$/.test(rawDestination) && !rawDestination.startsWith("//") ? rawDestination : "";
+  const rawReferenceUrl = String(input.reference_url ?? fallback.reference_url ?? "").trim();
+  const referenceUrl = rawReferenceUrl ? safeUrl(rawReferenceUrl) : "";
+  const primaryOwnerId = String(input.primary_owner_id ?? fallback.primary_owner_id ?? "").trim();
+  let collaboratorIds = input.collaborator_ids ?? fallback.collaborator_ids ?? [];
+  if (typeof collaboratorIds === "string") { try { collaboratorIds = JSON.parse(collaboratorIds); } catch { collaboratorIds = []; } }
+  collaboratorIds = [...new Set((Array.isArray(collaboratorIds) ? collaboratorIds : []).map((value) => String(value).trim()))].filter((id) => ANALYTICS_MEMBER_IDS.has(id) && id !== primaryOwnerId).slice(0, 9);
+  const resultStatus = String(input.result_status ?? fallback.result_status ?? "pending").trim().toLowerCase();
+  const reviewOn = String(input.review_on ?? fallback.review_on ?? "").trim();
+  if (!validAnalyticsDate(occurredOn) || !title || !ANALYTICS_INITIATIVE_CHANNELS.has(channel) || !ANALYTICS_INITIATIVE_TYPES.has(initiativeType)) return null;
+  if (rawDestination && !destinationPath) return null;
+  if (rawReferenceUrl && !referenceUrl) return null;
+  if (!ANALYTICS_MEMBER_IDS.has(primaryOwnerId) || !ANALYTICS_RESULT_STATUSES.has(resultStatus) || (reviewOn && !validAnalyticsDate(reviewOn))) return null;
+  return {
+    occurred_on: occurredOn,
+    title,
+    channel,
+    initiative_type: initiativeType,
+    destination_path: destinationPath,
+    objective: String(input.objective ?? fallback.objective ?? "").trim().slice(0, 300),
+    hypothesis: String(input.hypothesis ?? fallback.hypothesis ?? "").trim().slice(0, 500),
+    owner: TOTONOE_MEMBERS.find((person) => person.id === primaryOwnerId)?.name || "",
+    primary_owner_id: primaryOwnerId,
+    collaborator_ids: JSON.stringify(collaboratorIds),
+    reference_url: referenceUrl,
+    notes: String(input.notes ?? fallback.notes ?? "").trim().slice(0, 1000),
+    result_status: resultStatus,
+    learning: String(input.learning ?? fallback.learning ?? "").trim().slice(0, 1000),
+    next_action: String(input.next_action ?? fallback.next_action ?? "").trim().slice(0, 500),
+    review_on: reviewOn,
+  };
+}
+
+function serializeAnalyticsInitiative(row) {
+  if (!row) return row;
+  let collaboratorIds = [];
+  try { collaboratorIds = JSON.parse(row.collaborator_ids || "[]"); } catch {}
+  return { ...row, collaborator_ids: Array.isArray(collaboratorIds) ? collaboratorIds : [] };
+}
+
+async function listAnalyticsInitiatives(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+  if (auth.error) return auth.error;
+  const url = new URL(request.url), start = url.searchParams.get("start") || analyticsJapanDate(29), end = url.searchParams.get("end") || analyticsJapanDate();
+  if (!validAnalyticsDate(start) || !validAnalyticsDate(end) || start > end) return json({ error: "invalid_date_range" }, { status: 400 });
+  const result = await env.DB.prepare(`SELECT id, occurred_on, title, channel, initiative_type, destination_path, objective, hypothesis, owner, primary_owner_id, collaborator_ids, reference_url, notes, result_status, learning, next_action, review_on, created_by, updated_by, created_at, updated_at FROM analytics_initiatives WHERE occurred_on BETWEEN ? AND ? ORDER BY occurred_on DESC, updated_at DESC`).bind(start, end).all();
+  return json({ initiatives: (result.results || []).map(serializeAnalyticsInitiative) });
+}
+
+async function createAnalyticsInitiative(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const initiative = normalizeAnalyticsInitiative(await readJson(request) || {});
+  if (!initiative) return json({ error: "invalid_initiative", message: "施策の日付、名称、媒体、リンク先を確認してください。" }, { status: 400 });
+  const id = uid("initiative");
+  await env.DB.prepare(`INSERT INTO analytics_initiatives (id, occurred_on, title, channel, initiative_type, destination_path, objective, hypothesis, owner, primary_owner_id, collaborator_ids, reference_url, notes, result_status, learning, next_action, review_on, created_by, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(id, initiative.occurred_on, initiative.title, initiative.channel, initiative.initiative_type, initiative.destination_path, initiative.objective, initiative.hypothesis, initiative.owner, initiative.primary_owner_id, initiative.collaborator_ids, initiative.reference_url, initiative.notes, initiative.result_status, initiative.learning, initiative.next_action, initiative.review_on, auth.email, auth.email).run();
+  await audit(env, auth.email, "analytics_initiative.create", "analytics_initiative", id, { occurred_on: initiative.occurred_on, channel: initiative.channel, destination_path: initiative.destination_path });
+  const saved = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  return json({ initiative: serializeAnalyticsInitiative(saved) }, { status: 201 });
+}
+
+async function updateAnalyticsInitiative(request, env, id) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const current = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  if (!current) return json({ error: "not_found" }, { status: 404 });
+  const initiative = normalizeAnalyticsInitiative(await readJson(request) || {}, current);
+  if (!initiative) return json({ error: "invalid_initiative", message: "施策の日付、名称、媒体、リンク先を確認してください。" }, { status: 400 });
+  await env.DB.prepare(`UPDATE analytics_initiatives SET occurred_on = ?, title = ?, channel = ?, initiative_type = ?, destination_path = ?, objective = ?, hypothesis = ?, owner = ?, primary_owner_id = ?, collaborator_ids = ?, reference_url = ?, notes = ?, result_status = ?, learning = ?, next_action = ?, review_on = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .bind(initiative.occurred_on, initiative.title, initiative.channel, initiative.initiative_type, initiative.destination_path, initiative.objective, initiative.hypothesis, initiative.owner, initiative.primary_owner_id, initiative.collaborator_ids, initiative.reference_url, initiative.notes, initiative.result_status, initiative.learning, initiative.next_action, initiative.review_on, auth.email, id).run();
+  await audit(env, auth.email, "analytics_initiative.update", "analytics_initiative", id, { occurred_on: initiative.occurred_on, channel: initiative.channel, destination_path: initiative.destination_path });
+  const saved = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  return json({ initiative: serializeAnalyticsInitiative(saved) });
+}
+
+async function analyticsSummary(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+  if (auth.error) return auth.error;
+  if (!env.CLOUDFLARE_ANALYTICS_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_WEB_ANALYTICS_SITE_TAG) {
+    return json({ error: "analytics_not_configured", message: "Cloudflare Analyticsの読み取り設定が必要です。" }, { status: 503 });
+  }
+  const url = new URL(request.url);
+  const start = url.searchParams.get("start") || analyticsJapanDate(29);
+  const end = url.searchParams.get("end") || analyticsJapanDate();
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(start) || !/^20\d{2}-\d{2}-\d{2}$/.test(end)) return json({ error: "invalid_date_range" }, { status: 400 });
+  const startTime = Date.parse(`${start}T00:00:00Z`), endTime = Date.parse(`${end}T00:00:00Z`);
+  if (!Number.isFinite(startTime) || !Number.isFinite(endTime) || startTime > endTime || endTime - startTime > 92 * 86400000) return json({ error: "invalid_date_range" }, { status: 400 });
+  const periodDays = Math.round((endTime - startTime) / 86400000) + 1;
+  const previousEnd = new Date(startTime - 86400000).toISOString().slice(0, 10);
+  const previousStart = new Date(startTime - periodDays * 86400000).toISOString().slice(0, 10);
+  const query = `query($accountTag:string!,$start:Date!,$end:Date!,$previousStart:Date!,$previousEnd:Date!,$siteTag:string!){viewer{accounts(filter:{accountTag:$accountTag}){
+    entries:rumPageloadEventsAdaptiveGroups(limit:5000,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[date_DESC,sum_visits_DESC]){dimensions{date refererHost requestPath}sum{visits}}
+    previousEntries:rumPageloadEventsAdaptiveGroups(limit:5000,filter:{date_geq:$previousStart,date_leq:$previousEnd,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[sum_visits_DESC]){dimensions{refererHost requestPath}sum{visits}}
+    journeys:rumPageloadEventsAdaptiveGroups(limit:500,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%",refererHost:"basecraftas.com"},orderBy:[count_DESC]){count dimensions{refererPath requestPath}}
+    daily:rumPageloadEventsAdaptiveGroups(limit:100,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[date_ASC]){dimensions{date}sum{visits}}
+  }}}`;
+  const analyticsFetch = env.ANALYTICS_FETCH || fetch;
+  const response = await analyticsFetch("https://api.cloudflare.com/client/v4/graphql", { method: "POST", headers: { authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_API_TOKEN}`, "content-type": "application/json" }, body: JSON.stringify({ query, variables: { accountTag: env.CLOUDFLARE_ACCOUNT_ID, start, end, previousStart, previousEnd, siteTag: env.CLOUDFLARE_WEB_ANALYTICS_SITE_TAG } }) });
+  if (!response.ok) return json({ error: "analytics_upstream_error", message: "Cloudflare Analyticsを取得できませんでした。" }, { status: 502 });
+  const payload = await response.json();
+  if (payload.errors?.length) return json({ error: "analytics_query_error", message: payload.errors[0]?.message || "Analytics query failed" }, { status: 502 });
+  const account = payload.data?.viewer?.accounts?.[0];
+  if (!account) return json({ error: "analytics_query_empty" }, { status: 502 });
+  const entries = (account.entries || []).map((group) => ({ date: group.dimensions?.date || "", referer_host: group.dimensions?.refererHost || "", source: analyticsSourceLabel(group.dimensions?.refererHost), request_path: group.dimensions?.requestPath || "", landing_page: analyticsPageLabel(group.dimensions?.requestPath), visits: Number(group.sum?.visits || 0) })).filter((row) => row.date && row.visits > 0);
+  const previousEntries = (account.previousEntries || []).map((group) => ({ source: analyticsSourceLabel(group.dimensions?.refererHost), request_path: group.dimensions?.requestPath || "", landing_page: analyticsPageLabel(group.dimensions?.requestPath), visits: Number(group.sum?.visits || 0) })).filter((row) => row.visits > 0);
+  const sources = analyticsAggregate(entries, "source"), landingTotals = new Map();
+  for (const row of entries) { const current = landingTotals.get(row.request_path) || { label: row.landing_page, path: row.request_path, visits: 0 }; current.visits += row.visits; landingTotals.set(row.request_path, current); }
+  const landings = [...landingTotals.values()].sort((left, right) => right.visits - left.visits || left.label.localeCompare(right.label, "ja"));
+  const aiLabels = new Set(["ChatGPT", "Perplexity", "Claude", "Gemini", "Microsoft Copilot"]), visits = entries.reduce((sum, row) => sum + row.visits, 0), directVisits = entries.filter((row) => row.source === "直接・判別不能").reduce((sum, row) => sum + row.visits, 0);
+  const previousSources = analyticsAggregate(previousEntries, "source"), previousVisits = previousEntries.reduce((sum, row) => sum + row.visits, 0), previousDirectVisits = previousEntries.filter((row) => row.source === "直接・判別不能").reduce((sum, row) => sum + row.visits, 0);
+  const previousKpis = { visits: previousVisits, identified_visits: previousVisits - previousDirectVisits, direct_visits: previousDirectVisits, ai_visits: previousSources.filter((row) => aiLabels.has(row.label)).reduce((sum, row) => sum + row.visits, 0) };
+  const journeys = (account.journeys || []).map((group) => ({ from_path: group.dimensions?.refererPath || "", from_label: analyticsPageLabel(group.dimensions?.refererPath), to_path: group.dimensions?.requestPath || "", to_label: analyticsPageLabel(group.dimensions?.requestPath), count: Number(group.count || 0) })).filter((row) => row.count > 0 && row.from_path && row.from_path !== row.to_path).sort((left, right) => right.count - left.count);
+  const dailyByDate = new Map((account.daily || []).map((group) => [group.dimensions?.date, Number(group.sum?.visits || 0)])), daily = [];
+  for (let time = startTime; time <= endTime; time += 86400000) { const date = new Date(time).toISOString().slice(0, 10); daily.push({ date, visits: dailyByDate.get(date) || 0 }); }
+  const currentKpis = { visits, identified_visits: visits - directVisits, direct_visits: directVisits, ai_visits: sources.filter((row) => aiLabels.has(row.label)).reduce((sum, row) => sum + row.visits, 0) };
+  return json({ generated_at: new Date().toISOString(), filters: { start, end, bot: 0, path_prefix: "/projects/totonoe/" }, kpis: currentKpis, comparison: { start: previousStart, end: previousEnd, kpis: previousKpis, sources: previousSources }, sources, landings, daily, journeys, entries }, { headers: { "cache-control": "private, max-age=300" } });
+}
+
 async function resetTestBillingData(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
   if (auth.error) return auth.error;
@@ -3227,7 +3404,7 @@ async function listWeeklyAnswerVideos(request, env) {
   return json({
     videos: (videos.results || []).map((video) => ({
       ...video,
-      playback_url: "/api/tsuzuri-studio/api/weekly/answer-videos/" + encodeURIComponent(video.id) + "/stream",
+      playback_url: "/api/totonoe-studio/api/weekly/answer-videos/" + encodeURIComponent(video.id) + "/stream",
     })),
     sync: sync || null,
     playback: "secure_proxy",
@@ -3414,7 +3591,7 @@ async function publicationAssets(env, article) {
 async function serveMedia(request, env, key) {
   if (!env.MEDIA) return new Response('Not found', {status: 404});
   const requestPath = new URL(request.url).pathname;
-  const isPrivate = requestPath.startsWith('/api/tsuzuri-studio/media/') || requestPath.startsWith('/api/column-studio/media/');
+  const isPrivate = requestPath.startsWith('/api/totonoe-studio/media/') || requestPath.startsWith('/api/tsuzuri-studio/media/') || requestPath.startsWith('/api/column-studio/media/');
   if (isPrivate) {
     const auth = await requireRole(request, env, ['admin','editor','viewer']);
     if (auth.error) return auth.error;
@@ -3554,6 +3731,11 @@ const worker = {
     if (path === "/api/admin/billing-summary" && request.method === "GET") return billingSummary(request, env);
     if (path === "/api/admin/billing-test-data/reset" && request.method === "POST") return resetTestBillingData(request, env);
     if (path === "/api/admin/waitlist" && request.method === "GET") return listWaitlistAdmin(request, env);
+    if (path === "/api/analytics-summary" && request.method === "GET") return analyticsSummary(request, env);
+    if (path === "/api/analytics-initiatives" && request.method === "GET") return listAnalyticsInitiatives(request, env);
+    if (path === "/api/analytics-initiatives" && request.method === "POST") return createAnalyticsInitiative(request, env);
+    const analyticsInitiativeMatch = path.match(/^\/api\/analytics-initiatives\/([^/]+)$/);
+    if (analyticsInitiativeMatch && request.method === "PATCH") return updateAnalyticsInitiative(request, env, analyticsInitiativeMatch[1]);
 
     if (path === "/api/articles" && request.method === "GET") {
       const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);

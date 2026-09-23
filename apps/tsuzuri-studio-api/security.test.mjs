@@ -163,7 +163,8 @@ test('YouTube preview uses oEmbed for the title and thumbnail',async()=>{
 
 test('public build excludes source/config/report files and includes real 404/security headers',()=>{
  for(const file of ['apps/tsuzuri-studio-api/src/worker.js','apps/tsuzuri-studio-api/schema.sql','apps/tsuzuri-studio-api/wrangler.toml','README.md','package.json','package-lock.json','scripts/build-site.mjs','apps/tsuzuri-studio/security-entry.js'])assert.equal(existsSync(join('dist',file)),false,file);
- for(const file of ['index.html','404.html','_headers','apps/tsuzuri-studio/security.js','projects/totonoe/article-actions.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
+ for(const file of ['index.html','404.html','_headers','apps/totonoe-studio/security.js','projects/totonoe/article-actions.js','projects/totonoe/assets/characters/mion-standard.png'])assert.ok(existsSync(join('dist',file)),file);
+ assert.equal(existsSync('dist/apps/tsuzuri-studio'),false,'legacy Studio assets are not duplicated');
  assert.equal(existsSync('dist/projects/totonoe/tsumami/content-1790033960584.html'),false);
  const publishedIndex=JSON.parse(readFileSync('dist/projects/totonoe/data/contents/index.json','utf8'));
  const publishedVideo=publishedIndex.articles.find(article=>article.source_id==='rAnUjlcZhW8');

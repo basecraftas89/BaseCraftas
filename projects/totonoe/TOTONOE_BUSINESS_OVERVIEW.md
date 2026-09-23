@@ -238,7 +238,7 @@ Base Craftas
 | 基盤 | 担うこと | 主な技術・保管先 | 現状 |
 |---|---|---|---|
 | 公開サイト | サービス説明、無料コンテンツ、参加・相談導線 | 静的HTML/CSS/JS、Cloudflare | 主要ページを公開中 |
-| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開 | Cloudflare Access、Worker、D1、R2、GitHub | 運営基盤あり。2026年9月14日から指定2アカウントだけを固定管理者として扱う。公開動線ごとの確認が必要 |
+| ToToNoE+ Studio | TSUZURI記事、YouTube動画、次回朝活情報の登録・公開、アクセス解析 | Cloudflare Access、Worker、D1、R2、GitHub、Cloudflare Web Analytics | 運営基盤あり。2026年9月14日から指定2アカウントだけを固定管理者として扱う。アクセス解析ビューを2026年9月23日に本番公開 |
 | 公開朝活情報 | 次回サムネイルと情報を匿名閲覧者へ配信 | `/public-content/weekend-event.json` | 2026年9月13日確認時HTTP 200、`event:null` で既定表示 |
 | TAYORI会員基盤 | ログイン、契約権限、週次資料、質問、回答動画、プロフィール | メール認証、D1、Google Drive、Google Sheets、Worker | メール認証APIは本番稼働中。課金は14日無料設定まで本番Workerへ反映済みだが、販売は未開始 |
 | IROHA学習基盤 | 教材、週間計画、進捗、振り返り | D1、制限付きDrive、Worker | 資格確認導線はローカルで廃止。実Drive同期・本番データ・公開導線は未完了 |
@@ -372,3 +372,10 @@ ToToNoE+の独自性は、専門職コミュニティ、週次の発信と学習
 - Podcastに第17回「AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ」（stand.fm、9/19）を追加。
 - コメキャリ生限定アーカイブに、第17回のDriveファイル（`1c4FYxTu2-o_HIsT1hKJE56sE4W-0Ma-A`、9/19）を追加。既存のGoogleアカウント閲覧権限は維持。
 - Cloudflare静的Workerへデプロイ後、匿名ブラウザでPodcastカード（stand.fm埋め込みを含む）とアーカイブカード（Driveプレビュー導線を含む）の第17回表示を確認済み。
+
+## 2026年9月23日 ToToNoE+ Studioアクセス解析（本番反映済み）
+
+- ToToNoE+ StudioへCloudflare Web Analyticsを統合し、正規URLを `/apps/totonoe-studio/` へ変更。旧 `/apps/tsuzuri-studio/` と `/apps/column-studio/` は互換URLとして維持し、認証後に正規URLへ転送する。
+- 7日・30日・90日・任意期間で、媒体別流入、入口ページ、日別推移、日付と媒体のヒートマップ、日付・媒体・入口ページ別の訪問数、サイト内のページ移動を表示。直前の同期間比較、自然文の要約、CSV出力に対応。
+- 施策の実施日、媒体、種類、誘導先、目的、仮説、10名から選ぶ主担当・共同担当、振り返り、学び、次のアクション、確認日をD1へ保存。担当者絞り込み、グラフ上の施策マーカー、前後7日が揃う場合の参考差分を表示する。
+- D1へ `20260923_analytics_initiatives.sql` を適用し、Cloudflare Analytics読み取り専用トークンをWorker Secretへ登録。静的サイトWorker `d0cc38a6-4f5d-46a9-b863-28049ccb0f66`、API Worker `10b4c4be-7862-4830-9558-ce07c9fa924e` を本番へ反映した。

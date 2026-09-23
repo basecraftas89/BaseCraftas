@@ -328,7 +328,7 @@ test("回答動画一覧はWeekly会員だけが取得でき、Driveファイル
   assert.equal(payload.videos[0].title, "質問への回答");
   assert.equal("drive_file_id" in payload.videos[0], false);
   assert.equal(payload.playback, "secure_proxy");
-  assert.equal(payload.videos[0].playback_url, "/api/tsuzuri-studio/api/weekly/answer-videos/video-1/stream");
+  assert.equal(payload.videos[0].playback_url, "/api/totonoe-studio/api/weekly/answer-videos/video-1/stream");
 
   const missing = fixture();
   assert.equal((await missing.call("/api/weekly/answer-videos", "")).status, 401);

@@ -5,7 +5,7 @@ Cloudflare Access で保護した TSUZURI Studio から、D1 に記事、メン�
 ## 作成済みの Cloudflare リソース
 
 - Access application: `TSUZURI Studio`
-- Protected path: `basecraftas.com/apps/tsuzuri-studio/*`
+- Protected path: `basecraftas.com/apps/totonoe-studio/*`
 - D1 database: `column-studio-db`
 - D1 database id: `67c5a478-7a5d-48af-9e81-c34da1362263`
 - R2 bucket: `column-studio-media`
@@ -29,7 +29,7 @@ Worker の環境変数に次を設定してください。
 - `TEAM_DOMAIN`: `https://<team-name>.cloudflareaccess.com`
 - `POLICY_AUD`: TSUZURI Studioを保護するAccess ApplicationのAudienceタグ
 
-`workers.dev` は無効化しています。編集APIの `basecraftas.com/api/tsuzuri-studio/*` もCloudflare Accessの保護対象に含めてください。公開画像の `basecraftas.com/column-media/*` は認証不要の配信経路です。
+`workers.dev` は無効化しています。編集APIの正規経路 `basecraftas.com/api/totonoe-studio/*` もCloudflare Accessの保護対象に含めてください。旧 `/api/tsuzuri-studio/*` と `/api/column-studio/*` は互換経路として残します。公開画像の `basecraftas.com/column-media/*` は認証不要の配信経路です。
 
 ローカル確認時だけ、`ALLOW_DEV_AUTH=true` を設定すると Access の代わりに `x-column-studio-dev-email` ヘッダーでユーザーを渡せます。本番の `wrangler.toml` では `ALLOW_DEV_AUTH=false` にしています。
 
@@ -117,7 +117,7 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 ## 2026-09-11 セキュリティ改修
 
 `migrations/20260911_security.sql` が必須です。画像配信は公開スナップショット方式へ変更しました。
-アップロードには保存済みarticle_idが必要です。管理画面は認証付き `/api/tsuzuri-studio/media/<key>` でプレビューし、
+アップロードには保存済みarticle_idが必要です。管理画面は認証付き `/api/totonoe-studio/media/<key>` でプレビューし、
 `/column-media/<key>` は公開操作で確定した画像だけを返します。既存画像の移行が必要です。
 詳しい反映順序と未実施項目は `../../docs/SECURITY_RELEASE_2026-09-11.md` を参照してください。
 
@@ -141,6 +141,7 @@ GitHub App の秘密鍵やトークンは、リポジトリやフロントエン
 10. `migrations/20260920_billing_dashboard.sql`
 11. `migrations/20260921_character_studio_articles.sql`（既存のキャラクター記事4本をStudioへ登録）
 12. `migrations/20260922_fixed_admin_accounts.sql`（指定2アカウントを管理者へ固定し、旧管理者を編集者へ変更）
+13. `migrations/20260923_analytics_initiatives.sql`（アクセス解析の施策、担当者、振り返りを保存）
 
 課金画面がテストデータを表示している場合だけ、「テスト表示をリセット」を利用できます。`POST /api/admin/billing-test-data/reset` は管理者限定かつ `STRIPE_MODE=test` 限定です。テスト契約、テスト売上、契約状態履歴、Checkout試行、テスト契約由来の会員権限をD1の一括処理で削除します。本番データ、顧客アカウント、ウェイトリスト、コンテンツ、Stripe Webhookの受信監査履歴は保持します。
 

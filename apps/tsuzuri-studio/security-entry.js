@@ -38,7 +38,7 @@ function previewUrl(value) {
   if (!safe) return '';
   const url = new URL(safe, location.href);
   return url.origin === location.origin && url.pathname.startsWith('/column-media/')
-    ? '/api/tsuzuri-studio/media/' + url.pathname.slice('/column-media/'.length) : safe;
+    ? '/api/totonoe-studio/media/' + url.pathname.slice('/column-media/'.length) : safe;
 }
 window.TsuzuriSecurity = {body, url: safeUrl, previewUrl};
 window.ColumnSecurity = window.TsuzuriSecurity;

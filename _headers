@@ -6,10 +6,14 @@
   Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'none'
 
-/apps/tsuzuri-studio/*
+/apps/totonoe-studio/*
   Cache-Control: private, no-store
   Referrer-Policy: no-referrer
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'
+
+/apps/tsuzuri-studio/*
+  Cache-Control: private, no-store
+  Referrer-Policy: no-referrer
 
 /apps/column-studio/*
   Cache-Control: private, no-store

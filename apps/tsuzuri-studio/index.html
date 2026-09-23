@@ -49,6 +49,9 @@
         <button class="nav-item admin-only" type="button" data-view="billing">
           <span class="nav-icon" aria-hidden="true">¥</span><span>課金・会員</span>
         </button>
+        <button class="nav-item" type="button" data-view="analytics">
+          <span class="nav-icon" aria-hidden="true">↗</span><span>アクセス解析</span>
+        </button>
         <button class="nav-item admin-only" type="button" data-view="settings">
           <span class="nav-icon" aria-hidden="true">⚙</span><span>公開設定</span>
         </button>
@@ -227,6 +230,51 @@
         </div>
       </section>
 
+      <section class="view" id="view-analytics" data-title="アクセス解析">
+        <div class="page-wrap analytics-wrap">
+          <div class="page-heading analytics-heading">
+            <div><p class="eyebrow">ACCESS ANALYTICS</p><h1>どこから来て、どこへ進んだか</h1><p>ToToNoE+の流入媒体、入口ページ、サイト内の主な移動をCloudflareから確認します。</p></div>
+            <div class="analytics-heading-meta"><span class="analytics-live"><i></i>Cloudflare Web Analytics</span><small id="analyticsLastUpdated">最終取得 —</small></div>
+          </div>
+          <div class="analytics-filters" aria-label="アクセス解析の期間指定">
+            <label>表示期間<select id="analyticsRange"><option value="7">直近7日</option><option value="30" selected>直近30日</option><option value="90">直近90日</option><option value="custom">期間を指定</option></select></label>
+            <label>開始日<input type="date" id="analyticsStart" disabled></label>
+            <label>終了日<input type="date" id="analyticsEnd" disabled></label>
+            <label>比較<select id="analyticsCompare"><option value="previous" selected>直前の同じ期間</option><option value="none">比較しない</option></select></label>
+            <button class="secondary-button" type="button" data-action="refresh-analytics">更新</button>
+            <button class="primary-button" type="button" data-action="new-analytics-initiative">施策を記録</button>
+          </div>
+          <p class="analytics-quality" id="analyticsQuality" role="status">アクセス情報を読み込んでいます。</p>
+          <p class="analytics-insight" id="analyticsInsight">選択期間の変化を集計しています。</p>
+          <div class="analytics-kpis">
+            <article class="analytics-kpi"><span>入口訪問</span><strong id="analyticsVisits">—</strong><em id="analyticsVisitsDelta"></em><small>ToToNoE+を入口にした訪問</small></article>
+            <article class="analytics-kpi"><span>媒体を判別</span><strong id="analyticsIdentified">—</strong><em id="analyticsIdentifiedDelta"></em><small>参照元ドメインが残った訪問</small></article>
+            <article class="analytics-kpi"><span>直接・判別不能</span><strong id="analyticsDirect">—</strong><em id="analyticsDirectDelta"></em><small>直接入力や参照元を渡さないアプリ</small></article>
+            <article class="analytics-kpi"><span>AI経由</span><strong id="analyticsAi">—</strong><em id="analyticsAiDelta"></em><small>AIサービスの参照元を確認できた訪問</small></article>
+          </div>
+          <div class="analytics-grid">
+            <section class="panel analytics-panel"><div class="panel-head"><div><p class="eyebrow">SOURCE</p><h2>どの媒体から来たか</h2></div></div><div class="analytics-bars" id="analyticsSources"></div></section>
+            <section class="panel analytics-panel"><div class="panel-head"><div><p class="eyebrow">LANDING PAGE</p><h2>最初に見られたページ</h2></div></div><div class="analytics-bars" id="analyticsLandings"></div></section>
+          </div>
+          <section class="panel analytics-panel analytics-trend-panel"><div class="panel-head"><div><p class="eyebrow">TREND</p><h2>入口訪問の推移</h2></div></div><div class="analytics-trend" id="analyticsTrend"></div></section>
+          <section class="panel analytics-panel analytics-heatmap-panel"><div class="panel-head"><div><p class="eyebrow">DATE × SOURCE</p><h2>日別・媒体別の流入ヒートマップ</h2><p>濃いマスほど、その日にその媒体からの訪問が多かったことを示します。</p></div></div><div class="analytics-heatmap-scroll"><div class="analytics-heatmap" id="analyticsHeatmap"></div></div></section>
+          <section class="panel analytics-panel analytics-initiative-panel">
+            <div class="panel-head"><div><p class="eyebrow">INITIATIVES</p><h2>実施した施策と前後の変化</h2><p>施策を日別推移と重ね、実施前後7日間の入口訪問を比較します。</p></div><div class="analytics-initiative-controls"><label>担当者<select id="analyticsOwnerFilter"><option value="all">全員</option></select></label><button class="secondary-button analytics-initiative-export" type="button" data-action="export-analytics-initiatives" disabled>施策CSV</button></div></div>
+            <div class="analytics-initiatives" id="analyticsInitiatives"><div class="analytics-empty">施策情報を読み込んでいます。</div></div>
+          </section>
+          <section class="panel analytics-panel analytics-daily-source-panel">
+            <div class="panel-head"><div><p class="eyebrow">DAILY SOURCE</p><h2>何日に、どの媒体から来たか</h2><p>日付と媒体ごとの訪問数です。同じ人の複数訪問を含む場合があります。</p></div><button class="secondary-button analytics-export-button" type="button" data-action="export-analytics-csv" disabled>CSVを書き出す</button></div>
+            <div class="analytics-table-scroll"><table class="analytics-table"><thead><tr><th>日付</th><th>媒体</th><th>参照元</th><th>入口ページ</th><th>訪問数</th></tr></thead><tbody id="analyticsDailySources"><tr><td colspan="5">アクセス情報を読み込んでいます。</td></tr></tbody></table></div>
+            <p class="analytics-export-help">CSVには選択期間の全データを、日付・媒体・参照元ドメイン・入口ページ・訪問数の形式で保存します。</p>
+          </section>
+          <section class="panel analytics-panel analytics-journey-panel">
+            <div class="panel-head"><div><p class="eyebrow">PAGE JOURNEY</p><h2>どのページを経て、どこへ進んだか</h2></div><small>同一利用者の追跡ではなく、ページ間移動の集計です</small></div>
+            <div class="analytics-journeys" id="analyticsJourneys"></div>
+          </section>
+          <aside class="analytics-note"><strong>「直接・判別不能」とAI流入</strong><p>ChatGPTなどの参照元が残ればAI経由に分類します。参照元を渡さないアプリからの訪問は、Cloudflareだけでは後から媒体を判定できないため、推測で振り分けません。</p></aside>
+        </div>
+      </section>
+
       <section class="view" id="view-billing" data-title="課金・会員">
         <div class="page-wrap billing-wrap">
           <div class="page-heading billing-heading">
@@ -313,10 +361,35 @@
   <dialog class="invite-dialog" id="inviteDialog">
     <form method="dialog" id="inviteForm"><div class="dialog-head"><div><p class="eyebrow">REGISTER MEMBER</p><h2>メンバーを登録</h2></div><button value="cancel" aria-label="閉じる">×</button></div><label>表示名（任意）<input id="inviteName" type="text" maxlength="100" placeholder="例：山田 太郎"></label><label>メールアドレス<input id="inviteEmail" type="email" required placeholder="name@example.com"></label><label>権限<select id="inviteRole"><option value="editor">編集者</option><option value="viewer">閲覧者</option></select></label><p>管理者は指定された2つのアカウントに固定されています。登録後、Cloudflare Accessでも同じメールアドレスを許可してください。この画面だけでは招待メールは送信されません。</p><div class="dialog-actions"><button value="cancel" class="secondary-button">キャンセル</button><button value="default" class="primary-button" id="sendInvite">メンバーを登録</button></div></form>
   </dialog>
+  <dialog class="analytics-initiative-dialog" id="analyticsInitiativeDialog">
+    <form id="analyticsInitiativeForm">
+      <input type="hidden" id="analyticsInitiativeId">
+      <div class="dialog-head"><div><p class="eyebrow">INITIATIVE LOG</p><h2 id="analyticsInitiativeDialogTitle">施策を記録</h2></div><button type="button" data-action="close-analytics-initiative" aria-label="閉じる">×</button></div>
+      <div class="analytics-initiative-form-grid">
+        <label>実施日<input id="analyticsInitiativeDate" type="date" required></label>
+        <label>媒体<select id="analyticsInitiativeChannel" required><option value="x">X</option><option value="instagram">Instagram</option><option value="youtube">YouTube</option><option value="email">メール</option><option value="event">イベント</option><option value="website">Webサイト</option><option value="ai">AI</option><option value="other">その他</option></select></label>
+        <label>施策の種類<select id="analyticsInitiativeType" required><option value="social_post">SNS投稿</option><option value="article">記事公開</option><option value="video">動画公開</option><option value="email">メール配信</option><option value="event">イベント</option><option value="site_update">サイト改修</option><option value="advertising">広告</option><option value="other">その他</option></select></label>
+        <fieldset class="wide analytics-member-field"><legend>主担当者</legend><div class="analytics-member-chips" id="analyticsInitiativePrimaryOwner"></div></fieldset>
+        <fieldset class="wide analytics-member-field"><legend>共同担当者（複数選択可）</legend><div class="analytics-member-chips" id="analyticsInitiativeCollaborators"></div></fieldset>
+        <label class="wide">施策名<input id="analyticsInitiativeTitle" type="text" maxlength="120" required placeholder="例：XでTAYORI紹介投稿"></label>
+        <label class="wide">誘導先パス<input id="analyticsInitiativeDestination" type="text" maxlength="300" placeholder="/projects/totonoe/tayori"></label>
+        <label class="wide">目的<input id="analyticsInitiativeObjective" type="text" maxlength="300" placeholder="例：TAYORIの認知とサービスページ閲覧を増やす"></label>
+        <label class="wide">仮説<textarea id="analyticsInitiativeHypothesis" maxlength="500" rows="3" placeholder="例：医療職向けの具体例を含めると、サービスページへの移動が増える"></textarea></label>
+        <label class="wide">投稿・参考URL<input id="analyticsInitiativeReference" type="url" maxlength="500" placeholder="https://x.com/..."></label>
+        <label class="wide">メモ<textarea id="analyticsInitiativeNotes" maxlength="1000" rows="3"></textarea></label>
+        <label>振り返り<select id="analyticsInitiativeResultStatus"><option value="pending">未振り返り</option><option value="success">成功</option><option value="partial">一部成功</option><option value="improve">改善して継続</option><option value="hold">保留</option></select></label>
+        <label>振り返り日<input id="analyticsInitiativeReviewOn" type="date"></label>
+        <label class="wide">学び<textarea id="analyticsInitiativeLearning" maxlength="1000" rows="3" placeholder="反応が良かった内容や、想定と違った点"></textarea></label>
+        <label class="wide">次のアクション<textarea id="analyticsInitiativeNextAction" maxlength="500" rows="2" placeholder="例：次回は投稿文に誘導先を明記する"></textarea></label>
+      </div>
+      <p class="analytics-initiative-form-help">個人情報は入力せず、施策の内容と検証したい仮説を記録してください。</p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-action="close-analytics-initiative">キャンセル</button><button type="submit" class="primary-button" id="saveAnalyticsInitiative">保存する</button></div>
+    </form>
+  </dialog>
   <div class="toast" id="toast" role="status"></div>
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260913-billing"></script>
-  <script src="script.js?v=20260913-billing"></script>
+  <script src="script.js?v=20260923-analytics-v2"></script>
 </body>
 </html>
