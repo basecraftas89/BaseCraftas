@@ -3613,6 +3613,17 @@ async function serveMedia(request, env, key) {
 
 const worker = {
   async scheduled(controller, env) {
+    // Friday 22:10 UTC is Saturday 07:10 JST. This job only syncs PDFs.
+    if (controller.cron === "10 22 * * FRI") {
+      try {
+        const materials = await syncWeeklyMaterials(env);
+        console.log(JSON.stringify({ event: "weekly.materials_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, materials }));
+      } catch (error) {
+        console.error(JSON.stringify({ event: "weekly.materials_sync.error", cron: controller.cron, scheduled_time: controller.scheduledTime, error: String(error.message || error) }));
+        throw error;
+      }
+      return;
+    }
     await env.DB.prepare("DELETE FROM api_write_limits WHERE bucket < ?").bind(Math.floor(Date.now() / 60000) - 60).run();
     try {
       await env.DB.prepare("DELETE FROM customer_auth_rate_limits WHERE bucket < ?").bind(Math.floor(Date.now() / (AUTH_RATE_BUCKET_MINUTES * 60 * 1000)) - 6).run();
@@ -3634,10 +3645,9 @@ const worker = {
       }
       if (controller.cron === "0 0 * * SAT") {
         const weekendThumbnails = await archiveExpiredWeekendThumbnails(env, controller.scheduledTime || Date.now());
-        const materials = await syncWeeklyMaterials(env);
         const archiveVideos = await scanDriveArchives(env);
         const trash = await purgeExpiredTrash(env);
-        console.log(JSON.stringify({ event: "weekly.saturday_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, weekend_thumbnails: weekendThumbnails, materials, archive_videos: archiveVideos, trash }));
+        console.log(JSON.stringify({ event: "weekly.saturday_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, weekend_thumbnails: weekendThumbnails, archive_videos: archiveVideos, trash }));
         return;
       }
       console.log(JSON.stringify({ event: "scheduled.skipped", cron: controller.cron, scheduled_time: controller.scheduledTime, reason: "unknown_cron" }));

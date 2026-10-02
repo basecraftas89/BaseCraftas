@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 preview_urls = false
 
 [triggers]
-crons = [ "0 * * * *", "0 0 * * SAT" ]
+crons = [ "0 * * * *", "10 22 * * FRI", "0 0 * * SAT" ]
 
 [vars]
 ALLOW_DEV_AUTH = "false"
