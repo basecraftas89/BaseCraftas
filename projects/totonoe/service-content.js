@@ -30,6 +30,7 @@
      ・theme（任意）を入れるとカードに副題が表示されます
      ===================================================== */
   var EPISODES = [
+    {"url": "https://stand.fm/episodes/6ac033c007ef172482bdae69", "no": 19, "theme": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践", "date": "2026-10-03"},
     { url: 'https://stand.fm/episodes/6a405981f6da955ea231d2a6', no: 1, theme: 'AI相談の落とし穴〜安倍全監督の事例と医療現場のリスク〜', date: '5/30' },
     { url: 'https://stand.fm/episodes/6a4059c8ac08572069cc0537', no: 2, theme: 'AIに代替されるPT・選ばれるPT〜臨床とテクノロジーの境界線〜', date: '6/6' },
     { url: 'https://stand.fm/episodes/6a405a0cf6da955ea231d2b4', no: 3, theme: 'Claude最強モデル登場！Fable 5の実力とスクショアプリ開発', date: '6/13' },
