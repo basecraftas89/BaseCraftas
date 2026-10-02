@@ -675,6 +675,7 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
+    {"no": 19, "date": "2026-10-03", "driveId": "1vGsbLh4Ljh_peSbdcA7Y3bfr7lhe8Crc", "title": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践"},
     { no: 17, date: '2026-09-19', driveId: '1c4FYxTu2-o_HIsT1hKJE56sE4W-0Ma-A',
       title: 'AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ' },
     { no: 16, date: '2026-09-12', driveId: '1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo',
