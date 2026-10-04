@@ -20,7 +20,7 @@
     "prompt": "Preserve exact Utsupon, Mikke and Shirube identities. Transparent frame: raccoon lower left, fox lower right, owl upper center; empty central lower region for separately typeset wordmark. Exactly three characters, no text, no scenic backdrop.",
     "logo": "projects/meguri/assets/logos/meguri-project-logo-v1.svg"
   },
-  "productionVersion": "82943696-295d-4c39-ae48-737d1b1120c3",
+  "productionVersion": "292cf733-dce8-4ef4-937a-00fb1e55503b",
   "verification": {
     "htmlPages": 49,
     "internalReferences": 2588,
@@ -39,6 +39,8 @@
     "layout": "Hakuto above the exact original wordmark, Tsugumo on the left, Mion on the right",
     "logo": "projects/logos/totonoe-project-logo-v1.svg",
     "bytes": 341614,
-    "mobileVerified": 390
+    "mobileVerified": 390,
+    "publicVerified": true,
+    "canonicalInputHashesMatch": true
   }
 }
