@@ -45,6 +45,6 @@ for f in (a.sleeport/'outputs/homepage-v2').rglob('*'):
  if f.suffix=='.md' and 'license' not in f.name.lower():continue
  out=sp/f.relative_to(a.sleeport/'outputs/homepage-v2');out.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,out)
  if out.suffix=='.html':
-  text=out.read_text(); canonical='https://basecraftas.com/projects/sleeport/'+out.name
+  text=out.read_text().replace('<small>© Sleeport</small>', '<small>© Sleeport · <a href="/projects/">Base Craftasのプロジェクト</a></small>'); canonical='https://basecraftas.com/projects/sleeport/'+out.name
   text=text.replace('</head>',f'<link rel="canonical" href="{canonical}"></head>');out.write_text(text)
 print('Exported adopted public sites, excluding admin, draft JSON, QA and originals.')

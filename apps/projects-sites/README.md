@@ -26,7 +26,7 @@ Exporting fresh upstream snapshots requires Python with Pillow:
 python3 scripts/export-project-sites.py --meguri '/Users/kantoshi/01_Base Craftas/05_MEGURI' --sleeport /Users/kantoshi/01_Sleeport
 ```
 
-Preserve the parent-site return link on Sleeport after exporting. Do not export admin, draft JSON, QA, source code, image originals or private records.
+Do not export admin, draft JSON, QA, source code, image originals or private records.
 
 ## Free-only operating rule
 
@@ -35,3 +35,7 @@ The user requires stopping before an operation can incur charges. Keep Workers F
 The build checks the free upload limits: fewer than 20,000 files and each file smaller than 25 MiB. If these limits fail, stop; do not upgrade. Deployment is manual and local, so it does not consume Workers Builds minutes or GitHub Actions. Existing R2 usage is outside this new deployment and its budget alerts do not enforce a spending cap. Do not claim this deployment adds an account-wide R2 automatic stop.
 
 Only the exact home/index/project routes in wrangler.toml are changed. Existing ToToNoE+ services and access routes remain under their existing Workers.
+
+## Verified production release: 2026-10-04
+
+Cloudflare version: `2a2fe4df-5f12-433a-bf60-090814578b9e`. Local release: 49 pages, 1,821 internal references checked, zero private files. Adopted Sleeport source checks: 24 pages, 1,037 links, 215 resources, all six full stories preserved. Live desktop and 390px mobile checks passed. Private editor/source URLs returned 404; anonymous TAYORI and IROHA pages retained login redirects.

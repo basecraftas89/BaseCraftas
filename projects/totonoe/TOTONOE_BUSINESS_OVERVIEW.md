@@ -392,4 +392,4 @@ ToToNoE+の独自性は、専門職コミュニティ、週次の発信と学習
 
 ## Base Craftasの他プロジェクトとの配置（2026-10-04）
 
-Base Craftasのトップとプロジェクト一覧から、ToToNoE+、Sleeport、MEGURIへそれぞれ案内する。SleeportとMEGURIの公開サイトは専用の静的配信Workerで提供し、ToToNoE+の会員権限・TAYORI・IROHAとは独立して運用する。公開状態は本番デプロイ後に確認する。
+Base Craftasのトップとプロジェクト一覧から、ToToNoE+、Sleeport、MEGURIへそれぞれ案内する。SleeportとMEGURIの公開サイトは専用の静的配信Workerで提供し、ToToNoE+の会員権限・TAYORI・IROHAとは独立して運用する。2026年10月4日に本番公開し、匿名アクセスで一覧・両サイト・素材表示と既存会員ページのログイン誘導を確認した。
