@@ -97,3 +97,8 @@ SVGは7枚、各252〜2101bytesで変更不要。MEGURI CSS約24.4KiB/JS約3.9Ki
 |projects/sleeport/assets/v2/porto-portrait.webp|243.0|218.6|optimized|
 |projects/sleeport/assets/v2/sleemo-portrait.webp|135.1|116.1|optimized|
 |projects/sleeport/assets/v2/wave-divider.webp|27.1|27.1|retained-already-efficient|
+
+
+公開確認: Cloudflare `096712d0-c8fb-4771-8a54-a0fa09ffb60a`。公開259件のHTTP 200および非公開URL404を確認。CSSキャッシュキーをimages-20261004に更新。
+
+整理: 今回の比較画像・圧縮検証候補・一時導入fonttools・ビルドの非保護ファイル909件を指紋付き計画で整理。原本、コード、公開出力は保持。cleanupスクリプトのassets保護規則により、専用scratch内の2回の中間ビルドのassetsを含む48,854,832bytesは保留。既存の旧distや別タスクのデータは変更していません。プレビューサーバー停止済み。
