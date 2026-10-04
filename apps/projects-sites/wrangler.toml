@@ -34,3 +34,7 @@ zone_name = "basecraftas.com"
 [[routes]]
 pattern = "basecraftas.com/projects/logos/totonoe-project-logo-v1.svg"
 zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/logos/totonoe-project-logo-v2.svg"
+zone_name = "basecraftas.com"

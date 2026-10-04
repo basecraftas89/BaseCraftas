@@ -10,19 +10,14 @@ for slug,label,family,weight,size,color in [('sleeport','Sleeport','Georgia, ser
  (folder/(slug+'-project-logo-v1.svg')).write_text(svg)
  print(slug,len(svg),'bytes')
 
-# ToToNoE+ reuses the exact adopted wordmark and existing transparent portraits.
-# Place the asset under the projects Worker route, leaving the ToToNoE+ Worker untouched.
+# Generated full-body ToToNoE+ trio matches the sibling logos; exact wordmark retained.
 folder=ROOT/'projects/logos';folder.mkdir(exist_ok=True)
-def embedded_image(path,x,y,w,h):
- buffer=BytesIO()
- with Image.open(ROOT/path) as image:image.save(buffer,'WEBP',lossless=True,method=6)
- encoded=base64.b64encode(buffer.getvalue()).decode()
- return f'<image x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="xMidYMid meet" href="data:image/webp;base64,{encoded}"/>'
-svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title"><title id="title">ToToNoE+とツグモ・ミオン・ハクト</title>'
-svg+=embedded_image('projects/totonoe/assets/characters/hakuto-standard.png',588,80,360,360)
-svg+=embedded_image('projects/totonoe/assets/characters/tsugumo-standard.png',36,408,360,360)
-svg+=embedded_image('projects/totonoe/assets/characters/mion-standard.png',1140,408,360,360)
-svg+=embedded_image('projects/totonoe/assets/totonoe-logo.png',418,530,700,275)
-svg+='</svg>'
-(folder/'totonoe-project-logo-v1.svg').write_text(svg)
-print('totonoe',len(svg),'bytes')
+frame=base64.b64encode((folder/'totonoe-characters-frame-v2.webp').read_bytes()).decode()
+buffer=BytesIO()
+with Image.open(ROOT/'projects/totonoe/assets/totonoe-logo.png') as image:
+ image.thumbnail((800,800),Image.Resampling.LANCZOS)
+ image.save(buffer,'WEBP',lossless=True,method=6)
+wordmark=base64.b64encode(buffer.getvalue()).decode()
+svg=f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title"><title id="title">ToToNoE+とツグモ・ミオン・ハクト</title><image width="1536" height="1024" href="data:image/webp;base64,{frame}"/><image x="490" y="745" width="556" height="218" preserveAspectRatio="xMidYMid meet" href="data:image/webp;base64,{wordmark}"/></svg>'
+(folder/'totonoe-project-logo-v2.svg').write_text(svg)
+print('totonoe v2',len(svg),'bytes')

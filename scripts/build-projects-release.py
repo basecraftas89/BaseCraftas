@@ -14,7 +14,7 @@ class Resources(HTMLParser):
     if a.get(key):self.urls.append(a[key])
   if a.get('srcset'):self.urls.extend(x.strip().split()[0] for x in a['srcset'].split(','))
   if tag=='link' and a.get('rel') not in ['canonical'] and a.get('href'):self.urls.append(a['href'])
-queue=['index.html','projects/index.html']+[str(p.relative_to(ROOT)) for slug in ['meguri','sleeport'] for p in (ROOT/'projects'/slug).rglob('*') if p.is_file() and p.suffix in {'.html','.css','.js','.txt'}];done=set()
+queue=['index.html','projects/index.html']+[str(p.relative_to(ROOT)) for p in (ROOT/'projects/logos').glob('*.svg')]+[str(p.relative_to(ROOT)) for slug in ['meguri','sleeport'] for p in (ROOT/'projects'/slug).rglob('*') if p.is_file() and p.suffix in {'.html','.css','.js','.txt'}];done=set()
 while queue:
  rel=queue.pop()
  if rel in done:continue
