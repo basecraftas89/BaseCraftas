@@ -47,3 +47,7 @@ See `outputs/project-image-audit-20261004.md` and its JSON inventory for all 78 
 After exporting fresh snapshots, run `python3 scripts/optimize-project-images.py` (Pillow) and `python3 scripts/compress-project-font.py` (fonttools[woff]); keep the CSS font URL set to WOFF2. Build into a fresh output directory to avoid stale files from earlier exports, then run the reference checker. Do not blindly deploy an old build directory.
 
 Optimized production version: `096712d0-c8fb-4771-8a54-a0fa09ffb60a`. All 259 routed public paths verified HTTP 200; private URLs 404. CSS cache key is bumped so existing visitors load the WOFF2 declaration.
+
+## Project listing logos: 2026-10-04
+
+The Sleeport and MEGURI cards use standalone SVG logos containing three official-character references and deterministic text. Sleeport uses the same Georgia bold / -0.02em typography as its header. Rebuild with `python3 scripts/build-project-logos.py`; the approved WebP frames are retained beside the SVG files. Generated full-resolution originals are preserved under the canonical `assets/project-logos` folder and in Codex generated_images. Prompt and reference notes are in `outputs/project-logos-20261004.json`. The new logos add about 264KiB to the full release, use no remote fonts or paid image transformations, and are served by the existing static worker.
