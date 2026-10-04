@@ -14,3 +14,6 @@ dist/
 .dev.vars
 .dev.vars.*
 /output/
+
+# Scoped public projects deployment build
+dist-projects/

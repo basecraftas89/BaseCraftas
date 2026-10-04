@@ -1,0 +1,32 @@
+name = "basecraftas-projects"
+account_id = "142982627bdfc09489c4aeeb2e3465a7"
+compatibility_date = "2026-10-04"
+workers_dev = false
+preview_urls = false
+
+# No Worker script, database or R2 binding: public requests use free static delivery.
+[assets]
+directory = "../../dist-projects"
+not_found_handling = "404-page"
+
+[[routes]]
+pattern = "basecraftas.com/projects/meguri*"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/projects/sleeport*"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/projects/"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/projects"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/projects/index.html"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/"
+zone_name = "basecraftas.com"
+[[routes]]
+pattern = "basecraftas.com/index.html"
+zone_name = "basecraftas.com"
