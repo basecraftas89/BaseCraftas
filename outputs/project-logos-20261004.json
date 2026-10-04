@@ -20,7 +20,7 @@
     "prompt": "Preserve exact Utsupon, Mikke and Shirube identities. Transparent frame: raccoon lower left, fox lower right, owl upper center; empty central lower region for separately typeset wordmark. Exactly three characters, no text, no scenic backdrop.",
     "logo": "projects/meguri/assets/logos/meguri-project-logo-v1.svg"
   },
-  "productionVersion": "292cf733-dce8-4ef4-937a-00fb1e55503b",
+  "productionVersion": "fd1e75f7-6e2c-440c-962c-e4edebcae314",
   "verification": {
     "htmlPages": 49,
     "internalReferences": 2588,
@@ -41,6 +41,14 @@
     "layout": "Full-body Tsugumo lower left, full-body Mion lower right, seated larger Hakuto above center; no circular portrait badges",
     "logo": "projects/logos/totonoe-project-logo-v2.svg",
     "fullResolutionOriginal": "/Users/kantoshi/01_Base Craftas/08_HP/HP/assets/project-logos/totonoe-characters-frame-v2.png",
-    "bytes": 213733
+    "bytes": 213733,
+    "verification": {
+      "desktopPublicLogoLoaded": true,
+      "mobileViewport": 390,
+      "mobileAllThreeLogosLoaded": true,
+      "horizontalOverflow": false,
+      "referenceCheck": "49 pages and 2588 references passed",
+      "publicAsset": "HTTP 200 image/svg+xml"
+    }
   }
 }
