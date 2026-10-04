@@ -45,3 +45,5 @@ Cloudflare version: `2a2fe4df-5f12-433a-bf60-090814578b9e`. Local release: 49 pa
 See `outputs/project-image-audit-20261004.md` and its JSON inventory for all 78 rasters. Public derivatives use WebP plus responsive widths. Full Japanese font coverage is preserved in WOFF2. Original snapshots remain in Git but unreferenced originals are excluded from deployment. The assets directory is `dist-projects-optimized`.
 
 After exporting fresh snapshots, run `python3 scripts/optimize-project-images.py` (Pillow) and `python3 scripts/compress-project-font.py` (fonttools[woff]); keep the CSS font URL set to WOFF2. Build into a fresh output directory to avoid stale files from earlier exports, then run the reference checker. Do not blindly deploy an old build directory.
+
+Optimized production version: `006197c8-e39e-4974-a8a6-0ea82660258e`. All 259 routed public paths verified HTTP 200; private URLs 404. CSS cache key is bumped so existing visitors load the WOFF2 declaration.
