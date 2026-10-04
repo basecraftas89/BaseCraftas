@@ -27,5 +27,18 @@
     "mobileWidth": 390,
     "horizontalOverflow": false,
     "bothPublicLogosLoaded": true
+  },
+  "totonoe": {
+    "method": "Deterministic SVG composition of existing official PNG assets; lossless WebP encoding; original wordmark preserved",
+    "references": [
+      "projects/totonoe/assets/totonoe-logo.png",
+      "projects/totonoe/assets/characters/tsugumo-standard.png",
+      "projects/totonoe/assets/characters/mion-standard.png",
+      "projects/totonoe/assets/characters/hakuto-standard.png"
+    ],
+    "layout": "Hakuto above the exact original wordmark, Tsugumo on the left, Mion on the right",
+    "logo": "projects/logos/totonoe-project-logo-v1.svg",
+    "bytes": 341614,
+    "mobileVerified": 390
   }
 }

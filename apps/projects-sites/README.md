@@ -51,3 +51,5 @@ Optimized production version: `096712d0-c8fb-4771-8a54-a0fa09ffb60a`. All 259 ro
 ## Project listing logos: 2026-10-04
 
 The Sleeport and MEGURI cards use standalone SVG logos containing three official-character references and deterministic text. Sleeport uses the same Georgia bold / -0.02em typography as its header. Rebuild with `python3 scripts/build-project-logos.py`; the approved WebP frames are retained beside the SVG files. Generated full-resolution originals are preserved under the canonical `assets/project-logos` folder and in Codex generated_images. Prompt and reference notes are in `outputs/project-logos-20261004.json`. The new logos add about 264KiB to the full release, use no remote fonts or paid image transformations, and are served by the existing static worker.
+
+ToToNoE+ uses its original wordmark with the official Tsugumo, Mion and Hakuto portraits in `projects/logos/totonoe-project-logo-v1.svg`. PNG inputs are encoded losslessly as embedded WebP. Its single exact route is served by this assets-only Worker, preserving existing ToToNoE+ application routes. Rebuild with the same `build-project-logos.py` script (Pillow required).
