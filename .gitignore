@@ -17,3 +17,5 @@ dist/
 
 # Scoped public projects deployment build
 dist-projects/
+
+dist-projects-optimized/

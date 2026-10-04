@@ -6,7 +6,7 @@ preview_urls = false
 
 # No Worker script, database or R2 binding: public requests use free static delivery.
 [assets]
-directory = "../../dist-projects"
+directory = "../../dist-projects-optimized"
 not_found_handling = "404-page"
 
 [[routes]]

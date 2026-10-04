@@ -1,0 +1,1773 @@
+[
+  {
+    "project": "meguri",
+    "source": "projects/meguri/brand/app-icon.webp",
+    "public": "projects/meguri/brand/app-icon.webp",
+    "beforeBytes": 33352,
+    "afterBytes": 33352,
+    "originalWidth": 512,
+    "originalHeight": 512,
+    "width": 512,
+    "height": 512,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/brand/characters/canonical/utsupon-basic-v1.webp",
+    "public": "projects/meguri/brand/characters/canonical/utsupon-basic-v1.webp",
+    "beforeBytes": 21310,
+    "afterBytes": 21310,
+    "originalWidth": 360,
+    "originalHeight": 390,
+    "width": 360,
+    "height": 390,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/brand/characters/generated/mikke-icon.webp",
+    "public": "projects/meguri/assets/optimized/brand/characters/generated/mikke-icon.webp",
+    "beforeBytes": 83320,
+    "afterBytes": 33600,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/brand/characters/generated/mikke-icon-480w.webp",
+        "width": 480,
+        "bytes": 20936
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/brand/characters/generated/shirube-icon-v2.webp",
+    "public": "projects/meguri/assets/optimized/brand/characters/generated/shirube-icon-v2.webp",
+    "beforeBytes": 89612,
+    "afterBytes": 34884,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/brand/characters/generated/shirube-icon-v2-480w.webp",
+        "width": 480,
+        "bytes": 22372
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/action-notice.webp",
+    "public": "projects/meguri/assets/optimized/media/action-notice.webp",
+    "beforeBytes": 220708,
+    "afterBytes": 88404,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/action-notice-480w.webp",
+        "width": 480,
+        "bytes": 61444
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/action-pickup-v2.webp",
+    "public": "projects/meguri/assets/optimized/media/action-pickup-v2.webp",
+    "beforeBytes": 219138,
+    "afterBytes": 89328,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/action-pickup-v2-480w.webp",
+        "width": 480,
+        "bytes": 60962
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/action-walk.webp",
+    "public": "projects/meguri/assets/optimized/media/action-walk.webp",
+    "beforeBytes": 272920,
+    "afterBytes": 109192,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/action-walk-480w.webp",
+        "width": 480,
+        "bytes": 72038
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/area-ikoka.webp",
+    "public": "projects/meguri/assets/optimized/media/area-ikoka.webp",
+    "beforeBytes": 297864,
+    "afterBytes": 224680,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/area-ikoka-480w.webp",
+        "width": 480,
+        "bytes": 56540
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/area-ikoka-800w.webp",
+        "width": 800,
+        "bytes": 122626
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/area-kawagoe.webp",
+    "public": "projects/meguri/assets/optimized/media/area-kawagoe.webp",
+    "beforeBytes": 292042,
+    "afterBytes": 218988,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/area-kawagoe-480w.webp",
+        "width": 480,
+        "bytes": 54390
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/area-kawagoe-800w.webp",
+        "width": 800,
+        "bytes": 116500
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/characters-trio.webp",
+    "public": "projects/meguri/assets/optimized/media/characters-trio.webp",
+    "beforeBytes": 321274,
+    "afterBytes": 274790,
+    "originalWidth": 1374,
+    "originalHeight": 1145,
+    "width": 1280,
+    "height": 1067,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/characters-trio-480w.webp",
+        "width": 480,
+        "bytes": 57104
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/characters-trio-800w.webp",
+        "width": 800,
+        "bytes": 131928
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/footer-town.webp",
+    "public": "projects/meguri/media/footer-town.webp",
+    "beforeBytes": 220670,
+    "afterBytes": 220670,
+    "originalWidth": 1920,
+    "originalHeight": 646,
+    "width": 1920,
+    "height": 646,
+    "status": "retained-already-efficient",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/footer-town-480w.webp",
+        "width": 480,
+        "bytes": 31916
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/footer-town-800w.webp",
+        "width": 800,
+        "bytes": 69914
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/hero-family.webp",
+    "public": "projects/meguri/media/hero-family.webp",
+    "beforeBytes": 217046,
+    "afterBytes": 217046,
+    "originalWidth": 1774,
+    "originalHeight": 887,
+    "width": 1774,
+    "height": 887,
+    "status": "retained-already-efficient",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/hero-family-480w.webp",
+        "width": 480,
+        "bytes": 34616
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/hero-family-800w.webp",
+        "width": 800,
+        "bytes": 73572
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-bakery.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-bakery.webp",
+    "beforeBytes": 216920,
+    "afterBytes": 160818,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-bakery-480w.webp",
+        "width": 480,
+        "bytes": 43772
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-bakery-800w.webp",
+        "width": 800,
+        "bytes": 89636
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-bath.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-bath.webp",
+    "beforeBytes": 443968,
+    "afterBytes": 313664,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-bath-480w.webp",
+        "width": 480,
+        "bytes": 55222
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-bath-800w.webp",
+        "width": 800,
+        "bytes": 139254
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-cafe.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-cafe.webp",
+    "beforeBytes": 454766,
+    "afterBytes": 325536,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-cafe-480w.webp",
+        "width": 480,
+        "bytes": 59794
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-cafe-800w.webp",
+        "width": 800,
+        "bytes": 152270
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-florist.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-florist.webp",
+    "beforeBytes": 222298,
+    "afterBytes": 168748,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-florist-480w.webp",
+        "width": 480,
+        "bytes": 47262
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-florist-800w.webp",
+        "width": 800,
+        "bytes": 94224
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-printing.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-printing.webp",
+    "beforeBytes": 108276,
+    "afterBytes": 83254,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-printing-480w.webp",
+        "width": 480,
+        "bytes": 26422
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-printing-800w.webp",
+        "width": 800,
+        "bytes": 48788
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/photo-workshop.webp",
+    "public": "projects/meguri/assets/optimized/media/photo-workshop.webp",
+    "beforeBytes": 171772,
+    "afterBytes": 129112,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-workshop-480w.webp",
+        "width": 480,
+        "bytes": 38430
+      },
+      {
+        "path": "projects/meguri/assets/optimized/media/photo-workshop-800w.webp",
+        "width": 800,
+        "bytes": 71886
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/step-check.webp",
+    "public": "projects/meguri/assets/optimized/media/step-check.webp",
+    "beforeBytes": 222466,
+    "afterBytes": 93434,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/step-check-480w.webp",
+        "width": 480,
+        "bytes": 63672
+      }
+    ]
+  },
+  {
+    "project": "meguri",
+    "source": "projects/meguri/media/step-reflect.webp",
+    "public": "projects/meguri/assets/optimized/media/step-reflect.webp",
+    "beforeBytes": 244714,
+    "afterBytes": 98528,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 640,
+    "height": 640,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/meguri/assets/optimized/media/step-reflect-480w.webp",
+        "width": 480,
+        "bytes": 65308
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/apple-touch-icon.png",
+    "public": "projects/sleeport/assets/apple-touch-icon.png",
+    "beforeBytes": 57256,
+    "afterBytes": 57256,
+    "originalWidth": 180,
+    "originalHeight": 180,
+    "width": 180,
+    "height": 180,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/dortal-portrait.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/dortal-portrait.webp",
+    "beforeBytes": 248486,
+    "afterBytes": 67740,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/dortal-portrait-480w.webp",
+        "width": 480,
+        "bytes": 9660
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/dortal-portrait-800w.webp",
+        "width": 800,
+        "bytes": 25214
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/harbor-forest-eyemask.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/harbor-forest-eyemask.webp",
+    "beforeBytes": 626472,
+    "afterBytes": 205468,
+    "originalWidth": 1672,
+    "originalHeight": 941,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/harbor-forest-eyemask-480w.webp",
+        "width": 480,
+        "bytes": 44778
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/harbor-forest-eyemask-800w.webp",
+        "width": 800,
+        "bytes": 103722
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/line-sticker-autumn.png",
+    "public": "projects/sleeport/assets/line-sticker-autumn.png",
+    "beforeBytes": 21550,
+    "afterBytes": 21550,
+    "originalWidth": 240,
+    "originalHeight": 240,
+    "width": 240,
+    "height": 240,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/line-sticker-daily.png",
+    "public": "projects/sleeport/assets/line-sticker-daily.png",
+    "beforeBytes": 21951,
+    "afterBytes": 21951,
+    "originalWidth": 240,
+    "originalHeight": 240,
+    "width": 240,
+    "height": 240,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/line-sticker-new-day.png",
+    "public": "projects/sleeport/assets/line-sticker-new-day.png",
+    "beforeBytes": 21445,
+    "afterBytes": 21445,
+    "originalWidth": 240,
+    "originalHeight": 240,
+    "width": 240,
+    "height": 240,
+    "status": "retained-small",
+    "variants": []
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/porto-portrait-compact-wings.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/porto-portrait-compact-wings.webp",
+    "beforeBytes": 240578,
+    "afterBytes": 59044,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/porto-portrait-compact-wings-480w.webp",
+        "width": 480,
+        "bytes": 16694
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/porto-portrait-compact-wings-800w.webp",
+        "width": 800,
+        "bytes": 32104
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/rest-e.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/rest-e.webp",
+    "beforeBytes": 446828,
+    "afterBytes": 171406,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-e-480w.webp",
+        "width": 480,
+        "bytes": 45098
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-e-800w.webp",
+        "width": 800,
+        "bytes": 91120
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/rest-r.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/rest-r.webp",
+    "beforeBytes": 419022,
+    "afterBytes": 153156,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-r-480w.webp",
+        "width": 480,
+        "bytes": 45676
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-r-800w.webp",
+        "width": 800,
+        "bytes": 86460
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/rest-s.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/rest-s.webp",
+    "beforeBytes": 415432,
+    "afterBytes": 157094,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-s-480w.webp",
+        "width": 480,
+        "bytes": 41314
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-s-800w.webp",
+        "width": 800,
+        "bytes": 84062
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/rest-t.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/rest-t.webp",
+    "beforeBytes": 499179,
+    "afterBytes": 202722,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-t-480w.webp",
+        "width": 480,
+        "bytes": 50118
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/rest-t-800w.webp",
+        "width": 800,
+        "bytes": 103046
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/sleemo-portrait.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/sleemo-portrait.webp",
+    "beforeBytes": 1965245,
+    "afterBytes": 68530,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/sleemo-portrait-480w.webp",
+        "width": 480,
+        "bytes": 12086
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/sleemo-portrait-800w.webp",
+        "width": 800,
+        "bytes": 30816
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-01.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-01.webp",
+    "beforeBytes": 253675,
+    "afterBytes": 96896,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-01-480w.webp",
+        "width": 480,
+        "bytes": 23664
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-01-800w.webp",
+        "width": 800,
+        "bytes": 48308
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-03.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-03.webp",
+    "beforeBytes": 319815,
+    "afterBytes": 144056,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-03-480w.webp",
+        "width": 480,
+        "bytes": 29656
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-03-800w.webp",
+        "width": 800,
+        "bytes": 68418
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-05.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-05.webp",
+    "beforeBytes": 326173,
+    "afterBytes": 150914,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-05-480w.webp",
+        "width": 480,
+        "bytes": 29304
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-05-800w.webp",
+        "width": 800,
+        "bytes": 68214
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-01-cloud-contact.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-01-cloud-contact.webp",
+    "beforeBytes": 372392,
+    "afterBytes": 169242,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-01-cloud-contact-480w.webp",
+        "width": 480,
+        "bytes": 45582
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-01-cloud-contact-800w.webp",
+        "width": 800,
+        "bytes": 93528
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-03-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-03-20260930.webp",
+    "beforeBytes": 274840,
+    "afterBytes": 104500,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-03-20260930-480w.webp",
+        "width": 480,
+        "bytes": 32044
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-03-20260930-800w.webp",
+        "width": 800,
+        "bytes": 59014
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-04-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-04-20260930.webp",
+    "beforeBytes": 285436,
+    "afterBytes": 113546,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-04-20260930-480w.webp",
+        "width": 480,
+        "bytes": 31536
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-04-20260930-800w.webp",
+        "width": 800,
+        "bytes": 62024
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-05-underwater-home.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-05-underwater-home.webp",
+    "beforeBytes": 286849,
+    "afterBytes": 113310,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-05-underwater-home-480w.webp",
+        "width": 480,
+        "bytes": 29930
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-05-underwater-home-800w.webp",
+        "width": 800,
+        "bytes": 59252
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-06-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-06-20260930.webp",
+    "beforeBytes": 225840,
+    "afterBytes": 78292,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-06-20260930-480w.webp",
+        "width": 480,
+        "bytes": 24686
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-06-20260930-800w.webp",
+        "width": 800,
+        "bytes": 46010
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-08-family.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-08-family.webp",
+    "beforeBytes": 318636,
+    "afterBytes": 141398,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-08-family-480w.webp",
+        "width": 480,
+        "bytes": 33360
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-08-family-800w.webp",
+        "width": 800,
+        "bytes": 73156
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-10-sea-rescue-short-fin.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-10-sea-rescue-short-fin.webp",
+    "beforeBytes": 457915,
+    "afterBytes": 229208,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-10-sea-rescue-short-fin-480w.webp",
+        "width": 480,
+        "bytes": 54140
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-10-sea-rescue-short-fin-800w.webp",
+        "width": 800,
+        "bytes": 123040
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-11-cloud-contact.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-11-cloud-contact.webp",
+    "beforeBytes": 311919,
+    "afterBytes": 131156,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-11-cloud-contact-480w.webp",
+        "width": 480,
+        "bytes": 35100
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-11-cloud-contact-800w.webp",
+        "width": 800,
+        "bytes": 71502
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-12-cloud-contact.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-12-cloud-contact.webp",
+    "beforeBytes": 289707,
+    "afterBytes": 114400,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-12-cloud-contact-480w.webp",
+        "width": 480,
+        "bytes": 30904
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-12-cloud-contact-800w.webp",
+        "width": 800,
+        "bytes": 61814
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/dortal-chapter-13-cloud-contact.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-13-cloud-contact.webp",
+    "beforeBytes": 372825,
+    "afterBytes": 172212,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-13-cloud-contact-480w.webp",
+        "width": 480,
+        "bytes": 45844
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/dortal-chapter-13-cloud-contact-800w.webp",
+        "width": 800,
+        "bytes": 96506
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-01.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-01.webp",
+    "beforeBytes": 317379,
+    "afterBytes": 140092,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-01-480w.webp",
+        "width": 480,
+        "bytes": 31960
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-01-800w.webp",
+        "width": 800,
+        "bytes": 72580
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-02.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-02.webp",
+    "beforeBytes": 288244,
+    "afterBytes": 108644,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-02-480w.webp",
+        "width": 480,
+        "bytes": 25012
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-02-800w.webp",
+        "width": 800,
+        "bytes": 54420
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-04-distinct-flock.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-04-distinct-flock.webp",
+    "beforeBytes": 283594,
+    "afterBytes": 118636,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-04-distinct-flock-480w.webp",
+        "width": 480,
+        "bytes": 28284
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-04-distinct-flock-800w.webp",
+        "width": 800,
+        "bytes": 59906
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-05.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-05.webp",
+    "beforeBytes": 328041,
+    "afterBytes": 147706,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-05-480w.webp",
+        "width": 480,
+        "bytes": 30586
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-05-800w.webp",
+        "width": 800,
+        "bytes": 70346
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-02-identity.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-02-identity.webp",
+    "beforeBytes": 348077,
+    "afterBytes": 156328,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-02-identity-480w.webp",
+        "width": 480,
+        "bytes": 42266
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-02-identity-800w.webp",
+        "width": 800,
+        "bytes": 89748
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-05-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-05-20260930.webp",
+    "beforeBytes": 268986,
+    "afterBytes": 97608,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-05-20260930-480w.webp",
+        "width": 480,
+        "bytes": 27506
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-05-20260930-800w.webp",
+        "width": 800,
+        "bytes": 54012
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-06-identity.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-06-identity.webp",
+    "beforeBytes": 362541,
+    "afterBytes": 163340,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-06-identity-480w.webp",
+        "width": 480,
+        "bytes": 40272
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-06-identity-800w.webp",
+        "width": 800,
+        "bytes": 89550
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-07-identity.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-07-identity.webp",
+    "beforeBytes": 419778,
+    "afterBytes": 195032,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-07-identity-480w.webp",
+        "width": 480,
+        "bytes": 50940
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-07-identity-800w.webp",
+        "width": 800,
+        "bytes": 107400
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-09-identity.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-09-identity.webp",
+    "beforeBytes": 339081,
+    "afterBytes": 145878,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-09-identity-480w.webp",
+        "width": 480,
+        "bytes": 39628
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-09-identity-800w.webp",
+        "width": 800,
+        "bytes": 81554
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-10-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-10-20260930.webp",
+    "beforeBytes": 354669,
+    "afterBytes": 157654,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-10-20260930-480w.webp",
+        "width": 480,
+        "bytes": 43002
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-10-20260930-800w.webp",
+        "width": 800,
+        "bytes": 88130
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/porto-chapter-11-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-11-20260930.webp",
+    "beforeBytes": 309329,
+    "afterBytes": 135740,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-11-20260930-480w.webp",
+        "width": 480,
+        "bytes": 34954
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/porto-chapter-11-20260930-800w.webp",
+        "width": 800,
+        "bytes": 73358
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-01-distinct-muur.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-01-distinct-muur.webp",
+    "beforeBytes": 264560,
+    "afterBytes": 94038,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-01-distinct-muur-480w.webp",
+        "width": 480,
+        "bytes": 25650
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-01-distinct-muur-800w.webp",
+        "width": 800,
+        "bytes": 50128
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-02-dolphin-body.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-02-dolphin-body.webp",
+    "beforeBytes": 262441,
+    "afterBytes": 96316,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-02-dolphin-body-480w.webp",
+        "width": 480,
+        "bytes": 24044
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-02-dolphin-body-800w.webp",
+        "width": 800,
+        "bytes": 50904
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-03.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-03.webp",
+    "beforeBytes": 227832,
+    "afterBytes": 78700,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-03-480w.webp",
+        "width": 480,
+        "bytes": 18090
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-03-800w.webp",
+        "width": 800,
+        "bytes": 40766
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-04.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-04.webp",
+    "beforeBytes": 305055,
+    "afterBytes": 120720,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-04-480w.webp",
+        "width": 480,
+        "bytes": 25038
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-04-800w.webp",
+        "width": 800,
+        "bytes": 58474
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-05.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-05.webp",
+    "beforeBytes": 302753,
+    "afterBytes": 122246,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-05-480w.webp",
+        "width": 480,
+        "bytes": 26338
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-05-800w.webp",
+        "width": 800,
+        "bytes": 60352
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-01-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-01-20260930.webp",
+    "beforeBytes": 291467,
+    "afterBytes": 119216,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-01-20260930-480w.webp",
+        "width": 480,
+        "bytes": 31864
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-01-20260930-800w.webp",
+        "width": 800,
+        "bytes": 64634
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-03-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-03-20260930.webp",
+    "beforeBytes": 215179,
+    "afterBytes": 73690,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-03-20260930-480w.webp",
+        "width": 480,
+        "bytes": 23476
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-03-20260930-800w.webp",
+        "width": 800,
+        "bytes": 41600
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-08-identity.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-08-identity.webp",
+    "beforeBytes": 345208,
+    "afterBytes": 151926,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-08-identity-480w.webp",
+        "width": 480,
+        "bytes": 42178
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-08-identity-800w.webp",
+        "width": 800,
+        "bytes": 85756
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-09-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-09-20260930.webp",
+    "beforeBytes": 313780,
+    "afterBytes": 132164,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-09-20260930-480w.webp",
+        "width": 480,
+        "bytes": 36632
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-09-20260930-800w.webp",
+        "width": 800,
+        "bytes": 73694
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-10-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-10-20260930.webp",
+    "beforeBytes": 278475,
+    "afterBytes": 106022,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-10-20260930-480w.webp",
+        "width": 480,
+        "bytes": 29724
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-10-20260930-800w.webp",
+        "width": 800,
+        "bytes": 58822
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/stories/sleemo-chapter-11-20260930.jpg",
+    "public": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-11-20260930.webp",
+    "beforeBytes": 294691,
+    "afterBytes": 119942,
+    "originalWidth": 1280,
+    "originalHeight": 720,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-11-20260930-480w.webp",
+        "width": 480,
+        "bytes": 31830
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/stories/sleemo-chapter-11-20260930-800w.webp",
+        "width": 800,
+        "bytes": 66580
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/cloud-letters.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/cloud-letters.webp",
+    "beforeBytes": 120012,
+    "afterBytes": 70704,
+    "originalWidth": 1672,
+    "originalHeight": 941,
+    "width": 1280,
+    "height": 720,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/cloud-letters-480w.webp",
+        "width": 480,
+        "bytes": 18322
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/cloud-letters-800w.webp",
+        "width": 800,
+        "bytes": 38242
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/dortal-portrait.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/dortal-portrait.webp",
+    "beforeBytes": 162772,
+    "afterBytes": 137972,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/dortal-portrait-480w.webp",
+        "width": 480,
+        "bytes": 32324
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/dortal-portrait-800w.webp",
+        "width": 800,
+        "bytes": 68034
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/forest-frame.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/forest-frame.webp",
+    "beforeBytes": 217004,
+    "afterBytes": 141780,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/forest-frame-480w.webp",
+        "width": 480,
+        "bytes": 31972
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/forest-frame-800w.webp",
+        "width": 800,
+        "bytes": 74474
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/forest-story.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/forest-story.webp",
+    "beforeBytes": 341058,
+    "afterBytes": 231834,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/forest-story-480w.webp",
+        "width": 480,
+        "bytes": 55542
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/forest-story-800w.webp",
+        "width": 800,
+        "bytes": 121660
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/harbor-footer.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/harbor-footer.webp",
+    "beforeBytes": 269916,
+    "afterBytes": 232860,
+    "originalWidth": 2172,
+    "originalHeight": 724,
+    "width": 2172,
+    "height": 724,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-footer-480w.webp",
+        "width": 480,
+        "bytes": 20406
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-footer-800w.webp",
+        "width": 800,
+        "bytes": 51606
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/harbor-hero.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/harbor-hero.webp",
+    "beforeBytes": 238906,
+    "afterBytes": 212142,
+    "originalWidth": 1672,
+    "originalHeight": 941,
+    "width": 1672,
+    "height": 941,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-hero-480w.webp",
+        "width": 480,
+        "bytes": 34502
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-hero-800w.webp",
+        "width": 800,
+        "bytes": 77816
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/harbor-market.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/harbor-market.webp",
+    "beforeBytes": 361922,
+    "afterBytes": 237122,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-market-480w.webp",
+        "width": 480,
+        "bytes": 55078
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/harbor-market-800w.webp",
+        "width": 800,
+        "bytes": 124332
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/lighthouse-learning.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/lighthouse-learning.webp",
+    "beforeBytes": 240944,
+    "afterBytes": 160570,
+    "originalWidth": 1536,
+    "originalHeight": 1024,
+    "width": 1280,
+    "height": 853,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/lighthouse-learning-480w.webp",
+        "width": 480,
+        "bytes": 43182
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/lighthouse-learning-800w.webp",
+        "width": 800,
+        "bytes": 88136
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/porto-portrait.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/porto-portrait.webp",
+    "beforeBytes": 248852,
+    "afterBytes": 223840,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/porto-portrait-480w.webp",
+        "width": 480,
+        "bytes": 61290
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/porto-portrait-800w.webp",
+        "width": 800,
+        "bytes": 123264
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/sleemo-portrait.webp",
+    "public": "projects/sleeport/assets/optimized/assets/v2/sleemo-portrait.webp",
+    "beforeBytes": 138392,
+    "afterBytes": 118872,
+    "originalWidth": 1254,
+    "originalHeight": 1254,
+    "width": 1254,
+    "height": 1254,
+    "status": "optimized",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/sleemo-portrait-480w.webp",
+        "width": 480,
+        "bytes": 32202
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/sleemo-portrait-800w.webp",
+        "width": 800,
+        "bytes": 62536
+      }
+    ]
+  },
+  {
+    "project": "sleeport",
+    "source": "projects/sleeport/assets/v2/wave-divider.webp",
+    "public": "projects/sleeport/assets/v2/wave-divider.webp",
+    "beforeBytes": 27788,
+    "afterBytes": 27788,
+    "originalWidth": 2172,
+    "originalHeight": 724,
+    "width": 2172,
+    "height": 724,
+    "status": "retained-already-efficient",
+    "variants": [
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/wave-divider-480w.webp",
+        "width": 480,
+        "bytes": 4116
+      },
+      {
+        "path": "projects/sleeport/assets/optimized/assets/v2/wave-divider-800w.webp",
+        "width": 800,
+        "bytes": 7374
+      }
+    ]
+  }
+]

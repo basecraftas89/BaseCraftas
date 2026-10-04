@@ -39,3 +39,9 @@ Only the exact home/index/project routes in wrangler.toml are changed. Existing 
 ## Verified production release: 2026-10-04
 
 Cloudflare version: `2a2fe4df-5f12-433a-bf60-090814578b9e`. Local release: 49 pages, 1,821 internal references checked, zero private files. Adopted Sleeport source checks: 24 pages, 1,037 links, 215 resources, all six full stories preserved. Live desktop and 390px mobile checks passed. Private editor/source URLs returned 404; anonymous TAYORI and IROHA pages retained login redirects.
+
+## Image optimization: 2026-10-04
+
+See `outputs/project-image-audit-20261004.md` and its JSON inventory for all 78 rasters. Public derivatives use WebP plus responsive widths. Full Japanese font coverage is preserved in WOFF2. Original snapshots remain in Git but unreferenced originals are excluded from deployment. The assets directory is `dist-projects-optimized`.
+
+After exporting fresh snapshots, run `python3 scripts/optimize-project-images.py` (Pillow) and `python3 scripts/compress-project-font.py` (fonttools[woff]); keep the CSS font URL set to WOFF2. Build into a fresh output directory to avoid stale files from earlier exports, then run the reference checker. Do not blindly deploy an old build directory.
