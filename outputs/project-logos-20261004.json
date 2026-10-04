@@ -19,5 +19,13 @@
     ],
     "prompt": "Preserve exact Utsupon, Mikke and Shirube identities. Transparent frame: raccoon lower left, fox lower right, owl upper center; empty central lower region for separately typeset wordmark. Exactly three characters, no text, no scenic backdrop.",
     "logo": "projects/meguri/assets/logos/meguri-project-logo-v1.svg"
+  },
+  "productionVersion": "82943696-295d-4c39-ae48-737d1b1120c3",
+  "verification": {
+    "htmlPages": 49,
+    "internalReferences": 2588,
+    "mobileWidth": 390,
+    "horizontalOverflow": false,
+    "bothPublicLogosLoaded": true
   }
 }
