@@ -42,3 +42,27 @@ zone_name = "basecraftas.com"
 [[routes]]
 pattern = "basecraftas.com/products*"
 zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/about.html"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/profile.html"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/contact.html"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/services/"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/services"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/services/index.html"
+zone_name = "basecraftas.com"
