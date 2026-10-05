@@ -66,3 +66,15 @@ zone_name = "basecraftas.com"
 [[routes]]
 pattern = "basecraftas.com/services/index.html"
 zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/about"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/profile"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/contact"
+zone_name = "basecraftas.com"
