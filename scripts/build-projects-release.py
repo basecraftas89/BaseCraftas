@@ -15,7 +15,7 @@ class Resources(HTMLParser):
   if a.get('srcset'):self.urls.extend(x.strip().split()[0] for x in a['srcset'].split(','))
   if tag=='link' and a.get('rel') not in ['canonical'] and a.get('href'):self.urls.append(a['href'])
 # Preserve the previous public wordmark for rollback compatibility.
-queue=['index.html','projects/index.html','projects/totonoe/assets/totonoe-logo.png']+[str(p.relative_to(ROOT)) for p in (ROOT/'projects/logos').glob('*.svg')]+[str(p.relative_to(ROOT)) for slug in ['meguri','sleeport'] for p in (ROOT/'projects'/slug).rglob('*') if p.is_file() and p.suffix in {'.html','.css','.js','.txt'}];done=set()
+queue=['products/index.html','index.html','projects/index.html','projects/totonoe/assets/totonoe-logo.png']+[str(p.relative_to(ROOT)) for p in (ROOT/'projects/logos').glob('*.svg')]+[str(p.relative_to(ROOT)) for slug in ['meguri','sleeport'] for p in (ROOT/'projects'/slug).rglob('*') if p.is_file() and p.suffix in {'.html','.css','.js','.txt'}];done=set()
 while queue:
  rel=queue.pop()
  if rel in done:continue
