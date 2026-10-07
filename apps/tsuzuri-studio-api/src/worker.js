@@ -4170,6 +4170,7 @@ const worker = {
     // Friday 22:10 UTC is Saturday 07:10 JST. This job only syncs PDFs.
     if (controller.cron === "10 22 * * FRI") {
       try {
+        const materials = await syncWeeklyMaterials(env);
         console.log(JSON.stringify({ event: "weekly.materials_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, materials }));
       } catch (error) {
         console.error(JSON.stringify({ event: "weekly.materials_sync.error", cron: controller.cron, scheduled_time: controller.scheduledTime, error: String(error.message || error) }));
@@ -4204,7 +4205,6 @@ const worker = {
       }
       if (controller.cron === "0 0 * * SAT") {
         const weekendThumbnails = await archiveExpiredWeekendThumbnails(env, controller.scheduledTime || Date.now());
-        const materials = await syncWeeklyMaterials(env);
         const archiveVideos = await scanDriveArchives(env);
         const trash = await purgeExpiredTrash(env);
         console.log(JSON.stringify({ event: "weekly.saturday_sync", cron: controller.cron, scheduled_time: controller.scheduledTime, weekend_thumbnails: weekendThumbnails, archive_videos: archiveVideos, trash }));
