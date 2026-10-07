@@ -38,7 +38,7 @@ test('the four published character stories are Studio-ready and seeded without o
   assert.equal(sql.prepare("SELECT title FROM articles WHERE id='character-story-mion-which-shadow'").get().title,'Studio edit');
 });
 
-test('character page renders the selected destination while TSUZURI excludes it',async()=>{
+test('character page renders the selected destination and TSUZURI includes character stories',async()=>{
   const html=read('projects/totonoe/characters/index.html');
   const dom=new JSDOM(html,{url:'https://basecraftas.com/projects/totonoe/characters/',runScripts:'outside-only'});
   const index=JSON.parse(read('projects/totonoe/data/contents/index.json'));
@@ -48,7 +48,8 @@ test('character page renders the selected destination while TSUZURI excludes it'
   const cards=dom.window.document.querySelectorAll('#characterStoriesGrid .story-card');
   assert.equal(cards.length,4);
   assert.match(cards[0].querySelector('a').getAttribute('href'),/^\.\.\/tsuzuri\/.+\/$/);
-  assert.match(read('projects/totonoe/service-content.js'),/item\.destination !== 'characters'/);
+  assert.match(read('projects/totonoe/service-content.js'),/item\.status === 'published' && \(item\.content_type \|\| 'column'\) === 'column'/);
+  assert.match(read('projects/totonoe/service-content.js'),/isCharacterStory/);
 });
 
 test('Studio offers both destinations and the Worker preserves character actors and routes',()=>{

@@ -19,28 +19,39 @@ export const BILLING_PLANS = Object.freeze({
     recurringPriceEnv: "STRIPE_PRICE_CURRICULUM_MONTHLY",
     entitlementCodes: Object.freeze(["curriculum_all_access", "weekly_access"]),
   }),
-  curriculum_annual: Object.freeze({
-    planCode: "curriculum_annual",
-    productCode: "curriculum",
-    billingInterval: "annual",
-    recurringAmountYen: 29800,
-    recurringPriceEnv: "STRIPE_PRICE_CURRICULUM_ANNUAL",
-    entitlementCodes: Object.freeze(["curriculum_all_access", "weekly_access"]),
-  }),
 });
 
 export const CURRICULUM_ENTRY_FEES = Object.freeze({
-  first: Object.freeze({ amountYen: 9800, priceEnv: "STRIPE_PRICE_IROHA_FIRST" }),
-  rejoin: Object.freeze({ amountYen: 4800, priceEnv: "STRIPE_PRICE_IROHA_REJOIN" }),
+  first: Object.freeze({ amountYen: 0, priceEnv: null }),
+  rejoin: Object.freeze({ amountYen: 0, priceEnv: null }),
 });
 
-export const CURRICULUM_CAMPAIGNS = Object.freeze({});
+export const CURRICULUM_CAMPAIGNS = Object.freeze({
+  iroha_first_waiver_5000: Object.freeze({
+    campaignCode: "iroha_first_waiver_5000",
+    allowedPlanCodes: Object.freeze(["curriculum_monthly"]),
+    allowedFeeTypes: Object.freeze(["first"]),
+    allowedAudienceTypes: Object.freeze(["general", "therapist"]),
+    entryFeeAmountYen: 0,
+    entryFeePriceEnv: null,
+    trialPeriodMonths: 3,
+  }),
+});
+
+export function addCalendarMonthsUtc(startMs, months) {
+  const start = new Date(startMs);
+  if (!Number.isFinite(startMs) || Number.isNaN(start.getTime()) || !Number.isInteger(months) || months < 1) throw billingError("invalid_trial_start");
+  const year = start.getUTCFullYear();
+  const month = start.getUTCMonth();
+  const lastDay = new Date(Date.UTC(year, month + months + 1, 0)).getUTCDate();
+  return Math.floor(Date.UTC(year, month + months, Math.min(start.getUTCDate(), lastDay), start.getUTCHours(), start.getUTCMinutes(), start.getUTCSeconds()) / 1000);
+}
 
 function billingError(code) {
   return Object.assign(new Error(code), { code, status: 400 });
 }
 
-export function resolveBillingQuote({ planCode, audienceType = "general", feeType = "none", campaignCode = "none" } = {}) {
+export function resolveBillingQuote({ planCode, audienceType = "general", feeType = "none", campaignCode = "none", nowMs = Date.now() } = {}) {
   const plan = BILLING_PLANS[String(planCode || "")];
   if (!plan) throw billingError("invalid_plan");
   if (!["general", "therapist"].includes(audienceType)) throw billingError("invalid_audience");
@@ -73,7 +84,8 @@ export function resolveBillingQuote({ planCode, audienceType = "general", feeTyp
     ? { amountYen: campaign.entryFeeAmountYen, priceEnv: campaign.entryFeePriceEnv }
     : CURRICULUM_ENTRY_FEES[feeType];
   if (!entryFee) throw billingError("invalid_entry_fee");
-  const trialPeriodDays = campaign?.trialPeriodDays || (feeType === "first" ? 30 : 0);
+  const trialEndSeconds = campaign?.trialPeriodMonths ? addCalendarMonthsUtc(nowMs, campaign.trialPeriodMonths) : null;
+  const trialPeriodDays = trialEndSeconds ? Math.ceil((trialEndSeconds * 1000 - nowMs) / 86400000) : (feeType === "first" ? 30 : 0);
   return Object.freeze({
     ...plan,
     audienceType: "general",
@@ -83,6 +95,7 @@ export function resolveBillingQuote({ planCode, audienceType = "general", feeTyp
     firstChargeAmountYen: entryFee.amountYen + (trialPeriodDays ? 0 : plan.recurringAmountYen),
     campaignCode: campaign?.campaignCode || "none",
     trialPeriodDays,
+    trialEndSeconds,
     currency: "jpy",
   });
 }

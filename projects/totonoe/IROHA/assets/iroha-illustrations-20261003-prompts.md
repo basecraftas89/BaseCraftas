@@ -1,0 +1,18 @@
+Built-in image_gen; transparent_background=true. Generated originals retained.
+
+## challenges
+
+Create a finished wide landscape slide illustration PNG for Japanese ToToNoE+ IROHA website. Genuine transparent background, no full canvas colored rectangle. Friendly polished tactile 3D clay/paper miniature illustration, forest deep teal #005449, sage green, warm cream, orange #de603c, dark high contrast readable Japanese typography. Simple generous spacing, three visually connected scenes left to right, restrained details. No logo, no heading, no footer, no extra text beyond exact labels below. Illustrations carry the message with concise labels. Three sympathetic adult professional learners: left confused by floating AI news cards while foundational puzzle pieces are missing; center hesitates to ask a question with speech bubbles; right looks worried as knowledge stacks move ahead. Exact labels below scenes: 「基礎があいまい」「今さら聞きづらい」「遅れている気がする」. Avoid panic or negative stereotypes.
+
+## learning
+
+Create a finished wide landscape slide illustration PNG for Japanese ToToNoE+ IROHA website. Genuine transparent background, no full canvas colored rectangle. Friendly polished tactile 3D clay/paper miniature illustration, forest deep teal #005449, sage green, warm cream, orange #de603c, dark high contrast readable Japanese typography. Simple generous spacing, three visually connected scenes left to right, restrained details. No logo, no heading, no footer, no extra text beyond exact labels below. Illustrations carry the message with concise labels. Three stages linked by clear orange arrows: left sturdy blocks and open book, center selecting a tool with laptop and three tool cards, right professional trying an idea at desk with small plant growing. Exact labels: 「1 基礎」「2 活用」「3 実践」 and secondary short labels 「土台をつくる」「使い方を選ぶ」「仕事で試す」.
+
+## flow
+
+Create a finished wide landscape slide illustration PNG for Japanese ToToNoE+ IROHA website. Genuine transparent background, no full canvas colored rectangle. Friendly polished tactile 3D clay/paper miniature illustration, forest deep teal #005449, sage green, warm cream, orange #de603c, dark high contrast readable Japanese typography. Simple generous spacing, three visually connected scenes left to right, restrained details. No logo, no heading, no footer, no extra text beyond exact labels below. Illustrations carry the message with concise labels. A continuous gentle learning cycle with three scenes linked by orange arrows and a return arc: setting weekly goal with calendar, choosing lesson on laptop with play icon, recording reflection in notebook with small badge. Exact labels: 「目標を決める」「カリキュラムを選ぶ」「記録して振り返る」. Accessible high contrast.
+
+## switch
+
+Create a finished wide landscape slide illustration PNG for Japanese ToToNoE+ IROHA website. Genuine transparent background, no full canvas colored rectangle. Friendly polished tactile 3D clay/paper miniature illustration, forest deep teal #005449, sage green, warm cream, orange #de603c, dark high contrast readable Japanese typography. Simple generous spacing, three visually connected scenes left to right, restrained details. No logo, no heading, no footer, no extra text beyond exact labels below. Illustrations carry the message with concise labels. Contract migration explanation, three large cream panels with distinctly colored headers, teal dark text, orange arrows, small mail icon then confirmation icon then combined benefit gift illustration. Exact text first panel 「同じメールで申込」「IROHAへ」; second 「IROHA加入完了」「TAYORI単体契約は自動終了」; third 「月額はIROHAのみ」「2,980円（税込）」「TAYORIの対象特典も継続」. Very legible large text, clean corporate friendly slide, not pale washed-out. No extra claim about enrollment fees.
+

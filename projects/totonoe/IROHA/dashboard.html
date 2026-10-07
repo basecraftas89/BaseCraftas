@@ -4,39 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>学習ホーム｜ToToNoE+ IROHA</title>
+  <title>カリキュラム｜ToToNoE+ IROHA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="curriculum.css?v=20260912-entitlements">
+  <link rel="stylesheet" href="curriculum-badges-20261001.css?v=20261002-lesson-sequence">
+  <link rel="stylesheet" href="lesson-notes.css?v=20261002-account-notes">
+<link rel="stylesheet" href="../member-world-banners.css?v=20261003g">  <link rel="stylesheet" href="seminars-member.css?v=20261003a">
+  <link rel="stylesheet" href="../TAYORI/weekend-media.css?v=20261003d">
 </head>
 <body class="learning-app" data-page-entitlement="curriculum">
   <aside class="learning-sidebar">
     <a class="curriculum-brand" href="index.html" aria-label="IROHA料金ページへ">
-      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" width="1442" height="566">
+      <img src="../assets/totonoe-logo-optimized.webp" alt="ToToNoE+" width="1442" height="566">
     </a>
     <nav aria-label="会員メニュー">
       <a href="../TAYORI/"><span class="material-symbols-rounded" aria-hidden="true">newspaper</span>TAYORI</a>
       <a href="dashboard.html" class="is-active" data-entitlement="curriculum"><span class="material-symbols-rounded" aria-hidden="true">school</span>IROHA</a>
-      <a href="#tools"><span class="material-symbols-rounded" aria-hidden="true">menu_book</span>ツールから学ぶ</a>
-      <button type="button" data-open-history><span class="material-symbols-rounded" aria-hidden="true">monitoring</span>学習履歴</button>
       <a href="mypage.html"><span class="material-symbols-rounded" aria-hidden="true">person</span>マイページ</a>
     </nav>
     <p class="sidebar-message"><strong>学びで、<br>現場のチカラに。</strong><br>医療・介護を原点に、実務へつながる学びを届けます。</p>
   </aside>
 
   <main class="learning-main" id="home">
-    <header class="learning-hero">
-      <div>
-        <p class="eyebrow">AI整え習慣</p>
-        <h1>今週の学びを、<br>自分のペースで続ける。</h1>
-        <p>現場で役立つ知識とツールを、無理なく、着実に。</p>
-      </div>
-      <div class="account-summary">
-        <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
-        <div><strong>山田 太郎さん</strong><small>IROHA年額プラン</small></div>
-      </div>
+    <header class="iroha-topbar">
+      <div><p class="eyebrow">TOTONOE IROHA</p><h1 id="irohaViewTitle">カリキュラムを探す</h1></div>
+      <div class="iroha-member-status"><span class="iroha-status-dot" aria-hidden="true"></span><div><strong>IROHA 学習ページ</strong><small>会員向け</small></div></div>
     </header>
+    <section class="iroha-banner-hero" aria-label="IROHAの世界観">
+      <img id="irohaWorldBanner" alt="" width="1440" height="480" decoding="async">
+    </section>
+    <nav class="iroha-view-nav" aria-label="IROHAの学習メニュー">
+<a href="?view=progress" data-iroha-view-link="progress"><span class="material-symbols-rounded" aria-hidden="true">calendar_month</span><span>学習管理</span></a><a href="?view=goals" data-iroha-view-link="goals"><span class="material-symbols-rounded" aria-hidden="true">flag</span><span>目標設定</span></a>
+      <a href="?view=curriculum" data-iroha-view-link="curriculum" class="is-active" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">menu_book</span><span>カリキュラム</span></a>
+      <a href="?view=history" data-iroha-view-link="history"><span class="material-symbols-rounded" aria-hidden="true">workspace_premium</span><span>学習履歴</span></a>
+      <a href="?view=seminars" data-iroha-view-link="seminars"><span class="material-symbols-rounded" aria-hidden="true">co_present</span><span>セミナー</span></a>
+    </nav>
+
+    <section class="iroha-view" data-iroha-view="progress" hidden aria-labelledby="irohaProgressTitle">
+      <figure class="iroha-start-guide"><img src="../assets/iroha-guide-progress-v1.webp" alt="学習管理。予定を決める、時間を記録する、振り返る。今週の学ぶ日と時間を設定。取り組んだ学習時間を残す。週次レビューで次につなぐ。" width="1672" height="941" loading="lazy" decoding="async"></figure>
+      <div class="iroha-view-intro"><p class="eyebrow">YOUR PROGRESS</p><h2 id="irohaProgressTitle">学習計画と週次レビュー</h2><p>無理のない予定を決め、学習時間を記録しましょう。週次レビューは取り組みたいときに開けます。</p></div>
 
     <section class="week-panel" aria-labelledby="weekTitle">
       <div class="panel-heading">
@@ -51,6 +58,15 @@
       </div>
       <ol class="week-days" id="weekDays" aria-label="日曜から土曜の学習予定"></ol>
       <p class="gentle-note">今週はここまででも大丈夫。未完了は来週へ移せます。</p>
+      <div class="next-week-prep">
+        <span class="material-symbols-rounded" aria-hidden="true">event_upcoming</span>
+        <div>
+          <strong>土曜日に、次の週を準備します</strong>
+          <p id="nextWeekStatus">次週の予定は、土曜日に2〜3日を選んで決めます。</p>
+        </div>
+        <button type="button" data-plan-next-week>次週の予定を決める</button>
+      </div>
+    </section>
       <section class="weekly-progress-card" aria-labelledby="weeklyProgressTitle">
         <div class="weekly-progress-heading">
           <div>
@@ -75,78 +91,93 @@
           </div>
         </div>
       </section>
-      <div class="next-week-prep">
-        <span class="material-symbols-rounded" aria-hidden="true">event_upcoming</span>
-        <div>
-          <strong>土曜日に、次の週を準備します</strong>
-          <p id="nextWeekStatus">次週の予定は、土曜日に2〜3日を選んで決めます。</p>
-        </div>
-        <button type="button" data-plan-next-week>次週の予定を決める</button>
-      </div>
+      <section class="iroha-progress-history" aria-labelledby="irohaHistoryTitle"><div><h3 id="irohaHistoryTitle">今週の記録</h3><button type="button" data-open-history>すべての学習履歴を見る</button></div><ul id="irohaStudySessions"></ul><p id="irohaStudySessionsEmpty">記録すると、ここに学習日と時間が表示されます。</p></section>
     </section>
+
+    <section class="iroha-view" data-iroha-view="goals" hidden aria-labelledby="irohaGoalsTitle">
+      <figure class="iroha-start-guide"><img src="../assets/iroha-guide-goals-v1.webp" alt="目標設定。目標を決める、理由を言葉に、時間を決める。何を、どこまで学ぶか決める。仕事で役立てたいことを書く。学ぶ曜日と時間を設定。" width="1672" height="941" loading="lazy" decoding="async"></figure>
+      <div class="iroha-view-intro"><p class="eyebrow">YOUR GOAL</p><h2 id="irohaGoalsTitle">目標を決める</h2><p>目指すことを言葉にし、今週の時間と次の行動に結びつけます。</p></div>
+      <div class="iroha-goal-grid">
+        <article class="iroha-feature-card"><span class="material-symbols-rounded" aria-hidden="true">flag</span><h3>今週の目標</h3><p id="irohaGoalSummary">まだ目標は設定されていません。下の欄から今週の目標を決めましょう。</p><form id="irohaGoalForm" class="iroha-goal-form"><label>何を、どこまで進めますか？<textarea name="goal" rows="2" required placeholder="例：ChatGPTの基礎を2レッスン学ぶ"></textarea></label><label>その目標に取り組む理由は？<textarea name="reason" rows="2" placeholder="実務でどのように役立てたいか"></textarea></label><button type="submit" class="primary-button">今週の目標を保存</button></form><button type="button" class="iroha-inline-action" data-open-review>週次レビューと次週の目標を開く</button></article>
+        <article class="iroha-feature-card"><span class="material-symbols-rounded" aria-hidden="true">schedule</span><h3>今週の学習時間</h3><p id="irohaTimeGoalSummary">1週間の時間と学ぶ曜日を決めます。</p><div class="iroha-goal-steps"><p>1週間の総学習時間を決める</p><p>取り組む曜日を2〜3日選ぶ</p><p>曜日ごとの時間を配分する</p></div><button type="button" class="secondary-button" data-edit-schedule>学習時間を設定</button></article>
+      </div>
+      <p class="iroha-data-note">設定内容は現在このブラウザ内に保存されます。別の端末との同期はまだありません。</p>
+    </section>
+
+    <div class="iroha-view" data-iroha-view="curriculum">
+      <figure class="iroha-start-guide"><img src="../assets/iroha-guide-curriculum-v1.webp" alt="カリキュラム。講座を探す、動画で学ぶ、学びを記録。学びたい分野から選ぶ。レッスンを順番に進める。アウトプットを次の実践へ。" width="1672" height="941" loading="lazy" decoding="async"></figure>
+      <div class="iroha-view-intro"><p class="eyebrow">LEARN YOUR WAY</p><h2>カリキュラム</h2><p>学習中の講座から続けるか、分野を選んで新しい講座を探しましょう。</p></div>
 
     <div class="learning-grid">
       <div class="learning-primary">
-        <section class="current-course" aria-labelledby="currentCourseTitle">
-          <img src="../assets/totonoe-weekly-filter.jpg" alt="ノートパソコンと学習資料" width="1672" height="941">
-          <div>
-            <p class="status-label">現在のコース</p>
-            <h2 id="currentCourseTitle">ChatGPT 基礎から実務活用へ</h2>
-            <p>医療・介護の現場で使える生成AIの実践知</p>
-            <div class="course-progress"><span style="width:38%"></span></div>
-            <p class="progress-copy"><strong>38%</strong> 完了</p>
-            <div class="next-lesson">
-              <span class="material-symbols-rounded" aria-hidden="true">play_circle</span>
-              <div><small>次に学ぶレッスン</small><strong>プロンプトを仕事の型にする</strong><span>約12分・レッスン4 / 10</span></div>
-            </div>
-            <button type="button" class="primary-button" data-start-lesson>続きから学ぶ</button>
-          </div>
+        <section class="iroha-current-learning" aria-labelledby="irohaCurrentLearningTitle">
+          <div class="panel-heading compact"><div><p class="eyebrow">CONTINUE LEARNING</p><h2 id="irohaCurrentLearningTitle">学習中の講座</h2></div></div>
+          <div id="irohaCurrentLearningList" class="iroha-current-learning-list"></div>
         </section>
-
         <section class="tool-library" id="tools" aria-labelledby="toolsTitle">
-          <div class="panel-heading compact">
-            <div><h2 id="toolsTitle">ツールから学ぶ</h2><p>まずは3つの生成AIから、仕事に合わせて選べます。</p></div>
-          </div>
-          <div class="tool-curricula">
-            <button class="tool-card" type="button" data-tool="ChatGPT">
-              <span class="tool-logo"><img src="assets/chatgpt.svg" alt="" width="41" height="41"></span>
-              <span class="tool-card-copy"><strong>ChatGPT</strong><small>対話・文章・日常業務の基本</small></span>
-              <span class="tool-lessons">基本操作／安全な使い方／プロンプト／実務の型</span>
-              <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
-            </button>
-            <button class="tool-card" type="button" data-tool="Claude">
-              <span class="tool-logo"><img src="assets/claude.svg" alt="" width="64" height="64"></span>
-              <span class="tool-card-copy"><strong>Claude</strong><small>長い資料の整理・比較・推敲</small></span>
-              <span class="tool-lessons">基本操作／資料読解／構成づくり／レビュー</span>
-              <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
-            </button>
-            <button class="tool-card" type="button" data-tool="Gemini">
-              <span class="tool-logo"><img src="assets/gemini.svg" alt="" width="64" height="64"></span>
-              <span class="tool-card-copy"><strong>Gemini</strong><small>Googleサービスと情報整理</small></span>
-              <span class="tool-lessons">基本操作／情報確認／Workspace活用／実務連携</span>
-              <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
-            </button>
-          </div>
-          <p class="brand-note">各ロゴは各社の公式配布・公式サイトのデータをそのまま使用しています。各サービスによる推奨・提携を示すものではありません。</p>
+          <div class="panel-heading compact"><div><h2 id="toolsTitle">講座を探す</h2><p>選んだ分野の講座とレッスンを確認できます。</p></div></div>
+          <section class="curriculum-list-panel" aria-labelledby="irohaCurriculumListTitle">
+            <h3 id="irohaCurriculumListTitle" tabindex="-1">分野を選んでください</h3>
+            <p id="irohaCategoryStatus">公開中のカリキュラムを表示します。</p>
+            <div id="irohaCurriculumList" class="curriculum-list"></div>
+          </section>
+          <section class="iroha-tool-detail" id="irohaToolDetail" aria-labelledby="irohaToolDetailTitle" tabindex="-1">
+            <div class="iroha-tool-detail-heading">
+              <div><p class="status-label">選択中のカリキュラム</p><h3 id="irohaToolDetailTitle">カリキュラムを選んでください</h3><p id="irohaCurriculumChoice" class="iroha-choice-note">レッスンと進捗をここに表示します。</p></div>
+              <button type="button" class="primary-button" data-start-lesson hidden>次のレッスンへ</button>
+            </div>
+            <p id="irohaLessonStatus" class="iroha-lesson-status" role="status">分野とカリキュラムを選ぶと、レッスンを確認できます。</p>
+            <div id="irohaLessonGroups" class="iroha-lesson-groups"></div>
+          </section>
         </section>
       </div>
-
-      <aside class="learning-support">
-        <section>
-          <h2><span class="material-symbols-rounded" aria-hidden="true">support_agent</span>相談特典までの道のり</h2>
-          <span class="pending-badge">法人研修プラン公開後に受付開始</span>
-          <p>対象カリキュラムの修了後、運営担当者との30分相談枠を1回利用できる設計です。</p>
-          <div class="benefit-progress" aria-label="10件中6件完了"><span></span><span></span><span></span><span></span><span></span><span></span><i></i><i></i><i></i><i></i></div>
-          <small>現在 6 / 10レッスン</small>
-          <p class="support-note">予約機能はまだ接続していません。法人研修プラン完成後に、30分枠の空き時間から選べるようにします。</p>
-        </section>
-        <section>
-          <h2>契約プラン</h2>
-          <p><strong>年額 29,800円</strong><br>月額より2か月分お得</p>
-          <a href="index.html#pricing">料金と契約を確認</a>
-        </section>
+      <aside class="iroha-category-rail" aria-labelledby="irohaCategoriesTitle">
+        <div class="panel-heading compact"><div><h2 id="irohaCategoriesTitle">学びたい分野を選ぶ</h2><p>選んだ分野の講座を表示します。</p></div></div>
+        <div class="curriculum-categories" id="irohaCategoryList" role="group" aria-label="学習分野"></div>
       </aside>
     </div>
+    </div>
+    <section class="iroha-view iroha-achievements" data-iroha-view="history" hidden aria-labelledby="irohaAchievementsTitle">
+      <figure class="iroha-start-guide"><img src="../assets/iroha-guide-history-v1.webp" alt="学習履歴。メモを見返す、バッジを確認、修了証を見る。受講メモから学びを振り返る。修了したレッスンを確認。カリキュラムの修了を確認。" width="1672" height="941" loading="lazy" decoding="async"></figure>
+      <section class="iroha-achievement-panel iroha-notes-panel" id="irohaNotesPanel" aria-labelledby="irohaNotesTitle"><h3 id="irohaNotesTitle">受講メモ</h3><p class="iroha-notes-status" id="irohaNotesStatus" role="status">保存したメモをここで見返せます。</p><div id="irohaNotesList"></div><button class="secondary-button" id="irohaNotesMore" type="button" hidden>さらに表示</button><button class="secondary-button" id="irohaNotesRetry" type="button" hidden>再読み込み</button></section>
+      <div class="iroha-view-intro"><p class="eyebrow">YOUR ACHIEVEMENTS</p><h2 id="irohaAchievementsTitle">学びの積み重ね</h2><p>公開済みレッスンの修了バッジと、カリキュラムの修了証を確認できます。</p></div>
+      <div class="iroha-achievement-summary"><div><span class="material-symbols-rounded" aria-hidden="true">military_tech</span><strong id="irohaBadgeCount">0</strong><span>修了バッジ</span></div><div><span class="material-symbols-rounded" aria-hidden="true">workspace_premium</span><strong id="irohaCertificateCount">0</strong><span>修了証</span></div></div>
+      <details class="iroha-achievement-panel iroha-badge-collection-panel"><summary><span id="irohaBadgeCollectionTitle">バッジコレクション</span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary><div class="iroha-badge-collection-grid" id="irohaBadgeCollectionList"></div></details>
+      <details class="iroha-achievement-panel iroha-badge-collection-panel iroha-history-disclosure"><summary><span id="irohaBadgesTitle">修了したレッスン</span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary><div class="iroha-history-disclosure-content"><p>動画を確認し、学んだことを記録したレッスンのバッジを表示します。</p><div class="iroha-award-list" id="irohaBadgeList"></div><p id="irohaBadgeEmpty" class="iroha-award-empty">まだ修了したレッスンはありません。カリキュラムから学習を始めましょう。</p></div></details>
+      <details class="iroha-achievement-panel iroha-badge-collection-panel iroha-history-disclosure"><summary><span id="irohaCertificatesTitle">カリキュラムの修了証</span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></summary><div class="iroha-history-disclosure-content"><p>同じカリキュラムの公開済みレッスンをすべて修了すると、このブラウザ内に修了証が保存されます。</p><div class="iroha-award-list" id="irohaCertificateList"></div><p id="irohaCertificateEmpty" class="iroha-award-empty">まだ修了証はありません。公開済みレッスンの準備状況はカリキュラムから確認できます。</p></div></details>
+      <p class="iroha-data-note">バッジ・修了証は現時点ではブラウザ内のプレビュー記録です。別端末との同期や公式な修了証の発行には対応していません。</p>
+    </section>
+      <section class="iroha-view iroha-seminars seminar-section" data-iroha-view="seminars" hidden aria-labelledby="irohaSeminarsTitle">
+        <figure class="subview-guide seminar-guide"><img src="../assets/tayori-guide-seminars-v2-optimized.webp" alt="セミナーの参加条件。無料セミナーと運営講師の対象有料セミナーは同じ緑色で、TAYORI会員が追加料金なし。別色の外部講師の対象有料セミナーはTAYORI会員が別途料金、IROHA会員は追加料金なし" width="1672" height="941" loading="lazy"></figure>
+        <div class="section-heading"><div><p class="eyebrow">MEMBER SEMINARS</p><h2 id="irohaSeminarsTitle">セミナー</h2><p>無料セミナーも有料セミナーも、開催情報と会員向けの参加条件をここで確認できます。</p></div></div>
+        <p class="seminar-policy-note">※ 対象の有料セミナーには会員向けの申込方法を個別にご案内します。外部の申込ページに表示される一般料金・参加条件とは異なる場合があります。</p>
+        <article class="member-weekly-event" id="weeklyEvent" aria-labelledby="weeklyEventTitle">
+          <img src="../assets/weekend-ai-fixed-thumbnail.webp" alt="週末のAI整え習慣" width="1600" height="900" loading="lazy">
+          <div><span class="member-weekly-badge">毎週開催</span><h3 id="weeklyEventTitle">週末のAI整え習慣</h3><p>毎週土曜 朝6:00〜6:30 ／ 参加無料</p><p>1週間のAI情報を整理し、来週の仕事で試すことを考えるオンライン朝活です。</p><a class="primary-button" href="https://us02web.zoom.us/j/88657718766?pwd=K4MGNT4aa4Mm9PBTxNmg7xsCo2GWbm.1" target="_blank" rel="noopener noreferrer">Zoomで参加する</a></div>
+        </article>
+        <details class="member-weekend-library" aria-labelledby="weekendLibraryTitle">
+          <summary class="weekend-library-heading"><h3 id="weekendLibraryTitle">週末のAI整え習慣を振り返る</h3></summary>
+          <div class="weekend-library-body">
+          <div class="weekend-library-tabs" role="tablist" aria-label="アーカイブとポッドキャスト">
+            <button type="button" id="weekendArchiveTab" role="tab" aria-selected="true" aria-controls="weekendArchivePanel" data-weekend-mode="archive"><img src="../TAYORI/assets/archive-button-optimized.webp?v=20261003c" alt="アーカイブ" width="800" height="237" loading="lazy"></button>
+            <button type="button" id="weekendPodcastTab" role="tab" aria-selected="false" aria-controls="weekendPodcastPanel" tabindex="-1" data-weekend-mode="podcast"><img src="../TAYORI/assets/podcast-button-optimized.webp?v=20261003c" alt="ポッドキャスト" width="800" height="222" loading="lazy"></button>
+          </div>
+          <div class="weekend-library-controls">
+            <div class="weekend-library-ranges" id="weekendLibraryRanges" role="group" aria-label="回数を選ぶ"></div>
+            <div class="weekend-library-sort" role="group" aria-label="並び順">
+              <button type="button" data-weekend-sort="asc" aria-pressed="false" aria-label="昇順：古い回から">昇順</button>
+              <button type="button" data-weekend-sort="desc" aria-pressed="true" aria-label="降順：新しい回から">降順</button>
+            </div>
+          </div>
+          <p class="weekend-library-status" id="weekendLibraryStatus" role="status"></p>
+          <div id="weekendArchivePanel" role="tabpanel" aria-labelledby="weekendArchiveTab"><p class="weekend-library-note">過去回のアーカイブをその場で開いて振り返れます。</p><div class="weekend-library-list" id="weekendArchiveList"></div></div>
+          <div id="weekendPodcastPanel" role="tabpanel" aria-labelledby="weekendPodcastTab" hidden><p class="weekend-library-note">音声で過去回を振り返れます。</p><div class="weekend-library-list" id="weekendPodcastList"></div></div>
+          </div>
+        </details>
+        <div class="seminar-filters" aria-label="セミナーの絞り込み"><div><strong>開催状況</strong><div class="filter-chips" id="seminarStatusFilters"></div></div><div><strong>タグ</strong><div class="filter-chips" id="seminarTagFilters"></div></div></div>
+        <div class="seminar-group"><div class="section-heading"><div><p class="eyebrow">PAID</p><h2>有料セミナー</h2></div></div><div class="seminar-card-grid" id="tayoriPaidSeminars"></div><p class="seminar-empty" id="tayoriPaidEmpty" hidden>現在ご案内できる有料セミナーはありません。公開され次第、参加条件とともにここへ掲載します。</p></div>
+        <div class="seminar-group"><div class="section-heading"><div><p class="eyebrow">FREE</p><h2>無料セミナー</h2></div></div><div class="seminar-card-grid" id="tayoriFreeSeminars"></div><p class="seminar-empty" id="tayoriFreeEmpty" hidden>現在ご案内できる無料セミナーはありません。</p></div>
+      </section>
   </main>
 
   <dialog class="schedule-dialog" id="scheduleDialog">
@@ -266,7 +297,8 @@
       <button class="dialog-close" aria-label="閉じる"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       <p class="eyebrow">LEARNING HISTORY</p>
       <h2>学習履歴</h2>
-      <ul><li><strong>安全に使うための基本</strong><span>9月10日 完了</span></li><li><strong>ChatGPTとは何か</strong><span>9月7日 完了</span></li></ul>
+      <ul id="historyEntries"></ul>
+      <p id="historyEntriesEmpty">学習時間の記録はまだありません。</p>
       <button class="secondary-button" value="close">閉じる</button>
     </form>
   </dialog>
@@ -274,7 +306,11 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="member-shell.js?v=20260912-entitlements"></script>
   <script src="curriculum-config.js?v=20260911f"></script>
-  <script src="curriculum-store.js?v=20260911a"></script>
-  <script src="curriculum.js?v=20260911h"></script>
+  <script src="curriculum-store.js?v=20261002-notes-completion"></script>
+  <script src="curriculum-delivery.js?v=20261003-server-progress"></script>
+  <script src="lesson-notes.js?v=20261002-account-notes"></script>
+  <script src="../seminars.js?v=20261003-fixed-weekend"></script>
+  <script src="curriculum.js?v=20261003-management-banners-v5"></script>
+  <script src="../TAYORI/weekend-media.js?v=20261003e"></script>
 </body>
 </html>

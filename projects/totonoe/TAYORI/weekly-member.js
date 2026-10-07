@@ -5,6 +5,7 @@
   const isLocalPreview = ["localhost", "127.0.0.1", ""].includes(location.hostname);
   const questionStorageKey = "totonoe-weekly-priority-question-preview-v1";
   const sampleFiles = [
+    ["8_9_26.pdf", "1OVT0m9VeTNsLLHrAMkdAhkWQ_JDhvw9M", "2026-09-27"],
     ["8_9_5.pdf", "1dbgVG8cMH6GTSdULdYcs2Pw1ceBef0Q1", "2026-09-05"],
     ["8_8_29.pdf", "1_20elq4S-WvSIZKFMZEFGqoafWwVv3mi", "2026-08-29"],
     ["8_8_22.pdf", "1Cu33wrv8TaSDwmbkIaMW34VNDNnF06XU", "2026-08-22"],
@@ -50,17 +51,20 @@
     sort: document.querySelector("#materialSort"),
     grid: document.querySelector("#materialGrid"),
     empty: document.querySelector("#emptyState"),
-    curriculumNav: document.querySelector("#curriculumNavLink")
+    curriculumNav: document.querySelector("#curriculumNavLink"),
+    viewTitle: document.querySelector("#tayoriViewTitle")
   };
 
   Object.assign(elements, {
-    questionDialog: document.querySelector("#priorityQuestionDialog"),
+    questionComposer: document.querySelector("#questionComposer"),
+    questionToggle: document.querySelector("#questionToggle"),
+    questionToggleText: document.querySelector("#questionToggleText"),
+    questionWeekRange: document.querySelector("#questionWeekRange"),
+    questionFormWeekRange: document.querySelector("#questionFormWeekRange"),
     questionForm: document.querySelector("#priorityQuestionForm"),
     questionStatus: document.querySelector("#questionStatus"),
     questionSlotBadge: document.querySelector("#questionSlotBadge"),
-    openQuestionDialog: document.querySelector("#openQuestionDialog"),
-    closeQuestionDialog: document.querySelector("#closeQuestionDialog"),
-    cancelQuestionDialog: document.querySelector("#cancelQuestionDialog"),
+    closeQuestionPanel: document.querySelector("#closeQuestionPanel"),
     questionError: document.querySelector("#questionFormError"),
     answerVideoList: document.querySelector("#answerVideoList"),
     answerVideoEmpty: document.querySelector("#answerVideoEmpty"),
@@ -68,6 +72,40 @@
 
   let materials = [];
   let currentQuestion = null;
+  let seminarStatusFilter = "all";
+  let seminarTagFilter = "all";
+  let answerCategoryFilter = "all";
+  let questionSubmissionOpen = false;
+  const viewTitles = { home: "ご案内", questions: "今週の優先質問", answers: "みんなの質問・回答動画", backnumbers: "バックナンバー", seminars: "セミナー" };
+
+  function currentView() {
+    const requested = new URLSearchParams(location.search).get("view") || "home";
+    return Object.hasOwn(viewTitles, requested) ? requested : "home";
+  }
+
+  function renderView() {
+    const view = currentView();
+    const banner = document.querySelector("#tayoriWorldBanner");
+    if (banner) banner.src = "../assets/member-banner-" + view + "-v2.webp";
+    elements.viewTitle.textContent = viewTitles[view];
+    document.title = viewTitles[view] + "｜TAYORI｜ToToNoE+";
+    document.querySelectorAll("[data-tayori-view]").forEach((section) => { section.hidden = section.dataset.tayoriView !== view; });
+    document.querySelectorAll("[data-tayori-tab]").forEach((link) => {
+      if (link.dataset.tayoriTab === view) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
+  function navigateView(view) {
+    if (!Object.hasOwn(viewTitles, view)) return;
+    const url = new URL(location.href);
+    if (view === "home") url.searchParams.delete("view");
+    else url.searchParams.set("view", view);
+    url.hash = "";
+    history.pushState({ tayoriView: view }, "", url);
+    renderView();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function formatDate(value) {
     const date = new Date(value);
@@ -81,21 +119,147 @@
     return (bytes / 1024 / 1024).toFixed(1) + " MB";
   }
 
+  function seminarHasEnded(seminar) {
+    const end = String(seminar.time || "").match(/[〜~–-](\d{1,2}:\d{2})/);
+    const clock = end ? end[1].padStart(5, "0") : "23:59";
+    const timestamp = Date.parse(String(seminar.date || "") + "T" + clock + ":00+09:00");
+    return Number.isFinite(timestamp) && timestamp <= Date.now();
+  }
+
+  function safeSeminarUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value, location.href);
+      return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+    } catch { return ""; }
+  }
+
+  function seminarCard(seminar) {
+    const past = seminarHasEnded(seminar);
+    const paid = seminar.price && seminar.price !== "無料";
+    const card = document.createElement("article");
+    card.className = "tayori-seminar-card" + (past ? " is-past" : "");
+    const thumb = safeSeminarUrl(/^https?:\/\//.test(seminar.thumb || "") ? seminar.thumb : "../" + (seminar.thumb || "assets/og-image.jpg"));
+    if (thumb) {
+      const image = document.createElement("img");
+      image.src = thumb;
+      image.alt = "";
+      image.loading = "lazy";
+      image.width = 640;
+      image.height = 360;
+      card.append(image);
+    }
+    const body = document.createElement("div");
+    body.className = "tayori-seminar-card-body";
+    const badge = document.createElement("span");
+    badge.className = "tayori-seminar-badge" + (past ? " is-past" : "");
+    badge.textContent = past ? "開催終了" : "開催予定";
+    const date = document.createElement("p");
+    date.className = "tayori-seminar-date";
+    date.textContent = [seminar.dateLabel || seminar.date, seminar.time].filter(Boolean).join("　");
+    const title = document.createElement("h3");
+    title.textContent = seminar.title || "セミナー";
+    const speaker = document.createElement("p");
+    speaker.className = "tayori-seminar-speaker";
+    const speakerTypeLabel = seminar.speakerType === "team" ? "ToToNoE+運営メンバー" : seminar.speakerType === "external" ? "外部講師" : "";
+    speaker.textContent = "講師：" + (seminar.speakerName || "確認中") + (speakerTypeLabel ? "（" + speakerTypeLabel + "）" : "");
+    const price = document.createElement("p");
+    price.className = "tayori-seminar-price";
+    price.textContent = paid ? "一般参加費：" + seminar.price : "参加費：無料";
+    body.append(badge, date, title, speaker, price);
+    if (paid) {
+      const condition = document.createElement("p");
+      condition.className = "tayori-seminar-condition";
+      condition.textContent = seminar.speakerType === "team" ? "TAYORI会員：追加料金なし" : seminar.speakerType === "external" ? "TAYORI会員：別途料金 ／ IROHA会員：追加料金なし" : "会員向け参加条件を確認中";
+      body.append(condition);
+    }
+    const url = safeSeminarUrl(paid ? seminar.memberRegistrationUrl : seminar.url);
+    if (url) {
+      const link = document.createElement("a");
+      link.className = "secondary-button";
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = paid ? "会員向け申込ページへ" : past ? "開催ページを見る" : "詳細・申込を見る";
+      body.append(link);
+    } else if (paid && !past) {
+      const note = document.createElement("p");
+      note.className = "tayori-seminar-condition";
+      note.textContent = "会員向け申込方法は、運営からご案内します。";
+      body.append(note);
+    }
+    card.append(body);
+    return card;
+  }
+
+  function renderSeminars() {
+    const seminars = Array.isArray(window.TOTONOE_SEMINARS) ? window.TOTONOE_SEMINARS : [];
+    const statusWrap = document.querySelector("#seminarStatusFilters");
+    const tagWrap = document.querySelector("#seminarTagFilters");
+    const tags = [...new Set(seminars.flatMap((seminar) => Array.isArray(seminar.tags) ? seminar.tags : []))].sort((a, b) => String(a).localeCompare(String(b), "ja"));
+    if (seminarTagFilter !== "all" && !tags.includes(seminarTagFilter)) seminarTagFilter = "all";
+    statusWrap.replaceChildren(...[["all", "すべて"], ["upcoming", "開催予定"], ["past", "開催終了"]].map(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.setAttribute("aria-pressed", String(seminarStatusFilter === value));
+      button.addEventListener("click", () => { seminarStatusFilter = value; renderSeminars(); });
+      return button;
+    }));
+    tagWrap.replaceChildren(...[["all", "すべて"], ...tags.map((tag) => [tag, tag])].map(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.setAttribute("aria-pressed", String(seminarTagFilter === value));
+      button.addEventListener("click", () => { seminarTagFilter = value; renderSeminars(); });
+      return button;
+    }));
+    const sorted = seminars.filter((seminar) => {
+      if (seminarStatusFilter === "upcoming" && seminarHasEnded(seminar)) return false;
+      if (seminarStatusFilter === "past" && !seminarHasEnded(seminar)) return false;
+      return seminarTagFilter === "all" || (Array.isArray(seminar.tags) && seminar.tags.includes(seminarTagFilter));
+    }).sort((a, b) => {
+      const pastDifference = Number(seminarHasEnded(a)) - Number(seminarHasEnded(b));
+      return pastDifference || (seminarHasEnded(a) ? String(b.date).localeCompare(String(a.date)) : String(a.date).localeCompare(String(b.date)));
+    });
+    const free = sorted.filter((seminar) => seminar.price === "無料");
+    const paid = sorted.filter((seminar) => seminar.price && seminar.price !== "無料");
+    document.querySelector("#tayoriFreeSeminars")?.replaceChildren(...free.map(seminarCard));
+    document.querySelector("#tayoriPaidSeminars")?.replaceChildren(...paid.map(seminarCard));
+    const filtered = seminarStatusFilter !== "all" || seminarTagFilter !== "all";
+    const freeEmpty = document.querySelector("#tayoriFreeEmpty");
+    const paidEmpty = document.querySelector("#tayoriPaidEmpty");
+    freeEmpty.hidden = free.length > 0;
+    paidEmpty.hidden = paid.length > 0;
+    freeEmpty.textContent = filtered ? "この条件に合う無料セミナーはありません。" : "現在ご案内できる無料セミナーはありません。";
+    paidEmpty.textContent = filtered ? "この条件に合う有料セミナーはありません。" : "現在ご案内できる有料セミナーはありません。公開され次第、参加条件とともにここへ掲載します。";
+  }
+
   function showMember(member, rows, preview = false) {
-    materials = rows.slice().sort((a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0));
+    const seenNames = new Set();
+    materials = rows.slice()
+      .sort((a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0))
+      .filter((row) => {
+        const name = String(row.file_name || "").toLowerCase();
+        if (seenNames.has(name)) return false;
+        seenNames.add(name);
+        return true;
+      });
     elements.loading.hidden = true;
     elements.blocked.hidden = true;
     elements.content.hidden = false;
     elements.preview.hidden = !preview;
     elements.status.className = "member-status is-active";
     elements.status.innerHTML = '<span class="status-dot" aria-hidden="true"></span><div><strong>' +
-      (member?.has_curriculum_access ? "IROHA会員" : "TAYORI会員") + '</strong><small>' +
+      (member?.staff_access ? "運営メンバー" : member?.has_curriculum_access ? "IROHA会員" : "TAYORI会員") + '</strong><small>' +
       (member?.current_period_end ? formatDate(member.current_period_end) + "まで有効" : "有効な会員です") + "</small></div>";
     updateCurriculumNavigation(Boolean(member?.has_curriculum_access));
     renderLatest();
     renderGrid();
+    renderSeminars();
     loadPriorityQuestion();
     loadAnswerVideos();
+    renderView();
   }
 
   function updateCurriculumNavigation(canOpen) {
@@ -231,10 +395,10 @@
   }
 
   function weekRangeLabel(weekStart) {
-    const start = new Date(weekStart + "T12:00:00");
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    return (start.getMonth() + 1) + "月" + start.getDate() + "日〜" + (end.getMonth() + 1) + "月" + end.getDate() + "日";
+    const start = new Date(weekStart + 'T00:00:00Z');
+    const end = new Date(start); end.setUTCDate(start.getUTCDate() + 6);
+    const label = date => date.getUTCFullYear() + '年' + (date.getUTCMonth() + 1) + '月' + date.getUTCDate() + '日';
+    return label(start) + '（日）〜' + label(end) + '（土）';
   }
 
   function fillQuestionForm(question) {
@@ -248,20 +412,34 @@
 
   function renderQuestionState(payload) {
     currentQuestion = payload?.question || null;
+    questionSubmissionOpen = typeof payload?.submission_open === 'boolean' ? payload.submission_open : true;
     const weekLabel = weekRangeLabel(payload?.week_start || localWeekStart());
+    elements.questionWeekRange.textContent = weekLabel;
+    elements.questionFormWeekRange.textContent = weekLabel;
     if (!currentQuestion) {
-      elements.questionSlotBadge.textContent = "1枠利用できます";
+      elements.questionSlotBadge.textContent = questionSubmissionOpen ? "送信できます" : "受付時間外";
       elements.questionSlotBadge.className = "is-available";
-      elements.questionStatus.textContent = weekLabel + "の質問を受け付けています。";
-      elements.openQuestionDialog.textContent = "質問を整理して送る";
+      elements.questionStatus.textContent = questionSubmissionOpen ? "曜日を問わず、今週の質問を1枠送れます（日曜〜土曜・日本時間）。" : "受付状態を確認できません。ページを再読み込みしてください。";
+      elements.questionToggleText.textContent = questionSubmissionOpen ? "質問を整理して送る" : "受付期間を確認";
+      if (elements.questionComposer.open) {
+        const locked = !questionSubmissionOpen || (currentQuestion && currentQuestion.status !== 'submitted');
+        elements.questionForm.querySelectorAll('input, textarea, select').forEach(field => { field.disabled = Boolean(locked); });
+        elements.questionForm.querySelector('button[type="submit"]').hidden = Boolean(locked);
+      }
       return;
     }
+    if (!questionSubmissionOpen) elements.questionStatus.textContent = "受付時間外です。送信済みの内容は確認できます。";
     const labels = { submitted: "受付済み", in_review: "回答準備中", answered: "回答済み", closed: "受付終了" };
     elements.questionSlotBadge.textContent = labels[currentQuestion.status] || "受付済み";
     elements.questionSlotBadge.className = "is-used";
-    elements.questionStatus.textContent = "質問：" + currentQuestion.question;
-    elements.openQuestionDialog.textContent = currentQuestion.status === "submitted" ? "質問を確認・更新" : "送信内容を確認";
-    fillQuestionForm(currentQuestion);
+    elements.questionStatus.textContent = (questionSubmissionOpen ? "今週の1枠は利用済みです。" : "受付時間外です。送信済みの内容は確認できます。") + (questionSubmissionOpen && currentQuestion.status === "submitted" ? "回答準備に入るまでは同じ質問を更新できます。" : "送信内容を確認できます。");
+    elements.questionToggleText.textContent = questionSubmissionOpen && currentQuestion.status === "submitted" ? "質問を確認・更新" : "送信内容を確認";
+    if (!elements.questionComposer.open) fillQuestionForm(currentQuestion);
+    if (elements.questionComposer.open) {
+        const locked = !questionSubmissionOpen || (currentQuestion && currentQuestion.status !== 'submitted');
+        elements.questionForm.querySelectorAll('input, textarea, select').forEach(field => { field.disabled = Boolean(locked); });
+        elements.questionForm.querySelector('button[type="submit"]').hidden = Boolean(locked);
+      }
   }
 
   function readLocalQuestion() {
@@ -289,19 +467,20 @@
     elements.questionForm.querySelectorAll(".question-progress span").forEach((item, index) => item.classList.toggle("is-current", index + 1 === Number(stepNumber)));
   }
 
-  function openQuestionDialog() {
+  function prepareQuestionPanel() {
+    if (!elements.questionComposer.open) return;
     elements.questionError.textContent = "";
-    if (!currentQuestion) elements.questionForm.reset();
-    else fillQuestionForm(currentQuestion);
-    const locked = currentQuestion && currentQuestion.status !== "submitted";
+
+    const locked = !questionSubmissionOpen || (currentQuestion && currentQuestion.status !== "submitted");
     elements.questionForm.querySelectorAll("input, textarea, select").forEach((field) => { field.disabled = Boolean(locked); });
     elements.questionForm.querySelector('button[type="submit"]').hidden = Boolean(locked);
+    elements.closeQuestionPanel.textContent = locked ? "閉じる" : "あとで入力する";
     openQuestionStep(1);
-    elements.questionDialog.showModal();
   }
 
-  function closeQuestionDialog() {
-    elements.questionDialog.close();
+  function closeQuestionPanel() {
+    elements.questionComposer.open = false;
+    elements.questionToggle.focus();
   }
 
   function questionPayload() {
@@ -322,7 +501,17 @@
   async function savePriorityQuestion(event) {
     event.preventDefault();
     elements.questionError.textContent = "";
-    if (!elements.questionForm.reportValidity()) return;
+    if (!questionSubmissionOpen) {
+      elements.questionError.textContent = "受付状態を再確認しています。";
+      loadPriorityQuestion(); return;
+    }
+    const invalid = [...elements.questionForm.querySelectorAll("input, textarea, select")].find((field) => !field.disabled && !field.checkValidity());
+    if (invalid) {
+      const step = invalid.closest(".question-step");
+      if (step) openQuestionStep(step.dataset.questionStep);
+      invalid.reportValidity();
+      return;
+    }
     const button = elements.questionForm.querySelector('button[type="submit"]');
     const payload = questionPayload();
     button.disabled = true;
@@ -342,8 +531,8 @@
         result = body;
       }
       renderQuestionState(result);
-      closeQuestionDialog();
-      elements.questionStatus.textContent = "今週の優先質問を受け付けました。類似質問とまとめ、TAYORI会員全員が見られる回答動画として扱います。回答準備に入るまでは更新できます。";
+      closeQuestionPanel();
+      elements.questionStatus.textContent = "今週の優先質問を受け付けました。類似質問とまとめ、TAYORI会員全員が見られる回答動画として扱います。回答準備に入るまでは同じ質問を更新できます。";
     } catch (error) {
       elements.questionError.textContent = error.message;
     } finally {
@@ -352,44 +541,113 @@
     }
   }
 
-  function renderAnswerVideos(videos, playback) {
-    elements.answerVideoList.replaceChildren();
-    elements.answerVideoEmpty.hidden = videos.length > 0;
-    videos.forEach((video) => {
-      const article = document.createElement("article");
-      article.className = "answer-video-row";
-      article.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">play_circle</span><div><time></time><h3></h3><p></p></div><button type="button" disabled>再生準備中</button>';
-      article.querySelector("time").textContent = formatDate(video.published_at);
-      article.querySelector("h3").textContent = video.title || "TAYORI回答動画";
-      article.querySelector("p").textContent = video.description || "類似する優先質問をまとめた、TAYORI会員共通の解説・回答動画";
-      const playButton = article.querySelector("button");
-      if (playback === "secure_proxy" && video.playback_url) {
-        playButton.disabled = false;
-        playButton.textContent = "再生する";
-        playButton.addEventListener("click", () => {
-          const currentPlayer = article.querySelector("video");
-          if (currentPlayer) {
-            currentPlayer.pause();
-            currentPlayer.removeAttribute("src");
-            currentPlayer.load();
-            currentPlayer.remove();
-            playButton.textContent = "再生する";
-            return;
-          }
-          const player = document.createElement("video");
-          player.className = "answer-video-player";
-          player.controls = true;
-          player.playsInline = true;
-          player.preload = "metadata";
-          player.src = video.playback_url;
-          player.setAttribute("aria-label", (video.title || "TAYORI回答動画") + "を再生");
-          article.append(player);
-          playButton.textContent = "閉じる";
-          player.play().catch(() => {});
-        });
-      }
-      elements.answerVideoList.append(article);
+  const sampleAnswerVideos = [
+    { category: "AI活用", question_topics: ["忙しい現場でAIを試すなら、どの仕事から始める？"], title: "小さく始めるAI活用の選び方", description: "最初の一歩を決めるための考え方を紹介する想定です。" },
+    { category: "情報管理", question_topics: ["個人情報を入力せずに、AIで申し送りを要約するには？"], title: "安全に要約するための準備", description: "入力前に確認する項目を整理する想定です。" },
+    { category: "資料づくり", question_topics: ["会議メモから議事録を作るとき、まず何を決めればいい？"], title: "議事録づくりの手順", description: "目的と残す情報を決める流れを示す想定です。" },
+  ];
+
+  function answerCategory(video) {
+    if (video.category) return video.category;
+    const text = [video.title, ...(video.question_topics || [])].join(" ");
+    if (/個人情報|安全|情報管理|権限/.test(text)) return "情報管理";
+    if (/議事録|資料|文章|要約/.test(text)) return "資料づくり";
+    if (/AI|ChatGPT|生成AI/i.test(text)) return "AI活用";
+    return "その他";
+  }
+
+  function applyAnswerFilter() {
+    document.querySelectorAll("#answerCategoryFilters button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.category === answerCategoryFilter)));
+    document.querySelectorAll("#answerVideoList .answer-video-row, #answerSampleList .answer-video-row").forEach((card) => {
+      card.hidden = answerCategoryFilter !== "all" && card.dataset.category !== answerCategoryFilter;
+      if (card.hidden) card.querySelector("video")?.pause();
     });
+    const visibleReal = document.querySelectorAll("#answerVideoList .answer-video-row:not([hidden])").length;
+    elements.answerVideoEmpty.hidden = visibleReal > 0;
+    elements.answerVideoEmpty.querySelector("p").textContent = answerCategoryFilter === "all"
+      ? "類似質問をまとめた回答動画が公開されると、TAYORI会員全員がここから確認できます。"
+      : "このテーマの公開済み回答動画はまだありません。";
+  }
+
+  function renderAnswerFilters() {
+    const wrap = document.querySelector("#answerCategoryFilters");
+    wrap.replaceChildren(...[["all", "すべて"], ["AI活用", "AI活用"], ["情報管理", "情報管理"], ["資料づくり", "資料づくり"], ["その他", "その他"]].map(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.category = value;
+      button.textContent = label;
+      button.addEventListener("click", () => { answerCategoryFilter = value; applyAnswerFilter(); });
+      return button;
+    }));
+    applyAnswerFilter();
+  }
+
+  function answerVideoCard(video, playback, sample = false) {
+    const article = document.createElement("article");
+    article.className = "answer-video-row" + (sample ? " is-sample" : "");
+    article.dataset.category = answerCategory(video);
+    const topics = Array.isArray(video.question_topics) ? video.question_topics.filter((topic) => typeof topic === "string" && topic.trim()) : [];
+    const thumbnail = document.createElement("div");
+    thumbnail.className = "answer-question-thumb";
+    const eyebrow = document.createElement("small");
+    eyebrow.textContent = sample ? "みなさまからの質問（サンプル）" : "みなさまからの質問";
+    const question = document.createElement("strong");
+    question.textContent = topics[0] || "質問テーマの公開準備中です";
+    thumbnail.append(eyebrow, question);
+    const body = document.createElement("div");
+    body.className = "answer-video-card-body";
+    const meta = document.createElement("span");
+    meta.className = "answer-video-meta";
+    meta.textContent = sample ? "架空のサンプル ・ " + video.category : formatDate(video.published_at) + " ・ " + answerCategory(video);
+    const title = document.createElement("h3");
+    title.textContent = video.title || "TAYORI回答動画";
+    const summary = document.createElement("p");
+    summary.textContent = video.description || "類似する優先質問をまとめた、会員共通の回答動画です。";
+    body.append(meta, title, summary);
+    if (topics.length > 1) {
+      const extra = document.createElement("p");
+      extra.textContent = "ほかの質問：" + topics.slice(1).join("／");
+      body.append(extra);
+    }
+    const playButton = document.createElement("button");
+    playButton.type = "button";
+    playButton.disabled = true;
+    playButton.textContent = sample ? "画面サンプル" : "再生準備中";
+    if (!sample && playback === "secure_proxy" && video.playback_url) {
+      playButton.disabled = false;
+      playButton.textContent = "回答動画を再生";
+      playButton.addEventListener("click", () => {
+        const currentPlayer = article.querySelector("video");
+        if (currentPlayer) {
+          currentPlayer.pause();
+          currentPlayer.removeAttribute("src");
+          currentPlayer.load();
+          currentPlayer.remove();
+          playButton.textContent = "回答動画を再生";
+          return;
+        }
+        const player = document.createElement("video");
+        player.className = "answer-video-player";
+        player.controls = true;
+        player.playsInline = true;
+        player.preload = "metadata";
+        player.src = video.playback_url;
+        player.setAttribute("aria-label", (video.title || "TAYORI回答動画") + "を再生");
+        body.append(player);
+        playButton.textContent = "閉じる";
+        player.play().catch(() => {});
+      });
+    }
+    body.append(playButton);
+    article.append(thumbnail, body);
+    return article;
+  }
+
+  function renderAnswerVideos(videos, playback) {
+    elements.answerVideoList.replaceChildren(...videos.map((video) => answerVideoCard(video, playback)));
+    elements.answerVideoEmpty.hidden = videos.length > 0;
+    document.querySelector("#answerSampleList").replaceChildren(...sampleAnswerVideos.map((video) => answerVideoCard(video, "", true)));
+    renderAnswerFilters();
   }
 
   async function loadAnswerVideos() {
@@ -421,9 +679,19 @@
 
   elements.search.addEventListener("input", renderGrid);
   elements.sort.addEventListener("change", renderGrid);
-  elements.openQuestionDialog.addEventListener("click", openQuestionDialog);
-  elements.closeQuestionDialog.addEventListener("click", closeQuestionDialog);
-  elements.cancelQuestionDialog.addEventListener("click", closeQuestionDialog);
+  document.querySelectorAll('[data-tayori-tab], .tayori-next-links a, .guide-links a[href^="?view="], .guide-contact-note a[href^="?view="]').forEach((link) => link.addEventListener("click", (event) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    event.preventDefault();
+    navigateView(new URL(link.href).searchParams.get("view") || "home");
+  }));
+  window.addEventListener("popstate", renderView);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && !elements.content.hidden) loadPriorityQuestion(); });
+  setInterval(() => { if (!document.hidden && !elements.content.hidden) loadPriorityQuestion(); }, 60000);
+  window.addEventListener("totonoe:seminars-updated", () => {
+    if (!elements.content.hidden) renderSeminars();
+  });
+  elements.questionComposer.addEventListener("toggle", prepareQuestionPanel);
+  elements.closeQuestionPanel.addEventListener("click", closeQuestionPanel);
   elements.questionForm.addEventListener("submit", savePriorityQuestion);
   elements.questionForm.querySelectorAll("[data-question-next]").forEach((button) => button.addEventListener("click", () => {
     const step = button.closest(".question-step");
@@ -434,5 +702,8 @@
   elements.questionForm.querySelectorAll(".question-step").forEach((details) => details.addEventListener("toggle", () => {
     if (details.open) openQuestionStep(details.dataset.questionStep);
   }));
+  const initialWeekLabel = weekRangeLabel(localWeekStart());
+  elements.questionWeekRange.textContent = initialWeekLabel;
+  elements.questionFormWeekRange.textContent = initialWeekLabel;
   load();
 })();

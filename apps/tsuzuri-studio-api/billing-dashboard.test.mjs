@@ -75,8 +75,52 @@ test('ウェイトリストは人数上限なしで公開受付し、管理者�
   assert.equal('enrollment' in data,false);
 });
 
+test('TAYORI案内は本番準備済みの管理者だけが一件送信し、再送を防ぐ',async()=>{
+  const {sql,env}=fixture();
+  sql.prepare("INSERT INTO waitlist_entries(id,email,interest,status,source,consent_at) VALUES('wait_tayori','member@example.com','tayori_personal','waiting','test',CURRENT_TIMESTAMP)").run();
+  env.STRIPE_MODE='live';
+  env.STRIPE_CHECKOUT_ENABLED='true';
+  env.STRIPE_LIVE_READY='true';
+  env.STRIPE_SECRET_KEY='sk_live_example';
+  env.STRIPE_PRICE_TAYORI_MONTHLY='price_live123';
+  env.TAYORI_INVITATIONS_ENABLED='true';
+  env.RESEND_API_KEY='re_test';
+  env.RESEND_FROM_EMAIL='ToToNoE+ <no-reply@example.com>';
+  env.PUBLIC_SITE_ORIGIN='https://basecraftas.com';
+  const endpoint='/api/admin/waitlist/wait_tayori/invite';
+  let result=await call(env,endpoint,'POST',{},'editor@example.com');
+  assert.equal(result.status,403);
+  env.TAYORI_INVITATIONS_ENABLED='false';
+  result=await call(env,endpoint,'POST',{});
+  assert.equal(result.status,503);
+  env.TAYORI_INVITATIONS_ENABLED='true';
+  const originalFetch=globalThis.fetch;
+  let sent=0;
+  globalThis.fetch=async(_url,init)=>{
+    sent+=1;
+    const body=JSON.parse(init.body);
+    assert.deepEqual(body.to,['member@example.com']);
+    assert.match(body.text,/14日間の無料トライアル/);
+    return Response.json({id:'email_tayori_invite'});
+  };
+  try{
+    result=await call(env,endpoint,'POST',{});
+    assert.equal(result.status,201);
+    result=await call(env,endpoint,'POST',{});
+    assert.equal(result.status,409);
+    assert.equal(sent,1);
+    assert.equal(sql.prepare("SELECT status FROM waitlist_entries WHERE id='wait_tayori'").get().status,'invited');
+    assert.equal(sql.prepare("SELECT status FROM tayori_waitlist_invitations WHERE waitlist_entry_id='wait_tayori'").get().status,'sent');
+    const repeat=await worker.fetch(new Request('https://test.local/api/totonoe-member/api/public/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'member@example.com',interest:'tayori_personal',privacy_consent:true,source:'test'})}),env);
+    assert.equal(repeat.status,201);
+    assert.equal(sql.prepare("SELECT status FROM waitlist_entries WHERE id='wait_tayori'").get().status,'invited');
+  }finally{globalThis.fetch=originalFetch;}
+});
+
 test('課金集計は管理者限定で、人数・当月実績・継続月額を同じ絞り込みで返す',async()=>{
   const {sql,env}=fixture();
+  env.STRIPE_SECRET_KEY='sk_test_fixture';
+  env.BILLING_COUPON_FETCH=async url=>{const id=new URL(url).pathname.split('/').pop();return new Response(JSON.stringify({id,livemode:false,status:id==='sub_test_iroha'?'trialing':'active',discounts:[]}));};
   sql.prepare("INSERT INTO customer_accounts(id,email) VALUES('customer_weekly','weekly@example.com')").run();
   sql.prepare("INSERT INTO customer_accounts(id,email) VALUES('customer_iroha','iroha@example.com')").run();
   sql.prepare("INSERT INTO customer_subscriptions(id,customer_id,product_code,billing_interval,audience_type,status,provider_subscription_id,recurring_amount_yen,fee_type,livemode) VALUES('sub_weekly','customer_weekly','weekly','monthly','general','active','sub_test_weekly',1480,'none',0)").run();
@@ -150,6 +194,10 @@ test('Studioに管理者限定の課金画面と実データ未取得時の表�
   assert.match(html,/月別決済額と会員数/);
   assert.match(script,/\/api\/admin\/billing-summary/);
   assert.match(script,/\/api\/admin\/waitlist/);
+  assert.match(html,/管理者の個別案内なしで14日間の無料体験を開始できます/);
+  assert.match(script,/item\.status==='joined'\?'入会済み'/);
+  assert.doesNotMatch(html,/data-invite-waitlist/);
+  assert.doesNotMatch(script,/item\.status==='joined'\?'案内済み'/);
   assert.match(html,/テスト表示をリセット/);
   assert.match(script,/\/api\/admin\/billing-test-data\/reset/);
   assert.match(script,/本番データ、顧客アカウント、ウェイトリスト、コンテンツ/);
@@ -164,4 +212,16 @@ test('管理メニューは全権限で場所を確認でき、操作は管理�
   const script=readFileSync('apps/tsuzuri-studio/script.js','utf8');
   for(const view of ['members','billing','settings']) assert.match(html,new RegExp(`class="nav-item admin-nav-item"[^>]+data-view="${view}"`));
   assert.match(script,/この画面は管理者専用です。管理者アカウントで再ログインしてください。/);
+});
+
+test('匿名会員集計は編集者・閲覧者に許可し、未認証を拒否する',async()=>{
+  const {sql,env}=fixture();
+  sql.prepare("INSERT INTO members(id,email,name,role,status) VALUES('coupon_viewer','viewer@example.com','Viewer','viewer','active')").run();
+  for(const email of ['editor@example.com','viewer@example.com']){
+    const response=await call(env,'/api/member-coupon-summary','GET',null,email);
+    assert.equal(response.status,503); // Auth succeeds; missing Stripe key is reported explicitly.
+    assert.deepEqual(await response.json(),{error:'member_summary_unavailable'});
+  }
+  const response=await call(env,'/api/member-coupon-summary','GET',null,'unregistered@example.com');
+  assert.equal(response.status,403);
 });

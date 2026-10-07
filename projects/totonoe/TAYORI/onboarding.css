@@ -1,0 +1,30 @@
+#tayoriOnboarding{width:min(620px,calc(100% - 28px));max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:24px;background:#fff;color:#173d2c;box-shadow:0 16px 80px #102c3140;font-family:inherit;overflow-y:auto}
+#tayoriOnboarding::backdrop{background:#102b2670}
+#tayoriOnboarding .onboarding-inner{padding:30px 40px 36px}
+#tayoriOnboarding .onboarding-top{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:13px;color:#61766a}
+#tayoriOnboarding button{font:inherit;cursor:pointer;min-height:44px}
+#tayoriOnboarding .onboarding-close{border:0;background:none;color:#4d695b;padding:8px 12px;font-size:14px}
+#tayoriOnboarding #onboardingCharacter{display:block;height:136px;width:136px;object-fit:contain;margin:24px auto 8px}
+#tayoriOnboarding .onboarding-name{text-align:center;font-size:13px;color:#55715f;margin:0 0 24px}
+#tayoriOnboarding h2{font-size:24px;line-height:1.6;margin:0 0 20px}
+#tayoriOnboarding h2:focus{outline:none}
+#tayoriOnboarding .onboarding-copy{font-size:15px;line-height:1.95;margin:0 0 24px}
+#tayoriOnboarding .onboarding-hint{background:#eff5ed;border-radius:12px;padding:18px 20px;font-size:14px;line-height:1.85;margin:0}
+#tayoriOnboarding .onboarding-actions{display:flex;justify-content:space-between;gap:16px;margin-top:28px}
+#tayoriOnboarding .onboarding-back{background:none;border:1px solid #cddcd2;border-radius:999px;padding:10px 20px;color:#245943}
+#tayoriOnboarding .onboarding-next{border:0;background:#245943;border-radius:999px;padding:12px 24px;color:white;font-weight:700;margin-left:auto}
+#tayoriOnboarding button:focus-visible,.onboarding-replay:focus-visible{outline:3px solid #dd854d;outline-offset:3px}
+#tayoriOnboarding [hidden]{display:none!important}
+#tayoriOnboarding .onboarding-error{color:#923a2d;font-size:13px;line-height:1.6}
+#tayoriOnboarding .onboarding-error:empty{display:none}
+.onboarding-replay{border:1px solid #d4dfd5;border-radius:999px;padding:10px 16px;color:#245943;background:white;font:inherit;font-size:13px;cursor:pointer;min-height:44px}
+.weekly-topbar{flex-wrap:wrap}
+@media(max-width:600px){#tayoriOnboarding .onboarding-inner{padding:24px 26px 28px}#tayoriOnboarding #onboardingCharacter{height:112px;width:112px;margin-top:20px}#tayoriOnboarding h2{font-size:21px}#tayoriOnboarding .onboarding-copy{margin-bottom:20px}#tayoriOnboarding .onboarding-hint{padding:16px 18px}#tayoriOnboarding .onboarding-next{padding:12px 18px}#tayoriOnboarding .onboarding-back{padding:10px 16px}}
+
+#tayoriOnboarding .onboarding-video{position:relative;width:100%;aspect-ratio:16/9;margin:20px 0;overflow:hidden;border-radius:12px;background:#eff5ed}
+#tayoriOnboarding .onboarding-video iframe,#tayoriOnboarding .onboarding-video-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:#fff}
+#tayoriOnboarding .onboarding-video-play img{display:block;width:100%;height:100%;object-fit:cover;margin:0}
+#tayoriOnboarding .onboarding-video-play span{position:absolute;right:12px;bottom:12px;padding:7px 12px;border-radius:999px;background:#245943;color:#fff;font-size:12px}
+.onboarding-preference{display:flex;align-items:center;gap:12px;min-height:44px;margin-top:20px;font-size:14px;line-height:1.7;cursor:pointer}
+.onboarding-preference input{width:20px;height:20px;flex:none;accent-color:#245943}
+.onboarding-settings-note{font-size:12px;color:#61766a;line-height:1.8;margin:4px 0}.onboarding-settings-note a{text-decoration:underline;text-underline-offset:3px}

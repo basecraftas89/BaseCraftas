@@ -1,9 +1,9 @@
 {
-  "version": 3,
-  "rootName": "カリキュラム",
+  "version": 4,
+  "rootName": "02_IROHA｜いろは",
   "rootId": "1VhRIwnuJaNr3ATLyWpqbm2oLxS3_aX5T",
   "rootUrl": "https://drive.google.com/drive/folders/1VhRIwnuJaNr3ATLyWpqbm2oLxS3_aX5T",
-  "visibilityWarning": "現在のルートには「リンクを知っている全員・閲覧者」が設定されています。有料教材アップロード前に解除してください。",
+  "visibilityWarning": "2026-09-30のルート権限メタデータでは一般公開リンクは見られません。公開前に各教材と下位フォルダの権限を確認してください。",
   "folders": [
     {
       "key": "management",
@@ -26,8 +26,17 @@
       ]
     },
     {
+      "key": "llm",
+      "name": "02_LLM・対話AI",
+      "driveFolderId": "1wp5fVaRRsoFChKPARdWOqnP4uJq5HRaI",
+      "audience": "curriculum_member",
+      "purpose": "ChatGPT・Claude・Geminiなど対話AIのカリキュラム",
+      "children": ["01_ChatGPT", "02_Claude", "03_Gemini"]
+    },
+    {
       "key": "chatgpt",
-      "name": "02_ChatGPT",
+      "name": "01_ChatGPT",
+      "parentKey": "llm",
       "driveFolderId": "15J0s9USIKRmVxoZo2CQCke5Y5xII6_wL",
       "audience": "curriculum_member",
       "purpose": "ChatGPTの基礎から実務活用",
@@ -41,6 +50,7 @@
     {
       "key": "claude",
       "name": "02_Claude",
+      "parentKey": "llm",
       "driveFolderId": "16hlnn3nsHI7cVi0OV0gXGSlHB4ffnOY_",
       "audience": "curriculum_member",
       "purpose": "Claudeの基礎から長文・資料活用",
@@ -53,7 +63,8 @@
     },
     {
       "key": "gemini",
-      "name": "02_Gemini",
+      "name": "03_Gemini",
+      "parentKey": "llm",
       "driveFolderId": "1mdvX3ptE6UmpO_w0r755gOpIdAeXs7qj",
       "audience": "curriculum_member",
       "purpose": "GeminiとGoogleサービスの実務活用",
@@ -65,8 +76,45 @@
       ]
     },
     {
+      "key": "image",
+      "name": "03_画像生成AI",
+      "driveFolderId": "14KpsUYIVQlwiYzMrnAW__Fj81RuB6mHC",
+      "audience": "curriculum_member",
+      "purpose": "画像生成と編集。新しいツールごとに子フォルダを追加"
+    },
+    {
+      "key": "video",
+      "name": "04_動画生成AI",
+      "driveFolderId": "1Ee4GbglvwpTfhtWogr4t0Gsl9me7-9ZS",
+      "audience": "curriculum_member",
+      "purpose": "動画生成と編集。新しいツールごとに子フォルダを追加"
+    },
+    {
+      "key": "setup",
+      "name": "05_導入・初期設定",
+      "driveFolderId": "1r7-BCiLXQnlIjCAXvfJD6hdHuJrcZiAq",
+      "audience": "curriculum_member",
+      "purpose": "アカウント設定・環境準備・運用開始"
+    },
+    {
+      "key": "organization",
+      "name": "06_組織導入・提案",
+      "driveFolderId": "17Sr57Ch5rbi6_jBPovnIQ95sQ-RtOa5e",
+      "audience": "curriculum_member",
+      "purpose": "組織への提案・営業・定着支援"
+    },
+    {
+      "key": "automation",
+      "name": "07_業務自動化",
+      "driveFolderId": "1IuMaTOJHuE9V5_CNiqXZcegM-8RuQWDY",
+      "audience": "curriculum_member",
+      "purpose": "Excel・マクロと業務の仕組み化",
+      "children": ["01_Excel・マクロ"]
+    },
+    {
       "key": "excel_macro",
-      "name": "02_Excel・マクロ",
+      "name": "01_Excel・マクロ",
+      "parentKey": "automation",
       "driveFolderId": "1-tQzECnVzB1MqsyVCIsRcX4bM4FUezdU",
       "audience": "curriculum_member",
       "purpose": "Excel・VBA・マクロの基礎と自動化",
@@ -78,8 +126,17 @@
       ]
     },
     {
+      "key": "other",
+      "name": "08_その他",
+      "driveFolderId": "1BNe19PYo6u_V3r-UqROTDfN0GO6qNReT",
+      "audience": "curriculum_member",
+      "purpose": "既存分類に収まらない新しい講座",
+      "children": ["01_その他AIツール"]
+    },
+    {
       "key": "other_ai",
-      "name": "02_その他AIツール",
+      "name": "01_その他AIツール",
+      "parentKey": "other",
       "driveFolderId": "1LEFsUJpNIbgHQglPrYsbQG3wliiXKUhF",
       "audience": "curriculum_member",
       "purpose": "今後追加するAIツール別カリキュラム",
@@ -112,18 +169,19 @@
       "purpose": "削除前の一時保管"
     }
   ],
-  "lessonFolderPattern": "{curriculum}/{section}/{sectionNo}_{lessonNo}_{lessonTitle}",
-  "lessonExample": "02_ChatGPT/01_基礎/01_01_ChatGPTとは何か",
+  "lessonFolderPattern": "{分野}/{ツールまたは講座}/{セクション}/NN_レッスン名.mp4",
+  "lessonExample": "02_LLM・対話AI/01_ChatGPT/01_基礎/01_ChatGPTとは何か.mp4",
   "lessonFiles": [
-    "01_動画.mp4",
-    "02_文字起こし.pdf",
-    "03_ワークシート.pdf"
+    "01_ChatGPTとは何か.mp4",
+    "01_ChatGPTとは何か_文字起こし.pdf",
+    "01_ChatGPTとは何か_ワークシート.pdf"
   ],
+  "videoOrderRule": "動画ファイル名の先頭番号NNを同一カリキュラム内で一意にし、基礎・実務活用・演習のフォルダをまたいでも数値昇順に表示する。番号なしは後ろに置く。",
   "numberingRule": {
     "00": "運用管理",
-    "01": "ツール横断の基礎・生成AIリテラシー",
-    "02": "ChatGPT・Claude・Geminiなどツール別カリキュラム",
-    "03": "業務別・職種別カリキュラム用に予約",
+    "01": "生成AIリテラシー",
+    "02": "LLM・対話AIとツール別カリキュラム",
+    "03-08": "画像・動画・初期設定・組織導入・業務自動化・その他",
     "90-99": "制作・差し替え・削除の運用領域"
   }
 }

@@ -102,7 +102,7 @@ test('public member route exposes only customer-scoped endpoints',async()=>{
  }
 });
 
-test('public weekend event exposes only the most recently updated published thumbnail without authentication',async()=>{
+test('public weekend event always exposes the fixed thumbnail without authentication',async()=>{
  const f=fixture();
  const older=await f.article({slug:'weekend-older',title:'前の告知',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/older.png'});
  const latest=await f.article({slug:'weekend-latest',title:'最新の告知',content_type:'weekend',hero_url:'https://basecraftas.com/column-media/latest.png'});
@@ -110,8 +110,8 @@ test('public weekend event exposes only the most recently updated published thum
  f.sql.prepare("UPDATE articles SET status='published', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(latest.id);
  const response=await f.call('/public-content/weekend-event.json','GET',undefined,'');
  assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
- const body=await response.json();assert.equal(body.event.hero_url,'https://basecraftas.com/column-media/latest.png');
- assert.deepEqual(Object.keys(body.event).sort(),['hero_url','updated_at']);
+ const body=await response.json();assert.equal(body.event.hero_url,'/projects/totonoe/assets/weekend-ai-fixed-thumbnail-optimized.webp');
+ assert.deepEqual(Object.keys(body.event).sort(),['fixed','hero_url']);
 });
 
 test('weekend thumbnail expires after Saturday 6:30 JST until the next image is published',()=>{

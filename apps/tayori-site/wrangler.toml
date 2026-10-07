@@ -1,0 +1,130 @@
+name = "basecraftas-tayori"
+main = "../site-worker/worker.js"
+compatibility_date = "2026-09-11"
+workers_dev = false
+preview_urls = false
+
+[build]
+command = "node apps/tayori-site/build-assets.mjs"
+cwd = "."
+
+[assets]
+directory = "../../dist-tayori"
+binding = "ASSETS"
+run_worker_first = true
+
+[[services]]
+binding = "MEMBER_API"
+service = "column-studio-api"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/tayori*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/waitlist.js*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/TAYORI/*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/totonoe-tayori-benefits-v4.webp"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-benefit-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-guide-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-signup-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-story-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-problem-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-one-step-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/tayori-trial-cta-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/seminar-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/seminars.js*"
+zone_name = "basecraftas.com"
+
+# Shared account page uses the same authenticated Service Binding as TAYORI.
+# IROHA sales, dashboard and lessons remain outside this release.
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/IROHA/mypage*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/IROHA/member-shell.js*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/IROHA/curriculum.css*"
+zone_name = "basecraftas.com"
+
+# Scoped public content hub alongside the TAYORI landing page.
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/contents*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/contents-page.css*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/service-content.js*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/content-button-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/service-tsuzuri-home.webp"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/service-tsumami-home.webp"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/content-learning-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/assets/content-world-*"
+zone_name = "basecraftas.com"
+
+[[routes]]
+pattern = "basecraftas.com/projects/totonoe/content-learning-tabs.js*"
+zone_name = "basecraftas.com"
+
+[[services]]
+binding = "MEMBER_UI_ASSETS"
+service = "totonoe-member-ui"
+
+[[services]]
+binding = "PUBLIC_UI_ASSETS"
+service = "totonoe-public-ui"

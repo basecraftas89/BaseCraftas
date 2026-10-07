@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS weekly_onboarding (
+  customer_id TEXT PRIMARY KEY REFERENCES customer_accounts(id),
+  version INTEGER NOT NULL DEFAULT 1,
+  step INTEGER NOT NULL DEFAULT 0 CHECK (step BETWEEN 0 AND 3),
+  completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0,1)),
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

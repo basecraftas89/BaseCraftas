@@ -50,8 +50,8 @@ test('published dashboard metadata replaces legacy cards without duplication; dr
   const dom=await page('weekend-ai.html','service-content.js',articles);
   try {
     const d=dom.window.document;
-    assert.equal(d.querySelectorAll('.pod-card').length,17);
-    assert.equal(d.querySelectorAll('.archive-card').length,17);
+    assert.equal(d.querySelectorAll('.pod-card').length,18);
+    assert.equal(d.querySelectorAll('.archive-card').length,18);
     const updatedPodcast=d.querySelector('.pod-card iframe[src="https://stand.fm/embed/episodes/6aa47d67279752ae5dd1c9c7"]').closest('.pod-card');
     const updatedArchive=[...d.querySelectorAll('.archive-card')].find(card=>card.textContent.includes('更新したアーカイブ'));
     assert.match(updatedPodcast.textContent,/更新したPodcast/);
@@ -66,9 +66,9 @@ test('weekend page reflects edited and newly published episodes in descending or
   const dom=await page('weekend-ai.html','service-content.js',[...articles,next]);
   try {
     const cards=[...dom.window.document.querySelectorAll('.pod-card')];
-    assert.equal(cards.length,18);
-    assert.match(cards[0].textContent,/第17回/);
-    assert.match(cards[0].textContent,/第17回/);
+    assert.equal(cards.length,19);
+    assert.match(cards[0].textContent,/第18回/);
+    assert.match(cards[1].textContent,/第17回/);
     assert.match(cards.find(card=>card.textContent.includes('次の回')).textContent,/次の回/);
     assert.match(cards.find(card=>card.textContent.includes('AIが面接')).textContent,/AIが面接/);
     assert.match(cards.find(card=>card.textContent.includes('更新したPodcast')).textContent,/更新したPodcast/);
@@ -128,7 +128,7 @@ test('weekend page keeps the standard thumbnail and guidance when no current eve
 test('homepage shares seminar data, keeps the weekly event first and separates service readiness', async () => {
   const html=readFileSync('projects/totonoe/index.html','utf8');
   const script=readFileSync('projects/totonoe/seminars.js','utf8');
-  for(const [date,expected] of [['2026-09-12T00:00:00+09:00',3],['2026-09-14T21:30:00+09:00',3],['2026-09-14T22:00:00+09:00',2],['2026-09-28T21:00:00+09:00',1]]) {
+  for(const [date,expected] of [['2026-09-12T00:00:00+09:00',4],['2026-09-14T21:30:00+09:00',4],['2026-09-14T22:00:00+09:00',3],['2026-09-28T21:00:00+09:00',2],['2026-10-20T00:00:00+09:00',1]]) {
     const dom=new JSDOM(html,{url:'https://example.com/projects/totonoe/',runScripts:'outside-only'});
     try {
       dom.window.Date.now=()=>Date.parse(date);
@@ -206,11 +206,11 @@ test('a shared TSUMAMI video URL opens the requested video instead of a column p
 
 test('seminar grids promote published weekly thumbnails and adapt to one, two or three events', async () => {
   for (const file of ['index.html','contents.html']) {
-    for (const [hero, extra, columns] of [[null,0,'1'],['https://example.com/week.png',0,'2'],['https://example.com/week.png',3,'3'],[null,3,'3'],['javascript:alert(1)',0,'1']]) {
+    for (const [hero, extra, columns] of [[null,0,'1'],['https://example.com/week.png',0,'1'],['https://example.com/week.png',1,'2'],['https://example.com/week.png',3,'3'],[null,3,'3'],['javascript:alert(1)',0,'1']]) {
       const dom=new JSDOM(readFileSync('projects/totonoe/'+file,'utf8'),{url:'https://example.com/projects/totonoe/'+file,runScripts:'outside-only'});
       try {
-        dom.window.Date.now=()=>Date.parse('2026-09-17T12:00:00+09:00');
-        dom.window.fetch=async url=>({ok:true,json:async()=>String(url).includes('weekend-event') ? {event:hero?{hero_url:hero}:null} : {articles:Array.from({length:extra},(_,i)=>({status:'published',content_type:'seminar',title:'追加セミナー'+i,media_url:'https://example.com/seminar/'+i,source_published_at:'2026-10-01',hero_url:'https://example.com/thumb.png'}))}});
+        dom.window.Date.now=()=>Date.parse('2026-10-20T12:00:00+09:00');
+        dom.window.fetch=async url=>({ok:true,json:async()=>String(url).includes('weekend-event') ? {event:hero?{hero_url:hero}:null} : {articles:Array.from({length:extra},(_,i)=>({status:'published',content_type:'seminar',title:'追加セミナー'+i,media_url:'https://example.com/seminar/'+i,source_published_at:'2026-11-01',hero_url:'https://example.com/thumb.png'}))}});
         dom.window.eval(readFileSync('projects/totonoe/seminars.js','utf8'));
         await new Promise(resolve=>setTimeout(resolve,20));
         const d=dom.window.document, grid=d.querySelector('#semGrid');

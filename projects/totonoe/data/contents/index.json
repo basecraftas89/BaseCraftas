@@ -217,7 +217,7 @@
         "キャラクター",
         "ツグモ"
       ],
-      "hero_url": "../assets/characters/stories/tsugumo/01-1_capable-before-dawn.png",
+      "hero_url": "../assets/characters/stories/tsugumo/01-1_capable-before-dawn-optimized.webp",
       "url": "tsuzuri/tsugumo-morning-call/",
       "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/tsugumo-morning-call/",
       "published_at": "2026-09-13",
@@ -246,7 +246,7 @@
         "キャラクター",
         "ハクト"
       ],
-      "hero_url": "../assets/characters/stories/hakuto/02-1_successful-writer.png",
+      "hero_url": "../assets/characters/stories/hakuto/02-1_successful-writer-optimized.webp",
       "url": "tsuzuri/hakuto-story-beyond-window/",
       "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/hakuto-story-beyond-window/",
       "published_at": "2026-09-13",
@@ -275,7 +275,7 @@
         "キャラクター",
         "ミオン"
       ],
-      "hero_url": "../assets/characters/stories/mion/03-1_chasing-everything.png",
+      "hero_url": "../assets/characters/stories/mion/03-1_chasing-everything-optimized.webp",
       "url": "tsuzuri/mion-which-shadow/",
       "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/mion-which-shadow/",
       "published_at": "2026-09-13",
@@ -302,9 +302,11 @@
       "speakers": [],
       "tags": [
         "キャラクター",
-        "ミオン・ツグモ・ハクト"
+        "ミオン",
+        "ツグモ",
+        "ハクト"
       ],
-      "hero_url": "../assets/characters/stories/trio/04-1_tools-connect-them.png",
+      "hero_url": "../assets/characters/stories/trio/04-1_tools-connect-them-optimized.webp",
       "url": "tsuzuri/three-characters-same-gift/",
       "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/three-characters-same-gift/",
       "published_at": "2026-09-13",

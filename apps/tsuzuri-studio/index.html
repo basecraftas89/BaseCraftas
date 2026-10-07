@@ -16,7 +16,7 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <img src="../../projects/totonoe/assets/totonoe-logo.png" alt="ToToNoE+">
+        <img src="../../projects/totonoe/assets/totonoe-logo-optimized.webp" alt="ToToNoE+">
         <span>ToToNoE+ Studio</span>
       </div>
       <button class="new-post-button" type="button" data-action="new-post">
@@ -99,6 +99,12 @@
             <article class="status-card"><span>今月の更新</span><strong id="monthCount">3</strong><small>本</small><i class="status-accent blue"></i></article>
             <article class="status-card"><span>チーム</span><strong id="memberCount">3</strong><small>人</small><i class="status-accent gold"></i></article>
           </div>
+          <section class="panel billing-table-panel" aria-label="会員のクーポン利用状況">
+            <div class="panel-head"><div><p class="eyebrow">MEMBERS</p><h2>会員・無料クーポン利用状況</h2></div><button class="secondary-button" type="button" id="refreshMemberCoupons">更新</button></div>
+            <p id="memberCouponQuality" role="status">ログイン後にStripeの適用状況を確認します。</p>
+            <div class="billing-table-scroll"><table class="billing-table"><thead><tr><th>サービス</th><th>有効会員</th><th>無料クーポン適用</th><th>その他の割引</th><th>クーポンなし</th><th>うち無料トライアル</th><th>未確認</th></tr></thead><tbody id="memberCouponRows"></tbody></table></div>
+            <p>人数のみを表示します。無料トライアルは「クーポンなし」の内数です。対象者の資格・過去の利用履歴ではなく、現在の適用状況です。</p>
+          </section>
           <div class="dashboard-grid">
             <section class="panel recent-panel">
               <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>最近のコンテンツ</h2></div><button type="button" class="text-button" data-content-view="all">すべて見る →</button></div>
@@ -215,6 +221,17 @@
                 <div class="setting-field"><span class="setting-label">Speaker</span><select id="postSpeakers" multiple size="5"><option value="shindo-toshiki">神藤 俊希</option><option value="kajiwara-yusuke">梶原 祐輔</option><option value="kaito-taisho">海藤 大将</option><option value="nakagawa-masahiro">中川 理浩</option><option value="kimura-koharu">木村 倖晴</option><option value="ito-masaya">伊東 雅也</option><option value="tsunashima-shu">綱島 脩</option><option value="kuroishi-ryota">黒石 涼太</option><option value="kojima-ken">小島 健</option><option value="kaigaishi-shogo">貝ヶ石 祥吾</option></select><small class="field-help">コンテンツの登壇者や対話者を複数選択できます。</small></div>
                 <div class="setting-field topic-tag-field"><label for="postTags">Topic Tag</label><input id="postTags" type="text" placeholder="候補を選ぶか、カンマ区切りで入力"><small class="field-help">現在のToToNoE+で使用中のタグから選べます。独自タグも入力でき、更新履歴に残ります。</small><div class="topic-tag-suggestions" id="topicTagSuggestions" aria-label="使用中のトピックタグ"></div></div>
                 <div class="source-detail-grid" id="sourceDetailFields" hidden><label id="episodeNoField">第何回<input id="postEpisodeNo" type="number" min="1" step="1" placeholder="16"></label><label><span id="sourceDateLabel">開催日・公開日</span><input id="postSourceDate" type="date"></label></div>
+                <div class="seminar-detail-fields" id="seminarDetailFields" hidden>
+                  <strong>セミナーの講師・参加条件</strong>
+                  <p class="field-help">参加費と講師区分をそれぞれ設定できます。運営メンバー・外部講師のどちらでも、無料／有料の回を登録できます。</p>
+                  <label>参加費区分<select id="postSeminarFeeType"><option value="">選択してください</option><option value="free">無料</option><option value="paid">有料</option></select></label>
+                  <label id="seminarPriceField">一般参加費（税込・円）<input id="postSeminarPrice" type="number" min="1" max="10000000" step="1" inputmode="numeric" placeholder="3000"></label>
+                  <label>講師区分<select id="postSeminarSpeakerType"><option value="">選択してください</option><option value="team">ToToNoE+運営メンバー</option><option value="external">外部講師</option></select></label>
+                  <label>講師名<input id="postSeminarSpeakerName" type="text" maxlength="100" placeholder="講師名"></label>
+                  <div class="seminar-time-fields"><label>開始時刻<input id="postSeminarStart" type="time"></label><label>終了時刻<input id="postSeminarEnd" type="time"></label></div>
+                  <label>会員向け申込URL<input id="postSeminarMemberUrl" type="url" inputmode="url" placeholder="https://..."><small class="field-help">有料回の会員専用申込先。未入力ならTAYORIに申込ボタンを出さず、運営からの案内待ちと表示します。</small></label>
+                  <p id="seminarPolicyPreview" class="seminar-policy-preview">参加費区分と講師区分を選ぶと、会員向けの条件が表示されます。</p>
+                </div>
                 <input id="postSourceType" type="hidden"><input id="postSourceId" type="hidden">
                 <label>公開ページのURLスラッグ<input id="postSlug" type="text" placeholder="article-url"><small class="field-help">URL末尾の article-url にあたる部分です。</small></label>
                 <div class="setting-block"><span>公開状態</span><div class="visibility-row"><i></i><div><strong id="visibilityTitle">下書き</strong><small id="visibilityCopy">サイトには表示されません</small></div></div></div>
@@ -309,6 +326,7 @@
           </section>
           <section class="panel billing-table-panel">
             <div class="panel-head"><div><p class="eyebrow">WAITLIST</p><h2>ウェイトリスト</h2></div></div>
+            <p class="field-help">TAYORIの申込受付を開始すると、登録者は公開ページから本人確認・Stripeでの決済情報登録を行い、管理者の個別案内なしで14日間の無料体験を開始できます。</p>
             <div class="billing-table-scroll"><table class="billing-table"><thead><tr><th>メールアドレス</th><th>希望プラン</th><th>状態</th><th>登録日</th></tr></thead><tbody id="waitlistEntries"><tr><td colspan="4">登録情報を読み込んでいます。</td></tr></tbody></table></div>
           </section>
           <p class="security-note">🔒 この画面は管理者だけが閲覧できます。当月決済額はStripeの支払済み実績、継続課金予定額は現在の契約条件に基づく月額換算です。</p>
@@ -390,6 +408,6 @@
   <button type="button" data-action="logout" class="secondary-button" style="margin:16px">端末の保存を消してログアウト</button>
   <p style="margin:16px;font-size:12px">共有されていない原稿は、このタブ内に最大8時間だけ保存されます。タブを閉じる前に「チームに共有済み」を確認してください。</p>
   <script src="security.js?v=20260913-billing"></script>
-  <script src="script.js?v=20260923-analytics-v2"></script>
+  <script src="script.js?v=20261002-seminar-options"></script>
 </body>
 </html>

@@ -13,27 +13,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260916-content-hub">
 <link rel="stylesheet" href="editorial.css?v=20260908a">
-</head>
-<body>
-<header class="site-header scrolled" id="siteHeader">
-  <div class="header-inner">
-    <a href="index.html" class="brand" aria-label="ToToNoE+ トップへ">
-      <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
-    </a>
-    <nav class="site-nav" id="siteNav">
-      <a href="index.html">TOP</a>
-      <a href="weekend-ai.html">週末のAI整え習慣</a>
-      <div class="nav-dropdown"><a href="service.html" class="nav-main">サービス</a><div class="nav-menu" aria-label="サービスメニュー"><a href="tayori.html">たより｜TAYORI</a><span class="nav-disabled" aria-disabled="true">いろは｜IROHA <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">法人研修 <small>準備中</small></span><span class="nav-disabled" aria-disabled="true">プロダクト <small>準備中</small></span></div></div><div class="nav-dropdown"><a href="contents.html" class="nav-main">コンテンツ</a><div class="nav-menu" aria-label="コンテンツメニュー"><a href="tsuzuri/">コラム</a><a href="tsumami/">動画コンテンツ</a><a href="contents.html#archive">アーカイブ</a><a href="contents.html#podcast">ポッドキャスト</a><a href="contents.html#seminars">セミナー</a></div></div>
-      <a href="characters/">キャラクター</a>
-      <a href="team.html">チーム</a>
-      <a href="faq.html">FAQ</a>
-    </nav>
-    <a href="service.html" class="btn btn-cta header-cta">サービスを見る</a>
-    <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
+<link rel="stylesheet" href="/projects/totonoe/shared-header.css?v=20261005-content-label-v6"><script src="/projects/totonoe/shared-header.js?v=20261005-content-label-v6" defer></script></head>
+<body class=" totonoe-header-layout"><header class="site-header totonoe-shared-header" id="siteHeader">
+<div class="header-inner"><a href="/projects/totonoe/" class="brand" aria-label="ToToNoE+ トップへ"><img src="/projects/totonoe/assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="brand-logo" width="1442" height="566"></a>
+<a href="/projects/totonoe/TAYORI/login.html" class="home-login">会員ログイン →</a><button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-controls="siteNav" aria-expanded="false"><span></span><span></span><span></span></button></div>
+<nav class="site-nav home-navigation" id="siteNav" aria-label="メインナビゲーション">
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/seminars.html">セミナー</a><button class="header-menu-toggle" aria-label="セミナーの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/weekend-ai.html">週末のAI整え習慣</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/contents.html">コンテンツ</a><button class="header-menu-toggle" aria-label="コンテンツの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/tsuzuri/">つづり｜TSUZURI</a><a href="/projects/totonoe/tsumami/">つまみ｜TSUMAMI</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/service.html">サービス</a><button class="header-menu-toggle" aria-label="サービスの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/tayori.html">たより｜TAYORI</a><a href="/projects/totonoe/IROHA/">いろは｜IROHA</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/team.html">ToToNoE+について</a><button class="header-menu-toggle" aria-label="ToToNoE+についての項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/team.html">チーム</a><a href="/projects/totonoe/characters/">キャラクターと世界観</a><a href="/projects/totonoe/faq.html">よくある質問</a></div></div>
+</nav></header>
+
 <main class="legal">
   <div class="container container-narrow">
     <p class="eyebrow">CANCELLATION POLICY</p>
@@ -56,6 +46,7 @@
     </ul>
 
     <h2>3. ToToNoE+ TAYORI等の定額サービス</h2>
+    <p>TAYORI個人プランは、申込時に決済情報を登録した後、14日間の無料トライアルが始まります。無料期間終了前に解約手続きが完了すれば月額料金は発生しません。解約せずに無料期間が終了すると、月額980円（税込）の請求が始まり、その後は月ごとに自動更新されます。受付開始時には申込画面で実際の無料期間終了日時と初回請求予定日をご確認ください。</p>
     <ul>
       <li><strong>解約方法：</strong>解約を希望する場合は、申込ページ、決済サービス、またはお問い合わせフォームからご連絡ください。</li>
       <li><strong>解約の反映：</strong>解約手続きの完了後、次回更新分から請求を停止します。決済サービスの仕様により反映時期が異なる場合があります。</li>
@@ -93,7 +84,7 @@
   <div class="container footer-grid">
     <div class="footer-brand">
       <a href="index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
-        <img src="assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
+        <img src="assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
       </a>
       <p>本質に向き合い、専門職が大切にしたいことへ戻れる余白をつくるチームプロジェクト。</p>
     </div>
@@ -112,6 +103,6 @@
     <a href="cancellation.html">キャンセル・解約ポリシー</a>
   </div>
 </footer>
-<script src="common.js?v=20260905a"></script>
+<script src="common.js?v=20261005-mobile"></script>
 </body>
 </html>

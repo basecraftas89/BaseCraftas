@@ -1,0 +1,43 @@
+/* Shared storefront cards for the character page and story endings. */
+.line-sticker-intro{margin:18px 0 32px;color:var(--ink-soft);line-height:1.9}
+.line-sticker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-width:800px;align-items:stretch}
+.line-sticker-card{overflow:hidden;border:1px solid #dbe5dd;border-radius:24px;background:#fff;display:flex;flex-direction:column;min-width:0}
+.line-sticker-art{display:grid;place-items:center;padding:28px 16px;background:radial-gradient(ellipse at center,#fffdf5 0%,#f0f4e8 100%)}
+.line-sticker-art img{display:block;width:100%;max-width:240px;height:auto;aspect-ratio:1;object-fit:contain}
+.line-sticker-copy{display:flex;flex-direction:column;align-items:start;flex:1;padding:24px;gap:14px}
+.line-sticker-copy h3{margin:0;font-size:1.35rem;color:var(--teal-deep)}
+.line-sticker-copy p{margin:0;color:var(--ink-soft);font-size:.9rem;line-height:1.8;flex:1}
+.line-sticker-button{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:48px;padding:13px 18px;border-radius:12px;background:#245b43;color:#fff;font-size:.85rem;font-weight:700;text-align:center;text-decoration:none;line-height:1.6;transition:background .2s}
+.line-sticker-button:hover{background:#173e2e}
+.line-sticker-button:focus-visible{outline:3px solid #d18042;outline-offset:4px}
+.line-sticker-copy .line-sticker-button{width:100%;box-sizing:border-box}
+.line-sticker-note{margin:24px 0 0;color:var(--ink-soft);font-size:.78rem;line-height:1.8}
+.line-sticker-story{margin:48px 0 0;border:1px solid #dbe5dd;border-radius:24px;overflow:hidden;background:#fff;display:grid;grid-template-columns:240px minmax(0,1fr)}
+.line-sticker-story .line-sticker-art{padding:20px}
+.column-body-inner .line-sticker-story h2{font-size:1.4rem;line-height:1.6;margin:0}
+.column-body-inner .line-sticker-story p{margin:0}
+.column-body-inner .line-sticker-story .line-sticker-button{color:#fff;text-decoration:none}
+.line-sticker-story .line-sticker-note{font-size:.75rem}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* Keep the four sets together, including on small screens. */
+.line-sticker-grid .line-sticker-card{border-radius:16px}
+.line-sticker-grid .line-sticker-card{height:100%}
+.line-sticker-grid .line-sticker-art{padding:16px 12px}
+.line-sticker-grid .line-sticker-art img{max-width:140px}
+.line-sticker-grid .line-sticker-copy{padding:16px;gap:10px}
+.line-sticker-grid .line-sticker-copy{min-height:142px;box-sizing:border-box}
+.line-sticker-grid .line-sticker-copy h3{font-size:1rem}
+.line-sticker-grid .line-sticker-copy p{font-size:.8rem}
+.line-sticker-grid .line-sticker-button{font-size:.8rem;padding:10px 8px;min-height:44px}
+@media(max-width:600px){.line-sticker-art{padding:24px}.line-sticker-art img{max-width:220px}.line-sticker-story{grid-template-columns:1fr}.line-sticker-copy{padding:24px}.line-sticker-story .line-sticker-art img{max-width:200px}}
+
+@media(max-width:600px){
+.line-sticker-grid{gap:6px}
+.line-sticker-grid .line-sticker-card{border-radius:10px}
+.line-sticker-grid .line-sticker-art{padding:8px 3px}
+.line-sticker-grid .line-sticker-copy{padding:8px 4px;gap:8px;align-items:center}
+.line-sticker-grid .line-sticker-copy{min-height:82px}
+.line-sticker-grid .line-sticker-copy h3{font-size:.75rem;white-space:nowrap}
+.line-sticker-grid .line-sticker-copy p{display:none}
+.line-sticker-grid .line-sticker-button{padding:6px 2px;gap:2px;font-size:.6875rem;min-height:44px;border-radius:7px;white-space:nowrap}
+}

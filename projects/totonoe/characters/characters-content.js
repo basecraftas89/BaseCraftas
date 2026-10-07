@@ -32,11 +32,11 @@
     image.loading = 'lazy';
     var copy = document.createElement('div');
     var label = document.createElement('p');
-    label.textContent = storyLabel(item);
+    label.textContent = 'つづり｜TSUZURI';
     var title = document.createElement('h3');
     title.textContent = item.title || '無題の物語';
     var action = document.createElement('span');
-    action.textContent = '読む →';
+    action.textContent = 'つづりで読む →';
     copy.append(label, title, action);
     link.append(image, copy);
     article.appendChild(link);
@@ -49,6 +49,8 @@
       var stories = (data.articles || []).filter(function (item) {
         return item.status === 'published' && (item.destination === 'characters' || item.category === 'character-story');
       });
+      var order = { 'tsugumo-morning-call': 0, 'mion-which-shadow': 1, 'hakuto-story-beyond-window': 2, 'three-characters-same-gift': 3 };
+      stories.sort(function (a, b) { return (order[a.slug] ?? 99) - (order[b.slug] ?? 99); });
       if (!stories.length) return;
       grid.replaceChildren();
       stories.forEach(function (item) { grid.appendChild(buildCard(item)); });

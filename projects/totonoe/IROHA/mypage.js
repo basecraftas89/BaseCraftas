@@ -97,7 +97,7 @@
     const interests = new Set(profile.interest_topics || []);
     form.querySelectorAll('input[name="interest_topics"]').forEach((input) => { input.checked = interests.has(input.value); });
     document.querySelector("#memberDisplayName").textContent = (profile.display_name || "会員") + "さん";
-    document.querySelector("#memberPlanName").textContent = profile.has_curriculum_access ? "IROHA会員（TAYORI込み）" : "TAYORI会員";
+    document.querySelector("#memberPlanName").textContent = profile.staff_access ? "運営メンバー（契約内容は「支払い・解約を管理」で確認）" : profile.has_curriculum_access ? "IROHA会員（TAYORI込み）" : "TAYORI会員";
   }
 
   function profilePayload(form) {

@@ -5,84 +5,44 @@ import {JSDOM} from 'jsdom';
 
 const read = name => readFileSync(`projects/totonoe/${name}`, 'utf8');
 
-test('content tabs, upcoming default and independent newest-three sidebars', async () => {
-  const dom = new JSDOM(read('contents.html'), {url:'https://example.com/projects/totonoe/contents.html', runScripts:'outside-only', pretendToBeVisual:true});
-  try {
-    const {document:d} = dom.window;
-    dom.window.Date.now = () => Date.parse('2026-09-17T12:00:00+09:00');
-    dom.window.localStorage.setItem('wa_seminars_status_v1','past');
-    dom.window.localStorage.setItem('wa_seminars_tag_v1','座談会');
-    dom.window.localStorage.setItem('wa_tsuzuri_order_v1','oldest');
-    dom.window.localStorage.setItem('wa_tsumami_order_v1','oldest');
-    const articles = [1,4,2,3].flatMap(i=>[
-      {status:'published',content_type:'column',title:'記事'+i,url:'tsuzuri/article-'+i+'.html',published_at:'2026-09-0'+i},
-      {status:'published',content_type:'learning',title:'資料'+i,media_url:'https://example.com/file-'+i,published_at:'2026-09-0'+i}
-    ]);
-    articles.push({status:'published',content_type:'column',destination:'characters',title:'キャラクターの物語',published_at:'2026-09-16'});
-    articles.push({status:'draft',content_type:'column',title:'未公開の記事',published_at:'2026-09-16'});
-    dom.window.fetch = async () => ({ok:true,json:async()=>({articles})});
-    dom.window.eval(read('service-content.js'));
-    dom.window.eval(read('seminars.js'));
-    dom.window.eval(read('contents-tabs.js'));
-    await new Promise(resolve=>setTimeout(resolve,30));
-    assert.deepEqual([...d.querySelectorAll('[role="tab"]')].map(x=>x.textContent), ['セミナー','ポッドキャスト','アーカイブ']);
-    assert.equal(d.querySelector('#seminars').hidden,false);
-    assert.equal(d.querySelector('#podcast').hidden,true);
-    assert.equal(d.querySelector('#archive').hidden,true);
-    assert.equal(d.querySelector('#semStatusFilter .active').dataset.semStatus,'upcoming');
-    assert.equal(d.querySelectorAll('#semGrid .is-past').length,0);
-    assert.equal(d.querySelector('#semGrid').children.length,2);
-    assert.ok(d.querySelector('#semGrid').firstElementChild.classList.contains('contents-recurring-card'));
-    assert.match(d.querySelector('#semGrid img').getAttribute('src'),/weekend-ai-default-thumbnail/);
-    assert.equal(d.querySelector('#tsuzuri-heading').textContent,'つづりTSUZURI');
-    assert.equal(d.querySelector('#tsumami-heading').textContent,'つまみTSUMAMI');
-    d.querySelector('[data-sem-status="past"]').click();
-    assert.equal(d.querySelectorAll('#semGrid .contents-recurring-card').length,0);
-    d.querySelector('[data-sem-status="upcoming"]').click();
-    d.querySelector('[data-sem-tag="座談会"]').click();
-    assert.equal(d.querySelector('#semGrid').children.length,1);
-    assert.ok(d.querySelector('#semGrid').firstElementChild.classList.contains('contents-recurring-card'));
-    d.querySelector('[data-sem-tag="all"]').click();
-    for(const name of ['tsuzuri','tsumami']) {
-      assert.deepEqual([...d.querySelectorAll('#'+name+'Latest strong')].map(x=>x.textContent),[4,3,2].map(i=>(name==='tsuzuri'?'記事':'資料')+i));
-    }
-    d.querySelector('#tab-podcast').click();
-    assert.equal(d.querySelector('#podcast').hidden,false);
-    assert.equal(d.querySelector('#seminars').hidden,true);
-    d.querySelector('#tab-podcast').dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
-    assert.equal(d.activeElement.id,'tab-archive');
-    assert.equal(d.querySelector('#archive').hidden,false);
-    assert.equal(dom.window.location.hash,'#archive');
-    assert.ok(d.querySelectorAll('#archiveGrid .archive-card').length > 0);
-    assert.ok(d.querySelector('#podList').children.length > 0);
-    d.querySelector('#archiveGrid button').click();
-    assert.equal(d.querySelector('#cvModal').getAttribute('aria-hidden'),'false');
-    d.querySelector('#cvModalClose').click();
-    assert.equal(d.querySelector('#cvModal').getAttribute('aria-hidden'),'true');
-    d.querySelector('#tab-seminars').click();
-    d.querySelector('[data-sem-status="all"]').click();
-    assert.ok(d.querySelectorAll('#semGrid .is-past').length > 0);
-    d.querySelector('#semGrid .sem-detail').click();
-    assert.equal(d.querySelector('#semModal').getAttribute('aria-hidden'),'false');
-    dom.window.location.hash='#podcast';
-    dom.window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'));
-    assert.equal(d.querySelector('#podcast').hidden,false);
-  } finally {dom.window.close();}
+test('learning modes switch the visible content and support keyboard navigation', () => {
+ const dom = new JSDOM(read('contents.html'), {runScripts:'outside-only'});
+ try {
+  const d = dom.window.document;
+  dom.window.eval(read('content-learning-tabs.js'));
+  const text = d.querySelector('#mode-tsuzuri'), video = d.querySelector('#mode-tsumami');
+  assert.equal(d.querySelector('#panel-tsuzuri').hidden,false);
+  assert.equal(d.querySelector('#panel-tsumami').hidden,true);
+  video.click();
+  assert.equal(d.querySelector('#panel-tsuzuri').hidden,true);
+  assert.equal(d.querySelector('#panel-tsumami').hidden,false);
+  assert.equal(video.getAttribute('aria-selected'),'true');
+  assert.equal(text.tabIndex,-1);
+  assert.equal(d.querySelector('#panel-tsumami .btn').getAttribute('href'),'tsumami/');
+  video.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
+  assert.equal(d.activeElement,text);
+  assert.equal(d.querySelector('#panel-tsuzuri').hidden,false);
+  assert.equal(d.querySelector('#panel-tsuzuri .btn').getAttribute('href'),'tsuzuri/');
+  assert.equal(d.querySelector('#podcast'),null);
+  assert.equal(d.querySelector('.content-step-grid'),null);
+  assert.ok(new JSDOM(read('weekend-ai.html')).window.document.querySelector('#podList'));
+ } finally {dom.window.close();}
 });
 
-test('empty published article feed shows an honest sidebar empty state', async () => {
-  const dom = new JSDOM(read('contents.html'), {url:'https://example.com/projects/totonoe/contents.html#archive',runScripts:'outside-only',pretendToBeVisual:true});
-  try {
-    dom.window.fetch = async () => ({ok:true,json:async()=>({articles:[]})});
-    dom.window.eval(read('service-content.js'));
-    dom.window.eval(read('contents-tabs.js'));
-    await new Promise(resolve=>setTimeout(resolve,30));
-    const d=dom.window.document;
-    assert.match(d.querySelector('#tsuzuriLatest').textContent,/公開記事を準備/);
-    assert.equal(d.querySelectorAll('#tsumamiLatest .contents-latest-item').length,0);
-    assert.match(d.querySelector('#tsumamiLatest').textContent,/公開動画を準備/);
-    assert.equal(d.querySelector('#archive').hidden,false);
-  } finally {dom.window.close();}
+test('TAYORI application link remains usable when full, closed or status unavailable', async () => {
+  for (const state of [{enabled:true,mode:'live',accepting:true,capacity_state:'available'}, {enabled:true,mode:'live',accepting:true,capacity_state:'full'}, {enabled:true,mode:'live',accepting:false}, null]) {
+    const dom = new JSDOM(read('tayori.html'), {url:'https://example.com/projects/totonoe/tayori.html',runScripts:'outside-only'});
+    try {
+      dom.window.fetch = async () => {if(!state) throw new Error('offline'); return {ok:true,json:async()=>state};};
+      dom.window.eval(read('waitlist.js'));
+      await new Promise(resolve=>setTimeout(resolve,10));
+      const d = dom.window.document;
+      assert.equal(d.querySelector('[data-tayori-direct-signup]').hidden,false);
+      assert.equal(d.querySelector('[data-tayori-footer-signup]').getAttribute('href'),'TAYORI/subscribe.html');
+      assert.equal(d.querySelector('[data-waitlist-form]'),null);
+      assert.equal(d.querySelector('.tayori-hero .btn-cta')?.getAttribute('href') || d.querySelector('a.btn-cta[href="TAYORI/subscribe.html"]').getAttribute('href'),'TAYORI/subscribe.html');
+    } finally { dom.window.close(); }
+  }
 });
 
 test('forthcoming service LPs never enter the public build; member pages remain available', () => {

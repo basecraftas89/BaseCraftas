@@ -50,6 +50,15 @@
       document.body.appendChild(btn);
     }
 
+    var musicButton = document.getElementById('bgmToggle');
+    var footer = document.querySelector('.site-footer');
+    if (musicButton && footer && !footer.contains(musicButton)) {
+      var music = document.createElement('div');
+      music.className = 'container footer-music';
+      music.appendChild(musicButton);
+      footer.appendChild(music);
+    }
+
     if (!window.__TOTONOE_BGM_SCRIPT_LOADING && !document.querySelector('script[src*="bgm.js"]')) {
       window.__TOTONOE_BGM_SCRIPT_LOADING = true;
       var script = document.createElement('script');
@@ -315,6 +324,12 @@
      ===================================================== */
   function boot() {
     initHeader();
+    if (!document.querySelector('script[data-totonoe-marketing]')) {
+      var marketing = document.createElement('script');
+      marketing.src = assetUrl('marketing-attribution.js?v=20261002a');
+      marketing.dataset.totonoeMarketing = '';
+      document.head.appendChild(marketing);
+    }
     initBgmControls();
     initApplyLinks();
     initCountdown();

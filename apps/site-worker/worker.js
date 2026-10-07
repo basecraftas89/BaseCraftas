@@ -1,4 +1,9 @@
+import {withDashboardRefinement} from './dashboard-refinement-release.js';
+import {withJourneyMeasurement} from './journey-release.js';
+import {withPublicUI} from './public-ui-release.js';
+import {withMemberUI} from './member-ui-release.js';
 const PROFILE_PATH = "/api/totonoe-member/api/customer/profile";
+const AUTH_STATUS_PATH = "/api/totonoe-member/api/customer/auth/status";
 
 function normalizedPath(pathname) {
   try {
@@ -51,32 +56,57 @@ function salesResponse(url, required) {
   return new Response(null, { status: 302, headers: { location: new URL(pathname, url.origin).href, "cache-control": "no-store" } });
 }
 
-async function loadProfile(request) {
+async function memberApiResponse(request, env, path) {
   const url = new URL(request.url);
   const headers = new Headers({ accept: "application/json" });
   const cookie = request.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
-  const response = await fetch(new URL(PROFILE_PATH, url.origin), { headers, redirect: "manual", signal: AbortSignal.timeout(5000) });
+  return env.MEMBER_API.fetch(new Request(new URL(path, url.origin), { headers, redirect: "manual", signal: AbortSignal.timeout(5000) }));
+}
+
+async function loadProfile(request, env) {
+  const response = await memberApiResponse(request, env, PROFILE_PATH);
   if (response.status === 401) return { authenticated: false };
   if (!response.ok) return { authenticated: false };
   const payload = await response.json();
   return { authenticated: true, ...(payload.profile || {}) };
 }
 
-export default {
+async function loadAccessStatus(request, env) {
+  const response = await memberApiResponse(request, env, AUTH_STATUS_PATH);
+  if (!response.ok) return { authenticated: false };
+  const payload = await response.json();
+  return { authenticated: payload.authenticated === true, ...(payload.access || {}) };
+}
+
+const siteWorker = {
   async fetch(request, env) {
     const url = new URL(request.url);
     const pathname = normalizedPath(url.pathname);
     if (!pathname || isPrivateSource(pathname)) return protectedResponse(new Response("Not Found", { status: 404 }), true);
+    if (/^\/projects\/totonoe\/TAYORI\/login(?:\.html)?\/?$/.test(pathname)) {
+      const assetUrl = new URL("/projects/totonoe/TAYORI/login-20261001", url);
+      return protectedResponse(await env.ASSETS.fetch(new Request(assetUrl, request)), true);
+    }
     const required = requiredEntitlement(pathname);
     if (!required) return protectedResponse(await env.ASSETS.fetch(request));
 
     let profile;
-    try { profile = await loadProfile(request); }
+    if (required === "weekly") {
+      let access;
+      try { access = await loadAccessStatus(request, env); }
+      catch { return protectedResponse(new Response("認証を確認できません。時間をおいて再度お試しください。", {status:503, headers:{"retry-after":"30"}}), true); }
+      const hasStaffAccess = access.staff_access === true && ["admin", "editor"].includes(access.staff_role);
+      const hasWeeklyAccess = access.has_weekly_access === true || access.has_curriculum_access === true || hasStaffAccess;
+      if (!access.authenticated || !hasWeeklyAccess) return protectedResponse(!access.authenticated ? loginResponse(url) : salesResponse(url, required), true);
+      return protectedResponse(await env.ASSETS.fetch(request), true);
+    }
+    try { profile = await loadProfile(request, env); }
     catch { return protectedResponse(new Response("認証を確認できません。時間をおいて再度お試しください。", {status:503, headers:{"retry-after":"30"}}), true); }
     if (!profile.authenticated) return protectedResponse(loginResponse(url), true);
 
-    const hasWeekly = Boolean(profile.has_weekly_access || profile.has_curriculum_access);
+    const hasStaffAccess = profile.staff_access === true && ["admin", "editor"].includes(profile.staff_role);
+    const hasWeekly = Boolean(profile.has_weekly_access || profile.has_curriculum_access || hasStaffAccess);
     const allowed = required === "curriculum"
       ? Boolean(profile.has_curriculum_access)
       : hasWeekly;
@@ -85,4 +115,5 @@ export default {
   }
 };
 
+export default withDashboardRefinement(withJourneyMeasurement(withPublicUI(withMemberUI(siteWorker))));
 export { isPrivateSource, requiredEntitlement };

@@ -1,0 +1,29 @@
+# 下層ページのキャラクターヒーローバナー（2026-10-03）
+
+Built-in imagegenで新規制作。公式3キャラクターMODEL SHEETと統合設計v1.6、ミオン公式仕様v1.6を参照。モデルシートは同一性の参照素材。キャラクターの形・服・装備と湖畔の世界観を保持。文字はHTMLで表示し、画像に文字を焼き込まない。
+
+- セミナー: page-hero-seminars-v1.png（採用原本）、page-hero-seminars-v1.webp（配信用）。一枚のカードを囲み、一緒に学ぶ。
+- サービス: page-hero-service-v1.png（採用原本）、page-hero-service-v1.webp（配信用）。新聞と学びを届け合う。
+- FAQ: page-hero-faq-v1.png（採用原本）、page-hero-faq-v1.webp（配信用）。問いに耳を傾け、安心して話す。
+
+PNG原本とCodex generated_images内の生成原本は保護して保持。WebPは1800×600、品質72で容量を調整した配信用派生素材。PCでは3:1、モバイルでは中央の2:1で表示。テキストは画像の上に独立配置して読みやすさを保つ。
+
+## 生成プロンプト
+
+### seminars
+
+Use case: illustration-story. Asset type: full-width website hero panorama. Generate a SINGLE polished ultra-wide landscape banner, approximately 3:1 ratio, NOT a contact sheet. The three input images are IDENTITY REFERENCES ONLY, not layouts to reproduce. Preserve exactly Hakuto the cream elderly goat with curved brown horns, beard, sage robe, canvas satchel; Mion the small blue kingfisher with orange cheeks, cream chest, ONE ivory earphone with microphone and green recorder on strap; Tsugumo the white rooster with orange comb, sage jacket, scarf, newspaper bag. Scale goat tallest, rooster middle, kingfisher smallest. ToToNoE+ world: bright tranquil emerald lake, broadleaf forest, wood cabin, discreet white round lighthouse in the distance. Tactile soft 3D storybook illustration, detailed feathers and wood, warm natural morning light, ivory, sage and deep forest-green with restrained terracotta. Entire story subjects completely within CENTER 65% horizontally and middle 65% vertically so responsive cropping never cuts faces or equipment. Spacious scenic edges extending left/right, calm uncluttered. No text, letters, logos, interface, split panels, extra characters or humans. Image must be usable across full browser width, no border or baked-in typography. Scene: three friends around a round wooden outdoor table on the lakeside cabin terrace, collaboratively learning. Hakuto gently points to one illustrated card, Tsugumo listens with a notebook, Mion curiously considers the card. The table is low and accessible. Equal conversation, friendly lively discovery, no teacher above others. Lake and forest panorama behind them.
+
+生成原本: /Users/kantoshi/.codex/generated_images/01a10093-4ed4-7211-a125-e7cdecdcb47d/exec-60a8d8df-170a-4b51-839c-0f197bde4580.png
+
+### services
+
+Use case: illustration-story. Asset type: full-width website hero panorama. Generate a SINGLE polished ultra-wide landscape banner, approximately 3:1 ratio, NOT a contact sheet. The three input images are IDENTITY REFERENCES ONLY, not layouts to reproduce. Preserve exactly Hakuto the cream elderly goat with curved brown horns, beard, sage robe, canvas satchel; Mion the small blue kingfisher with orange cheeks, cream chest, ONE ivory earphone with microphone and green recorder on strap; Tsugumo the white rooster with orange comb, sage jacket, scarf, newspaper bag. Scale goat tallest, rooster middle, kingfisher smallest. ToToNoE+ world: bright tranquil emerald lake, broadleaf forest, wood cabin, discreet white round lighthouse in the distance. Tactile soft 3D storybook illustration, detailed feathers and wood, warm natural morning light, ivory, sage and deep forest-green with restrained terracotta. Entire story subjects completely within CENTER 65% horizontally and middle 65% vertically so responsive cropping never cuts faces or equipment. Spacious scenic edges extending left/right, calm uncluttered. No text, letters, logos, interface, split panels, extra characters or humans. Image must be usable across full browser width, no border or baked-in typography. Scene: at the open wooden cabin porch overlooking the lake, Tsugumo warmly offers ONE carefully prepared newspaper to Mion, while Hakuto beside them holds an open notebook and smiles. A few orderly blank cards on a modest wooden counter imply learning and useful tools being delivered. Emphasize practical support and one small next step; cozy but spacious morning panorama.
+
+生成原本: /Users/kantoshi/.codex/generated_images/01a10093-4ed4-7211-a125-e7cdecdcb47d/exec-ff0f8e14-c77d-4da1-b7c6-ae5660681380.png
+
+### faq
+
+Use case: illustration-story. Asset type: full-width website hero panorama. Generate a SINGLE polished ultra-wide landscape banner, approximately 3:1 ratio, NOT a contact sheet. The three input images are IDENTITY REFERENCES ONLY, not layouts to reproduce. Preserve exactly Hakuto the cream elderly goat with curved brown horns, beard, sage robe, canvas satchel; Mion the small blue kingfisher with orange cheeks, cream chest, ONE ivory earphone with microphone and green recorder on strap; Tsugumo the white rooster with orange comb, sage jacket, scarf, newspaper bag. Scale goat tallest, rooster middle, kingfisher smallest. ToToNoE+ world: bright tranquil emerald lake, broadleaf forest, wood cabin, discreet white round lighthouse in the distance. Tactile soft 3D storybook illustration, detailed feathers and wood, warm natural morning light, ivory, sage and deep forest-green with restrained terracotta. Entire story subjects completely within CENTER 65% horizontally and middle 65% vertically so responsive cropping never cuts faces or equipment. Spacious scenic edges extending left/right, calm uncluttered. No text, letters, logos, interface, split panels, extra characters or humans. Image must be usable across full browser width, no border or baked-in typography. Scene: by a sheltered lakeside wooden bench, Mion asks a thoughtful question while holding its small recorder, Hakuto leans gently to listen at equal eye level, Tsugumo sits nearby holding one blank question card. Faces calm, reassuring, approachable, not exaggerated confusion. Cups of tea and an open notebook nearby, broad peaceful lake and soft forest beyond.
+
+生成原本: /Users/kantoshi/.codex/generated_images/01a10093-4ed4-7211-a125-e7cdecdcb47d/exec-6428e1ae-2e70-4760-a83b-b0a762c9c920.png

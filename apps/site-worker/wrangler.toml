@@ -15,3 +15,15 @@ cwd = "."
 directory = "../../dist"
 binding = "ASSETS"
 run_worker_first = true
+
+[[services]]
+binding = "MEMBER_API"
+service = "column-studio-api"
+
+[[services]]
+binding = "MEMBER_UI_ASSETS"
+service = "totonoe-member-ui"
+
+[[services]]
+binding = "PUBLIC_UI_ASSETS"
+service = "totonoe-public-ui"

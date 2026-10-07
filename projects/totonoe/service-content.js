@@ -30,7 +30,8 @@
      ・theme（任意）を入れるとカードに副題が表示されます
      ===================================================== */
   var EPISODES = [
-    {"url": "https://stand.fm/episodes/6ac033c007ef172482bdae69", "no": 19, "theme": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践", "date": "2026-10-03"},
+    { url: 'https://stand.fm/episodes/6ac033c007ef172482bdae69', no: 19, theme: 'AI動画制作は台本がカギ！PR動画づくりと音声生成の実践', date: '10/3' },
+    { url: 'https://stand.fm/episodes/6aba6667296167d378e5e37d', no: 18, theme: 'ChatGPT＆Claude最新モデルリリース！今はアツいのはこれ！', date: '9/26' },
     { url: 'https://stand.fm/episodes/6a405981f6da955ea231d2a6', no: 1, theme: 'AI相談の落とし穴〜安倍全監督の事例と医療現場のリスク〜', date: '5/30' },
     { url: 'https://stand.fm/episodes/6a4059c8ac08572069cc0537', no: 2, theme: 'AIに代替されるPT・選ばれるPT〜臨床とテクノロジーの境界線〜', date: '6/6' },
     { url: 'https://stand.fm/episodes/6a405a0cf6da955ea231d2b4', no: 3, theme: 'Claude最強モデル登場！Fable 5の実力とスクショアプリ開発', date: '6/13' },
@@ -97,6 +98,7 @@
     });
 
     podList.innerHTML = '';
+    var mobileWeekly = document.body.classList.contains('weekend-ai-page') && window.matchMedia('(max-width:680px)').matches;
     var ordered = EPISODES.slice();
     if (podRange) {
       ordered = ordered.filter(function (e) { return e.no >= podRange.from && e.no <= podRange.to; });
@@ -136,6 +138,22 @@
           '</span>' +
         '</div>';
 
+      if (mobileWeekly) {
+        var embed = card.querySelector('.sfm-embed');
+        var player = embed.querySelector('iframe');
+        var playerUrl = player.getAttribute('src');
+        player.removeAttribute('src');
+        var disclosure = document.createElement('details');
+        disclosure.className = 'pod-embed-toggle';
+        var summary = document.createElement('summary');
+        summary.textContent = '音声プレイヤーを開く';
+        disclosure.append(summary, embed);
+        card.insertBefore(disclosure, card.querySelector('.pod-controls'));
+        disclosure.addEventListener('toggle', function () {
+          if (disclosure.open && !player.getAttribute('src')) player.src = playerUrl;
+          summary.textContent = disclosure.open ? '音声プレイヤーを閉じる' : '音声プレイヤーを開く';
+        });
+      }
       podList.appendChild(card);
 
       var watchBtn = card.querySelector('.watch-btn');
@@ -153,6 +171,25 @@
       sync();
     });
 
+    var more = document.getElementById('podMore');
+    if (!more && document.body.classList.contains('weekend-ai-page')) {
+      more = document.createElement('button');
+      more.type = 'button'; more.id = 'podMore'; more.className = 'pod-more';
+      more.setAttribute('aria-controls', 'podList');
+      podList.parentElement.insertAdjacentElement('afterend', more);
+    }
+    if (more) {
+      var cards = Array.from(podList.children);
+      var expanded = false;
+      function updateMore() {
+        cards.forEach(function (card, i) { card.hidden = mobileWeekly && !expanded && i >= 3; });
+        more.hidden = !mobileWeekly || cards.length <= 3;
+        more.setAttribute('aria-expanded', String(expanded));
+        more.textContent = expanded ? '閉じる' : 'もっと見る（残り' + Math.max(0, cards.length - 3) + '回）';
+      }
+      more.onclick = function () { expanded = !expanded; updateMore(); if (!expanded) more.scrollIntoView({block:'nearest'}); };
+      updateMore();
+    }
     podList.scrollLeft = 0;
     if (podList._updateNav) podList._updateNav();
   }
@@ -342,7 +379,7 @@
     TSUZURI_ITEMS.forEach(function (c) { existing[c.url] = true; });
     (items || [])
       .filter(function (item) {
-        return item.status === 'published' && (item.content_type || 'column') === 'column' && item.destination !== 'characters' && item.category !== 'character-story';
+        return item.status === 'published' && (item.content_type || 'column') === 'column';
       })
       .forEach(function (item) {
         var url = item.url || ('tsuzuri/' + item.slug + '.html');
@@ -353,6 +390,7 @@
         existing[url] = true;
         TSUZURI_ITEMS.push({
           title: item.title,
+          slug: item.slug || '',
           desc: item.excerpt || item.summary || '',
           tags: item.topic_tags || item.tags || [],
           date: item.published_at || String(item.updated_at || '').slice(0, 10),
@@ -360,7 +398,8 @@
           image: item.hero_url || '',
           thumb: 'TSUZURI',
           mainActor: item.main_actor && item.main_actor.name ? item.main_actor.name : '',
-          speakers: (item.speakers || []).map(function (person) { return person.name; })
+          speakers: (item.speakers || []).map(function (person) { return person.name; }),
+          isCharacterStory: item.destination === 'characters' || item.category === 'character-story'
         });
       });
   }
@@ -410,7 +449,7 @@
         id: item.id,
         image: item.hero_url || '',
         title: item.title,
-        desc: item.excerpt || '',
+        desc: /Claude\s*Academy/i.test(item.title || '') ? 'Anthropic公式の学習環境「Claude Academy」を紹介。コースの選び方や使い方を、実際の画面で解説します。' : (item.excerpt || ''),
         tags: item.topic_tags || item.tags || [],
         date: generatedDate(item),
         type: item.content_type === 'video' ? '動画' : (item.content_type_label || 'つまみ｜TSUMAMI'),
@@ -447,7 +486,7 @@
   function loadGeneratedContent() {
     if (!window.fetch) return;
     fetch(window.TOTONOE_CONTENT_DATA_URL || 'data/contents/index.json', { cache: 'no-store' })
-      .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
+      .then(function (res) { if (!res.ok) throw new Error('Content feed unavailable'); return res.json(); })
       .then(function (data) {
         var items = data.articles || [];
         mergeGeneratedTsuzuri(items);
@@ -537,6 +576,10 @@
 
     var list = TSUZURI_ITEMS.slice().sort(function (a, b) {
       var diff = new Date(a.date) - new Date(b.date);
+      if (!diff && a.isCharacterStory && b.isCharacterStory) {
+        var order = { 'tsugumo-morning-call': 0, 'mion-which-shadow': 1, 'hakuto-story-beyond-window': 2, 'three-characters-same-gift': 3 };
+        return (order[a.slug] ?? 99) - (order[b.slug] ?? 99);
+      }
       return tsuzuriOrder === 'oldest' ? diff : -diff;
     });
     if (currentTsuzuriTag !== 'all') {
@@ -656,7 +699,7 @@
 
 
   /* =====================================================
-     アーカイブ動画（コメキャリ生限定）
+     アーカイブ動画（対象会員限定）
      ─────────────────────────────────────────────────────
      ▼ 新しい回を追加するとき
        1. Googleドライブの「アーカイブ」フォルダに動画をアップロード
@@ -676,7 +719,10 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
-    {"no": 19, "date": "2026-10-03", "driveId": "1vGsbLh4Ljh_peSbdcA7Y3bfr7lhe8Crc", "title": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践"},
+    { no: 19, date: '2026-10-03', driveId: '1vGsbLh4Ljh_peSbdcA7Y3bfr7lhe8Crc',
+      title: 'AI動画制作は台本がカギ！PR動画づくりと音声生成の実践' },
+    { no: 18, date: '2026-09-26', driveId: '1syUKMbFP8m6oifWVy3p86-yZPqSvqoo-',
+      title: 'ChatGPT＆Claude最新モデルリリース！今はアツいのはこれ！' },
     { no: 17, date: '2026-09-19', driveId: '1c4FYxTu2-o_HIsT1hKJE56sE4W-0Ma-A',
       title: 'AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ' },
     { no: 16, date: '2026-09-12', driveId: '1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo',
@@ -910,7 +956,7 @@
       card.setAttribute('role', 'listitem');
       card.innerHTML =
         '<button type="button" class="archive-card-main" aria-label="第' + a.no + '回の録画を再生">' +
-          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>コメキャリ生限定</span>' +
+          '<span class="archive-badge"><span class="archive-lock" aria-hidden="true">\uD83D\uDD12</span>対象会員限定</span>' +
           '<span class="archive-no">第' + a.no + '回</span>' +
           '<span class="archive-date">' + formatDate(a.date) + '</span>' +
           '<span class="archive-title">' + esc(a.title) + '</span>' +
@@ -934,9 +980,9 @@
     if (!a.driveId && a.folderId) {
       cvModalBody.innerHTML =
         '<div class="cv-modal-content">' +
-          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリ生限定</p>' +
+          '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 対象会員限定</p>' +
           '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
-          '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
+
           '<div class="cv-fallback">' +
             '<p class="cv-fallback-title">\uD83D\uDD12 アーカイブ動画フォルダを開く</p>' +
             '<p class="cv-fallback-body">この回の動画は、Googleドライブのアーカイブ動画フォルダに格納されています。' +
@@ -955,9 +1001,9 @@
         'allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>' +
       '</div>' +
       '<div class="cv-modal-content">' +
-        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 コメキャリ生限定</p>' +
+        '<p class="cv-modal-meta">第' + a.no + '回　' + formatDate(a.date) + '　\uD83D\uDD12 対象会員限定</p>' +
         '<h3 class="cv-modal-title">' + esc(a.title) + '</h3>' +
-          '<p class="cv-fallback-body">閲覧を希望されるコメキャリ生は、運営まで個別にご連絡ください。</p>' +
+
         '<div class="cv-fallback">' +
           '<p class="cv-fallback-title">\uD83D\uDD12 映像が表示されない場合</p>' +
           '<p class="cv-fallback-body">視聴権限のあるGoogleアカウントでログインしているかご確認ください。' +
@@ -1041,15 +1087,39 @@
     openRequestedVideo();
   }
 
-  // The sidebar always shows the latest three; list-page sort preferences do not apply.
+  // Latest panels use publication dates, independent of list-page sorting preferences.
+  function latestTimestamp(item) {
+    var value = String(item.date || '');
+    // The original podcast ledger covers 2026 and stores dates as M/D.
+    if (/^\d{1,2}\/\d{1,2}$/.test(value)) value = '2026/' + value;
+    return Date.parse(value) || 0;
+  }
+  function newestPublishedFirst(a, b) {
+    return latestTimestamp(b) - latestTimestamp(a) || (Number(b.no) || 0) - (Number(a.no) || 0);
+  }
   function renderContentSidebar() {
-    [{ id: 'tsuzuriLatest', items: TSUZURI_ITEMS }, { id: 'tsumamiLatest', items: CONTENTS }].forEach(function (group) {
+    var podcastTarget = document.getElementById('podcastLatest');
+    if (podcastTarget) {
+      podcastTarget.replaceChildren();
+      EPISODES.slice().sort(newestPublishedFirst).slice(0, Math.min(3, Math.max(1, Number(podcastTarget.dataset.latestLimit) || 2))).forEach(function(ep){
+        var link = document.createElement('a');
+        link.className = 'home-podcast-item';
+        link.href = ep.url; link.target = '_blank'; link.rel = 'noopener';
+        var number = document.createElement('span'); number.textContent = 'EP. ' + ep.no;
+        var title = document.createElement('strong'); title.textContent = ep.theme;
+        var date = document.createElement('time');
+        var timestamp = latestTimestamp(ep);
+        date.dateTime = timestamp ? new Date(timestamp).toLocaleDateString('sv-SE') : '';
+        date.textContent = date.dateTime ? formatDate(date.dateTime) : '';
+        var action = document.createElement('span'); action.textContent = 'stand.fmで聴く ↗';
+        link.append(number,date,title,action); podcastTarget.appendChild(link);
+      });
+    }
+    [{ id: 'tsuzuriLatest', items: TSUZURI_ITEMS.filter(function (item) { return !item.isCharacterStory; }) }, { id: 'tsumamiLatest', items: CONTENTS }].forEach(function (group) {
       var target = document.getElementById(group.id);
       if (!target) return;
       var limit = Math.min(3, Math.max(1, Number(target.dataset.latestLimit) || 3));
-      var latest = group.items.slice().sort(function (a, b) {
-        return (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0);
-      }).slice(0, limit);
+      var latest = group.items.slice().sort(newestPublishedFirst).slice(0, limit);
       target.replaceChildren();
       if (!latest.length) {
         var emptyNote = document.createElement('p');
@@ -1073,7 +1143,7 @@
           } catch (e) { return; }
         }
         var image = document.createElement('img');
-        var imageUrl = item.image || (item.youtubeId ? ytThumbUrl(item.youtubeId) : 'assets/service-tsuzuri.png');
+        var imageUrl = item.image || (item.youtubeId ? ytThumbUrl(item.youtubeId) : 'assets/service-tsuzuri-optimized.webp');
         // Studio thumbnails use article-relative paths; resolve against the article directory.
         if (imageUrl.indexOf('../assets/') === 0) imageUrl = imageUrl.slice(3);
         image.src = imageUrl;
@@ -1091,6 +1161,7 @@
   renderContentSidebar();
   initPodcastRanges();
   setupPodcastSort();
+  if (document.body.classList.contains('weekend-ai-page')) window.matchMedia('(max-width:680px)').addEventListener('change', renderPodcast);
   setupSlider({ trackId: 'podList', prevId: 'podPrev', nextId: 'podNext', cardSelector: '.pod-card', hintId: 'podHint' });
   renderPodcast();
 

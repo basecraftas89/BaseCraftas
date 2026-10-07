@@ -1,0 +1,40 @@
+.seminar-section { max-width: 1120px; margin: 0 auto; }
+.seminar-guide { margin-top: 0; }
+.seminar-filters { margin-top: 26px; padding: 16px; display: grid; gap: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.seminar-filters > div { display: flex; align-items: flex-start; gap: 14px; }
+.seminar-filters strong { min-width: 66px; padding-top: 7px; color: var(--ink); font-size: .78rem; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-chips button { min-height: 35px; padding: 6px 13px; color: var(--sage); background: white; border: 1px solid #bad0c3; border-radius: 999px; font-size: .74rem; font-weight: 800; }
+.filter-chips button[aria-pressed="true"] { color: white; background: var(--sage); border-color: var(--sage); }
+.filter-chips button:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.seminar-benefits { margin-top: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.seminar-benefits article { min-width: 0; padding: 18px; background: #e8f3ec; border: 1px solid #d0e1d5; border-radius: 14px; }
+.seminar-benefits article:nth-child(3) { background: #fff0e6; border-color: #efd5c5; }
+.seminar-benefit-icon { width: 40px; height: 40px; display: grid; place-items: center; color: white; background: #0c4935; border-radius: 50%; }
+.seminar-benefits article:nth-child(3) .seminar-benefit-icon { background: #bd5632; }
+.seminar-benefits h3 { margin: 10px 0 5px; color: var(--ink); font-size: .95rem; line-height: 1.5; }
+.seminar-benefits p { margin: 0; font-size: .78rem; }
+.seminar-policy-note { margin: 12px 0 0; color: #5a7167; font-size: .74rem; }
+.member-weekly-event { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 22px; align-items: center; margin-top: 20px; padding: 18px; background: #edf6ef; border: 1px solid #bad7c4; border-radius: 16px; }
+.member-weekly-event img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 10px; }
+.member-weekly-event h3 { margin: 8px 0; color: var(--ink); font-size: 1.22rem; }
+.member-weekly-event p { margin: 5px 0; font-size: .84rem; }
+.member-weekly-event .primary-button { display: inline-flex; margin-top: 12px; }
+.member-weekly-badge { display: inline-block; padding: 4px 9px; color: white; background: #0c4935; border-radius: 999px; font-size: .7rem; font-weight: 800; }
+.seminar-group { margin-top: 36px; }
+.seminar-card-grid { margin-top: 15px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tayori-seminar-card { min-width: 0; overflow: hidden; background: white; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 24px rgba(26,51,44,.07); }
+.tayori-seminar-card > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; background: #f3f6f3; }
+.tayori-seminar-card.is-past > img { filter: brightness(.78) saturate(.72); }
+.tayori-seminar-card.is-past { background: #f7f8f7; }
+.tayori-seminar-card-body { padding: 17px; }
+.tayori-seminar-badge { padding: 4px 9px; display: inline-block; color: #206a49; background: #e0f2e8; border-radius: 999px; font-size: .69rem; font-weight: 800; }
+.tayori-seminar-badge.is-past { color: #66766f; background: #edf1ef; }
+.tayori-seminar-date { margin: 9px 0 4px; color: var(--orange-deep); font-size: .74rem; font-weight: 800; }
+.tayori-seminar-card h3 { margin: 0 0 8px; color: var(--ink); font-size: 1rem; line-height: 1.5; }
+.tayori-seminar-speaker, .tayori-seminar-price { margin: 4px 0; font-size: .76rem; }
+.tayori-seminar-price { color: var(--ink); font-weight: 800; }
+.tayori-seminar-condition { margin: 8px 0; padding: 8px 10px; color: var(--ink); background: var(--paper); border-radius: 8px; font-size: .73rem; }
+.tayori-seminar-card .secondary-button { margin-top: 10px; font-size: .76rem; }
+.seminar-empty { margin: 15px 0 0; padding: 28px; color: #587067; background: var(--paper); border: 1px dashed #b9ccc0; border-radius: 14px; font-size: .82rem; text-align: center; }
+.iroha-seminars .subview-guide{margin:0 0 24px}.iroha-seminars .subview-guide img{display:block;width:100%;height:auto}.iroha-seminars .section-heading h2{margin:4px 0 8px}.member-weekly-badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#d8ede0;color:#206a49;font-size:.75rem;font-weight:700}.iroha-seminars{--sage:#2d6056;--paper:#f7faf5}@media(max-width:1100px){.seminar-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.seminar-card-grid,.member-weekly-event{grid-template-columns:1fr}.seminar-filters>div{display:block}.seminar-filters strong{display:block;margin-bottom:7px}}
