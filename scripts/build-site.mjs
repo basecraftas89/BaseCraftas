@@ -12,10 +12,10 @@ await rm(out,{recursive:true,force:true});
 await mkdir(out,{recursive:true});
 const extensions = new Set(['.html','.css','.js','.png','.jpg','.jpeg','.webp','.gif','.svg','.ico','.mp3','.mp4','.woff','.woff2']);
 // Only these public trees can enter a deployment. Never traverse apps/API or tools.
-const trees = ['css','js','images','services','projects','apps/tsuzuri-studio'];
+const trees = ['css','js','images','services','products','projects','apps/tsuzuri-studio'];
 const blocked = /(?:^|\/)(?:node_modules|\.git|\.wrangler|\.pet-runs|scripts|tests?)(?:\/|$)|(?:\.test\.|security-entry\.js$)/;
 // Retain forthcoming service drafts locally; never ship their LPs.
-const unpublishedPages = new Set(['projects/totonoe/IROHA/index.html', 'projects/totonoe/corporate.html', 'projects/totonoe/products.html']);
+const unpublishedPages = new Set(['projects/totonoe/corporate.html', 'projects/totonoe/products.html', 'services/branding.html']);
 const copied=[];
 async function copyFile(relative) {
   await mkdir(path.dirname(path.join(out,relative)),{recursive:true});
@@ -31,6 +31,8 @@ async function walk(relative) {
   }
 }
 for(const tree of trees)await walk(tree);
+await cp(path.join(out,'apps/tsuzuri-studio'),path.join(out,'apps/totonoe-studio'),{recursive:true});
+await rm(path.join(out,'apps/tsuzuri-studio'),{recursive:true,force:true});
 for(const entry of await readdir(root,{withFileTypes:true})) {
   if(entry.isFile() && (entry.name.endsWith('.html')||['_headers','_redirects','robots.txt','sitemap.xml'].includes(entry.name)))await copyFile(entry.name);
 }
@@ -52,6 +54,7 @@ for(const file of copied.filter(file=>/^projects\/totonoe\/data\/contents\/[a-z0
     const body=splitMemberBody(item.body_html || '');
     const article={...item,source_id:safeSourceId(item.source_id),url:safeUrl(item.url,true),body_html:body.publicHtml,has_member_section:Boolean(item.has_member_section||body.hasMemberSection),media_url:safeUrl(item.media_url),hero_url:safeUrl(item.hero_url,true),
       ...(item.external_link?{external_link:{...item.external_link,url:safeUrl(item.external_link.url),image:safeUrl(item.external_link.image)}}:{})};
+    if(article.content_type==='seminar'&&article.seminar_details){article.seminar_details={...article.seminar_details,member_registration_url:safeUrl(article.seminar_details.member_registration_url)};}
     if((article.content_type||'column')==='column'){
       const characterStory=article.destination==='characters'||article.category==='character-story';
       article.destination=characterStory?'characters':'tsuzuri';

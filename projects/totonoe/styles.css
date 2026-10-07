@@ -1575,6 +1575,15 @@ body.sem-lock{overflow:hidden}
 .column-article-body p{
   font-size:1rem;line-height:2.08;color:var(--ink-soft);margin-bottom:22px;
 }
+.column-article-body .story-figure{
+  margin:56px 0 60px;
+}
+.column-article-body .story-figure img{
+  display:block;width:100%;height:auto;border-radius:18px;
+}
+.column-article-body .story-figure figcaption{
+  margin-top:12px;color:var(--muted);font-size:.82rem;line-height:1.7;text-align:center;
+}
 .column-article-body .section-cta{justify-content:flex-start;margin-top:34px}
 
 /* ===== Quiet principle layer

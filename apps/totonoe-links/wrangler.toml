@@ -1,0 +1,10 @@
+name = "basecraftas-totonoe-links"
+account_id = "142982627bdfc09489c4aeeb2e3465a7"
+main = "worker.js"
+compatibility_date = "2026-09-11"
+workers_dev = false
+preview_urls = false
+
+[[routes]]
+pattern = "basecraftas.com/go/*"
+zone_name = "basecraftas.com"

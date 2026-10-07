@@ -12,6 +12,13 @@
   let checkoutRequestId = "";
 
   const messages = {
+    tayori_daily_limit_reached: "今週末の10名枠は満席です。申込ページのウェイトリストへご登録ください。次の受付は翌週土曜6:30（日本時間）からです。",
+    tayori_capacity_pending: "残りの枠は決済中の方が仮確保しています。時間をおいて再度お試しください。",
+    tayori_checkout_pending: "決済状況を確認しています。重複申し込みを防ぐため、少し時間をおいて再度お試しください。",
+    tayori_weekend_closed: "新規受付は土曜6:30〜日曜23:30（日本時間）、土日合計10名までです。次の受付時間にお申し込みください。",
+    checkout_expired_retry: "決済画面の有効期限が切れました。申し込み画面を開き直してください。",
+    auth_email_daily_limit_reached: "本日の確認メール送信上限に達しました。次の午前9時（日本時間）以降にお試しください。",
+    auth_email_cooldown: "確認メールは60秒以上あけて再送してください。",
     invalid_email: "メールアドレスの形式をご確認ください。",
     too_many_requests: "短時間に送信回数が上限に達しました。10分ほど待ってからお試しください。",
     auth_email_delivery_failed: "認証メールを送信できませんでした。時間をおいて再度お試しください。",
@@ -62,7 +69,7 @@
       verifiedEmail = emailForm.elements.email.value.trim();
       const result = await api("/api/customer/auth/request-code", {
         method: "POST",
-        body: JSON.stringify({ email: verifiedEmail }),
+        body: JSON.stringify({ email: verifiedEmail, signup_product: "weekly" }),
       });
       setStep("code");
       if (result.dev_code && ["localhost", "127.0.0.1"].includes(window.location.hostname)) codeForm.elements.code.value = result.dev_code;

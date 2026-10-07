@@ -1,0 +1,1 @@
+(function(){'use strict';var november=Date.now()>=Date.parse('2026-11-01T00:00:00+09:00');if(november){var october=document.getElementById('octoberParticipation');if(october)october.hidden=true;}var sticky=document.querySelector('#stickyCta a');if(sticky){sticky.removeAttribute('data-apply');sticky.href='#participation';sticky.textContent='参加方法';}})();

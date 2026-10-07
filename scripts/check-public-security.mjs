@@ -20,8 +20,10 @@ const checks = [
   ['/projects/totonoe/IROHA/dashboard', 302, 'member'],
   ['/projects/totonoe/IROHA/lesson.html', 302, 'member'],
   ['/projects/totonoe/IROHA/mypage', 302, 'member'],
+  ['/apps/totonoe-studio/', 302, 'access'],
   ['/apps/tsuzuri-studio/', 302, 'access'],
   ['/apps/column-studio/', 302, 'access'],
+  ['/api/totonoe-studio/api/analytics-summary?from=2026-09-01&to=2026-09-23', 302, 'access'],
   ['/api/totonoe-member/api/customer/profile', 401, 'api'],
   ['/api/totonoe-member/api/weekly/materials', 401, 'api'],
 ];

@@ -41,6 +41,25 @@ test("admin state and lesson completion are stored in separate namespaces", asyn
   assert.notEqual(store.ADMIN_KEY, store.LEARNER_KEY);
 });
 
+test("修了バッジは公開済み動画の完了だけに付与し、全修了でプレビュー修了証を作る", async () => {
+  const window = await loadStore();
+  const store = window.TOTONOE_CURRICULUM_STORE;
+  const admin = store.readAdminState();
+  const learner = { lessonProgress: { "gpt-bas-01": { status: "completed", playbackCompletedAt: "2026-09-28T00:00:00Z", completedAt: "2026-09-28T00:00:00Z" }, "cla-bas-01": { status: "completed" } } };
+  assert.equal(store.buildAchievementModel(admin, learner).badges.length, 0);
+  admin.lessons[0].workflowStatus = "published";
+  admin.lessons[0].folderStage = "delivery";
+  admin.lessons[0].providerAssetId = "1AbCdEfGhijKLMnOP";
+  assert.equal(store.buildAchievementModel(admin, learner).badges.length, 0);
+  learner.lessonProgress["gpt-bas-01"].badgeEligible = true;
+  const result = store.buildAchievementModel(admin, learner);
+  assert.equal(result.badges.length, 1);
+  assert.equal(result.badges[0].tool, "ChatGPT");
+  assert.equal(result.certificates.length, 1);
+  assert.equal(result.certificates[0].lessonIds[0], "gpt-bas-01");
+  window.close();
+});
+
 test("curriculum learner flow is protected and management stays local-only", async () => {
   const [adminHtml, lessonHtml, dashboardHtml] = await Promise.all([
     fs.readFile(path.join(curriculumDir, "admin.html"), "utf8"),
@@ -85,7 +104,7 @@ test("curriculum LP stays coming-soon and exposes only waitlist registration", a
   assert.match(html, /<meta name="robots" content="noindex,nofollow">/);
   assert.match(html, /COMING SOON/);
   assert.match(html, /現在、公開に向けて準備中です/);
-  assert.match(html, /初回 9,800円 ／ 再入会 4,800円/);
+  assert.match(html, /初回入会費 5,000円／再入会費 2,500円/);
   assert.match(html, /data-interest="iroha_personal"/);
   assert.match(html, /data-interest="iroha_corporate"/);
   assert.doesNotMatch(html, /購入|会員ログイン|qualificationForm|checkoutPreview/);

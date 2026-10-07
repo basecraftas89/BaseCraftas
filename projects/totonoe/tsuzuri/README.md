@@ -5,7 +5,7 @@ TSUZURI Studioから公開すると、記事HTMLと `data/contents/index.json` �
 
 - 正式表記：`つづり｜TSUZURI`
 - 公開一覧：`./index.html`
-- 管理画面：`../../../apps/tsuzuri-studio/`
+- 管理画面（公開URL）：`/apps/totonoe-studio/`（ソースは `../../../apps/tsuzuri-studio/`）
 - 内部互換値：既存データとの互換性のため `content_type: column` を維持
 
 削除した初期サンプル3記事は再登録しません。公開中の記事だけがJSONインデックスからホームと一覧へ反映されます。

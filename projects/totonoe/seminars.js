@@ -9,10 +9,27 @@
   /* ===================================================== */
   /*  セミナー設定（ここを編集）                             */
   /*  ・date は 'YYYY-MM-DD' 形式（並び替え・開催済み判定に使用） */
-  /*  ・tags は任意。カード/モーダルにバッジとして表示され、
+  /*  ・有料回は price・speakerType（team/external）・memberRegistrationUrl を設定。
+        会員向けURLが未設定の場合、TAYORI側には申込リンクを出しません。
+      ・tags は任意。カード/モーダルにバッジとして表示され、
         タグフィルターにも自動で反映されます                    */
   /* ===================================================== */
   var SEMINARS = [
+    {
+      date: '2026-10-19',
+      dateLabel: '2026年10月19日（月）',
+      time: '21:00〜22:00',
+      title: 'セラピストのためのCodex超入門｜AIで始める業務改善・ツール作成',
+      subtitle: '「こんなの欲しい」を、AIで実現してみませんか？',
+      speakerName: '木村 倖晴',
+      speakerTitle: 'ToToNoE+運営メンバー／有限会社正木工業・DX推進・理学療法士',
+      speakerType: 'team',
+      price: '無料',
+      thumb: 'assets/seminar-2026-10-19-codex-intro.jpg',
+      summary: 'Codexの基本とChatGPT Workとの違い・使い分けを初心者向けに整理し、セラピストの業務改善や簡単なツール作成への活用イメージを実例とともに紹介します。',
+      url: 'https://therapis10.com/seminars/cmukhpr6p2bc35wwk0wjp50g9',
+      tags: ['Codex', '業務改善', 'ツール作成']
+    },
     {
       date: '2026-09-28',
       dateLabel: '2026年9月28日（月）',
@@ -21,6 +38,7 @@
       subtitle: '自分を知るAIから、仕事を任せられるAIへ',
       speakerName: '伊東 雅也',
       speakerTitle: '信愛整形外科医院／理学療法士',
+      speakerType: 'external',
       price: '無料',
       thumb: 'assets/seminar-2026-09-28-chatgpt-work.jpg',
       summary: 'ChatGPT Workをテーマに、AIへ文脈を渡し、自分の仕事を理解して一緒に進めるパートナーへ変えていく考え方を学ぶ回です。',
@@ -63,6 +81,7 @@
       subtitle: '権限管理とデータ保存先の理解',
       speakerName: '梶原 祐輔',
       speakerTitle: '理学療法士／株式会社PLAST チーフ・DX担当',
+      speakerType: 'external',
       price: '無料',
       thumb: 'assets/seminar-2026-08-10-ai-literacy.jpg',
       summary: '生成AIを現場に取り入れるときに管理職が押さえておきたい、権限管理とデータ保存先の考え方を整理する回です。',
@@ -77,6 +96,7 @@
       subtitle: '',
       speakerName: '小島 健',
       speakerTitle: '運動器認定理学療法士／十全記念病院',
+      speakerType: 'external',
       price: '無料',
       thumb: 'assets/seminar-2026-08-17-grok-x-branding.jpg',
       summary: 'Grokを活用してX（旧Twitter）運用を効率化し、自己ブランディングやキャリアの可能性を広げるための実践術を紹介します。',
@@ -85,6 +105,15 @@
     }
   ];
   /* ===================================================== */
+
+  // TAYORI会員ページでも公開中のセミナー情報を同じ一覧から参照する。
+  window.TOTONOE_SEMINARS = SEMINARS;
+  if (!document.getElementById('semGrid')) {
+    loadGeneratedSeminars().then(function () {
+      window.dispatchEvent(new Event('totonoe:seminars-updated'));
+    });
+    return;
+  }
 
   /* ヘッダー・モバイルナビの処理は common.js に集約しました。
      （以前はこのファイルにも同じコードがありました） */
@@ -122,15 +151,19 @@
       if (existing[item.media_url]) return;
       existing[item.media_url] = true;
       var date = generatedDate(item);
+      var details = item.seminar_details || {};
+      var paid = details.fee_type === 'paid' && Number(details.price_yen) > 0;
       SEMINARS.push({
         date: date || '2099-12-31',
         dateLabel: dateLabel(date),
-        time: '',
+        time: details.start_time && details.end_time ? details.start_time + '〜' + details.end_time : '',
         title: item.title || 'セミナー',
         subtitle: '',
-        speakerName: speakerLabel(item) || 'ToToNoE+',
+        speakerName: details.speaker_name || speakerLabel(item) || 'ToToNoE+',
         speakerTitle: 'ToToNoE+',
-        price: '',
+        speakerType: details.speaker_type || '',
+        price: paid ? Number(details.price_yen).toLocaleString('ja-JP') + '円' : '無料',
+        memberRegistrationUrl: details.member_registration_url || '',
         thumb: item.hero_url || (item.external_link && item.external_link.image) || 'assets/og-image.jpg',
         summary: item.excerpt || item.summary || '',
         url: item.media_url,
@@ -141,7 +174,7 @@
 
   function loadGeneratedSeminars() {
     if (!window.fetch) return Promise.resolve();
-    return fetch('data/contents/index.json', { cache: 'no-store' })
+    return fetch('/projects/totonoe/data/contents/index.json', { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : { articles: [] }; })
       .then(function (data) { mergeGeneratedSeminars(data.articles || []); })
       .catch(function () {});
@@ -155,18 +188,9 @@
 
   /* ---------- 並び替え・開催状況の絞り込み ---------- */
   var recurringTemplate = document.getElementById('recurringSeminarTemplate');
-  var weeklyImage = '';
-  function loadWeeklyImage() {
-    if (!recurringTemplate || !window.fetch) return Promise.resolve();
-    return fetch('/public-content/weekend-event.json', {cache:'no-store', credentials:'omit'})
-      .then(function (res) { return res.ok ? res.json() : {}; })
-      .then(function (data) {
-        var event = data && data.event;
-        if (!event || !event.hero_url) return;
-        var url = new URL(event.hero_url, location.href);
-        if (/^https?:$/.test(url.protocol)) weeklyImage = url.href;
-      }).catch(function () {});
-  }
+  // The weekly event uses the user-approved permanent artwork.
+  var weeklyImage = new URL('assets/weekend-ai-fixed-thumbnail.webp', document.querySelector('script[src*="seminars.js"]').src).href;
+  function loadWeeklyImage() { return Promise.resolve(); }
   var ORDER_KEY = 'wa_seminars_order_v1';
   var STATUS_KEY = 'wa_seminars_status_v1';
   var TAG_KEY = 'wa_seminars_tag_v1';
@@ -287,7 +311,7 @@
           : '') +
         '<div class="sem-modal-cta">' +
           '<a href="' + escapeHtml(sem.url) + '" target="_blank" rel="noopener" class="btn btn-cta btn-lg">' +
-            (past ? 'アーカイブを見る' : '無料で申し込む') +
+            (past ? '開催ページを見る' : sem.price === '無料' ? '無料で申し込む' : '詳細・申込を見る') +
           '</a>' +
           '<span class="sem-modal-price">参加費：' + escapeHtml(sem.price) + '</span>' +
         '</div>' +
@@ -372,10 +396,9 @@
         weeklyCard.classList.add('sem-weekly-featured');
         var weeklyImg = weeklyCard.querySelector('img');
         weeklyImg.src = weeklyImage;
-        weeklyImg.alt = '週末のAI整え習慣 今週のテーマ';
+        weeklyImg.alt = '週末のAI整え習慣 毎週土曜 朝6:00';
         weeklyImg.addEventListener('error', function () {
-          weeklyImage = '';
-          render();
+          weeklyImg.alt = '週末のAI整え習慣 固定サムネイルを読み込めませんでした';
         }, {once:true});
         weeklyCard.querySelector('.sem-badge').textContent = '開催予定';
       }
@@ -403,7 +426,7 @@
           '<div class="sem-card-actions">' +
             '<button type="button" class="btn btn-ghost sem-detail">詳細を見る</button>' +
             '<a href="' + escapeHtml(sem.url) + '" target="_blank" rel="noopener" class="btn btn-cta sem-apply">' +
-              (past ? 'アーカイブを見る' : '無料で申し込む') +
+              (past ? '開催ページを見る' : sem.price === '無料' ? '無料で申し込む' : '詳細・申込を見る') +
             '</a>' +
           '</div>' +
         '</div>';

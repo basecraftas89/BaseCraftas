@@ -1,22 +1,39 @@
+import {businessSummary,recordServiceUsage,observeDiscountHistory} from './business-metrics.js';
+import {adjustBillingMembership} from './billing-membership.js';
+import { collectJourney, journeySummary, recordJourneyCheckout } from './journey-analytics.js';
+import { aggregateMemberCoupons } from './member-coupon-summary.js';
+import { weeklyQuestionWindow } from "./weekly-question-window.mjs";
+import {streamMemberArchive} from './archive-stream.js';
 import {archiveMetadata} from './archive-metadata.js';
+import { getLessonNote, listLessonNotes, saveLessonNote, syncLessonNoteSheet } from './curriculum-notes.js';
+import { deliveryCatalog, memberCatalog, startPlayback, playbackHeartbeat, completeDeliveryLesson, streamDeliveryLesson, registerClaudeStaffPreview } from './curriculum-playback.js';
 import {articleHtml} from './public-render.js';
 import { sanitizeBody, splitMemberBody, safeUrl, safeSourceId, readBytes, imageType, requestGuard, secureResponse } from './security.js';
 import { resolveBillingQuote, verifyStripeWebhook } from './billing.js';
-import { isCurrentWeekendThumbnail, latestSaturdayEventEnd } from './weekend-event.js';
+import { reserveTayoriAdmission, admissionWindow, TAYORI_DAILY_ADMISSIONS, weekendAdmissionWindow, requireWeekendAdmission, tayoriCheckoutExpiry } from './enrollment-limits.js';
+import { completionLimitEnabled, checkTayoriCompletedCapacity, claimTayoriCheckout, heldTayoriCheckout, recoverTayoriSession, reconcileTayoriCapacity, recordTayoriCapacityEvent, tayoriCapacityStatus, releaseUncreatedTayoriCheckout } from './tayori-capacity.js';
 import {
   normalizeCustomerEmail,
   generateOtpCode,
   generateSessionToken,
   hashAuthValue,
+  hashCustomerPassword,
+  generatePasswordSalt,
+  CUSTOMER_PASSWORD_ITERATIONS,
   timingSafeTextEqual,
   sendOtpWithResend,
   customerSessionCookie,
   clearCustomerSessionCookie,
   readCookie,
   buildStripeCheckoutParams,
+  resolveIrohaFirstPromotion,
   createStripeCheckoutSession,
   createStripePortalSession,
+  cancelReplacedTayoriSubscription,
   sendQualificationReviewEmail,
+  sendTayoriInvitationEmail,
+  sendIrohaWaitlistReceipt,
+  notifyIrohaWaitlistTeam,
 } from './customer-auth.js';
 
 const jsonHeaders = {
@@ -65,6 +82,8 @@ const WEEKLY_OPERATION_STATUS_MAP = {
 const CUSTOMER_OTP_TTL_MINUTES = 10;
 const CUSTOMER_SESSION_DAYS = 30;
 const AUTH_RATE_BUCKET_MINUTES = 10;
+const CUSTOMER_PASSWORD_MAX_ATTEMPTS = 5;
+const CUSTOMER_PASSWORD_LOCK_MINUTES = 15;
 const TOTONOE_MEMBERS = [
   { id: "shindo-toshiki", name: "神藤 俊希" },
   { id: "kajiwara-yusuke", name: "梶原 祐輔" },
@@ -149,7 +168,7 @@ function uid(prefix) {
 
 function normalizePath(pathname) {
   const rawPath = pathname.replace(/\/+$/, "") || "/";
-  const basePaths = ["/api/tsuzuri-studio", "/api/column-studio", "/api/totonoe-member"];
+  const basePaths = ["/api/totonoe-studio", "/api/tsuzuri-studio", "/api/column-studio", "/api/totonoe-member"];
   const mediaBasePath = "/column-media";
   const publicContentBasePath = "/public-content";
   for (const basePath of basePaths) {
@@ -168,31 +187,42 @@ function normalizePath(pathname) {
 }
 
 function isPublicMemberRequest(rawPath, normalizedPath, method) {
+  if (rawPath.startsWith('/api/totonoe-member/') && isCurriculumPlaybackRequest(normalizedPath,method)) return true;
   const memberBasePath = "/api/totonoe-member";
   if (rawPath !== memberBasePath && !rawPath.startsWith(`${memberBasePath}/`)) return true;
   const allowed = new Set([
     "GET /api/health",
+    "POST /api/public/journey-event",
     "POST /api/customer/auth/request-code",
     "POST /api/customer/auth/verify-code",
+    "POST /api/customer/auth/password/login",
+    "POST /api/customer/auth/password/set",
     "GET /api/customer/auth/status",
     "POST /api/customer/auth/logout",
     "POST /api/customer/billing/checkout",
     "POST /api/customer/billing/portal",
+    "GET /api/public/tayori-enrollment-status",
     "POST /api/public/waitlist",
     "POST /api/stripe/webhook",
     "GET /api/customer/profile",
     "PATCH /api/customer/profile",
     "GET /api/weekly/me",
     "GET /api/weekly/materials",
+    "GET /api/weekly/onboarding",
+    "PATCH /api/weekly/onboarding",
     "GET /api/weekly/priority-question",
     "POST /api/weekly/priority-question",
     "GET /api/weekly/answer-videos",
+    "GET /api/curriculum/notes",
+    "POST /api/curriculum/notes",
   ]);
   if (method === "GET" && /^\/api\/member\/articles\/[^/]+\/body$/.test(normalizedPath)) return true;
+  if (method === "GET" && /^\/api\/curriculum\/notes\/[A-Za-z0-9_-]{1,160}$/.test(normalizedPath)) return true;
   const key = `${method} ${normalizedPath}`;
   if (allowed.has(key)) return true;
   if (method === "GET" && /^\/api\/weekly\/materials\/[^/]+\/open$/.test(normalizedPath)) return true;
   if (method === "GET" && /^\/api\/weekly\/answer-videos\/[^/]+\/stream$/.test(normalizedPath)) return true;
+  if (method === "GET" && /^\/api\/weekly\/archives\/[A-Za-z0-9_-]+\/stream$/.test(normalizedPath)) return true;
   if (method === "OPTIONS") {
     return isPublicMemberRequest(rawPath, normalizedPath, "GET") || isPublicMemberRequest(rawPath, normalizedPath, "POST") || isPublicMemberRequest(rawPath, normalizedPath, "PATCH");
   }
@@ -548,6 +578,7 @@ function articleJson(article, publishedAt, linkPreview = null) {
     source_published_at: article.source_published_at || (linkPreview && linkPreview.published_at) || "",
     source_type: sourceType,
     source_id: sourceId,
+    seminar_details: contentType === "seminar" ? parseSeminarDetails(article.seminar_details) : null,
     public_target: publicSection(contentType, destination).label,
     external_link: linkPreview ? {
       url: linkPreview.url,
@@ -697,6 +728,7 @@ async function publishArticleToGitHub(env, article) {
     source_published_at: data.source_published_at,
     source_type: data.source_type,
     source_id: data.source_id,
+    seminar_details: data.seminar_details,
     public_target: data.public_target,
     external_link: data.external_link,
     hero_url: data.hero_url,
@@ -799,6 +831,11 @@ async function getMember(env, email) {
     .first();
 }
 
+async function getTayoriStaffMember(env, email) {
+  const member = await getMember(env, email);
+  return member && ["admin", "editor"].includes(member.role) ? member : null;
+}
+
 async function requireRole(request, env, roles) {
   const email = await getActorEmail(request, env);
   const member = await getMember(env, email);
@@ -827,6 +864,7 @@ function validMemberRole(value) {
 }
 
 const FIXED_ADMIN_EMAILS = new Set([
+  "base.craftas478@gmail.com",
   "kansai89414@gmail.com",
   "toshiki.kanto.workspace@gmail.com",
 ]);
@@ -837,7 +875,7 @@ function isFixedAdminEmail(email) {
 
 const memberChangeGuard = "(NOT (role = 'admin' AND status = 'active') OR (? = 'admin' AND ? = 'active') OR (SELECT COUNT(*) FROM members WHERE role = 'admin' AND status = 'active') > 1)";
 function lastAdminError() { return json({error: "last_admin", message: "最後の管理者は変更・停止できません。"}, {status: 409}); }
-function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は指定された2つのアカウントに固定されています。"}, {status: 409}); }
+function adminRoleLockedError() { return json({error: "admin_role_locked", message: "管理者は指定された3つのアカウントに固定されています。"}, {status: 409}); }
 
 async function createMember(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
@@ -906,6 +944,33 @@ async function previewLink(request, env) {
   return json({ preview });
 }
 
+function parseSeminarDetails(value) {
+  try {
+    const parsed = typeof value === "string" ? JSON.parse(value) : value;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch { return {}; }
+}
+
+function normalizeSeminarDetails(value, fallback, contentType) {
+  if (contentType !== "seminar") return "{}";
+  const source = parseSeminarDetails(value === undefined ? fallback : value);
+  const price = Number(source.price_yen);
+  const url = String(source.member_registration_url || "").trim();
+  if (url && !safeUrl(url)) throw Object.assign(new Error("invalid_seminar_member_url"), { status: 400 });
+  if (source.price_yen !== undefined && source.price_yen !== "" && (!Number.isInteger(price) || price < 0 || price > 10000000)) {
+    throw Object.assign(new Error("invalid_seminar_price"), { status: 400 });
+  }
+  return JSON.stringify({
+    fee_type: ["free", "paid"].includes(source.fee_type) ? source.fee_type : "",
+    price_yen: source.price_yen === undefined || source.price_yen === "" ? null : price,
+    speaker_type: ["team", "external"].includes(source.speaker_type) ? source.speaker_type : "",
+    speaker_name: String(source.speaker_name || "").trim().slice(0, 100),
+    start_time: String(source.start_time || "").trim(),
+    end_time: String(source.end_time || "").trim(),
+    member_registration_url: safeUrl(url),
+  });
+}
+
 function normalizeArticle(input, fallback = {}) {
   const tagInput = input.topic_tags || input.topicTags || input.tags || fallback.tags || [];
   const tags = parseJsonArray(tagInput).map((tag) => String(tag).trim()).filter(Boolean);
@@ -929,6 +994,7 @@ function normalizeArticle(input, fallback = {}) {
     source_published_at: String(input.source_published_at || input.sourcePublishedAt || fallback.source_published_at || "").slice(0, 10),
     source_type: String(input.source_type || input.sourceType || fallback.source_type || "").trim(),
     source_id: safeSourceId(input.source_id ?? input.sourceId ?? fallback.source_id ?? ""),
+    seminar_details: normalizeSeminarDetails(input.seminar_details, fallback.seminar_details, contentType),
     hero_url: safeUrl(input.hero_url ?? input.heroUrl ?? fallback.hero_url ?? "", true),
     body_html: sanitizeBody(input.body_html ?? input.bodyHtml ?? fallback.body_html ?? ""),
     status: fallback.status === "published" ? "published" : "draft",
@@ -939,8 +1005,8 @@ async function recordVersion(env, article, actorEmail) {
   await env.DB.prepare(
     `INSERT INTO article_versions
       (id, article_id, revision, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
-       episode_no, source_published_at, source_type, source_id, hero_url, body_html, status, actor_email)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       episode_no, source_published_at, source_type, source_id, seminar_details, hero_url, body_html, status, actor_email)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       uid("ver"),
@@ -959,6 +1025,7 @@ async function recordVersion(env, article, actorEmail) {
       article.source_published_at || "",
       article.source_type || "",
       article.source_id || "",
+      article.seminar_details || "{}",
       article.hero_url,
       article.body_html,
       article.status,
@@ -978,7 +1045,7 @@ async function audit(env, actorEmail, action, entityType, entityId, metadata = {
 async function listArticles(env) {
   const result = await env.DB.prepare(
     `SELECT id, revision, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
-            episode_no, source_published_at, source_type, source_id, hero_url, body_html, status,
+            episode_no, source_published_at, source_type, source_id, seminar_details, hero_url, body_html, status,
             author_email, editor_email, published_at, deleted_at, created_at, updated_at
        FROM articles
       ORDER BY updated_at DESC`
@@ -995,40 +1062,15 @@ async function listArticles(env) {
 }
 
 async function publicWeekendEvent(env) {
-  const event = await env.DB.prepare(
-    `SELECT hero_url, updated_at
-       FROM articles
-      WHERE content_type = 'weekend'
-        AND status = 'published'
-        AND deleted_at IS NULL
-        AND hero_url != ''
-      ORDER BY updated_at DESC, rowid DESC
-      LIMIT 1`
-  ).first();
-  if (!event || !isCurrentWeekendThumbnail(event.updated_at)) {
-    return json({ event: null }, { headers: { "cache-control": "no-store" } });
-  }
   return json({ event: {
-    hero_url: safeUrl(event.hero_url, true),
-    updated_at: event.updated_at,
+    hero_url: "/projects/totonoe/assets/weekend-ai-fixed-thumbnail.png",
+    fixed: true,
   } }, { headers: { "cache-control": "no-store" } });
 }
 
-async function archiveExpiredWeekendThumbnails(env, nowMs = Date.now()) {
-  const boundary = new Date(latestSaturdayEventEnd(nowMs)).toISOString();
-  const result = await env.DB.prepare(
-    `UPDATE articles
-        SET status = 'archived', revision = revision + 1, updated_at = CURRENT_TIMESTAMP
-      WHERE content_type = 'weekend'
-        AND status = 'published'
-        AND deleted_at IS NULL
-        AND datetime(updated_at) < datetime(?)`
-  ).bind(boundary).run();
-  const archived = Number(result.meta?.changes || 0);
-  if (archived) {
-    await audit(env, "system@column-studio", "weekend.thumbnail.archive", "content_type", "weekend", { archived, boundary });
-  }
-  return { archived, boundary };
+async function archiveExpiredWeekendThumbnails() {
+  // Fixed artwork never expires; preserve existing article records.
+  return { archived: 0, fixed: true };
 }
 
 async function createArticle(request, env) {
@@ -1047,8 +1089,8 @@ async function createArticle(request, env) {
   await env.DB.prepare(
     `INSERT INTO articles
       (id, slug, title, excerpt, category, destination, content_type, tags, main_actor_id, speaker_ids, media_url,
-       episode_no, source_published_at, source_type, source_id, hero_url, body_html, status, author_email, editor_email)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       episode_no, source_published_at, source_type, source_id, seminar_details, hero_url, body_html, status, author_email, editor_email)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       id,
@@ -1066,6 +1108,7 @@ async function createArticle(request, env) {
       article.source_published_at,
       article.source_type,
       article.source_id,
+      article.seminar_details,
       article.hero_url,
       article.body_html,
       article.status,
@@ -1081,7 +1124,7 @@ async function createArticle(request, env) {
 }
 
 function serializeArticle(article) {
-  return { ...article, body_html: sanitizeBody(article.body_html), media_url: safeUrl(article.media_url), hero_url: safeUrl(article.hero_url, true), tags: parseJsonArray(article.tags), topic_tags: parseJsonArray(article.tags),
+  return { ...article, body_html: sanitizeBody(article.body_html), media_url: safeUrl(article.media_url), hero_url: safeUrl(article.hero_url, true), tags: parseJsonArray(article.tags), topic_tags: parseJsonArray(article.tags), seminar_details: parseSeminarDetails(article.seminar_details),
     speaker_ids: normalizePersonIds(article.speaker_ids) };
 }
 
@@ -1101,7 +1144,7 @@ async function updateArticle(request, env, id) {
   if (current.published_at) article.slug = current.slug;
   if (!/^[a-z0-9][a-z0-9-]*$/.test(article.slug)) return json({ error: "invalid_slug" }, { status: 400 });
   const fields = ["slug","title","excerpt","category","destination","content_type","tags","main_actor_id",
-    "speaker_ids","media_url","episode_no","source_published_at","source_type","source_id","hero_url","body_html","status"];
+    "speaker_ids","media_url","episode_no","source_published_at","source_type","source_id","seminar_details","hero_url","body_html","status"];
   const versionFields = fields.filter((field) => field !== "slug");
   const results = await env.DB.batch([
     env.DB.prepare("UPDATE articles SET " + fields.map((field) => field + " = ?").join(", ") +
@@ -1242,6 +1285,19 @@ async function enqueuePublish(request, env, id) {
     const video = sourceProfile(article.media_url);
     if (video.kind !== "video" || !video.source_id) {
       return json({ error: "youtube_url_required", message: "有効なYouTube動画URLを入力してください。" }, { status: 400 });
+    }
+  }
+  if (contentType === "seminar") {
+    const details = parseSeminarDetails(article.seminar_details);
+    const validTime = (value) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || ""));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(article.source_published_at || "") || !validTime(details.start_time) || !validTime(details.end_time) || details.end_time <= details.start_time) {
+      return json({ error: "seminar_schedule_required", message: "開催日と開始・終了時刻を確認してください。" }, { status: 400 });
+    }
+    if (!details.speaker_name || !["team", "external"].includes(details.speaker_type)) {
+      return json({ error: "seminar_speaker_required", message: "講師名と運営／外部の区分を指定してください。" }, { status: 400 });
+    }
+    if (details.fee_type === "paid" ? !(Number.isInteger(details.price_yen) && details.price_yen > 0) : details.fee_type !== "free") {
+      return json({ error: "seminar_price_required", message: "無料／有料と、有料の場合の一般参加費を指定してください。" }, { status: 400 });
     }
   }
   if (contentType === "weekend") {
@@ -1553,11 +1609,11 @@ async function validateWeeklyAnswerVideoUrl(env, url) {
   const fileId = driveFileIdFromUrl(url);
   if (!fileId) throw new Error("weekly_answer_video_url_invalid");
   const response = await googleJsonRequest(env, "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?fields=id,name,mimeType,parents,trashed");
-  if (response.trashed || !String(response.mimeType || "").startsWith("video/") || !(response.parents || []).includes(weeklyResponseFolderId(env))) {
+  const stored = await env.DB.prepare("SELECT id, title, parent_folder_id FROM weekly_answer_videos WHERE drive_file_id = ? AND status = 'published'").bind(fileId).first();
+  if (!stored) throw new Error("weekly_answer_video_not_synced");
+  if (response.trashed || !String(response.mimeType || "").startsWith("video/") || !(response.parents || []).includes(stored.parent_folder_id || weeklyResponseFolderId(env))) {
     throw new Error("weekly_answer_video_outside_authorized_folder");
   }
-  const stored = await env.DB.prepare("SELECT id, title FROM weekly_answer_videos WHERE drive_file_id = ? AND status = 'published'").bind(fileId).first();
-  if (!stored) throw new Error("weekly_answer_video_not_synced");
   return stored;
 }
 
@@ -1826,10 +1882,12 @@ function weeklyAnswerVideoTitle(fileName) {
     .trim() || "TAYORI回答動画";
 }
 
-async function fetchDriveWeeklyAnswerVideos(env) {
-  const folderId = weeklyResponseFolderId(env);
-  if (!folderId) throw new Error("drive_weekly_response_folder_missing");
-  const accessToken = await driveAccessToken(env);
+function weeklyAnswerCategory(folderName) {
+  const name = String(folderName || "").replace(/^\d{2}[_ -]+/, "").trim();
+  return new Set(["AI活用", "情報管理", "資料づくり", "その他"]).has(name) ? name : "その他";
+}
+
+async function listDriveWeeklyResponseChildren(folderId, accessToken) {
   const files = [];
   let pageToken = "";
   for (let page = 0; page < 5; page += 1) {
@@ -1847,11 +1905,31 @@ async function fetchDriveWeeklyAnswerVideos(env) {
     });
     const payload = JSON.parse(await readTextLimit(response, 1024 * 1024) || "{}");
     if (!response.ok) throw new Error(payload?.error?.message || "google_drive_weekly_response_list_failed");
-    files.push(...(payload.files || []).filter((file) => String(file.mimeType || "").startsWith("video/")));
+    files.push(...(payload.files || []));
     pageToken = payload.nextPageToken || "";
-    if (!pageToken) break;
+    if (!pageToken) return files;
   }
-  return files;
+  throw new Error("google_drive_weekly_response_folder_too_large");
+}
+
+async function fetchDriveWeeklyAnswerVideos(env) {
+  const folderId = weeklyResponseFolderId(env);
+  if (!folderId) throw new Error("drive_weekly_response_folder_missing");
+  const accessToken = await driveAccessToken(env);
+  const rootItems = await listDriveWeeklyResponseChildren(folderId, accessToken);
+  const draftId = String(env.DRIVE_WEEKLY_DRAFT_FOLDER_ID || "").trim();
+  const categoryFolders = rootItems.filter((item) =>
+    item.mimeType === "application/vnd.google-apps.folder" && item.id !== draftId && !/^00[_ -]/.test(String(item.name || ""))
+  );
+  if (categoryFolders.length > 20) throw new Error("google_drive_weekly_response_too_many_folders");
+  const rootVideos = rootItems.filter((item) => String(item.mimeType || "").startsWith("video/"))
+    .map((item) => ({ ...item, category: "その他", parentFolderId: folderId }));
+  const childGroups = await Promise.all(categoryFolders.map(async (folder) => {
+    const children = await listDriveWeeklyResponseChildren(folder.id, accessToken);
+    return children.filter((item) => String(item.mimeType || "").startsWith("video/"))
+      .map((item) => ({ ...item, category: weeklyAnswerCategory(folder.name), parentFolderId: folder.id }));
+  }));
+  return [...rootVideos, ...childGroups.flat()];
 }
 
 async function saveWeeklyAnswerVideoSyncState(env, values) {
@@ -1863,6 +1941,7 @@ async function saveWeeklyAnswerVideoSyncState(env, values) {
 async function syncWeeklyAnswerVideos(env, actorEmail = "system@column-studio") {
   try {
     const files = await fetchDriveWeeklyAnswerVideos(env);
+    const scanId = crypto.randomUUID();
     let newCount = 0;
     for (const file of files) {
       const existing = await env.DB.prepare("SELECT id FROM weekly_answer_videos WHERE drive_file_id = ?").bind(file.id).first();
@@ -1870,8 +1949,8 @@ async function syncWeeklyAnswerVideos(env, actorEmail = "system@column-studio") 
       const publishedAt = String(file.createdTime || file.modifiedTime || new Date().toISOString());
       await env.DB.prepare(
         `INSERT INTO weekly_answer_videos
-          (id, drive_file_id, title, description, file_name, mime_type, size_bytes, published_at, drive_created_time, drive_modified_time, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
+          (id, drive_file_id, title, description, file_name, mime_type, size_bytes, published_at, drive_created_time, drive_modified_time, category, parent_folder_id, last_seen_scan_id, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
          ON CONFLICT(drive_file_id) DO UPDATE SET
            title = excluded.title,
            description = excluded.description,
@@ -1880,10 +1959,14 @@ async function syncWeeklyAnswerVideos(env, actorEmail = "system@column-studio") 
            size_bytes = excluded.size_bytes,
            drive_created_time = excluded.drive_created_time,
            drive_modified_time = excluded.drive_modified_time,
+           category = excluded.category,
+           parent_folder_id = excluded.parent_folder_id,
+           last_seen_scan_id = excluded.last_seen_scan_id,
            status = 'published',
            updated_at = CURRENT_TIMESTAMP`
-      ).bind(existing?.id || uid("weekly_video"), file.id, weeklyAnswerVideoTitle(file.name), String(file.description || "").slice(0, 1000), String(file.name || "answer-video.mp4").slice(0, 300), String(file.mimeType || "video/mp4").slice(0, 100), Number(file.size || 0), publishedAt, String(file.createdTime || ""), String(file.modifiedTime || "")).run();
+      ).bind(existing?.id || uid("weekly_video"), file.id, weeklyAnswerVideoTitle(file.name), String(file.description || "").slice(0, 1000), String(file.name || "answer-video.mp4").slice(0, 300), String(file.mimeType || "video/mp4").slice(0, 100), Number(file.size || 0), publishedAt, String(file.createdTime || ""), String(file.modifiedTime || ""), file.category, file.parentFolderId, scanId).run();
     }
+    await env.DB.prepare("UPDATE weekly_answer_videos SET status = 'missing', updated_at = CURRENT_TIMESTAMP WHERE status = 'published' AND last_seen_scan_id <> ?").bind(scanId).run();
     await saveWeeklyAnswerVideoSyncState(env, { success: true, fileCount: files.length, newCount });
     await audit(env, actorEmail, "weekly.answer_videos.scan", "drive_folder", weeklyResponseFolderId(env), { file_count: files.length, new_count: newCount });
     return { file_count: files.length, new_count: newCount };
@@ -1897,6 +1980,7 @@ async function getCustomerAccess(request, env) {
   const sessionAuth = await getCustomerIdentity(request, env);
   const email = sessionAuth?.customer?.email || await getActorEmail(request, env);
   if (!email) return { error: json({ error: "authentication_required" }, { status: 401 }) };
+  const staffMember = await getTayoriStaffMember(env, email);
   const customer = sessionAuth?.customer || await env.DB.prepare(
     "SELECT id, email, display_name, status FROM customer_accounts WHERE lower(email) = ? AND status = 'active'"
   ).bind(email).first();
@@ -1926,6 +2010,7 @@ async function getCustomerAccess(request, env) {
   const entitlements = result.results || [];
   const hasWeeklyAccess = entitlements.some((item) => item.entitlement_code === "weekly_access" || item.entitlement_code === "curriculum_all_access");
   const hasCurriculumAccess = entitlements.some((item) => item.entitlement_code === "curriculum_all_access");
+  const hasTayoriStaffAccess = Boolean(staffMember);
   const currentPeriodEnd = entitlements.map((item) => item.current_period_end || item.ends_at).filter(Boolean).sort().at(-1) || null;
   return {
     email,
@@ -1936,8 +2021,10 @@ async function getCustomerAccess(request, env) {
       email: customer.email,
       display_name: customer.display_name,
       current_period_end: currentPeriodEnd,
-      has_weekly_access: hasWeeklyAccess,
-      has_curriculum_access: hasCurriculumAccess,
+      has_weekly_access: hasWeeklyAccess || hasTayoriStaffAccess,
+      has_curriculum_access: hasCurriculumAccess || hasTayoriStaffAccess,
+      staff_access: hasTayoriStaffAccess,
+      staff_role: staffMember?.role || null,
     },
   };
 }
@@ -1995,6 +2082,23 @@ async function requestCustomerAuthCode(request, env) {
     incrementCustomerAuthLimit(env, `email:${emailKey}`, 3),
   ]);
 
+  // Determine priority from server-side membership, never a client-provided flag.
+  let existingMember = false;
+  if (env.TAYORI_DAILY_LIMIT_ENABLED === "true" || env.CUSTOMER_EMAIL_BUDGET_ENABLED === "true") {
+    const member = await env.DB.prepare(`SELECT 1 FROM customer_accounts ca
+      WHERE lower(ca.email) = ? AND ca.status = 'active' AND (
+        EXISTS (SELECT 1 FROM customer_subscriptions s WHERE s.customer_id = ca.id
+          AND s.status IN ('trialing','active','past_due','paused','unpaid') AND s.livemode = ?)
+        OR EXISTS (SELECT 1 FROM stripe_checkout_attempts a WHERE a.customer_id = ca.id
+          AND a.status = 'completed' AND a.livemode = ?)) LIMIT 1`)
+      .bind(email, env.STRIPE_MODE === "live" ? 1 : 0, env.STRIPE_MODE === "live" ? 1 : 0).first();
+    existingMember = Boolean(member || await getTayoriStaffMember(env, email));
+    if (!existingMember && payload.signup_product === "weekly") {
+      if (completionLimitEnabled(env)) await checkTayoriCompletedCapacity(env);
+      else await reserveTayoriAdmission(env, emailKey);
+    }
+  }
+
   const code = generateOtpCode();
   const challengeId = uid("auth_challenge");
   const codeHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, `otp:${challengeId}`, code);
@@ -2007,7 +2111,7 @@ async function requestCustomerAuthCode(request, env) {
   try {
     let messageId = "local-development";
     if (!isLocalDevelopmentRequest(request, env)) {
-      const result = await sendOtpWithResend(env, { email, code, challengeId });
+      const result = await sendOtpWithResend(env, { email, code, challengeId, existingMember });
       messageId = result.messageId;
     }
     await env.DB.prepare(
@@ -2088,15 +2192,126 @@ async function verifyCustomerAuthCode(request, env) {
   }, { headers: { "set-cookie": customerSessionCookie(token) } });
 }
 
+async function createCustomerSession(env, customer) {
+  const token = generateSessionToken();
+  const tokenHash = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "session", token);
+  const sessionId = uid("customer_session");
+  await env.DB.prepare(
+    `INSERT INTO customer_sessions(id, customer_id, token_hash, expires_at)
+     VALUES (?, ?, ?, datetime('now', ?))`
+  ).bind(sessionId, customer.id, tokenHash, `+${CUSTOMER_SESSION_DAYS} days`).run();
+  return customerSessionCookie(token);
+}
+
+async function customerPasswordLogin(request, env) {
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  let email;
+  try { email = normalizeCustomerEmail(payload.email); } catch (error) { return json({ error: error.message }, { status: error.status || 400 }); }
+  const password = String(payload.password || "");
+  if (password.length < 12 || password.length > 256) return json({ error: "invalid_password" }, { status: 400 });
+  const ip = String(request.headers.get("cf-connecting-ip") || "unknown").slice(0, 80);
+  const requestKey = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "password-login", `${ip}:${email}`);
+  await incrementCustomerAuthLimit(env, `password:${requestKey}`, 10);
+  const row = await env.DB.prepare(
+    `SELECT ca.id, ca.email, ca.display_name, ca.status, ca.therapist_status,
+            pc.password_hash, pc.password_salt, pc.password_iterations, pc.failed_attempts,
+            (pc.locked_until IS NOT NULL AND datetime(pc.locked_until) > datetime('now')) AS is_locked
+       FROM customer_accounts ca
+       JOIN customer_password_credentials pc ON pc.customer_id = ca.id
+      WHERE lower(ca.email) = ? AND ca.status = 'active'`
+  ).bind(email).first();
+  const locked = Number(row?.is_locked || 0) === 1;
+  if (!row || locked) return json({ error: "invalid_login" }, { status: 401 });
+  const candidate = await hashCustomerPassword(password, row.password_salt, row.password_iterations);
+  if (!timingSafeTextEqual(candidate, row.password_hash)) {
+    const attempts = Number(row.failed_attempts || 0) + 1;
+    await env.DB.prepare(
+      `UPDATE customer_password_credentials
+          SET failed_attempts = ?, locked_until = CASE WHEN ? >= ? THEN datetime('now', ?) ELSE locked_until END,
+              updated_at = CURRENT_TIMESTAMP WHERE customer_id = ?`
+    ).bind(attempts >= CUSTOMER_PASSWORD_MAX_ATTEMPTS ? 0 : attempts, attempts, CUSTOMER_PASSWORD_MAX_ATTEMPTS, `+${CUSTOMER_PASSWORD_LOCK_MINUTES} minutes`, row.id).run();
+    return json({ error: "invalid_login" }, { status: 401 });
+  }
+  await env.DB.prepare("UPDATE customer_password_credentials SET failed_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE customer_id = ?").bind(row.id).run();
+  return json({ ok: true, customer: { email: row.email, display_name: row.display_name || "", therapist_status: row.therapist_status } }, { headers: { "set-cookie": await createCustomerSession(env, row) } });
+}
+
+async function setCustomerPassword(request, env) {
+  const auth = await requireCustomerIdentity(request, env);
+  if (auth.error) return auth.error;
+  const access = await getCustomerAccess(request, env);
+  if (access.error) return access.error;
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const password = String(payload.password || "");
+  if (password.length < 12 || password.length > 256) return json({ error: "invalid_password" }, { status: 400 });
+  const salt = generatePasswordSalt();
+  const hash = await hashCustomerPassword(password, salt, CUSTOMER_PASSWORD_ITERATIONS);
+  await env.DB.prepare(
+    `INSERT INTO customer_password_credentials(customer_id, password_hash, password_salt, password_iterations)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(customer_id) DO UPDATE SET password_hash = excluded.password_hash, password_salt = excluded.password_salt,
+       password_iterations = excluded.password_iterations, failed_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP`
+  ).bind(auth.customer.id, hash, salt, CUSTOMER_PASSWORD_ITERATIONS).run();
+  return json({ ok: true });
+}
+
+async function setStaffTayoriPassword(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const payload = await readJson(request);
+  if (!payload) return json({ error: "invalid_json" }, { status: 400 });
+  const password = String(payload.password || "");
+  if (password.length < 12 || password.length > 256) return json({ error: "invalid_password" }, { status: 400 });
+  const staff = await getTayoriStaffMember(env, auth.email);
+  if (!staff) return json({ error: "forbidden" }, { status: 403 });
+
+  const salt = generatePasswordSalt();
+  const hash = await hashCustomerPassword(password, salt, CUSTOMER_PASSWORD_ITERATIONS);
+  const email = normalizeCustomerEmail(staff.email);
+  await env.DB.prepare(
+    `INSERT INTO customer_accounts(id, email, status, email_verified_at)
+     VALUES (?, ?, 'active', CURRENT_TIMESTAMP)
+     ON CONFLICT(email) DO UPDATE SET
+       email_verified_at = CASE WHEN status = 'active' THEN CURRENT_TIMESTAMP ELSE email_verified_at END,
+       updated_at = CURRENT_TIMESTAMP`
+  ).bind(uid("customer"), email).run();
+  const customer = await env.DB.prepare(
+    "SELECT id, email, display_name, status, therapist_status FROM customer_accounts WHERE lower(email) = ?"
+  ).bind(email).first();
+  if (!customer || customer.status !== "active") return json({ error: "customer_account_unavailable" }, { status: 403 });
+
+  await env.DB.prepare(
+    `INSERT INTO customer_password_credentials(customer_id, password_hash, password_salt, password_iterations)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(customer_id) DO UPDATE SET password_hash = excluded.password_hash,
+       password_salt = excluded.password_salt, password_iterations = excluded.password_iterations,
+       failed_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP`
+  ).bind(customer.id, hash, salt, CUSTOMER_PASSWORD_ITERATIONS).run();
+  await env.DB.prepare(
+    "UPDATE customer_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE customer_id = ? AND revoked_at IS NULL"
+  ).bind(customer.id).run();
+  return json({ ok: true }, { headers: { "set-cookie": await createCustomerSession(env, customer) } });
+}
+
 async function customerAuthStatus(request, env) {
   const auth = await getCustomerIdentity(request, env);
   if (!auth) return json({ authenticated: false });
+  const access = await getCustomerAccess(request, env);
+  if (access.error) return json({ authenticated: false });
   return json({
     authenticated: true,
     customer: {
       email: auth.customer.email,
       display_name: auth.customer.display_name || "",
       therapist_status: auth.customer.therapist_status,
+    },
+    access: {
+      has_weekly_access: access.access.has_weekly_access,
+      has_curriculum_access: access.access.has_curriculum_access,
+      staff_access: access.access.staff_access,
+      staff_role: access.access.staff_role,
     },
   });
 }
@@ -2294,25 +2509,86 @@ async function joinWaitlist(request, env) {
     `INSERT INTO waitlist_entries(id, email, interest, status, source, consent_at)
      VALUES (?, ?, ?, 'waiting', ?, CURRENT_TIMESTAMP)
      ON CONFLICT(email, interest) DO UPDATE SET
-       status = CASE WHEN waitlist_entries.status = 'joined' THEN 'joined' ELSE 'waiting' END,
+       status = CASE WHEN waitlist_entries.status IN ('invited', 'joined') THEN waitlist_entries.status ELSE 'waiting' END,
        source = excluded.source,
        consent_at = excluded.consent_at,
        updated_at = CURRENT_TIMESTAMP`
   ).bind(id, email, interest, String(payload.source || "website").slice(0, 80)).run();
-  return json({ ok: true, interest }, { status: 201 });
+  let receiptSent;
+  if (interest.startsWith('iroha_')) {
+    const entry = await env.DB.prepare('SELECT id FROM waitlist_entries WHERE email = ? AND interest = ?').bind(email, interest).first();
+    const results = await Promise.allSettled([
+      sendIrohaWaitlistReceipt(env, { email, interest, entryId: entry.id }),
+      notifyIrohaWaitlistTeam(env, { email, interest, entryId: entry.id }),
+    ]);
+    receiptSent = results[0].status === 'fulfilled';
+    if (results[1].status === 'rejected') console.error('iroha_waitlist_team_notification_failed', entry.id);
+  }
+  return json({ ok: true, interest, ...(receiptSent === undefined ? {} : { receipt_sent: receiptSent }) }, { status: 201 });
 }
 
 async function listWaitlistAdmin(request, env) {
   const auth = await requireRole(request, env, ["admin"]);
   if (auth.error) return auth.error;
   const result = await env.DB.prepare(
-    "SELECT id, email, interest, status, source, consent_at, created_at, updated_at FROM waitlist_entries ORDER BY datetime(created_at) DESC LIMIT 500"
+    `SELECT id, email, interest, status, source, consent_at, created_at, updated_at
+       FROM waitlist_entries ORDER BY datetime(created_at) DESC LIMIT 500`
   ).all();
-  return json({ entries: result.results || [] });
+  return json({ entries: result.results || [], invitations_enabled: false });
+}
+
+function tayoriEnrollmentReady(env) {
+  const mode = String(env.STRIPE_MODE || "");
+  return env.STRIPE_CHECKOUT_ENABLED === "true"
+    && (mode === "test" || (mode === "live" && env.STRIPE_LIVE_READY === "true"))
+    && new RegExp(`^(?:sk|rk)_${mode}_`).test(String(env.STRIPE_SECRET_KEY || ""))
+    && /^price_[A-Za-z0-9]+$/.test(String(env.STRIPE_PRICE_TAYORI_MONTHLY || ""));
+}
+
+async function tayoriEnrollmentStatus(_request, env) {
+  return json({ enabled: tayoriEnrollmentReady(env) && env.STRIPE_MODE === "live" && env.TAYORI_DIRECT_ENROLLMENT_ENABLED === "true", mode: env.STRIPE_MODE === "live" ? "live" : "test",
+    ...(env.TAYORI_DAILY_LIMIT_ENABLED === "true" && !completionLimitEnabled(env) ? { daily_limit: TAYORI_DAILY_ADMISSIONS,
+      reset_at: (env.TAYORI_WEEKEND_ONLY === "true" ? weekendAdmissionWindow() : admissionWindow()).reset_at } : {}),
+    ...(completionLimitEnabled(env) ? await tayoriCapacityStatus(env) : {}),
+    ...(env.TAYORI_WEEKEND_ONLY === "true" ? { weekend_only: true, accepting: weekendAdmissionWindow().open,
+      next_open_at: weekendAdmissionWindow().opens_at, closes_at: weekendAdmissionWindow().accepting_closes_at, timezone: "Asia/Tokyo" } : {}) });
+}
+
+async function sendTayoriWaitlistInvitation(request, env, waitlistId) {
+  const auth = await requireRole(request, env, ["admin"]);
+  if (auth.error) return auth.error;
+  if (!tayoriEnrollmentReady(env) || env.STRIPE_MODE !== "live" || env.TAYORI_INVITATIONS_ENABLED !== "true") {
+    return json({ error: "tayori_invitations_not_enabled" }, { status: 503 });
+  }
+  const entry = await env.DB.prepare(
+    "SELECT id, email, status, consent_at FROM waitlist_entries WHERE id = ? AND interest = 'tayori_personal'"
+  ).bind(waitlistId).first();
+  if (!entry || !entry.consent_at || entry.status !== "waiting") return json({ error: "waitlist_entry_unavailable" }, { status: 409 });
+  const prior = await env.DB.prepare("SELECT id, status FROM tayori_waitlist_invitations WHERE waitlist_entry_id = ?").bind(entry.id).first();
+  if (prior?.status === "sent") return json({ error: "invitation_already_sent" }, { status: 409 });
+  if (prior?.status === "pending") return json({ error: "invitation_pending_review" }, { status: 409 });
+  const invitationId = prior?.id || uid("tayori_invitation");
+  const claim = prior
+    ? await env.DB.prepare("UPDATE tayori_waitlist_invitations SET status = 'pending', last_error = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'failed'").bind(invitationId).run()
+    : await env.DB.prepare("INSERT OR IGNORE INTO tayori_waitlist_invitations(id, waitlist_entry_id, status) VALUES (?, ?, 'pending')").bind(invitationId, entry.id).run();
+  if (!Number(claim.meta?.changes || 0)) return json({ error: "invitation_pending_review" }, { status: 409 });
+  try {
+    const result = await sendTayoriInvitationEmail(env, { email: entry.email, invitationId, origin: checkoutSiteOrigin(request, env) });
+    await env.DB.prepare("UPDATE tayori_waitlist_invitations SET status = 'sent', provider_message_id = ?, sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+      .bind(result.messageId, invitationId).run();
+    await env.DB.prepare("UPDATE waitlist_entries SET status = 'invited', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'waiting'").bind(entry.id).run();
+    return json({ sent: true, waitlist_id: entry.id }, { status: 201 });
+  } catch (error) {
+    await env.DB.prepare("UPDATE tayori_waitlist_invitations SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'")
+      .bind(String(error.message || "delivery_failed").slice(0, 120), invitationId).run();
+    throw error;
+  }
 }
 
 async function createCustomerCheckout(request, env) {
   if (env.STRIPE_CHECKOUT_ENABLED !== "true") return json({ error: "stripe_checkout_not_enabled" }, { status: 503 });
+  if (env.STRIPE_MODE === "live" && env.STRIPE_LIVE_READY !== "true") return json({ error: "stripe_live_not_ready" }, { status: 503 });
+  if (!["test", "live"].includes(env.STRIPE_MODE)) return json({ error: "stripe_mode_invalid" }, { status: 503 });
   const auth = await requireCustomerIdentity(request, env);
   if (auth.error) return auth.error;
   const payload = await readJson(request);
@@ -2321,46 +2597,126 @@ async function createCustomerCheckout(request, env) {
   if (!["weekly_monthly", "curriculum_monthly"].includes(planCode)) {
     return json({ error: "invalid_plan" }, { status: 400 });
   }
+  if (planCode === "curriculum_monthly" && env.IROHA_ENROLLMENT_ENABLED !== "true") {
+    return json({ error: "iroha_enrollment_not_enabled" }, { status: 503 });
+  }
+  if (planCode === "weekly_monthly" && env.STRIPE_MODE === "live" && env.TAYORI_DIRECT_ENROLLMENT_ENABLED !== "true") {
+    return json({ error: "tayori_enrollment_not_enabled" }, { status: 503 });
+  }
+  if (planCode === "weekly_monthly" && env.TAYORI_DIRECT_ENROLLMENT_ENABLED !== "true") {
+    const invited = await env.DB.prepare(
+      `SELECT w.id FROM waitlist_entries w
+       JOIN tayori_waitlist_invitations i ON i.waitlist_entry_id = w.id
+       WHERE lower(w.email) = lower(?) AND w.interest = 'tayori_personal'
+         AND w.status IN ('invited', 'joined') AND i.status = 'sent' LIMIT 1`
+    ).bind(auth.customer.email).first();
+    if (!invited) return json({ error: "tayori_invitation_required" }, { status: 403 });
+  }
   const audienceType = "general";
+  if (planCode === "weekly_monthly") {
+    // Check even before returning a previously opened checkout URL.
+    requireWeekendAdmission(env);
+    const included = await env.DB.prepare(
+      `SELECT id FROM customer_subscriptions WHERE customer_id = ? AND product_code = 'curriculum'
+       AND livemode = ? AND status IN ('incomplete', 'trialing', 'active', 'past_due', 'paused', 'unpaid') LIMIT 1`
+    ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+    if (included) return json({ error: "tayori_included_in_iroha" }, { status: 409 });
+    const pendingIroha = await env.DB.prepare(
+      "SELECT id FROM stripe_checkout_attempts WHERE customer_id = ? AND plan_code LIKE 'curriculum_%' AND livemode = ? AND status IN ('created','pending') LIMIT 1"
+    ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+    if (pendingIroha) return json({ error: "iroha_checkout_pending" }, { status: 409 });
+  }
   const requestId = String(payload.request_id || "");
   if (!/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "invalid_request_id" }, { status: 400 });
-  const idempotencyKey = `checkout:${auth.customer.id}:${requestId}`;
+  const idempotencyKey = `checkout:${env.STRIPE_MODE}:${auth.customer.id}:${requestId}`;
+  const useCompletionCapacity = planCode === "weekly_monthly" && completionLimitEnabled(env);
+  if (useCompletionCapacity) {
+    await reconcileTayoriCapacity(env);
+    let hold = await heldTayoriCheckout(env, auth.customer.id);
+    if (hold) {
+      if (hold.expires_at <= Date.now() / 1000) return json({ error: "tayori_checkout_pending" }, { status: 409 });
+      hold = await recoverTayoriSession(env, hold);
+      if (hold.checkout_url) return json({ checkout_url: hold.checkout_url, session_id: hold.stripe_checkout_session_id, reused: true });
+      return json({ error: "tayori_checkout_pending" }, { status: 409 });
+    }
+  }
   const previous = await env.DB.prepare(
-    "SELECT stripe_checkout_session_id, checkout_url, status FROM stripe_checkout_attempts WHERE idempotency_key = ?"
+    "SELECT stripe_checkout_session_id, checkout_url, status, created_at FROM stripe_checkout_attempts WHERE idempotency_key = ?"
   ).bind(idempotencyKey).first();
-  if (previous?.checkout_url && previous.status === "pending") {
+  if (!useCompletionCapacity && previous?.checkout_url && previous.status === "pending") {
+    if (planCode === "weekly_monthly" && env.TAYORI_WEEKEND_ONLY === "true"
+      && Date.parse(previous.created_at.replace(' ', 'T') + 'Z') + 3600000 <= Date.now()) {
+      return json({ error: "checkout_expired_retry" }, { status: 409 });
+    }
     return json({ checkout_url: previous.checkout_url, session_id: previous.stripe_checkout_session_id, reused: true });
   }
+  if (useCompletionCapacity && previous) return json({ error: "checkout_expired_retry" }, { status: 409 });
 
   const active = await env.DB.prepare(
     `SELECT id FROM customer_subscriptions
-      WHERE customer_id = ? AND product_code = ?
+      WHERE customer_id = ? AND product_code = ? AND livemode = ?
         AND status IN ('incomplete', 'trialing', 'active', 'past_due', 'paused')
       LIMIT 1`
-  ).bind(auth.customer.id, planCode === "weekly_monthly" ? "weekly" : "curriculum").first();
+  ).bind(auth.customer.id, planCode === "weekly_monthly" ? "weekly" : "curriculum", env.STRIPE_MODE === "live" ? 1 : 0).first();
   if (active) return json({ error: "subscription_already_exists" }, { status: 409 });
+  if (planCode === "weekly_monthly" && !useCompletionCapacity) {
+    // Reuse an in-flight checkout across retries/tabs without consuming a new slot.
+    const pending = await env.DB.prepare(`SELECT checkout_url, stripe_checkout_session_id
+      FROM stripe_checkout_attempts WHERE customer_id = ? AND plan_code = 'weekly_monthly'
+      AND livemode = ? AND status = 'pending' AND checkout_url != ''
+      AND datetime(created_at) > datetime('now', '-1 hour') LIMIT 1`)
+      .bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+    if (pending) return json({ checkout_url: pending.checkout_url, session_id: pending.stripe_checkout_session_id, reused: true });
+    const admissionKey = await hashAuthValue(env.CUSTOMER_AUTH_SECRET, "auth-email", auth.customer.email);
+    await reserveTayoriAdmission(env, admissionKey);
+  }
   const history = await env.DB.prepare(
-    "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND product_code = 'curriculum' LIMIT 1"
-  ).bind(auth.customer.id).first();
+    "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND product_code = 'curriculum' AND livemode = ? LIMIT 1"
+  ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+  if (planCode === "curriculum_monthly") {
+    const pendingAttempt = await env.DB.prepare(
+      `SELECT 1 FROM stripe_checkout_attempts
+       WHERE customer_id = ? AND plan_code = 'curriculum_monthly' AND livemode = ? AND status = 'pending' LIMIT 1`
+    ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+    if (pendingAttempt) return json({ error: "checkout_already_pending" }, { status: 409 });
+    if (!history) {
+      const completedAttempt = await env.DB.prepare(
+        `SELECT 1 FROM stripe_checkout_attempts
+         WHERE customer_id = ? AND plan_code = 'curriculum_monthly' AND livemode = ? AND status = 'completed' LIMIT 1`
+      ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+      if (completedAttempt) return json({ error: "subscription_sync_pending" }, { status: 409 });
+    }
+  }
   const feeType = planCode === "weekly_monthly" ? "none" : (history ? "rejoin" : "first");
-  const campaignCode = "none";
+  const promotionCodeId = resolveIrohaFirstPromotion({ code: payload.promotion_code, planCode, feeType, env });
+  const campaignCode = promotionCodeId ? "iroha_first_waiver_5000" : "none";
   const quote = resolveBillingQuote({ planCode, audienceType, feeType, campaignCode });
+  const appliedCampaignCode = quote.campaignCode;
   const attemptId = uid("checkout_attempt");
   await env.DB.prepare(
     `INSERT INTO stripe_checkout_attempts
       (id, customer_id, idempotency_key, plan_code, audience_type, fee_type, campaign_code,
-       trial_days, recurring_amount_yen, entry_fee_yen, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')`
+       trial_days, recurring_amount_yen, entry_fee_yen, livemode, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')`
   ).bind(attemptId, auth.customer.id, idempotencyKey, quote.planCode, quote.audienceType, quote.feeType,
-    quote.campaignCode, quote.trialPeriodDays, quote.recurringAmountYen, quote.entryFeeAmountYen).run();
+    appliedCampaignCode, quote.trialPeriodDays, quote.recurringAmountYen, quote.entryFeeAmountYen, env.STRIPE_MODE === "live" ? 1 : 0).run();
 
   const origin = checkoutSiteOrigin(request, env);
   const isWeeklyPlan = quote.planCode === "weekly_monthly";
+  const reusableStripeCustomer = auth.customer.stripe_customer_id
+    ? await env.DB.prepare(
+      `SELECT 1 FROM stripe_checkout_attempts
+       WHERE customer_id = ? AND stripe_customer_id = ? AND livemode = ? AND status = 'completed'
+       LIMIT 1`
+    ).bind(auth.customer.id, auth.customer.stripe_customer_id, env.STRIPE_MODE === "live" ? 1 : 0).first()
+    : null;
   const params = buildStripeCheckoutParams({
     quote,
     env,
-    customer: auth.customer,
+    customer: reusableStripeCustomer ? auth.customer : { ...auth.customer, stripe_customer_id: null },
     attemptId,
+    promotionCodeId,
+    appliedCampaignCode,
     successUrl: isWeeklyPlan
       ? `${origin}/projects/totonoe/TAYORI/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`
       : `${origin}/projects/totonoe/IROHA/checkout-complete.html?session_id={CHECKOUT_SESSION_ID}`,
@@ -2369,10 +2725,16 @@ async function createCustomerCheckout(request, env) {
       : `${origin}/projects/totonoe/IROHA/index.html?checkout=cancelled#pricing`,
   });
   try {
+    if (isWeeklyPlan) {
+      const expiry = tayoriCheckoutExpiry(env) || (useCompletionCapacity ? Math.floor(Date.now() / 1000) + 3600 : null);
+      if (expiry) params.set("expires_at", String(expiry));
+      if (useCompletionCapacity) await claimTayoriCheckout(env, { attemptId, customerId: auth.customer.id, expiresAt: expiry, params });
+    }
     const session = await createStripeCheckoutSession(env, params, idempotencyKey);
+    await recordJourneyCheckout(request, env, attemptId);
     await env.DB.prepare(
       `UPDATE stripe_checkout_attempts
-          SET status = 'pending', stripe_checkout_session_id = ?, checkout_url = ?, stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP
+          SET status = CASE WHEN status IN ('completed','expired') THEN status ELSE 'pending' END, stripe_checkout_session_id = ?, checkout_url = ?, stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?`
     ).bind(session.id, session.url, session.customerId, attemptId).run();
     return json({
@@ -2380,15 +2742,17 @@ async function createCustomerCheckout(request, env) {
       session_id: session.id,
       quote: {
         plan_code: quote.planCode,
-        first_charge_yen: quote.firstChargeAmountYen,
+        first_charge_yen: promotionCodeId ? 0 : quote.firstChargeAmountYen,
         recurring_amount_yen: quote.recurringAmountYen,
         trial_days: quote.trialPeriodDays,
-        campaign_code: quote.campaignCode,
+        trial_end: quote.trialEndSeconds || null,
+        campaign_code: appliedCampaignCode,
       },
     }, { status: 201 });
   } catch (error) {
+    if (useCompletionCapacity && error.checkoutNotCreated) await releaseUncreatedTayoriCheckout(env, attemptId);
     await env.DB.prepare(
-      "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+      "UPDATE stripe_checkout_attempts SET status = 'failed', last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status NOT IN ('completed','expired')"
     ).bind(String(error.detail || error.message || "stripe_error").slice(0, 200), attemptId).run();
     throw error;
   }
@@ -2401,13 +2765,21 @@ async function createCustomerPortal(request, env) {
     return json({ error: "stripe_customer_missing" }, { status: 409 });
   }
   const subscription = await env.DB.prepare(
-    "SELECT id FROM customer_subscriptions WHERE customer_id = ? AND provider = 'stripe' ORDER BY created_at DESC LIMIT 1"
-  ).bind(auth.customer.id).first();
+    "SELECT id, product_code FROM customer_subscriptions WHERE customer_id = ? AND provider = 'stripe' AND livemode = ? ORDER BY created_at DESC LIMIT 1"
+  ).bind(auth.customer.id, env.STRIPE_MODE === "live" ? 1 : 0).first();
   if (!subscription) return json({ error: "subscription_not_found" }, { status: 409 });
+  const customerLink = await env.DB.prepare(
+    `SELECT 1 FROM stripe_checkout_attempts
+     WHERE customer_id = ? AND stripe_customer_id = ? AND livemode = ? AND status = 'completed'
+     LIMIT 1`
+  ).bind(auth.customer.id, auth.customer.stripe_customer_id, env.STRIPE_MODE === "live" ? 1 : 0).first();
+  if (!customerLink) return json({ error: "stripe_customer_mode_mismatch" }, { status: 409 });
   const origin = checkoutSiteOrigin(request, env);
   const session = await createStripePortalSession(env, {
     customerId: auth.customer.stripe_customer_id,
-    returnUrl: `${origin}/projects/totonoe/IROHA/mypage.html?billing=returned`,
+    returnUrl: subscription.product_code === "weekly"
+      ? `${origin}/projects/totonoe/TAYORI/index.html?billing=returned`
+      : `${origin}/projects/totonoe/IROHA/mypage.html?billing=returned`,
   });
   return json({ portal_url: session.url }, { status: 201 });
 }
@@ -2559,7 +2931,7 @@ async function setSubscriptionEntitlements(env, subscription, status) {
     await env.DB.prepare(
       `INSERT INTO customer_entitlements
         (id, customer_id, entitlement_code, source_subscription_id, status, starts_at, ends_at)
-       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+       SELECT ?, ?, ?, ?, CASE WHEN EXISTS (SELECT 1 FROM customer_subscriptions WHERE id = ? AND status = 'canceled') THEN 'revoked' ELSE ? END, CURRENT_TIMESTAMP, ?
        ON CONFLICT(customer_id, entitlement_code, source_subscription_id) DO UPDATE SET
          status = excluded.status,
          ends_at = excluded.ends_at,
@@ -2568,6 +2940,7 @@ async function setSubscriptionEntitlements(env, subscription, status) {
       `entitlement_${subscription.id}_${entitlementCode}`,
       subscription.customer_id,
       entitlementCode,
+      subscription.id,
       subscription.id,
       entitlementStatus,
       entitlementStatus === "active" ? null : new Date().toISOString()
@@ -2586,18 +2959,71 @@ async function findStripeAttempt(env, metadata, subscriptionId = "") {
   return null;
 }
 
+async function reconcileIncludedTayori(env, customerId = "") {
+  const livemode = env.STRIPE_MODE === "live" ? 1 : 0;
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO subscription_replacements
+      (source_subscription_id, customer_id, replacement_subscription_id, livemode)
+     SELECT w.id, w.customer_id, i.id, w.livemode FROM customer_subscriptions w
+     JOIN customer_subscriptions i ON i.customer_id = w.customer_id AND i.livemode = w.livemode
+     WHERE w.product_code = 'weekly' AND w.provider = 'stripe' AND w.status != 'canceled'
+       AND i.product_code = 'curriculum' AND i.provider = 'stripe' AND i.status IN ('active','trialing')
+       AND w.livemode = ? AND (? = '' OR w.customer_id = ?)`
+  ).bind(livemode, customerId, customerId).run();
+  // A previously opened TAYORI Checkout can finish after IROHA (or even its cancellation).
+  // Persist the intent before that subscription exists so the late webhook still cancels it.
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO subscription_replacements
+      (source_subscription_id, customer_id, replacement_subscription_id, livemode)
+     SELECT 'subscription_' || a.id, a.customer_id, i.id, a.livemode FROM stripe_checkout_attempts a
+     JOIN customer_subscriptions i ON i.customer_id = a.customer_id AND i.livemode = a.livemode
+     WHERE a.plan_code = 'weekly_monthly' AND a.status IN ('created','pending')
+       AND i.product_code = 'curriculum' AND i.provider = 'stripe' AND i.status IN ('active','trialing')
+       AND a.livemode = ? AND (? = '' OR a.customer_id = ?)`
+  ).bind(livemode, customerId, customerId).run();
+  const pending = await env.DB.prepare(
+    `SELECT r.*, s.provider_subscription_id, s.audience_type FROM subscription_replacements r
+     JOIN customer_subscriptions s ON s.id = r.source_subscription_id
+     WHERE r.status = 'pending' AND r.livemode = ? AND (? = '' OR r.customer_id = ?)
+     ORDER BY r.updated_at LIMIT 50`
+  ).bind(livemode, customerId, customerId).all();
+  let failed = false;
+  for (const row of pending.results || []) {
+    try {
+      const canceled = await cancelReplacedTayoriSubscription(env, row.provider_subscription_id, row.customer_id);
+      await env.DB.prepare(
+        "UPDATE customer_subscriptions SET status = 'canceled', cancel_at_period_end = 0, canceled_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+      ).bind(stripeTimestamp(canceled.canceled_at) || new Date().toISOString(), row.source_subscription_id).run();
+      await setSubscriptionEntitlements(env, { id: row.source_subscription_id, customer_id: row.customer_id, plan_code: "weekly_monthly" }, "canceled");
+      await recordSubscriptionStatusEvent(env, { id: `replacement_${row.source_subscription_id}`, livemode: Boolean(livemode), created: canceled.canceled_at }, {
+        subscriptionId: row.source_subscription_id, customer_id: row.customer_id, plan_code: "weekly_monthly",
+        audience_type: row.audience_type, status: "canceled", cancel_at_period_end: 0,
+      });
+      await env.DB.prepare(
+        "UPDATE subscription_replacements SET status = 'completed', attempt_count = attempt_count + 1, last_error = '', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE source_subscription_id = ?"
+      ).bind(row.source_subscription_id).run();
+    } catch (error) {
+      failed = true;
+      await env.DB.prepare(
+        "UPDATE subscription_replacements SET attempt_count = attempt_count + 1, last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE source_subscription_id = ?"
+      ).bind(String(error.message || "replacement_failed").slice(0, 160), row.source_subscription_id).run();
+    }
+  }
+  if (failed) throw Object.assign(new Error("tayori_replacement_pending"), { status: 502 });
+}
+
 async function upsertStripeSubscription(env, attempt, object, forcedStatus = "") {
   const details = planDetails(attempt.plan_code);
   if (!details) throw Object.assign(new Error("invalid_checkout_plan"), { status: 400 });
   const providerSubscriptionId = String(object.subscription || object.id || "");
   if (!/^sub_[A-Za-z0-9_]+$/.test(providerSubscriptionId)) throw Object.assign(new Error("invalid_stripe_subscription"), { status: 400 });
-  const existing = await env.DB.prepare("SELECT id FROM customer_subscriptions WHERE provider_subscription_id = ?").bind(providerSubscriptionId).first();
+  const existing = await env.DB.prepare("SELECT id, status FROM customer_subscriptions WHERE provider_subscription_id = ?").bind(providerSubscriptionId).first();
   const subscriptionId = existing?.id || `subscription_${attempt.id}`;
-  const status = forcedStatus || stripeSubscriptionStatus(object.status);
+  let status = existing?.status === "canceled" ? "canceled" : (forcedStatus || stripeSubscriptionStatus(object.status));
   const customerId = typeof object.customer === "string" ? object.customer : String(object.customer?.id || "");
   const priceId = String(object.items?.data?.[0]?.price?.id || "");
-  const currentPeriodStart = stripeTimestamp(object.current_period_start);
-  const currentPeriodEnd = stripeTimestamp(object.current_period_end);
+  const currentPeriodStart = stripeTimestamp(object.current_period_start ?? object.items?.data?.[0]?.current_period_start);
+  const currentPeriodEnd = stripeTimestamp(object.current_period_end ?? object.items?.data?.[0]?.current_period_end);
   const canceledAt = stripeTimestamp(object.canceled_at);
   await env.DB.prepare(
     `INSERT INTO customer_subscriptions
@@ -2606,7 +3032,7 @@ async function upsertStripeSubscription(env, attempt, object, forcedStatus = "")
        current_period_end, cancel_at_period_end, canceled_at, livemode)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(provider_subscription_id) DO UPDATE SET
-       status = excluded.status,
+       status = CASE WHEN customer_subscriptions.status = 'canceled' THEN 'canceled' ELSE excluded.status END,
        provider_price_id = CASE WHEN excluded.provider_price_id = '' THEN customer_subscriptions.provider_price_id ELSE excluded.provider_price_id END,
        current_period_start = COALESCE(excluded.current_period_start, customer_subscriptions.current_period_start),
        current_period_end = COALESCE(excluded.current_period_end, customer_subscriptions.current_period_end),
@@ -2623,7 +3049,10 @@ async function upsertStripeSubscription(env, attempt, object, forcedStatus = "")
   if (/^cus_[A-Za-z0-9_]+$/.test(customerId)) {
     await env.DB.prepare("UPDATE customer_accounts SET stripe_customer_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(customerId, attempt.customer_id).run();
   }
+  status = (await env.DB.prepare("SELECT status FROM customer_subscriptions WHERE id = ?").bind(subscriptionId).first()).status;
   await setSubscriptionEntitlements(env, { ...attempt, id: subscriptionId }, status);
+  await reconcileIncludedTayori(env, attempt.customer_id);
+  status = (await env.DB.prepare("SELECT status FROM customer_subscriptions WHERE id = ?").bind(subscriptionId).first()).status;
   return {
     subscriptionId,
     status,
@@ -2640,12 +3069,20 @@ async function processStripeEvent(env, event) {
   const metadata = stripeMetadata(object);
   if (event.type === "checkout.session.expired") {
     if (metadata.attemptId) {
-      await env.DB.prepare("UPDATE stripe_checkout_attempts SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(metadata.attemptId).run();
+      const attempt = await findStripeAttempt(env, metadata);
+      if (!attempt) return "ignored";
+      if (metadata.customerId !== attempt.customer_id || metadata.planCode !== attempt.plan_code
+        || Number(attempt.livemode) !== Number(event.livemode) || object.status !== "expired"
+        || (attempt.stripe_checkout_session_id && attempt.stripe_checkout_session_id !== object.id)) {
+        throw Object.assign(new Error("checkout_metadata_mismatch"), { status: 400 });
+      }
+      await recordTayoriCapacityEvent(env, event, attempt);
+      await env.DB.prepare("UPDATE stripe_checkout_attempts SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status != 'completed'").bind(metadata.attemptId).run();
     }
     return "processed";
   }
   if (event.type === "checkout.session.completed") {
-    if (!/^cs_test_[A-Za-z0-9_]+$/.test(String(object.id || "")) || object.mode !== "subscription" || object.status !== "complete") {
+    if (!new RegExp(`^cs_${env.STRIPE_MODE}_[A-Za-z0-9_]+$`).test(String(object.id || "")) || object.mode !== "subscription" || object.status !== "complete") {
       throw Object.assign(new Error("invalid_checkout_session"), { status: 400 });
     }
     const attempt = await findStripeAttempt(env, metadata);
@@ -2653,12 +3090,26 @@ async function processStripeEvent(env, event) {
     if (metadata.customerId !== attempt.customer_id || metadata.planCode !== attempt.plan_code || Number(attempt.livemode) !== Number(event.livemode)) {
       throw Object.assign(new Error("checkout_metadata_mismatch"), { status: 400 });
     }
+    if (completionLimitEnabled(env) && attempt.plan_code === 'weekly_monthly'
+      && ((attempt.stripe_checkout_session_id && attempt.stripe_checkout_session_id !== object.id)
+        || !Number.isSafeInteger(event.created) || event.created <= 0)) {
+      throw Object.assign(new Error('checkout_capacity_metadata_mismatch'), { status: 400 });
+    }
     const subscription = await upsertStripeSubscription(env, attempt, object, Number(attempt.trial_days || 0) > 0 ? "trialing" : "active");
     await recordSubscriptionStatusEvent(env, event, subscription);
     await env.DB.prepare(
       `UPDATE stripe_checkout_attempts SET status = 'completed', stripe_checkout_session_id = ?,
        stripe_customer_id = ?, stripe_subscription_id = ?, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
     ).bind(object.id, subscription.customerId, subscription.subscriptionId ? String(object.subscription || "") : "", attempt.id).run();
+    await observeDiscountHistory(env,String(object.subscription||""));
+    await recordTayoriCapacityEvent(env, event, attempt);
+    if (attempt.plan_code === "weekly_monthly") {
+      await env.DB.prepare(
+        `UPDATE waitlist_entries SET status = 'joined', updated_at = CURRENT_TIMESTAMP
+          WHERE interest = 'tayori_personal' AND status IN ('waiting', 'invited')
+            AND lower(email) = (SELECT lower(email) FROM customer_accounts WHERE id = ?)`
+      ).bind(attempt.customer_id).run();
+    }
     return "processed";
   }
   if (["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
@@ -2666,24 +3117,32 @@ async function processStripeEvent(env, event) {
     const attempt = await findStripeAttempt(env, metadata, subscriptionStripeId);
     if (!attempt) return "ignored";
     if (metadata.customerId && metadata.customerId !== attempt.customer_id) throw Object.assign(new Error("subscription_metadata_mismatch"), { status: 400 });
+    if (Number(attempt.livemode) !== Number(event.livemode) || (metadata.planCode && metadata.planCode !== attempt.plan_code)) throw Object.assign(new Error("subscription_metadata_mismatch"), { status: 400 });
     const subscription = await upsertStripeSubscription(env, attempt, object, stripeSubscriptionStatus(object.status, event.type.endsWith(".deleted")));
     await recordSubscriptionStatusEvent(env, event, subscription);
     await env.DB.prepare("UPDATE stripe_checkout_attempts SET stripe_subscription_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(subscriptionStripeId, attempt.id).run();
+    await observeDiscountHistory(env,subscriptionStripeId);
     return "processed";
   }
   if (["invoice.paid", "invoice.payment_failed"].includes(event.type)) {
-    const subscriptionStripeId = typeof object.subscription === "string" ? object.subscription : String(object.subscription?.id || "");
+    const invoiceSubscription = object.subscription || object.parent?.subscription_details?.subscription;
+    const subscriptionStripeId = typeof invoiceSubscription === "string" ? invoiceSubscription : String(invoiceSubscription?.id || "");
     if (!subscriptionStripeId) return "ignored";
     const row = await env.DB.prepare(
-      `SELECT cs.id AS local_subscription_id, cs.cancel_at_period_end, sca.* FROM customer_subscriptions cs
+      `SELECT cs.id AS local_subscription_id, cs.cancel_at_period_end, cs.status AS subscription_status, sca.* FROM customer_subscriptions cs
        JOIN stripe_checkout_attempts sca ON sca.stripe_subscription_id = cs.provider_subscription_id
        WHERE cs.provider_subscription_id = ? LIMIT 1`
     ).bind(subscriptionStripeId).first();
     if (!row) return "ignored";
-    const status = event.type === "invoice.paid" ? "active" : "past_due";
-    await env.DB.prepare("UPDATE customer_subscriptions SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE provider_subscription_id = ?").bind(status, subscriptionStripeId).run();
+    const zeroTrialInvoice = event.type === "invoice.paid"
+      && Number(object.amount_paid || 0) === 0 && row.subscription_status === "trialing";
+    let status = event.type === "invoice.paid" ? (zeroTrialInvoice ? "trialing" : "active") : "past_due";
+    await env.DB.prepare("UPDATE customer_subscriptions SET status = CASE WHEN status = 'canceled' THEN 'canceled' ELSE ? END, updated_at = CURRENT_TIMESTAMP WHERE provider_subscription_id = ?").bind(status, subscriptionStripeId).run();
+    status = (await env.DB.prepare("SELECT status FROM customer_subscriptions WHERE id = ?").bind(row.local_subscription_id).first()).status;
     await setSubscriptionEntitlements(env, { ...row, id: row.local_subscription_id }, status);
     await recordInvoiceTransaction(env, event, object, row, event.type === "invoice.paid" ? "paid" : "failed");
+    await reconcileIncludedTayori(env, row.customer_id);
+    status = (await env.DB.prepare("SELECT status FROM customer_subscriptions WHERE id = ?").bind(row.local_subscription_id).first()).status;
     await recordSubscriptionStatusEvent(env, event, {
       subscriptionId: row.local_subscription_id,
       customer_id: row.customer_id,
@@ -2778,7 +3237,7 @@ async function billingSummary(request, env) {
   try {
     [subscriptionRows, transactionRows, statusEventRows, qualityRows] = await Promise.all([
       env.DB.prepare(
-        `SELECT id, customer_id, product_code, billing_interval, audience_type, status,
+        `SELECT id, customer_id, provider_subscription_id, product_code, billing_interval, audience_type, status,
                 recurring_amount_yen, cancel_at_period_end, current_period_end, created_at, updated_at
          FROM customer_subscriptions WHERE provider = 'stripe' AND livemode = ?`
       ).bind(livemode).all(),
@@ -2854,7 +3313,7 @@ async function billingSummary(request, env) {
   });
   const selected = monthlyByKey.get(selectedMonth) || { net_yen: 0 };
   const quality = qualityRows.results?.[0] || {};
-  return json({
+  return json(await adjustBillingMembership({
     generated_at: new Date().toISOString(),
     environment: livemode ? "live" : "test",
     filters: { month: selectedMonth, range, product, audience },
@@ -2875,7 +3334,184 @@ async function billingSummary(request, env) {
       has_subscription_history: statusEvents.length > 0,
       current_month_partial: selectedMonth === currentJapanMonth(),
     },
-  });
+  }, subscriptions, env));
+}
+
+function analyticsJapanDate(daysAgo = 0) {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000 - daysAgo * 86400000).toISOString().slice(0, 10);
+}
+
+function analyticsPageLabel(path) {
+  const clean = String(path || "").replace(/\/+$/, "") || "/";
+  const labels = {
+    "/": "Base Craftas トップ", "/projects": "Base Craftas プロジェクト一覧", "/projects/totonoe": "ToToNoE+ トップ",
+    "/projects/totonoe/service": "サービス", "/projects/totonoe/contents": "コンテンツ", "/projects/totonoe/team": "運営チーム",
+    "/projects/totonoe/faq": "FAQ", "/projects/totonoe/tayori": "たより｜TAYORI", "/projects/totonoe/tayori/login": "TAYORI ログイン",
+    "/projects/totonoe/tsuzuri": "つづり｜TSUZURI", "/projects/totonoe/tsumami": "つまみ｜TSUMAMI", "/projects/totonoe/characters": "キャラクター",
+    "/projects/totonoe/weekend-ai": "週末のAI整え習慣", "/projects/totonoe/privacy": "プライバシーポリシー", "/projects/totonoe/legal": "特定商取引法表記",
+  };
+  if (labels[clean]) return labels[clean];
+  if (clean.startsWith("/projects/totonoe/tsuzuri/")) return `TSUZURI記事：${clean.split("/").filter(Boolean).at(-1)}`;
+  return clean;
+}
+
+function analyticsSourceLabel(host) {
+  const value = String(host || "").toLowerCase();
+  if (!value) return "直接・判別不能";
+  if (value === "t.co" || value.endsWith(".x.com") || value === "x.com") return "X";
+  if (value.includes("instagram.com")) return "Instagram";
+  if (value.includes("facebook.com")) return "Facebook";
+  if (value.includes("youtube.com") || value === "youtu.be") return "YouTube";
+  if (value.includes("google.")) return "Google検索";
+  if (value === "my.prairie.cards") return "Prairie Card";
+  if (value === "chatgpt.com" || value === "chat.openai.com") return "ChatGPT";
+  if (value.endsWith("perplexity.ai")) return "Perplexity";
+  if (value.endsWith("claude.ai")) return "Claude";
+  if (value === "gemini.google.com") return "Gemini";
+  if (value === "copilot.microsoft.com") return "Microsoft Copilot";
+  return value;
+}
+
+function analyticsAggregate(rows, labelField, valueField = "visits") {
+  const totals = new Map();
+  for (const row of rows) totals.set(row[labelField], (totals.get(row[labelField]) || 0) + Number(row[valueField] || 0));
+  return [...totals].map(([label, visits]) => ({ label, visits })).sort((left, right) => right.visits - left.visits || left.label.localeCompare(right.label, "ja"));
+}
+
+const ANALYTICS_INITIATIVE_CHANNELS = new Set(["x", "instagram", "youtube", "email", "event", "website", "ai", "other"]);
+const ANALYTICS_INITIATIVE_TYPES = new Set(["social_post", "article", "video", "email", "event", "site_update", "advertising", "other"]);
+const ANALYTICS_RESULT_STATUSES = new Set(["pending", "success", "partial", "hold", "improve"]);
+const ANALYTICS_MEMBER_IDS = new Set(TOTONOE_MEMBERS.map((person) => person.id));
+
+function validAnalyticsDate(value) {
+  const text = String(value || "");
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(text)) return false;
+  return new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
+}
+
+function normalizeAnalyticsInitiative(input, fallback = {}) {
+  const occurredOn = String(input.occurred_on ?? fallback.occurred_on ?? "").trim();
+  const title = String(input.title ?? fallback.title ?? "").trim().slice(0, 120);
+  const channel = String(input.channel ?? fallback.channel ?? "other").trim().toLowerCase();
+  const initiativeType = String(input.initiative_type ?? fallback.initiative_type ?? "other").trim().toLowerCase();
+  const rawDestination = String(input.destination_path ?? fallback.destination_path ?? "").trim();
+  const destinationPath = rawDestination && /^\/[A-Za-z0-9._~!$&'()*+,;=:@%/-]{1,299}$/.test(rawDestination) && !rawDestination.startsWith("//") ? rawDestination : "";
+  const rawReferenceUrl = String(input.reference_url ?? fallback.reference_url ?? "").trim();
+  const referenceUrl = rawReferenceUrl ? safeUrl(rawReferenceUrl) : "";
+  const primaryOwnerId = String(input.primary_owner_id ?? fallback.primary_owner_id ?? "").trim();
+  let collaboratorIds = input.collaborator_ids ?? fallback.collaborator_ids ?? [];
+  if (typeof collaboratorIds === "string") { try { collaboratorIds = JSON.parse(collaboratorIds); } catch { collaboratorIds = []; } }
+  collaboratorIds = [...new Set((Array.isArray(collaboratorIds) ? collaboratorIds : []).map((value) => String(value).trim()))].filter((id) => ANALYTICS_MEMBER_IDS.has(id) && id !== primaryOwnerId).slice(0, 9);
+  const resultStatus = String(input.result_status ?? fallback.result_status ?? "pending").trim().toLowerCase();
+  const reviewOn = String(input.review_on ?? fallback.review_on ?? "").trim();
+  if (!validAnalyticsDate(occurredOn) || !title || !ANALYTICS_INITIATIVE_CHANNELS.has(channel) || !ANALYTICS_INITIATIVE_TYPES.has(initiativeType)) return null;
+  if (rawDestination && !destinationPath) return null;
+  if (rawReferenceUrl && !referenceUrl) return null;
+  if (!ANALYTICS_MEMBER_IDS.has(primaryOwnerId) || !ANALYTICS_RESULT_STATUSES.has(resultStatus) || (reviewOn && !validAnalyticsDate(reviewOn))) return null;
+  return {
+    occurred_on: occurredOn,
+    title,
+    channel,
+    initiative_type: initiativeType,
+    destination_path: destinationPath,
+    objective: String(input.objective ?? fallback.objective ?? "").trim().slice(0, 300),
+    hypothesis: String(input.hypothesis ?? fallback.hypothesis ?? "").trim().slice(0, 500),
+    owner: TOTONOE_MEMBERS.find((person) => person.id === primaryOwnerId)?.name || "",
+    primary_owner_id: primaryOwnerId,
+    collaborator_ids: JSON.stringify(collaboratorIds),
+    reference_url: referenceUrl,
+    notes: String(input.notes ?? fallback.notes ?? "").trim().slice(0, 1000),
+    result_status: resultStatus,
+    learning: String(input.learning ?? fallback.learning ?? "").trim().slice(0, 1000),
+    next_action: String(input.next_action ?? fallback.next_action ?? "").trim().slice(0, 500),
+    review_on: reviewOn,
+  };
+}
+
+function serializeAnalyticsInitiative(row) {
+  if (!row) return row;
+  let collaboratorIds = [];
+  try { collaboratorIds = JSON.parse(row.collaborator_ids || "[]"); } catch {}
+  return { ...row, collaborator_ids: Array.isArray(collaboratorIds) ? collaboratorIds : [] };
+}
+
+async function listAnalyticsInitiatives(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+  if (auth.error) return auth.error;
+  const url = new URL(request.url), start = url.searchParams.get("start") || analyticsJapanDate(29), end = url.searchParams.get("end") || analyticsJapanDate();
+  if (!validAnalyticsDate(start) || !validAnalyticsDate(end) || start > end) return json({ error: "invalid_date_range" }, { status: 400 });
+  const result = await env.DB.prepare(`SELECT id, occurred_on, title, channel, initiative_type, destination_path, objective, hypothesis, owner, primary_owner_id, collaborator_ids, reference_url, notes, result_status, learning, next_action, review_on, created_by, updated_by, created_at, updated_at FROM analytics_initiatives WHERE occurred_on BETWEEN ? AND ? ORDER BY occurred_on DESC, updated_at DESC`).bind(start, end).all();
+  return json({ initiatives: (result.results || []).map(serializeAnalyticsInitiative) });
+}
+
+async function createAnalyticsInitiative(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const initiative = normalizeAnalyticsInitiative(await readJson(request) || {});
+  if (!initiative) return json({ error: "invalid_initiative", message: "施策の日付、名称、媒体、リンク先を確認してください。" }, { status: 400 });
+  const id = uid("initiative");
+  await env.DB.prepare(`INSERT INTO analytics_initiatives (id, occurred_on, title, channel, initiative_type, destination_path, objective, hypothesis, owner, primary_owner_id, collaborator_ids, reference_url, notes, result_status, learning, next_action, review_on, created_by, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(id, initiative.occurred_on, initiative.title, initiative.channel, initiative.initiative_type, initiative.destination_path, initiative.objective, initiative.hypothesis, initiative.owner, initiative.primary_owner_id, initiative.collaborator_ids, initiative.reference_url, initiative.notes, initiative.result_status, initiative.learning, initiative.next_action, initiative.review_on, auth.email, auth.email).run();
+  await audit(env, auth.email, "analytics_initiative.create", "analytics_initiative", id, { occurred_on: initiative.occurred_on, channel: initiative.channel, destination_path: initiative.destination_path });
+  const saved = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  return json({ initiative: serializeAnalyticsInitiative(saved) }, { status: 201 });
+}
+
+async function updateAnalyticsInitiative(request, env, id) {
+  const auth = await requireRole(request, env, ["admin", "editor"]);
+  if (auth.error) return auth.error;
+  const current = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  if (!current) return json({ error: "not_found" }, { status: 404 });
+  const initiative = normalizeAnalyticsInitiative(await readJson(request) || {}, current);
+  if (!initiative) return json({ error: "invalid_initiative", message: "施策の日付、名称、媒体、リンク先を確認してください。" }, { status: 400 });
+  await env.DB.prepare(`UPDATE analytics_initiatives SET occurred_on = ?, title = ?, channel = ?, initiative_type = ?, destination_path = ?, objective = ?, hypothesis = ?, owner = ?, primary_owner_id = ?, collaborator_ids = ?, reference_url = ?, notes = ?, result_status = ?, learning = ?, next_action = ?, review_on = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .bind(initiative.occurred_on, initiative.title, initiative.channel, initiative.initiative_type, initiative.destination_path, initiative.objective, initiative.hypothesis, initiative.owner, initiative.primary_owner_id, initiative.collaborator_ids, initiative.reference_url, initiative.notes, initiative.result_status, initiative.learning, initiative.next_action, initiative.review_on, auth.email, id).run();
+  await audit(env, auth.email, "analytics_initiative.update", "analytics_initiative", id, { occurred_on: initiative.occurred_on, channel: initiative.channel, destination_path: initiative.destination_path });
+  const saved = await env.DB.prepare("SELECT * FROM analytics_initiatives WHERE id = ?").bind(id).first();
+  return json({ initiative: serializeAnalyticsInitiative(saved) });
+}
+
+async function analyticsSummary(request, env) {
+  const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+  if (auth.error) return auth.error;
+  if (!env.CLOUDFLARE_ANALYTICS_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_WEB_ANALYTICS_SITE_TAG) {
+    return json({ error: "analytics_not_configured", message: "Cloudflare Analyticsの読み取り設定が必要です。" }, { status: 503 });
+  }
+  const url = new URL(request.url);
+  const start = url.searchParams.get("start") || analyticsJapanDate(29);
+  const end = url.searchParams.get("end") || analyticsJapanDate();
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(start) || !/^20\d{2}-\d{2}-\d{2}$/.test(end)) return json({ error: "invalid_date_range" }, { status: 400 });
+  const startTime = Date.parse(`${start}T00:00:00Z`), endTime = Date.parse(`${end}T00:00:00Z`);
+  if (!Number.isFinite(startTime) || !Number.isFinite(endTime) || startTime > endTime || endTime - startTime > 92 * 86400000) return json({ error: "invalid_date_range" }, { status: 400 });
+  const periodDays = Math.round((endTime - startTime) / 86400000) + 1;
+  const previousEnd = new Date(startTime - 86400000).toISOString().slice(0, 10);
+  const previousStart = new Date(startTime - periodDays * 86400000).toISOString().slice(0, 10);
+  const query = `query($accountTag:string!,$start:Date!,$end:Date!,$previousStart:Date!,$previousEnd:Date!,$siteTag:string!){viewer{accounts(filter:{accountTag:$accountTag}){
+    entries:rumPageloadEventsAdaptiveGroups(limit:5000,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[date_DESC,sum_visits_DESC]){dimensions{date refererHost requestPath}sum{visits}}
+    previousEntries:rumPageloadEventsAdaptiveGroups(limit:5000,filter:{date_geq:$previousStart,date_leq:$previousEnd,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[sum_visits_DESC]){dimensions{refererHost requestPath}sum{visits}}
+    journeys:rumPageloadEventsAdaptiveGroups(limit:500,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%",refererHost:"basecraftas.com"},orderBy:[count_DESC]){count dimensions{refererPath requestPath}}
+    daily:rumPageloadEventsAdaptiveGroups(limit:100,filter:{date_geq:$start,date_leq:$end,siteTag:$siteTag,bot:0,requestPath_like:"/projects/totonoe/%"},orderBy:[date_ASC]){dimensions{date}sum{visits}}
+  }}}`;
+  const analyticsFetch = env.ANALYTICS_FETCH || fetch;
+  const response = await analyticsFetch("https://api.cloudflare.com/client/v4/graphql", { method: "POST", headers: { authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_API_TOKEN}`, "content-type": "application/json" }, body: JSON.stringify({ query, variables: { accountTag: env.CLOUDFLARE_ACCOUNT_ID, start, end, previousStart, previousEnd, siteTag: env.CLOUDFLARE_WEB_ANALYTICS_SITE_TAG } }) });
+  if (!response.ok) return json({ error: "analytics_upstream_error", message: "Cloudflare Analyticsを取得できませんでした。" }, { status: 502 });
+  const payload = await response.json();
+  if (payload.errors?.length) return json({ error: "analytics_query_error", message: payload.errors[0]?.message || "Analytics query failed" }, { status: 502 });
+  const account = payload.data?.viewer?.accounts?.[0];
+  if (!account) return json({ error: "analytics_query_empty" }, { status: 502 });
+  const entries = (account.entries || []).map((group) => ({ date: group.dimensions?.date || "", referer_host: group.dimensions?.refererHost || "", source: analyticsSourceLabel(group.dimensions?.refererHost), request_path: group.dimensions?.requestPath || "", landing_page: analyticsPageLabel(group.dimensions?.requestPath), visits: Number(group.sum?.visits || 0) })).filter((row) => row.date && row.visits > 0);
+  const previousEntries = (account.previousEntries || []).map((group) => ({ source: analyticsSourceLabel(group.dimensions?.refererHost), request_path: group.dimensions?.requestPath || "", landing_page: analyticsPageLabel(group.dimensions?.requestPath), visits: Number(group.sum?.visits || 0) })).filter((row) => row.visits > 0);
+  const sources = analyticsAggregate(entries, "source"), landingTotals = new Map();
+  for (const row of entries) { const current = landingTotals.get(row.request_path) || { label: row.landing_page, path: row.request_path, visits: 0 }; current.visits += row.visits; landingTotals.set(row.request_path, current); }
+  const landings = [...landingTotals.values()].sort((left, right) => right.visits - left.visits || left.label.localeCompare(right.label, "ja"));
+  const aiLabels = new Set(["ChatGPT", "Perplexity", "Claude", "Gemini", "Microsoft Copilot"]), visits = entries.reduce((sum, row) => sum + row.visits, 0), directVisits = entries.filter((row) => row.source === "直接・判別不能").reduce((sum, row) => sum + row.visits, 0);
+  const previousSources = analyticsAggregate(previousEntries, "source"), previousVisits = previousEntries.reduce((sum, row) => sum + row.visits, 0), previousDirectVisits = previousEntries.filter((row) => row.source === "直接・判別不能").reduce((sum, row) => sum + row.visits, 0);
+  const previousKpis = { visits: previousVisits, identified_visits: previousVisits - previousDirectVisits, direct_visits: previousDirectVisits, ai_visits: previousSources.filter((row) => aiLabels.has(row.label)).reduce((sum, row) => sum + row.visits, 0) };
+  const journeys = (account.journeys || []).map((group) => ({ from_path: group.dimensions?.refererPath || "", from_label: analyticsPageLabel(group.dimensions?.refererPath), to_path: group.dimensions?.requestPath || "", to_label: analyticsPageLabel(group.dimensions?.requestPath), count: Number(group.count || 0) })).filter((row) => row.count > 0 && row.from_path && row.from_path !== row.to_path).sort((left, right) => right.count - left.count);
+  const dailyByDate = new Map((account.daily || []).map((group) => [group.dimensions?.date, Number(group.sum?.visits || 0)])), daily = [];
+  for (let time = startTime; time <= endTime; time += 86400000) { const date = new Date(time).toISOString().slice(0, 10); daily.push({ date, visits: dailyByDate.get(date) || 0 }); }
+  const currentKpis = { visits, identified_visits: visits - directVisits, direct_visits: directVisits, ai_visits: sources.filter((row) => aiLabels.has(row.label)).reduce((sum, row) => sum + row.visits, 0) };
+  return json({ generated_at: new Date().toISOString(), filters: { start, end, bot: 0, path_prefix: "/projects/totonoe/" }, kpis: currentKpis, comparison: { start: previousStart, end: previousEnd, kpis: previousKpis, sources: previousSources }, sources, landings, daily, journeys, entries }, { headers: { "cache-control": "private, max-age=300" } });
 }
 
 async function resetTestBillingData(request, env) {
@@ -2917,15 +3553,15 @@ async function resetTestBillingData(request, env) {
 async function handleStripeWebhook(request, env) {
   if (request.method !== "POST") return json({ error: "not_found" }, { status: 404 });
   if (!/^application\/json(?:;|$)/i.test(request.headers.get("content-type") || "")) return json({ error: "unsupported_content_type" }, { status: 415 });
-  if (env.STRIPE_MODE !== "test") return json({ error: "stripe_test_mode_required" }, { status: 503 });
+  if (!["test", "live"].includes(env.STRIPE_MODE)) return json({ error: "stripe_mode_invalid" }, { status: 503 });
   const rawBody = new TextDecoder().decode(await readBytes(request, 256 * 1024));
   const { event } = await verifyStripeWebhook(rawBody, request.headers.get("stripe-signature"), env.STRIPE_WEBHOOK_SECRET);
-  if (event.livemode) return json({ error: "stripe_livemode_event_rejected" }, { status: 400 });
+  if (event.livemode !== (env.STRIPE_MODE === "live")) return json({ error: "stripe_event_mode_mismatch" }, { status: 400 });
   const inserted = await env.DB.prepare(
     `INSERT OR IGNORE INTO stripe_webhook_events
       (event_id, event_type, livemode, api_version, object_id, stripe_created_at, status)
      VALUES (?, ?, ?, ?, ?, ?, 'processing')`
-  ).bind(event.id, event.type.slice(0, 120), 0, String(event.api_version || "").slice(0, 40), stripeObjectId(event), Number(event.created || 0) || null).run();
+  ).bind(event.id, event.type.slice(0, 120), event.livemode ? 1 : 0, String(event.api_version || "").slice(0, 40), stripeObjectId(event), Number(event.created || 0) || null).run();
   if (!Number(inserted.meta?.changes || 0)) {
     const previous = await env.DB.prepare("SELECT status FROM stripe_webhook_events WHERE event_id = ?").bind(event.id).first();
     if (previous?.status !== "failed") return json({ received: true, duplicate: true });
@@ -3005,6 +3641,7 @@ function serializeWeeklyMaterial(row) {
 async function weeklyMemberStatus(request, env) {
   const auth = await requireWeeklyAccess(request, env);
   if (auth.error) return auth.error;
+  await recordServiceUsage(env,auth,"weekly","member_open");
   return json({ membership: auth.access });
 }
 
@@ -3072,6 +3709,8 @@ function serializeCustomerProfile(row, auth) {
     updated_at: row?.updated_at || null,
     has_weekly_access: auth.access.has_weekly_access,
     has_curriculum_access: auth.access.has_curriculum_access,
+    staff_access: auth.access.staff_access,
+    staff_role: auth.access.staff_role,
   };
 }
 
@@ -3154,6 +3793,22 @@ async function limitCustomerWrite(env, email) {
   return Boolean(result.meta.changes);
 }
 
+async function weeklyOnboarding(request, env) {
+  const auth = await requireWeeklyAccess(request, env);
+  if (auth.error) return auth.error;
+  const customerId = auth.access.customer_id;
+  if (request.method === "PATCH") {
+    if (!(await limitCustomerWrite(env, auth.email))) return json({error:"rate_limited"},{status:429});
+    const input = await readJson(request);
+    if (!input || !Number.isInteger(input.step) || input.step < 0 || input.step > 3 || typeof input.completed !== "boolean") return json({error:"invalid_onboarding"},{status:400});
+    await env.DB.prepare(`INSERT INTO weekly_onboarding(customer_id,version,step,completed) VALUES (?,1,?,?)
+      ON CONFLICT(customer_id) DO UPDATE SET version=1,step=excluded.step,completed=excluded.completed,updated_at=CURRENT_TIMESTAMP`)
+      .bind(customerId,input.step,Number(input.completed)).run();
+  }
+  const row = await env.DB.prepare("SELECT version,step,completed FROM weekly_onboarding WHERE customer_id = ?").bind(customerId).first();
+  return json({version:1,step:row?.step || 0,completed:row?.version === 1 && Boolean(row?.completed)});
+}
+
 async function getWeeklyPriorityQuestion(request, env) {
   const auth = await requireWeeklyAccess(request, env);
   if (auth.error) return auth.error;
@@ -3161,7 +3816,7 @@ async function getWeeklyPriorityQuestion(request, env) {
   const question = await env.DB.prepare(
     "SELECT * FROM weekly_priority_questions WHERE customer_id = ? AND week_start = ?"
   ).bind(auth.access.customer_id, weekStart).first();
-  return json({ week_start: weekStart, available: !question, question: serializePriorityQuestion(question) });
+  return json({ week_start: weekStart, available: !question && weeklyQuestionWindow().submission_open, question: serializePriorityQuestion(question), ...weeklyQuestionWindow() });
 }
 
 async function saveWeeklyPriorityQuestion(request, env) {
@@ -3217,17 +3872,34 @@ async function saveWeeklyPriorityQuestion(request, env) {
   return json({ week_start: weekStart, available: false, question: serializePriorityQuestion(saved), sheet_sync: sheetSync.status }, { status: current ? 200 : 201 });
 }
 
+async function approvedWeeklyAnswerVideoTopics(env) {
+  const rows = await env.DB.prepare(
+    "SELECT question_group, answer_video_url FROM weekly_priority_questions WHERE status = 'answered' AND video_consent = 1 AND operations_status = '回答動画公開済み' AND (question_group LIKE '公開:%' OR question_group LIKE '公開：%') AND answer_video_url <> ''"
+  ).all();
+  const topicsByDriveId = new Map();
+  for (const row of rows.results || []) {
+    const driveId = driveFileIdFromUrl(row.answer_video_url);
+    const topic = String(row.question_group || "").replace(/^公開[：:]/, "").trim();
+    if (!driveId || !topic || topic.length > 120 || /[\r\n<>@]|https?:\/\//i.test(topic)) continue;
+    if (!topicsByDriveId.has(driveId)) topicsByDriveId.set(driveId, new Set());
+    if (topicsByDriveId.get(driveId).size < 8) topicsByDriveId.get(driveId).add(topic);
+  }
+  return topicsByDriveId;
+}
+
 async function listWeeklyAnswerVideos(request, env) {
   const auth = await requireWeeklyAccess(request, env);
   if (auth.error) return auth.error;
-  const [videos, sync] = await Promise.all([
-    env.DB.prepare("SELECT id, title, description, file_name, mime_type, size_bytes, published_at FROM weekly_answer_videos WHERE status = 'published' ORDER BY datetime(published_at) DESC, created_at DESC").all(),
+  const [videos, topicsByDriveId, sync] = await Promise.all([
+    env.DB.prepare("SELECT id, drive_file_id, title, description, file_name, mime_type, size_bytes, published_at, category FROM weekly_answer_videos WHERE status = 'published' ORDER BY datetime(published_at) DESC, created_at DESC").all(),
+    approvedWeeklyAnswerVideoTopics(env),
     env.DB.prepare("SELECT last_success_at, last_error, file_count FROM weekly_answer_video_sync_state WHERE id = 'drive'").first(),
   ]);
   return json({
-    videos: (videos.results || []).map((video) => ({
+    videos: (videos.results || []).filter((video) => topicsByDriveId.has(video.drive_file_id)).map(({ drive_file_id, ...video }) => ({
       ...video,
-      playback_url: "/api/tsuzuri-studio/api/weekly/answer-videos/" + encodeURIComponent(video.id) + "/stream",
+      question_topics: [...topicsByDriveId.get(drive_file_id)],
+      playback_url: "/api/totonoe-studio/api/weekly/answer-videos/" + encodeURIComponent(video.id) + "/stream",
     })),
     sync: sync || null,
     playback: "secure_proxy",
@@ -3238,11 +3910,23 @@ async function streamWeeklyAnswerVideo(request, env, id) {
   const auth = await requireWeeklyAccess(request, env);
   if (auth.error) return auth.error;
   const video = await env.DB.prepare(
-    "SELECT id, drive_file_id, file_name, mime_type FROM weekly_answer_videos WHERE id = ? AND status = 'published'"
+    "SELECT id, drive_file_id, file_name, mime_type, parent_folder_id FROM weekly_answer_videos WHERE id = ? AND status = 'published'"
   ).bind(id).first();
   if (!video) return json({ error: "weekly_answer_video_not_found" }, { status: 404 });
+  const approvedVideos = await approvedWeeklyAnswerVideoTopics(env);
+  if (!approvedVideos.has(video.drive_file_id)) return json({ error: "weekly_answer_video_not_found" }, { status: 404 });
 
   const token = await driveAccessToken(env);
+  const metadataResponse = await fetch(
+    "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(video.drive_file_id) + "?fields=id,parents,trashed",
+    { signal: AbortSignal.timeout(10000), headers: { authorization: "Bearer " + token, accept: "application/json" } }
+  );
+  if (metadataResponse.status === 404) return json({ error: "weekly_answer_video_not_found" }, { status: 404 });
+  if (!metadataResponse.ok) return json({ error: "weekly_answer_video_unavailable" }, { status: 502 });
+  const metadata = JSON.parse(await readTextLimit(metadataResponse, 64 * 1024) || "{}");
+  if (metadata.trashed || !(metadata.parents || []).includes(video.parent_folder_id || weeklyResponseFolderId(env))) {
+    return json({ error: "weekly_answer_video_not_found" }, { status: 404 });
+  }
   const headers = new Headers({ authorization: "Bearer " + token, accept: video.mime_type || "video/*" });
   const requestedRange = String(request.headers.get("range") || "");
   if (/^bytes=\d*-\d*$/.test(requestedRange)) headers.set("range", requestedRange);
@@ -3414,7 +4098,7 @@ async function publicationAssets(env, article) {
 async function serveMedia(request, env, key) {
   if (!env.MEDIA) return new Response('Not found', {status: 404});
   const requestPath = new URL(request.url).pathname;
-  const isPrivate = requestPath.startsWith('/api/tsuzuri-studio/media/') || requestPath.startsWith('/api/column-studio/media/');
+  const isPrivate = requestPath.startsWith('/api/totonoe-studio/media/') || requestPath.startsWith('/api/tsuzuri-studio/media/') || requestPath.startsWith('/api/column-studio/media/');
   if (isPrivate) {
     const auth = await requireRole(request, env, ['admin','editor','viewer']);
     if (auth.error) return auth.error;
@@ -3433,8 +4117,60 @@ async function serveMedia(request, env, key) {
   }});
 }
 
+async function curriculumNotes(request, env, lessonId = null) {
+  const auth = await getCustomerAccess(request, env);
+  if (auth.error) return auth.error;
+  if (!auth.access.has_curriculum_access) return json({ error:"curriculum_access_required" }, { status:403 });
+  const owner = { id:auth.customer.id, displayName:auth.customer.display_name || '' };
+  if (request.method === 'GET') {
+    return json(lessonId ? { owner, note:await getLessonNote(env,owner.id,lessonId) } : { owner, ...await listLessonNotes(env,owner.id,Number(new URL(request.url).searchParams.get('offset') || 0)) });
+  }
+  const bucket = Math.floor(Date.now()/60000);
+  const limited = await env.DB.prepare("INSERT INTO api_write_limits(actor_email,bucket,count) VALUES(?,?,1) ON CONFLICT(actor_email,bucket) DO UPDATE SET count=count+1 WHERE count < 20")
+    .bind('iroha-notes:'+owner.id,bucket).run();
+  if (!limited.meta.changes) return json({error:'too_many_requests'},{status:429});
+  const result = await saveLessonNote(env,auth.customer,await readJson(request));
+  if (result.conflict) return json({ error:'note_conflict', note:result.note },{status:409});
+  let sheetSync = 'pending';
+  if (result.unchanged) {
+    sheetSync = (await env.DB.prepare('SELECT sheet_synced_at FROM iroha_lesson_note_revisions WHERE customer_id=? AND lesson_id=? AND revision=?')
+      .bind(owner.id,result.note.lessonId,result.note.revision).first())?.sheet_synced_at ? 'synced' : 'pending';
+  } else {
+    try { sheetSync = (await syncLessonNoteSheet(env,googleJsonRequest,result.eventId)).status; }
+    catch { console.warn(JSON.stringify({event:'iroha.notes.sheet_deferred'})); }
+  }
+  return json({ owner, note:result.note, sheetSync });
+}
+
+function isCurriculumPlaybackRequest(path,method) {
+  if(method==='OPTIONS')return isCurriculumPlaybackRequest(path,'GET')||isCurriculumPlaybackRequest(path,'POST');
+  return (method==='GET' && (path==='/api/curriculum/catalog' || /^\/api\/curriculum\/media\/[A-Za-z0-9_-]{1,160}$/.test(path)))
+    || (method==='POST' && path==='/api/curriculum/preview/claude')
+    || (method==='POST' && (/^\/api\/curriculum\/lessons\/[A-Za-z0-9_-]{1,160}\/(playback|complete)$/.test(path) || /^\/api\/curriculum\/playback\/[A-Za-z0-9_-]{1,160}$/.test(path)));
+}
+async function curriculumPlayback(request,env,path) {
+  const auth=await getCustomerAccess(request,env);
+  if(auth.error)return auth.error;
+  if(!auth.access.has_curriculum_access)return json({error:'curriculum_access_required'},{status:403});
+  if(path==='/api/curriculum/catalog')return json({owner:{id:auth.customer.id},staffAccess:auth.access.staff_access,...memberCatalog(await deliveryCatalog(env,auth))});
+  const parts=path.split('/');
+  if(parts[3]==='media')return streamDeliveryLesson(request,env,auth,parts[4],driveAccessToken);
+  const bucket=Math.floor(Date.now()/60000);
+  const limited=await env.DB.prepare('INSERT INTO api_write_limits(actor_email,bucket,count) VALUES(?,?,1) ON CONFLICT(actor_email,bucket) DO UPDATE SET count=count+1 WHERE count < 20')
+    .bind('iroha-playback:'+auth.customer.id,bucket).run();
+  if(!limited.meta.changes)return json({error:'too_many_requests'},{status:429});
+  if(path==='/api/curriculum/preview/claude')return json(await registerClaudeStaffPreview(env,auth,googleJsonRequest));
+  if(parts[3]==='playback')return json(await playbackHeartbeat(env,auth,parts[4],await readJson(request)));
+  if(parts[5]==='playback')return json(await startPlayback(env,auth,parts[4]));
+  return json(await completeDeliveryLesson(env,auth,parts[4]));
+}
+
 const worker = {
   async scheduled(controller, env) {
+    try { await reconcileTayoriCapacity(env); }
+    catch { console.warn(JSON.stringify({ event: "tayori.capacity_reconciliation_deferred" })); }
+    try { await reconcileIncludedTayori(env); }
+    catch (error) { console.error(JSON.stringify({ event: "billing.replacement.retry_failed", error: String(error.message || error).slice(0, 160) })); }
     await env.DB.prepare("DELETE FROM api_write_limits WHERE bucket < ?").bind(Math.floor(Date.now() / 60000) - 60).run();
     try {
       await env.DB.prepare("DELETE FROM customer_auth_rate_limits WHERE bucket < ?").bind(Math.floor(Date.now() / (AUTH_RATE_BUCKET_MINUTES * 60 * 1000)) - 6).run();
@@ -3448,6 +4184,8 @@ const worker = {
     }
     try {
       if (controller.cron === "0 * * * *") {
+        try { await syncLessonNoteSheet(env, googleJsonRequest); }
+        catch { console.warn(JSON.stringify({event:'iroha.notes.sheet_retry_deferred'})); }
         const answerVideos = await syncWeeklyAnswerVideos(env);
         const questionSheet = await syncPendingWeeklyQuestionsToSheet(env);
         const questionOperations = await syncWeeklyQuestionOperationsFromSheet(env);
@@ -3475,6 +4213,9 @@ const worker = {
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204 });
     if (path === "/api/health") return json({ ok: true, service: "tsuzuri-studio-api" });
+    if (isCurriculumPlaybackRequest(path,request.method)) return curriculumPlayback(request,env,path);
+    if (path === '/api/curriculum/notes' && ['GET','POST'].includes(request.method)) return curriculumNotes(request,env);
+    if (request.method === 'GET' && /^\/api\/curriculum\/notes\/[A-Za-z0-9_-]{1,160}$/.test(path)) return curriculumNotes(request,env,path.split('/').at(-1));
     if (path === "/api/public/weekend-event" && request.method === "GET") return publicWeekendEvent(env);
     if (path === "/api/public/waitlist" && request.method === "POST") return joinWaitlist(request, env);
 
@@ -3490,6 +4231,15 @@ const worker = {
     if (path === "/api/customer/auth/verify-code" && request.method === "POST") {
       return verifyCustomerAuthCode(request, env);
     }
+    if (path === "/api/customer/auth/password/login" && request.method === "POST") {
+      return customerPasswordLogin(request, env);
+    }
+    if (path === "/api/customer/auth/password/set" && request.method === "POST") {
+      return setCustomerPassword(request, env);
+    }
+    if (path === "/api/customer/auth/password/staff" && request.method === "POST") {
+      return setStaffTayoriPassword(request, env);
+    }
     if (path === "/api/customer/auth/status" && request.method === "GET") {
       return customerAuthStatus(request, env);
     }
@@ -3498,6 +4248,9 @@ const worker = {
     }
     if (path === "/api/customer/billing/checkout" && request.method === "POST") {
       return createCustomerCheckout(request, env);
+    }
+    if (path === "/api/public/tayori-enrollment-status" && request.method === "GET") {
+      return tayoriEnrollmentStatus(request, env);
     }
     if (path === "/api/customer/billing/portal" && request.method === "POST") {
       return createCustomerPortal(request, env);
@@ -3512,6 +4265,7 @@ const worker = {
     if (path === "/api/weekly/materials" && request.method === "GET") {
       return listWeeklyMaterials(request, env);
     }
+    if (path === "/api/weekly/onboarding" && ["GET", "PATCH"].includes(request.method)) return weeklyOnboarding(request, env);
     if (path === "/api/weekly/priority-question" && request.method === "GET") {
       return getWeeklyPriorityQuestion(request, env);
     }
@@ -3520,6 +4274,10 @@ const worker = {
     }
     if (path === "/api/weekly/answer-videos" && request.method === "GET") {
       return listWeeklyAnswerVideos(request, env);
+    }
+    const archiveStreamMatch = path.match(/^\/api\/weekly\/archives\/([A-Za-z0-9_-]+)\/stream$/);
+    if (archiveStreamMatch && request.method === "GET") {
+      return streamMemberArchive(request, env, archiveStreamMatch[1], {authorize: requireCustomerMember, tokenFor: driveAccessToken});
     }
     const weeklyAnswerVideoMatch = path.match(/^\/api\/weekly\/answer-videos\/([^/]+)\/stream$/);
     if (weeklyAnswerVideoMatch && request.method === "GET") {
@@ -3551,9 +4309,32 @@ const worker = {
     const memberMatch = path.match(/^\/api\/members\/([^/]+)$/);
     if (memberMatch && request.method === "PATCH") return updateMember(request, env, memberMatch[1]);
 
+    if (path === "/api/member-coupon-summary" && request.method === "GET") {
+      const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+      if (auth.error) return auth.error;
+      try { return json(await aggregateMemberCoupons(env), { headers: { "Cache-Control": "no-store" } }); }
+      catch { return json({ error: "member_summary_unavailable" }, { status: 503 }); }
+    }
     if (path === "/api/admin/billing-summary" && request.method === "GET") return billingSummary(request, env);
     if (path === "/api/admin/billing-test-data/reset" && request.method === "POST") return resetTestBillingData(request, env);
     if (path === "/api/admin/waitlist" && request.method === "GET") return listWaitlistAdmin(request, env);
+    const waitlistInviteMatch = path.match(/^\/api\/admin\/waitlist\/([A-Za-z0-9_-]+)\/invite$/);
+    if (waitlistInviteMatch && request.method === "POST") return sendTayoriWaitlistInvitation(request, env, waitlistInviteMatch[1]);
+    if (path === "/api/public/journey-event" && request.method === "POST") return collectJourney(request, env);
+    if (path === "/api/business-summary" && request.method === "GET") {
+      const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+      if (auth.error) return auth.error;
+      return businessSummary(request, env);
+    }
+    if (path === "/api/analytics-summary" && request.method === "GET") {
+      const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
+      if (auth.error) return auth.error;
+      return journeySummary(request, env);
+    }
+    if (path === "/api/analytics-initiatives" && request.method === "GET") return listAnalyticsInitiatives(request, env);
+    if (path === "/api/analytics-initiatives" && request.method === "POST") return createAnalyticsInitiative(request, env);
+    const analyticsInitiativeMatch = path.match(/^\/api\/analytics-initiatives\/([^/]+)$/);
+    if (analyticsInitiativeMatch && request.method === "PATCH") return updateAnalyticsInitiative(request, env, analyticsInitiativeMatch[1]);
 
     if (path === "/api/articles" && request.method === "GET") {
       const auth = await requireRole(request, env, ["admin", "editor", "viewer"]);
@@ -3631,7 +4412,9 @@ export default {
         path: new URL(request.url).pathname,
         error: String(error?.message || error || "internal_error").slice(0, 300),
       }));
-      return secureResponse(json({error: error.status ? error.message : 'internal_error'}, {status: error.status || 500}));
+      return secureResponse(json({error: error.status ? error.message : 'internal_error',
+        ...(error.resetAt ? { reset_at: error.resetAt } : {})},
+        {status: error.status || 500, headers: error.retryAfter ? { "retry-after": String(error.retryAfter) } : {}}));
     }
   }
 };

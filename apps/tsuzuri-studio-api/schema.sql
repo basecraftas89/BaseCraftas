@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS articles (
   source_published_at TEXT NOT NULL DEFAULT '',
   source_type TEXT NOT NULL DEFAULT '',
   source_id TEXT NOT NULL DEFAULT '',
+  seminar_details TEXT NOT NULL DEFAULT '{}',
   hero_url TEXT NOT NULL DEFAULT '',
   body_html TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'review', 'published', 'archived')),
@@ -53,6 +54,7 @@ CREATE TABLE IF NOT EXISTS article_versions (
   source_published_at TEXT NOT NULL DEFAULT '',
   source_type TEXT NOT NULL DEFAULT '',
   source_id TEXT NOT NULL DEFAULT '',
+  seminar_details TEXT NOT NULL DEFAULT '{}',
   hero_url TEXT NOT NULL DEFAULT '',
   body_html TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL,
@@ -97,6 +99,31 @@ CREATE TABLE IF NOT EXISTS audit_events (
   metadata TEXT NOT NULL DEFAULT '{}',
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS analytics_initiatives (
+  id TEXT PRIMARY KEY,
+  occurred_on TEXT NOT NULL,
+  title TEXT NOT NULL,
+  channel TEXT NOT NULL CHECK (channel IN ('x', 'instagram', 'youtube', 'email', 'event', 'website', 'ai', 'other')),
+  initiative_type TEXT NOT NULL CHECK (initiative_type IN ('social_post', 'article', 'video', 'email', 'event', 'site_update', 'advertising', 'other')),
+  destination_path TEXT NOT NULL DEFAULT '',
+  objective TEXT NOT NULL DEFAULT '',
+  hypothesis TEXT NOT NULL DEFAULT '',
+  owner TEXT NOT NULL DEFAULT '',
+  primary_owner_id TEXT NOT NULL DEFAULT '',
+  collaborator_ids TEXT NOT NULL DEFAULT '[]',
+  reference_url TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  result_status TEXT NOT NULL DEFAULT 'pending' CHECK (result_status IN ('pending', 'success', 'partial', 'hold', 'improve')),
+  learning TEXT NOT NULL DEFAULT '',
+  next_action TEXT NOT NULL DEFAULT '',
+  review_on TEXT NOT NULL DEFAULT '',
+  created_by TEXT NOT NULL DEFAULT '',
+  updated_by TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_analytics_initiatives_occurred_on ON analytics_initiatives(occurred_on DESC, updated_at DESC);
 
 CREATE TABLE IF NOT EXISTS archive_candidates (
   id TEXT PRIMARY KEY,
@@ -241,6 +268,9 @@ CREATE TABLE IF NOT EXISTS weekly_answer_videos (
   published_at TEXT NOT NULL,
   drive_created_time TEXT NOT NULL DEFAULT '',
   drive_modified_time TEXT NOT NULL DEFAULT '',
+  category TEXT NOT NULL DEFAULT 'その他',
+  parent_folder_id TEXT NOT NULL DEFAULT '',
+  last_seen_scan_id TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('published', 'missing', 'archived')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -285,6 +315,21 @@ CREATE TABLE IF NOT EXISTS customer_auth_rate_limits (
 
 -- Stripe foundation: idempotent event receipt and checkout attempt audit.
 -- Full Stripe event payloads are intentionally not retained to minimize PII.
+CREATE TABLE IF NOT EXISTS subscription_replacements (
+  source_subscription_id TEXT PRIMARY KEY,
+  customer_id TEXT NOT NULL,
+  replacement_subscription_id TEXT NOT NULL,
+  livemode INTEGER NOT NULL CHECK (livemode IN (0, 1)),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed')),
+  attempt_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  completed_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_subscription_replacements_pending
+  ON subscription_replacements(status, livemode, updated_at);
+
 CREATE TABLE IF NOT EXISTS stripe_webhook_events (
   event_id TEXT PRIMARY KEY,
   event_type TEXT NOT NULL,
@@ -361,3 +406,15 @@ CREATE TABLE IF NOT EXISTS waitlist_entries (
   UNIQUE(email, interest)
 );
 CREATE INDEX IF NOT EXISTS idx_waitlist_entries_interest_status ON waitlist_entries(interest, status, created_at);
+
+CREATE TABLE IF NOT EXISTS tayori_waitlist_invitations (
+  id TEXT PRIMARY KEY,
+  waitlist_entry_id TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
+  provider_message_id TEXT,
+  sent_at TEXT,
+  last_error TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (waitlist_entry_id) REFERENCES waitlist_entries(id)
+);

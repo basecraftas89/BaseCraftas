@@ -1,4 +1,5 @@
-import test from "node:test";
+import test, {beforeEach} from "node:test";
+beforeEach(context => context.mock.timers.enable({apis:["Date"],now:new Date("2026-10-08T03:00:00Z")}));
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
@@ -83,6 +84,27 @@ test("有効会員は入会前を含む全資料を新しい順に取得でき�
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.deepEqual(payload.materials.map((item) => item.title), ["最新号", "過去号"]);
+});
+
+test("アクティブな管理者・編集者はTAYORIのメールログイン後に資料へアクセスできる", async () => {
+  const staff = fixture();
+  staff.sql.prepare("INSERT INTO customer_accounts (id, email, status) VALUES ('staff-customer', 'EDITOR@example.com', 'active')").run();
+  staff.sql.prepare("INSERT INTO members (id, email, role, status) VALUES ('staff-editor', 'editor@example.com', 'editor', 'active')").run();
+  staff.sql.prepare("INSERT INTO weekly_materials (id, drive_file_id, title, file_name, web_view_link, published_at) VALUES ('staff-material', 'drive-staff', 'スタッフ確認用', 'staff.pdf', 'https://drive.google.com/file/d/staff/view', '2026-09-11T00:00:00Z')").run();
+
+  const response = await staff.call("/api/weekly/materials", "editor@example.com");
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.membership.has_weekly_access, true);
+  assert.equal(payload.membership.has_curriculum_access, true);
+  assert.equal(payload.membership.staff_access, true);
+  assert.equal(payload.membership.staff_role, "editor");
+  assert.equal(payload.materials[0].title, "スタッフ確認用");
+
+  const viewer = fixture();
+  viewer.sql.prepare("INSERT INTO customer_accounts (id, email, status) VALUES ('viewer-customer', 'viewer@example.com', 'active')").run();
+  viewer.sql.prepare("INSERT INTO members (id, email, role, status) VALUES ('staff-viewer', 'viewer@example.com', 'viewer', 'active')").run();
+  assert.equal((await viewer.call("/api/weekly/materials", "viewer@example.com")).status, 403);
 });
 
 test("解約済みでも支払済み期間中は閲覧でき、資料URLは一覧へ露出しない", async () => {
@@ -301,7 +323,7 @@ test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォ�
     if (url.includes("sheets.googleapis.com") && url.includes("!A5:W5")) return Response.json({ values: [schema.columns.map((column) => column.header)] });
     if (url.includes("sheets.googleapis.com") && url.includes("!A6:W2005")) return Response.json({ values: [sheetRow, untouchedSheetRow] });
     if (url.includes("drive/v3/files/drive-video-12345")) return Response.json({ id: "drive-video-12345", name: "answer.mp4", mimeType: "video/mp4", parents: ["answer-folder"], trashed: false });
-    if (url.includes("drive/v3/files?")) return Response.json({ files: [] });
+    if (url.includes("drive/v3/files?")) return Response.json({ files: [{ id: "drive-video-12345", name: "answer.mp4", mimeType: "video/mp4", createdTime: "2026-09-11T00:00:00Z" }] });
     throw new Error("unexpected fetch: " + url);
   };
   try {
@@ -318,32 +340,118 @@ test("運営列だけをD1へ取り込み、回答動画URLは指定Driveフォ�
   }
 });
 
+test("カテゴリ子フォルダだけを分類同期し、制作中へ移した動画を次回同期で失効する", async () => {
+  const active = fixture();
+  active.seed();
+  active.sql.prepare("INSERT INTO members (id, email, role, status) VALUES ('admin-1', 'admin@example.com', 'admin', 'active')").run();
+  active.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-google-token";
+  active.env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "answer-root";
+  active.env.DRIVE_WEEKLY_DRAFT_FOLDER_ID = "draft-folder";
+  active.env.DRIVE_WEEKLY_FOLDER_ID = "pdf-root";
+  let videoInCategory = true;
+  const requestedFolders = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input) => {
+    const query = new URL(String(input)).searchParams.get("q") || "";
+    const folder = query.match(/^'([^']+)' in parents/)?.[1] || "";
+    requestedFolders.push(folder);
+    if (folder === "answer-root") return Response.json({ files: [
+      { id: "draft-folder", name: "00_制作中・非配信", mimeType: "application/vnd.google-apps.folder" },
+      { id: "ai-folder", name: "01_AI活用", mimeType: "application/vnd.google-apps.folder" },
+      { id: "info-folder", name: "02_情報管理", mimeType: "application/vnd.google-apps.folder" },
+      { id: "root-video-id", name: "従来動画.mp4", mimeType: "video/mp4", createdTime: "2026-09-01T00:00:00Z" },
+    ] });
+    if (folder === "ai-folder") return Response.json({ files: videoInCategory ? [
+      { id: "category-video-id", name: "AI回答.mp4", mimeType: "video/mp4", createdTime: "2026-09-02T00:00:00Z" },
+    ] : [] });
+    if (folder === "info-folder" || folder === "pdf-root") return Response.json({ files: [] });
+    throw new Error("unexpected folder: " + folder);
+  };
+  try {
+    const firstSync = await active.call("/api/weekly/admin/sync", "admin@example.com", { method: "POST", body: {} });
+    assert.equal(firstSync.status, 200, await firstSync.text());
+    assert.deepEqual(requestedFolders.sort(), ["ai-folder", "answer-root", "info-folder", "pdf-root"]);
+    assert.deepEqual(active.sql.prepare("SELECT drive_file_id, category, parent_folder_id, status FROM weekly_answer_videos ORDER BY drive_file_id").all().map((row) => ({ ...row })), [
+      { drive_file_id: "category-video-id", category: "AI活用", parent_folder_id: "ai-folder", status: "published" },
+      { drive_file_id: "root-video-id", category: "その他", parent_folder_id: "answer-root", status: "published" },
+    ]);
+    active.sql.prepare("INSERT INTO weekly_priority_questions (id, customer_id, week_start, situation, goal, attempts, blocker, question, video_consent, status, operations_status, question_group, answer_video_url) VALUES ('q-category', 'customer-1', '2026-09-06', '場面', '目的', '試行', '課題', '質問', 1, 'answered', '回答動画公開済み', '公開：AIの使い方', 'https://drive.google.com/file/d/category-video-id/view')").run();
+    const listed = await (await active.call("/api/weekly/answer-videos")).json();
+    assert.equal(listed.videos.length, 1);
+    assert.equal(listed.videos[0].category, "AI活用");
+    videoInCategory = false;
+    assert.equal((await active.call("/api/weekly/admin/sync", "admin@example.com", { method: "POST", body: {} })).status, 200);
+    assert.equal(active.sql.prepare("SELECT status FROM weekly_answer_videos WHERE drive_file_id = 'category-video-id'").get().status, "missing");
+    assert.deepEqual((await (await active.call("/api/weekly/answer-videos")).json()).videos, []);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("回答動画一覧はWeekly会員だけが取得でき、DriveファイルIDを露出しない", async () => {
   const active = fixture();
   active.seed();
   active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at) VALUES ('video-1', 'private-drive-id', '質問への回答', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z')").run();
+  active.sql.prepare("INSERT INTO weekly_priority_questions (id, customer_id, week_start, situation, goal, attempts, blocker, question, video_consent, status, operations_status, question_group, answer_video_url) VALUES ('approved-question', 'customer-1', '2026-09-06', '場面', '目的', '試行', '課題', '質問', 1, 'answered', '回答動画公開済み', '公開：安全な議事録', 'https://drive.google.com/file/d/private-drive-id/view')").run();
   const response = await active.call("/api/weekly/answer-videos");
   const payload = await response.json();
   assert.equal(response.status, 200);
   assert.equal(payload.videos[0].title, "質問への回答");
   assert.equal("drive_file_id" in payload.videos[0], false);
   assert.equal(payload.playback, "secure_proxy");
-  assert.equal(payload.videos[0].playback_url, "/api/tsuzuri-studio/api/weekly/answer-videos/video-1/stream");
+  assert.equal(payload.videos[0].playback_url, "/api/totonoe-studio/api/weekly/answer-videos/video-1/stream");
 
   const missing = fixture();
   assert.equal((await missing.call("/api/weekly/answer-videos", "")).status, 401);
+});
+
+test("回答動画には公開指定済みの匿名質問テーマだけを紐づける", async () => {
+  const active = fixture();
+  active.seed();
+  active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at) VALUES ('video-1', 'drive-video-12345', '質問への回答', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z')").run();
+  const insert = active.sql.prepare(`INSERT INTO weekly_priority_questions
+    (id, customer_id, week_start, situation, goal, attempts, blocker, question, video_consent, status, operations_status, question_group, answer_video_url)
+    VALUES (?, 'customer-1', ?, '場面', '目的', '試行', '課題', '非公開の質問本文', ?, 'answered', '回答動画公開済み', ?, 'https://drive.google.com/file/d/drive-video-12345/view')`);
+  insert.run('q1', '2026-09-06', 1, '公開：議事録を安全に要約するには？');
+  insert.run('q2', '2026-09-13', 1, '内部管理用テーマ');
+  insert.run('q3', '2026-09-20', 0, '公開：同意のない質問');
+  const payload = await (await active.call('/api/weekly/answer-videos')).json();
+  assert.deepEqual(payload.videos[0].question_topics, ['議事録を安全に要約するには？']);
+  assert.equal(JSON.stringify(payload).includes('非公開の質問本文'), false);
+  assert.equal(JSON.stringify(payload).includes('drive-video-12345'), false);
+});
+
+test("Driveに同期しただけの動画は公開されず、承認取り消しで再生も止まる", async () => {
+  const active = fixture();
+  active.seed();
+  active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at) VALUES ('video-1', 'private-drive-id', '質問への回答', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z')").run();
+  const endpoint = "/api/weekly/answer-videos";
+  const stream = endpoint + "/video-1/stream";
+  assert.deepEqual((await (await active.call(endpoint)).json()).videos, []);
+  assert.equal((await active.call(stream)).status, 404);
+
+  active.sql.prepare("INSERT INTO weekly_priority_questions (id, customer_id, week_start, situation, goal, attempts, blocker, question, video_consent, status, operations_status, question_group, answer_video_url) VALUES ('q1', 'customer-1', '2026-09-06', '場面', '目的', '試行', '課題', '質問', 1, 'answered', '回答動画公開済み', '公開：安全な議事録', 'https://drive.google.com/file/d/private-drive-id/view')").run();
+  assert.equal((await (await active.call(endpoint)).json()).videos.length, 1);
+  active.sql.prepare("UPDATE weekly_priority_questions SET operations_status = '回答準備中' WHERE id = 'q1'").run();
+  assert.deepEqual((await (await active.call(endpoint)).json()).videos, []);
+  assert.equal((await active.call(stream)).status, 404);
 });
 
 test("回答動画は会員確認後にDrive IDを隠したままRange対応でストリーミングされる", async () => {
   const active = fixture();
   active.seed();
   active.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-google-token";
-  active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at) VALUES ('video-1', 'private-drive-id', '質問への回答', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z')").run();
+  active.env.DRIVE_WEEKLY_RESPONSE_FOLDER_ID = "answer-folder";
+  active.sql.prepare("INSERT INTO weekly_answer_videos (id, drive_file_id, title, file_name, mime_type, published_at, parent_folder_id) VALUES ('video-1', 'private-drive-id', '質問への回答', 'answer.mp4', 'video/mp4', '2026-09-11T00:00:00Z', 'answer-folder')").run();
+  active.sql.prepare("INSERT INTO weekly_priority_questions (id, customer_id, week_start, situation, goal, attempts, blocker, question, video_consent, status, operations_status, question_group, answer_video_url) VALUES ('approved-question', 'customer-1', '2026-09-06', '場面', '目的', '試行', '課題', '質問', 1, 'answered', '回答動画公開済み', '公開：安全な議事録', 'https://drive.google.com/file/d/private-drive-id/view')").run();
   const originalFetch = globalThis.fetch;
   let observedUrl = "";
   let observedHeaders;
+  let actualParent = "answer-folder";
   globalThis.fetch = async (input, init = {}) => {
-    observedUrl = String(input);
+    const url = String(input);
+    if (url.includes("fields=id,parents,trashed")) return Response.json({ id: "private-drive-id", parents: [actualParent], trashed: false });
+    observedUrl = url;
     observedHeaders = new Headers(init.headers);
     return new Response(new Uint8Array([1, 2]), {
       status: 206,
@@ -359,6 +467,9 @@ test("回答動画は会員確認後にDrive IDを隠したままRange対応で�
     assert.equal(response.headers.get("cache-control"), "private, no-store");
     assert.equal(response.headers.get("content-range"), "bytes 0-1/2");
     assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2]);
+    assert.equal(active.sql.prepare("SELECT COUNT(*) AS count FROM weekly_answer_video_events").get().count, 1);
+    actualParent = "draft-folder";
+    assert.equal((await active.call("/api/weekly/answer-videos/video-1/stream")).status, 404);
     assert.equal(active.sql.prepare("SELECT COUNT(*) AS count FROM weekly_answer_video_events").get().count, 1);
   } finally {
     globalThis.fetch = originalFetch;
@@ -395,6 +506,11 @@ test("Weekly画面は優先質問を小分けで入力し、会員限定の回�
   assert.match(html, /個別回答ではありません/);
   assert.match(script, /priority-question/);
   assert.match(script, /answer-videos/);
+  assert.match(html, /data-tayori-tab="answers"/);
+  assert.match(html, /data-tayori-view="backnumbers"/);
+  assert.match(html, /totonoe-tayori-benefits-v4\.webp/);
+  assert.match(script, /question_topics/);
+  assert.match(script, /member\?\.staff_access \? "運営メンバー"/);
 });
 
 test("優先質問フォームと管理表の回答列は同じ順序・項目で定義される", () => {
@@ -412,4 +528,30 @@ test("マイページは会員共通ナビとテーマ最適化用プロフィ�
   assert.match(html, /name="ai_usage_level"/);
   assert.match(html, /name="interest_topics"/);
   assert.match(html, /name="current_challenges"/);
+});
+
+
+test("優先質問は全曜日受付・JST日曜始まりの週1枠を維持", async context => {
+  const active=fixture();active.seed();
+  const body={situation:'5人のチームで毎週の申し送りを手作業で要約しています。',goal:'重要事項を落とさず短時間で要約する方法を知りたいです。',attempts:'ChatGPTで要約を試しましたが情報が抜けました。',blocker:'残す情報の指示方法を判断できません。',question:'重要事項を落とさず要約する指示の具体例を教えてください。',privacy_confirmed:true,video_consent:true};
+  let id;
+  for(let day=4;day<=10;day++){
+    context.mock.timers.setTime(new Date(`2026-10-${String(day).padStart(2,'0')}T03:00:00Z`).getTime());
+    const state=await(await active.call('/api/weekly/priority-question')).json();assert.equal(state.submission_open,true);assert.equal(state.week_start,'2026-10-04');
+    const saved=await active.call('/api/weekly/priority-question','weekly@example.com',{method:'POST',body});assert.equal(saved.status,day===4?201:200);const payload=await saved.json();if(!id)id=payload.question.id;assert.equal(payload.question.id,id);
+    assert.equal(active.sql.prepare('SELECT COUNT(*) AS n FROM weekly_priority_questions').get().n,1);
+  }
+  context.mock.timers.setTime(new Date('2026-10-10T14:59:59Z').getTime());assert.equal((await(await active.call('/api/weekly/priority-question')).json()).week_start,'2026-10-04');
+  context.mock.timers.setTime(new Date('2026-10-10T15:00:00Z').getTime());const state=await(await active.call('/api/weekly/priority-question')).json();assert.equal(state.week_start,'2026-10-11');assert.equal(state.available,true);
+  assert.equal((await active.call('/api/weekly/priority-question','weekly@example.com',{method:'POST',body})).status,201);assert.equal(active.sql.prepare('SELECT COUNT(*) AS n FROM weekly_priority_questions').get().n,2);
+});
+
+test("オンボーディングの進行は会員ごとに保存し未認証・無効値を拒否", async () => {
+  const active=fixture();active.seed();active.sql.exec(readFileSync("apps/tsuzuri-studio-api/migrations/20261004_weekly_onboarding.sql","utf8"));
+  assert.equal((await active.call("/api/totonoe-member/api/weekly/onboarding","")).status,401);
+  assert.equal((await (await active.call("/api/weekly/onboarding")).json()).completed,false);
+  const saved=await active.call("/api/totonoe-member/api/weekly/onboarding","weekly@example.com",{method:"PATCH",body:{step:3,completed:true}});assert.equal(saved.status,200);
+  assert.equal((await (await active.call("/api/weekly/onboarding")).json()).completed,true);
+  assert.equal((await active.call("/api/weekly/onboarding","weekly@example.com",{method:"PATCH",body:{step:99,completed:true}})).status,400);
+  const inactive=fixture();assert.equal((await inactive.call("/api/weekly/onboarding")).status,403);
 });

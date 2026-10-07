@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="curriculum.css?v=20260912-entitlements">
+<link rel="stylesheet" href="../TAYORI/onboarding.css?v=20261004d">
 </head>
 <body class="learning-app mypage-app" data-page-entitlement="member">
   <aside class="learning-sidebar">
@@ -31,9 +32,18 @@
       <div><h2 id="memberDisplayName">会員情報を確認中</h2><p id="memberPlanName">ご利用プラン</p></div>
       <div class="mypage-billing-actions">
         <button class="secondary-button" id="manageBillingButton" type="button">支払い・解約を管理</button>
+        <a class="secondary-button" href="../TAYORI/login.html?setup=1&amp;return=%2Fprojects%2Ftotonoe%2FIROHA%2Fmypage.html">パスワードを設定・変更</a>
+        <p>登録メールに届く10分有効の確認コードで本人確認後、新しいパスワードを設定できます。</p>
         <button class="text-button" id="memberLogoutButton" type="button">ログアウト</button>
         <p id="billingActionStatus" role="status" aria-live="polite"></p>
       </div>
+    </section>
+    <section class="member-profile-section" id="onboardingSettings" aria-labelledby="onboardingSettingsTitle">
+      <div class="section-heading"><div><p class="eyebrow">GUIDE</p><h2 id="onboardingSettingsTitle">TAYORIの使い方ガイド</h2></div></div>
+      <label class="onboarding-preference"><input id="onboardingPreference" type="checkbox" disabled><span>次回から使い方ガイドを表示しない</span></label>
+      <p class="onboarding-settings-note">チェックを外すと、TAYORIを開くたびに使い方ガイドを表示します。設定はアカウントに保存されます。</p>
+      <p id="onboardingPreferenceStatus" role="status" aria-live="polite">表示設定を確認しています。</p>
+      <a class="secondary-button" href="../TAYORI/?guide=1">今すぐガイドを見る</a>
     </section>
     <section class="member-profile-section" aria-labelledby="profileTitle">
       <div class="section-heading"><div><p class="eyebrow">PROFILE</p><h2 id="profileTitle">あなたの仕事と学びたいこと</h2><p>テーマリクエストを、実際の仕事に合う内容へ近づけるために使います。</p></div></div>
@@ -67,6 +77,7 @@
     </section>
   </main>
   <script src="member-shell.js?v=20260912-entitlements"></script>
-  <script src="mypage.js?v=20260912-billing"></script>
+  <script src="mypage.js?v=20260930-account"></script>
+<script src="../TAYORI/onboarding-preferences.js?v=20261004d"></script>
 </body>
 </html>

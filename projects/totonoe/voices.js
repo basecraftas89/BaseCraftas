@@ -17,75 +17,75 @@
 
   var CFG = window.WA_CONFIG || {};
   var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var currentDomain = 'care';
-  var currentData = null;
-  var APPLY_LINKS = {
-    care: {
-      url: CFG.APPLY_URL || 'https://therapis10.com/seminars/cmr5gtjs30be14do38qlsolpu',
-      label: '医療・介護向けの朝活に申し込む',
-      note: '医療・介護職向けの申込ページへ移動します。'
-    },
-    occupational: {
-      url: 'https://peatix.com/group/16590893',
-      label: '産業保健向けの朝活に申し込む',
-      note: '産業保健領域向けのPeatixページへ移動します。',
-      empty: '産業保健向けの参加者アンケートは現在準備中です。公開できるデータが整い次第、こちらに反映します。'
-    }
-  };
-
   /* =====================================================
      同梱データ（CSV未設定時に使われます）
      ===================================================== */
   var FALLBACK = {
-    stats: {
-      responses: 124,       // 回答数（第2回〜第14回の累計）
-      satisfaction: 8.4,    // 平均満足度（10点満点／加重平均）
-      nagara: 37.9,         // 「ながら参加」の割合（%／加重平均・概算）
-      sessions: 14          // 開催回数
+  "stats": {
+    "responses": 162,
+    "satisfaction": 8.4,
+    "nagara": 26.5,
+    "sessions": 19
+  },
+  "voices": [
+    {
+      "text": "紹介された動画のクオリティが高くて驚きました",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 10
     },
-    voices: [
-      {
-        text: 'いつもありがとうございます！これまでの朝活習慣にこの勉強会が加わり、有意義な時間を送ることができています。個人的には毎回最低一つは実践することを目標にしています！',
-        age: '40代', gender: '男性', style: '移動しながら参加', score: 10, domain: 'care'
-      },
-      {
-        text: 'Googleワークスペース活用術で、共有をグループ化できるなど、マメ知識的な事がしれてありがたいです。知っていると知らないでは、手間が全然違いますね。',
-        age: '40代', gender: '女性', style: '画面に集中して参加', score: 8, domain: 'care'
-      },
-      {
-        text: '毎週毎週AIの進化を聞いていると、追っかけてないと置いて行かれる感がすごいなと改めて思いました。',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 10, domain: 'care'
-      },
-      {
-        text: 'AIが何ができるかを分からないので、これから学んでいきたいと思います。Google Workspaceというものを使ったことがないので、使ってみたいと思いました。',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 8, domain: 'care'
-      },
-      {
-        text: '音声機能のデモンストレーションが良かったです。実臨床でも試したいですが、対話の中でうっかり口が滑って患者さんやスタッフの名前などをしゃべってしまいそうで怖いですね。',
-        age: '40代', gender: '男性', style: '移動しながら参加', score: 10, domain: 'care'
-      },
-      {
-        text: '個人情報の取り扱いは個々の意識を高めると同時に組織全体でも共有しないといけないと改めて感じました。いつも、多くの学びを提供して頂きありがとうございます！',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 10, domain: 'care'
-      },
-      {
-        text: '皆さんの情報感度の広範さにはいつもたいへん刺激になっています。厚労省の情報セキュリティ研修の事は全く知りませんでした。まずはそこから取り組んでみます！',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 7, domain: 'care'
-      },
-      {
-        text: '音声入力でここまで翻訳できてしまうことは知らなかったので、言語的転換が必要な時に使ってみます！',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 7, domain: 'care'
-      },
-      {
-        text: '有意義な朝活の時間を提供して頂きありがとうございます。AI普及について、管理業務を行っているスタッフの生存価値は常に見出していかないと感じました。',
-        age: '40代', gender: '男性', style: '画面に集中して参加', score: 10, domain: 'care'
-      },
-      {
-        text: 'Googleワークスペース活用法をもっと詳しく聞きたくなりました。勤怠管理やシフト調整などの管理業務が効率よくできたらいいなと思います。',
-        age: '40代', gender: '女性', style: '画面に集中して参加', score: 10, domain: 'care'
-      }
-    ]
-  };
+    {
+      "text": "動画生成に挑戦したい！",
+      "age": "",
+      "gender": "",
+      "style": "家事・育児をしながら参加",
+      "score": 9
+    },
+    {
+      "text": "印象に残ったことは、プレゼンターの印象では無く、動画のキャラクターや声の印象で内容を伝えられるということです。特に第一印象が人に与える影響が大きいとなると、始めにこれらを活用することは、とても有用なのではないか？と思いました。",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 8
+    },
+    {
+      "text": "動画生成はもっと試していきたい。",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 10
+    },
+    {
+      "text": "まだ動画での解説資料は作ったことが無かったので、取り組んでみたいと思いました。",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 7
+    },
+    {
+      "text": "wordやExcelの校正はAIに相談すると、いい感じに修正してくれるのでもう少し使いこなしたいとは思ってます。",
+      "age": "",
+      "gender": "",
+      "style": "移動中や他の作業をしながら参加",
+      "score": 10
+    },
+    {
+      "text": "image2.5の皆様の活用事例を知りたい。",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 9
+    },
+    {
+      "text": "チャットGPT画像生成（普段はGeminiを使うのですが精度比較などしたいと思いました）",
+      "age": "",
+      "gender": "",
+      "style": "画面に集中して参加",
+      "score": 9
+    }
+  ]
+};
 
   /* =====================================================
      CSVパーサ（引用符・カンマ・改行に対応）
@@ -160,11 +160,6 @@
   function renderStats(stats) {
     var sec = document.getElementById('voices');
     var note = document.getElementById('surveyNote');
-    if (currentDomain !== 'care') {
-      if (sec) sec.classList.add('no-domain-data');
-      if (note) note.textContent = (APPLY_LINKS[currentDomain] || APPLY_LINKS.occupational).empty;
-      return;
-    }
     if (sec) sec.classList.remove('no-domain-data');
 
     var map = {
@@ -189,42 +184,7 @@
   var timer = null;
 
   function getDomainVoices(voices) {
-    return (voices || []).filter(function (v) {
-      return !v.domain || v.domain === currentDomain;
-    });
-  }
-
-  function renderDomainCta() {
-    var link = document.getElementById('voiceApplyLink');
-    var note = document.getElementById('voiceCtaNote');
-    var data = APPLY_LINKS[currentDomain] || APPLY_LINKS.care;
-    if (link) {
-      link.href = data.url;
-      link.textContent = data.label;
-    }
-    if (note) note.textContent = data.note;
-  }
-
-  function bindDomainTabs() {
-    var tabs = document.querySelectorAll('[data-voice-domain]');
-    if (!tabs.length) return;
-    Array.prototype.forEach.call(tabs, function (tab) {
-      if (tab.dataset.bound === 'true') return;
-      tab.dataset.bound = 'true';
-      tab.addEventListener('click', function () {
-        currentDomain = tab.dataset.voiceDomain || 'care';
-        Array.prototype.forEach.call(tabs, function (t) {
-          var active = t.dataset.voiceDomain === currentDomain;
-          t.classList.toggle('active', active);
-          t.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        renderDomainCta();
-        if (currentData) {
-          renderStats(currentData.stats || {});
-          renderVoices(currentData.voices || []);
-        }
-      });
-    });
+    return voices || [];
   }
 
   function renderVoices(voices) {
@@ -235,7 +195,7 @@
     voices = getDomainVoices(voices);
 
     if (!voices.length) {
-      var data = APPLY_LINKS[currentDomain] || APPLY_LINKS.occupational;
+      var data = {};
       stop();
       track.innerHTML = '<div class="voice-empty" role="status">' + esc(data.empty || '現在、表示できる参加者の声はありません。') + '</div>';
       slides = [];
@@ -333,10 +293,9 @@
      起動
      ===================================================== */
   function apply(data) {
-    currentData = data;
     renderStats(data.stats || {});
-    bindDomainTabs();
-    renderDomainCta();
+
+
     renderVoices(data.voices || []);
   }
 

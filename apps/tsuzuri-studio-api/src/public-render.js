@@ -1,3 +1,4 @@
+import {applySharedHeader} from '../../../scripts/totonoe-shared-header.mjs';
 import {safeUrl,splitMemberBody} from './security.js';
 function escHtml(value) {
   return String(value || "")
@@ -23,7 +24,23 @@ function externalLinkLabel(type, url) {
   if(type==='video'||host==='youtu.be'||host==='youtube.com'||host.endsWith('.youtube.com'))return '動画を見る';
   return '元コンテンツを見る';
 }
+const characterStickers = {
+  'mion-which-shadow': { key: 'mion', name: 'ミオン', id: '36693609' },
+  'tsugumo-morning-call': { key: 'tsugumo', name: 'ツグモ', id: '36691867' },
+  'hakuto-story-beyond-window': { key: 'hakuto', name: 'ハクト', id: '36691854' },
+  'three-characters-same-gift': { key: 'trio', name: '3人セット', id: '36610674' },
+};
+function characterStickerHtml(article) {
+  if (article.destination !== 'characters' && article.category !== 'character-story') return '';
+  const sticker = characterStickers[article.slug];
+  if (!sticker) return '';
+  return `<aside class="line-sticker-story" aria-label="${sticker.name}のLINEスタンプ">
+    <div class="line-sticker-art"><img src="../assets/characters/stickers/${sticker.key}-main.png" alt="${sticker.name}のLINEスタンプ メインビジュアル" width="240" height="240" loading="lazy" decoding="async"></div>
+    <div class="line-sticker-copy"><p class="eyebrow">LINE STICKERS</p><h2>物語のつづきを、いつもの会話に。</h2><p>${sticker.name}のLINEスタンプで、あなたの気持ちを届けませんか。</p><a class="line-sticker-button" href="https://line.me/S/sticker/${sticker.id}" target="_blank" rel="noopener noreferrer">${sticker.name}のスタンプを購入する ↗</a><p class="line-sticker-note">LINEの販売ページが新しいタブで開きます。</p><a href="../characters/#line-stickers">4種類のスタンプを見る →</a></div>
+  </aside>`;
+}
 export function articleHtml(articleData) {
+  const sticker = characterStickerHtml(articleData);
   const body = splitMemberBody(articleData.body_html);
   const hasMemberSection = Boolean(articleData.has_member_section || body.hasMemberSection);
   const tags = (articleData.tags || []).map((tag) => `<span>${escHtml(tag)}</span>`).join("");
@@ -36,7 +53,7 @@ export function articleHtml(articleData) {
     ? `<p class="content-media-link"><a href="${escHtml(safeUrl(articleData.media_url))}" target="_blank" rel="noopener">${escHtml(linkLabel)} ↗</a></p>`
     : "";
   const section = publicSection(articleData.content_type, articleData.destination);
-  return `<!DOCTYPE html>
+  return applySharedHeader(`<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -54,6 +71,7 @@ export function articleHtml(articleData) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../styles.css?v=20260916-content-hub">
+${sticker ? '<link rel="stylesheet" href="../character-stickers.css?v=20260923b">' : ""}
 <style>
 .column-actor{display:flex;align-items:center;gap:.75rem;margin-top:1.2rem;color:var(--ink-soft);font-size:.9rem}
 .column-actor strong{color:var(--teal-deep)}
@@ -122,6 +140,7 @@ export function articleHtml(articleData) {
       <div class="container column-article-body column-body-inner">
         ${body.publicHtml || (hasMemberSection ? "" : "<p>本文はまだありません。</p>")}
         ${hasMemberSection ? `<section class="member-content-gate" data-member-article-id="${escHtml(articleData.id)}" data-member-revision="${escHtml(articleData.revision)}"><strong>ここから先は会員限定です</strong><span>ToToNoE+の会員としてログインすると、続きからお読みいただけます。</span><button type="button" data-member-unlock>会員限定部分を表示</button><p class="member-content-status" role="status" data-member-status></p></section><div data-member-content hidden></div>` : ""}
+        ${sticker}
         <section class="article-share" aria-labelledby="articleShareTitle"><h2 id="articleShareTitle">この記事を共有する</h2><p>気づきを、必要な人へ届ける。</p><div class="article-share-buttons"><button type="button" data-share="x">X</button><button type="button" data-share="threads">Threads</button><button type="button" data-share="instagram">Instagram</button><button type="button" data-share="copy">リンクをコピー</button></div><p class="member-content-status" role="status" data-share-status></p></section>
         <a class="column-back" href="${section.href}">← ${section.label}一覧へ戻る</a>
       </div>
@@ -155,5 +174,5 @@ export function articleHtml(articleData) {
 <script src="../article-actions.js?v=20260913a"></script>
 </body>
 </html>
-`;
+`);
 }

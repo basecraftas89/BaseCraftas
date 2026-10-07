@@ -250,7 +250,7 @@ PDF・スライドなどのカードには、タグが小さなラベルとし�
 
 ### 動画を追加する（YouTube運用・サムネイル付きカード表示）
 
-動画は **YouTube** で管理し、ToToNoE+ Studio（`/apps/tsuzuri-studio/`）の
+動画は **YouTube** で管理し、ToToNoE+ Studio（`/apps/totonoe-studio/`）の
 「つまみ｜TSUMAMI」→「YouTube動画を追加」から公開します。
 
 1. YouTube動画のURLを貼り付けて「情報を取得」を押す。

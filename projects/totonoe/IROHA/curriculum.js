@@ -55,7 +55,7 @@
   }
 
   function loadState() {
-    const fallback = { plannedDays: [1, 4, 5], weeklyMinutes: 60, dailyMinutes: 20, completedDays: [1, 4], nextWeekPlan: null };
+    const fallback = { plannedDays: [1, 4, 5], weeklyMinutes: 60, dailyMinutes: 20, completedDays: [], nextWeekPlan: null };
     try {
       return { ...fallback, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
     } catch {
@@ -92,6 +92,7 @@
         invalid_image_content: "画像ファイルを確認できませんでした。別の画像を選択してください。",
         image_too_large: "画像は2MB以内にしてください。",
         subscription_already_exists: "このメールアドレスには利用中の契約があります。マイページからご確認ください。",
+        tayori_included_in_iroha: "TAYORIはIROHAに含まれているため、追加契約は不要です。",
         stripe_checkout_not_enabled: "現在は決済機能の最終準備中です。受付開始までしばらくお待ちください。",
       };
       return messages[code] || "処理を完了できませんでした。時間をおいて再度お試しください。";
@@ -110,35 +111,21 @@
     }
 
     function update() {
-      const campaignApplies = Boolean(config.campaign) && billing === config.campaign.plan && audience === config.campaign.audience;
-      const entry = campaignApplies ? config.campaign.entryFee : config.entryFees.first[audience];
-      const recurring = config.plans.curriculum[billing];
-      const audienceLabel = campaignApplies
-        ? "セラピスト初回限定キャンペーン"
-        : (audience === "therapist" ? "セラピスト・初回登録" : "一般・初回登録");
-      const billingLabel = billing === "annual" ? "年額" : "月額";
-      const originalEntry = config.entryFees.first[audience];
-      const discountRate = Math.round((1 - entry / originalEntry) * 100);
-      const entryDiscount = Math.max(0, originalEntry - entry);
-      const campaignPrice = document.querySelector("#campaignPrice");
-      const specialPriceLabel = document.querySelector("#specialPriceLabel");
-      document.querySelector("#priceAudienceLabel").textContent = audienceLabel;
-      document.querySelector("#priceOriginal").textContent = yen.format(originalEntry);
-      document.querySelector("#priceDiscount").textContent = `${discountRate}% OFF`;
-      campaignPrice.hidden = !campaignApplies;
-      specialPriceLabel.hidden = !campaignApplies;
-      document.querySelector("#priceTotal").textContent = yen.format(entry);
+      const recurring = config.plans.curriculum.monthly;
+      document.querySelector("#priceAudienceLabel").textContent = "職種共通プラン";
+      document.querySelector("#priceOriginal").textContent = "0";
+      document.querySelector("#priceDiscount").textContent = "";
+      document.querySelector("#campaignPrice").hidden = true;
+      document.querySelector("#specialPriceLabel").hidden = true;
+      document.querySelector("#priceTotal").textContent = "0";
       document.querySelector("#recurringPrice").textContent = yen.format(recurring);
-      document.querySelector("#recurringUnit").textContent = billing === "annual" ? "円／年（税込）" : "円／月（税込）";
-      document.querySelector("#entryFeeNote").textContent = campaignApplies
-        ? `通常${yen.format(originalEntry)}円から${yen.format(entryDiscount)}円割引`
-        : `${audience === "therapist" ? "資格確認済みセラピスト" : "一般"}の初回入会費`;
-      document.querySelector("#subscriptionStartNote").textContent = `申込日から30日間は${billingLabel}料金0円`;
-      document.querySelector("#priceBreakdown").innerHTML = config.purchaseEnabled
-        ? `<strong>初月のサブスク料金はかかりません。</strong>${campaignApplies ? "資格確認後、" : ""}本日は入会費${yen.format(entry)}円のみお支払いいただき、${billingLabel}${yen.format(recurring)}円は30日後から始まります。`
-        : `<strong>表示中の料金は提供開始時の案です。</strong>${campaignApplies ? "資格確認後、" : ""}提供開始時は入会費${yen.format(entry)}円、${billingLabel}${yen.format(recurring)}円は利用開始30日後から始まる設計です。`;
+      document.querySelector("#recurringUnit").textContent = "円／月（税込）";
+      document.querySelector("#entryFeeNote").textContent = "入会費・再入会費はかかりません";
+      document.querySelector("#subscriptionStartNote").textContent = "初回は30日間無料";
+      document.querySelector("#priceBreakdown").innerHTML = `<strong>月額${yen.format(recurring)}円（税込）のみ。</strong>入会費・再入会費はかかりません。初回の無料期間終了後から月額料金が始まります。`;
       document.querySelectorAll("[data-billing]").forEach((button) => {
-        const active = button.dataset.billing === billing;
+        button.hidden = button.dataset.billing !== "monthly";
+        const active = button.dataset.billing === "monthly";
         button.classList.toggle("is-active", active);
         button.setAttribute("aria-pressed", String(active));
       });
@@ -150,7 +137,7 @@
     }
 
     document.querySelectorAll("[data-billing]").forEach((button) => button.addEventListener("click", () => {
-      billing = button.dataset.billing;
+      billing = "monthly";
       update();
     }));
     document.querySelectorAll("[data-audience]").forEach((button) => button.addEventListener("click", () => {
@@ -187,9 +174,9 @@
     document.querySelector("[data-preview-action]")?.addEventListener("click", () => {
       if (!config.purchaseEnabled) return;
       const type = audience === "therapist" ? "セラピスト" : "一般";
-      const period = billing === "annual" ? "年額29,800円" : "月額2,980円";
+      const period = "月額2,980円";
       const campaignApplies = Boolean(config.campaign) && billing === config.campaign.plan && audience === config.campaign.audience;
-      const campaignText = campaignApplies ? `・セラピスト初回限定 入会金${yen.format(config.campaign.entryFee)}円` : "";
+      const campaignText = "・入会費・再入会費なし";
       document.querySelector("#checkoutSummary").textContent = `${type}・${period}${campaignText}のお申し込みです。`;
       checkoutRequestId = crypto.randomUUID();
       setAuthStep("email");
@@ -240,7 +227,7 @@
           method: "POST",
           body: JSON.stringify({
             request_id: checkoutRequestId,
-            plan_code: billing === "annual" ? "curriculum_annual" : "curriculum_monthly",
+            plan_code: "curriculum_monthly",
             audience_type: audience,
           }),
         });
@@ -270,9 +257,21 @@
     update();
   }
 
-  function setupDashboard() {
+  async function setupDashboard() {
     const weekDays = document.querySelector("#weekDays");
     if (!weekDays) return;
+    if(window.TOTONOE_DELIVERY) {
+      const result=await window.TOTONOE_DELIVERY.ready;
+      if(result?.error) {
+        const message=document.createElement('p');message.textContent='教材と履歴を読み込めませんでした。ログイン状態と通信を確認して再読み込みしてください。';
+        document.querySelector('#irohaCurrentLearningList')?.replaceChildren(message);
+        return;
+      }
+      if(result?.staffAccess) {
+        const link=document.createElement('a');link.href='lesson.html?preview=claude';link.textContent='運営専用：動画・メモの接続確認';link.className='lesson-notes-history-link';
+        document.querySelector('#irohaNotesPanel')?.append(link);
+      }
+    }
 
     const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
     const now = getCurrentDate();
@@ -283,10 +282,256 @@
     nextSunday.setDate(sunday.getDate() + 7);
     const currentWeekKey = formatISODate(sunday);
     const nextWeekKey = formatISODate(nextSunday);
+    const previousSunday = new Date(sunday);
+    previousSunday.setDate(sunday.getDate() - 7);
+    const previousWeekKey = formatISODate(previousSunday);
     const state = loadState();
+
+    const viewMeta = {
+      progress: ["学習管理", "目標・学習計画・振り返りを、無理のないペースで。"],
+      goals: ["目標設定", "今週の小さな一歩と、取り組む理由を決めましょう。"],
+      curriculum: ["カリキュラムを探す", "学びたい分野から講座を選びましょう。"],
+      history: ["学習履歴", "修了バッジとカリキュラムの修了証を確認できます。"],
+      seminars: ["セミナー", "開催情報とIROHA会員向けの参加条件を確認できます。"],
+    };
+    function currentView() {
+      const requested = new URLSearchParams(location.search).get("view") || "curriculum";
+      if (requested === "plan") return "progress";
+      return Object.hasOwn(viewMeta, requested) ? requested : "curriculum";
+    }
+    function renderView() {
+      const view = currentView();
+      const banner = document.querySelector("#irohaWorldBanner");
+      if (banner) banner.src = "../assets/member-banner-" + ({progress:"management",goals:"goals",seminars:"seminars"}[view] || view) + (["goals", "curriculum"].includes(view) ? "-v3.webp" : "-v2.webp");
+      document.querySelector(".iroha-banner-hero")?.setAttribute("data-view", view);
+      document.querySelectorAll("[data-iroha-view]").forEach((section) => { section.hidden = section.dataset.irohaView !== view; });
+      document.querySelectorAll("[data-iroha-view-link]").forEach((link) => {
+        const active = link.dataset.irohaViewLink === view;
+        link.classList.toggle("is-active", active);
+        if (active) link.setAttribute("aria-current", "page"); else link.removeAttribute("aria-current");
+      });
+      document.querySelector("#irohaViewTitle").textContent = viewMeta[view][0];
+      document.title = viewMeta[view][0] + "｜ToToNoE+ IROHA";
+      window.dispatchEvent(new CustomEvent('totonoe:iroha-view', { detail:view }));
+      if (view === "history") renderAchievements();
+      if (view === "seminars") renderSeminars();
+    }
+    function safeSeminarUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value, location.href);
+        return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+      } catch { return ""; }
+    }
+    function safeSeminarImageUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value, new URL("../", location.href));
+        return ["https:", "http:", ...(location.protocol === "file:" ? ["file:"] : [])].includes(url.protocol) ? url.href : "";
+      } catch { return ""; }
+    }
+    let seminarStatusFilter = "all";
+    let seminarTagFilter = "all";
+  function seminarHasEnded(seminar) {
+    const end = String(seminar.time || "").match(/[〜~–-](\d{1,2}:\d{2})/);
+    const clock = end ? end[1].padStart(5, "0") : "23:59";
+    const timestamp = Date.parse(String(seminar.date || "") + "T" + clock + ":00+09:00");
+    return Number.isFinite(timestamp) && timestamp <= Date.now();
+  }
+
+  function safeSeminarUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value, location.href);
+      return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+    } catch { return ""; }
+  }
+
+  function seminarCard(seminar) {
+    const past = seminarHasEnded(seminar);
+    const paid = seminar.price && seminar.price !== "無料";
+    const card = document.createElement("article");
+    card.className = "tayori-seminar-card" + (past ? " is-past" : "");
+    const thumb = safeSeminarUrl(/^https?:\/\//.test(seminar.thumb || "") ? seminar.thumb : "../" + (seminar.thumb || "assets/og-image.jpg"));
+    if (thumb) {
+      const image = document.createElement("img");
+      image.src = thumb;
+      image.alt = "";
+      image.loading = "lazy";
+      image.width = 640;
+      image.height = 360;
+      card.append(image);
+    }
+    const body = document.createElement("div");
+    body.className = "tayori-seminar-card-body";
+    const badge = document.createElement("span");
+    badge.className = "tayori-seminar-badge" + (past ? " is-past" : "");
+    badge.textContent = past ? "開催終了" : "開催予定";
+    const date = document.createElement("p");
+    date.className = "tayori-seminar-date";
+    date.textContent = [seminar.dateLabel || seminar.date, seminar.time].filter(Boolean).join("　");
+    const title = document.createElement("h3");
+    title.textContent = seminar.title || "セミナー";
+    const speaker = document.createElement("p");
+    speaker.className = "tayori-seminar-speaker";
+    const speakerTypeLabel = seminar.speakerType === "team" ? "ToToNoE+運営メンバー" : seminar.speakerType === "external" ? "外部講師" : "";
+    speaker.textContent = "講師：" + (seminar.speakerName || "確認中") + (speakerTypeLabel ? "（" + speakerTypeLabel + "）" : "");
+    const price = document.createElement("p");
+    price.className = "tayori-seminar-price";
+    price.textContent = paid ? "一般参加費：" + seminar.price : "参加費：無料";
+    body.append(badge, date, title, speaker, price);
+    if (paid) {
+      const condition = document.createElement("p");
+      condition.className = "tayori-seminar-condition";
+      condition.textContent = ["team", "external"].includes(seminar.speakerType) ? "IROHA会員：追加料金なし" : "会員向け参加条件を確認中";
+      body.append(condition);
+    }
+    const url = safeSeminarUrl(paid ? seminar.memberRegistrationUrl : seminar.url);
+    if (url) {
+      const link = document.createElement("a");
+      link.className = "secondary-button";
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = paid ? "会員向け申込ページへ" : past ? "開催ページを見る" : "詳細・申込を見る";
+      body.append(link);
+    } else if (paid && !past) {
+      const note = document.createElement("p");
+      note.className = "tayori-seminar-condition";
+      note.textContent = "会員向け申込方法は、運営からご案内します。";
+      body.append(note);
+    }
+    card.append(body);
+    return card;
+  }
+
+  function renderSeminars() {
+    const seminars = Array.isArray(window.TOTONOE_SEMINARS) ? window.TOTONOE_SEMINARS : [];
+    const statusWrap = document.querySelector("#seminarStatusFilters");
+    const tagWrap = document.querySelector("#seminarTagFilters");
+    const tags = [...new Set(seminars.flatMap((seminar) => Array.isArray(seminar.tags) ? seminar.tags : []))].sort((a, b) => String(a).localeCompare(String(b), "ja"));
+    if (seminarTagFilter !== "all" && !tags.includes(seminarTagFilter)) seminarTagFilter = "all";
+    statusWrap.replaceChildren(...[["all", "すべて"], ["upcoming", "開催予定"], ["past", "開催終了"]].map(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.setAttribute("aria-pressed", String(seminarStatusFilter === value));
+      button.addEventListener("click", () => { seminarStatusFilter = value; renderSeminars(); });
+      return button;
+    }));
+    tagWrap.replaceChildren(...[["all", "すべて"], ...tags.map((tag) => [tag, tag])].map(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.setAttribute("aria-pressed", String(seminarTagFilter === value));
+      button.addEventListener("click", () => { seminarTagFilter = value; renderSeminars(); });
+      return button;
+    }));
+    const sorted = seminars.filter((seminar) => {
+      if (seminarStatusFilter === "upcoming" && seminarHasEnded(seminar)) return false;
+      if (seminarStatusFilter === "past" && !seminarHasEnded(seminar)) return false;
+      return seminarTagFilter === "all" || (Array.isArray(seminar.tags) && seminar.tags.includes(seminarTagFilter));
+    }).sort((a, b) => {
+      const pastDifference = Number(seminarHasEnded(a)) - Number(seminarHasEnded(b));
+      return pastDifference || (seminarHasEnded(a) ? String(b.date).localeCompare(String(a.date)) : String(a.date).localeCompare(String(b.date)));
+    });
+    const free = sorted.filter((seminar) => seminar.price === "無料");
+    const paid = sorted.filter((seminar) => seminar.price && seminar.price !== "無料");
+    document.querySelector("#tayoriFreeSeminars")?.replaceChildren(...free.map(seminarCard));
+    document.querySelector("#tayoriPaidSeminars")?.replaceChildren(...paid.map(seminarCard));
+    const filtered = seminarStatusFilter !== "all" || seminarTagFilter !== "all";
+    const freeEmpty = document.querySelector("#tayoriFreeEmpty");
+    const paidEmpty = document.querySelector("#tayoriPaidEmpty");
+    freeEmpty.hidden = free.length > 0;
+    paidEmpty.hidden = paid.length > 0;
+    freeEmpty.textContent = filtered ? "この条件に合う無料セミナーはありません。" : "現在ご案内できる無料セミナーはありません。";
+    paidEmpty.textContent = filtered ? "この条件に合う有料セミナーはありません。" : "現在ご案内できる有料セミナーはありません。公開され次第、参加条件とともにここへ掲載します。";
+  }
+
+    window.addEventListener("totonoe:seminars-updated", () => {
+      if (currentView() === "seminars") renderSeminars();
+    });
+    function renderAchievements() {
+      const store = window.TOTONOE_CURRICULUM_STORE;
+      if (!store) return;
+      const learner = store.readLearnerState();
+      const admin = store.readAdminState();
+      const model = store.buildAchievementModel(admin, learner);
+      if (JSON.stringify(learner.certificates || {}) !== JSON.stringify(model.certificateState)) {
+        learner.certificates = model.certificateState;
+        store.writeLearnerState(learner);
+      }
+      const dateLabel = (value) => value && !Number.isNaN(Date.parse(value)) ? new Date(value).toLocaleDateString("ja-JP") : "記録日未設定";
+      const badgeArtwork = (categoryId) => {
+        const visual = store.badgeVisualForCategory(categoryId);
+        const emblem = document.createElement("span");
+        emblem.className = "iroha-badge-emblem";
+        emblem.dataset.category = visual.categoryId;
+        const artwork = document.createElement("img");
+        artwork.className = "iroha-badge-artwork";
+        artwork.src = visual.artwork;
+        artwork.alt = "";
+        artwork.width = 512;
+        artwork.height = 512;
+        artwork.loading = "lazy";
+        emblem.append(artwork);
+        return emblem;
+      };
+      const appendBadge = (root, categoryId, heading, detail, { status = "", isCertificate = false } = {}) => {
+        const card = document.createElement("article");
+        card.className = `iroha-badge-card${status ? ` is-${status}` : ""}${isCertificate ? " is-certificate" : ""}`;
+        const title = document.createElement("strong");
+        title.textContent = heading;
+        const meta = document.createElement("small");
+        meta.textContent = detail;
+        card.append(badgeArtwork(categoryId));
+        if (status) {
+          const state = document.createElement("span");
+          state.className = "iroha-badge-state";
+          const icon = document.createElement("span");
+          icon.className = "material-symbols-rounded";
+          icon.setAttribute("aria-hidden", "true");
+          icon.textContent = status === "earned" ? "check_circle" : "lock";
+          state.append(icon, document.createTextNode(status === "earned" ? "取得済み" : status === "locked" ? "未取得" : "教材準備中"));
+          card.append(state);
+        }
+        card.append(title, meta);
+        root.append(card);
+      };
+      const badgeRoot = document.querySelector("#irohaBadgeList");
+      const collectionRoot = document.querySelector("#irohaBadgeCollectionList");
+      const certificateRoot = document.querySelector("#irohaCertificateList");
+      badgeRoot.replaceChildren();
+      collectionRoot.replaceChildren();
+      certificateRoot.replaceChildren();
+      store.categories.forEach((category) => {
+        const completedCount = model.badges.filter((badge) => badge.categoryId === category.id).length;
+        const hasPublishedLesson = admin.lessons.some((lesson) => store.isPublishedLesson(lesson) && store.lessonCategoryId(lesson) === category.id);
+        const status = completedCount ? "earned" : hasPublishedLesson ? "locked" : "unavailable";
+        const detail = completedCount ? `${completedCount}件のレッスンを修了` : hasPublishedLesson ? "公開レッスンの修了で解放" : "公開教材の準備中";
+        appendBadge(collectionRoot, category.id, category.label, detail, { status });
+      });
+      model.badges.forEach((item) => appendBadge(badgeRoot, item.categoryId, item.title, `${item.tool} ・ ${dateLabel(item.completedAt)} 修了`));
+      model.certificates.forEach((item) => appendBadge(certificateRoot, item.key.split(":")[0], `${item.title || item.tool} カリキュラム修了証`, `${dateLabel(item.issuedAt)} 取得 ・ プレビュー`, { isCertificate: true }));
+      document.querySelector("#irohaBadgeCount").textContent = String(model.badges.length);
+      document.querySelector("#irohaCertificateCount").textContent = String(model.certificates.length);
+      document.querySelector("#irohaBadgeEmpty").hidden = model.badges.length > 0;
+      document.querySelector("#irohaCertificateEmpty").hidden = model.certificates.length > 0;
+    }
+    document.querySelectorAll("[data-iroha-view-link]").forEach((link) => link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      event.preventDefault();
+      const url = new URL(link.href);
+      if (url.search !== location.search) history.pushState({}, "", url);
+      renderView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }));
+    window.addEventListener("popstate", renderView);
+    renderView();
 
     state.studySessions = Array.isArray(state.studySessions) ? state.studySessions : [];
     state.learningLogs = Array.isArray(state.learningLogs) ? state.learningLogs : [];
+    state.learningGoals = state.learningGoals && typeof state.learningGoals === "object" ? state.learningGoals : {};
     state.weeklyReviews = state.weeklyReviews && typeof state.weeklyReviews === "object" ? state.weeklyReviews : {};
     state.weeklyReflections = state.weeklyReflections && typeof state.weeklyReflections === "object" ? state.weeklyReflections : {};
 
@@ -424,7 +669,40 @@
       }
       const actualSummary = document.querySelector("#reviewActualSummary");
       if (actualSummary) actualSummary.textContent = "今週の学習実績：" + formatDuration(completed) + "（目標 " + formatDuration(goal) + "）";
+      const sessions = document.querySelector("#irohaStudySessions");
+      sessions.replaceChildren(...state.studySessions.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).map((session) => {
+        const item = document.createElement("li");
+        const date = document.createElement("time");
+        date.dateTime = session.date;
+        date.textContent = session.date;
+        const duration = document.createElement("strong");
+        duration.textContent = formatDuration(session.minutes);
+        item.append(date, duration);
+        return item;
+      }));
+      document.querySelector("#irohaStudySessionsEmpty").hidden = state.studySessions.length > 0;
     }
+
+    function renderGoalSummary() {
+      const currentGoal = state.learningGoals[currentWeekKey]?.goal || state.weeklyReviews[previousWeekKey]?.nextGoal;
+      const nextGoal = state.weeklyReviews[currentWeekKey]?.nextGoal;
+      document.querySelector("#irohaGoalSummary").textContent = currentGoal
+        ? "今週の目標：" + currentGoal + (nextGoal ? "／次週の目標：" + nextGoal : "")
+        : nextGoal ? "次週の目標：" + nextGoal : "まだ目標は設定されていません。下の欄から今週の目標を決めましょう。";
+      document.querySelector("#irohaTimeGoalSummary").textContent = "今週は合計" + formatDuration(state.weeklyMinutes || 60) + "を、" + state.plannedDays.map((day) => weekdays[day] + "曜日").join("・") + "に予定しています。";
+    }
+    const goalForm = document.querySelector("#irohaGoalForm");
+    goalForm.elements.goal.value = state.learningGoals[currentWeekKey]?.goal || state.weeklyReviews[previousWeekKey]?.nextGoal || "";
+    goalForm.elements.reason.value = state.learningGoals[currentWeekKey]?.reason || state.weeklyReviews[previousWeekKey]?.desiredOutcome || "";
+    goalForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const goal = goalForm.elements.goal.value.trim();
+      if (!goal) return goalForm.elements.goal.reportValidity();
+      state.learningGoals[currentWeekKey] = { goal, reason: goalForm.elements.reason.value.trim(), updatedAt: new Date().toISOString() };
+      saveState(state);
+      renderGoalSummary();
+      showToast("今週の目標を保存しました");
+    });
 
     const scheduleDialog = document.querySelector("#scheduleDialog");
     const scheduleForm = document.querySelector("#scheduleForm");
@@ -597,8 +875,8 @@
       if (!nextWeekStatus) return;
       if (!hasNextWeekPlan()) {
         nextWeekStatus.textContent = now.getDay() === 6
-          ? "振り返りのあと、今日中に次週の予定を決めましょう。"
-          : "次週の予定は、土曜日の振り返り後に決めます。";
+          ? "振り返りや次週の予定は、無理のないタイミングで。"
+          : "次週の予定は、都合に合わせて準備できます。";
         return;
       }
       const plan = state.nextWeekPlan;
@@ -647,7 +925,7 @@
       showScheduleStage(Number(button.dataset.scheduleBack));
     }));
     document.querySelector("[data-evenly-distribute]")?.addEventListener("click", () => renderAllocationFields(true));
-    document.querySelector("[data-edit-schedule]")?.addEventListener("click", () => openSchedule("current"));
+    document.querySelectorAll("[data-edit-schedule]").forEach((button) => button.addEventListener("click", () => openSchedule("current")));
     document.querySelector("[data-plan-next-week]")?.addEventListener("click", () => openSchedule("next"));
     scheduleDialog?.addEventListener("cancel", (event) => {
       if (scheduleDialog.dataset.required === "true") event.preventDefault();
@@ -690,6 +968,7 @@
       saveState(state);
       renderWeek();
       renderProgress();
+      renderGoalSummary();
       updateNextWeekStatus();
       scheduleError.textContent = "";
       showToast(scheduleMode === "next" ? "次の週の予定を保存しました" : "今週の予定を保存しました");
@@ -789,7 +1068,7 @@
     }
 
     weeklyReviewForm.elements.confidence?.addEventListener("input", updateConfidence);
-    document.querySelector("[data-open-review]")?.addEventListener("click", () => openWeeklyReview(false));
+    document.querySelectorAll("[data-open-review]").forEach((button) => button.addEventListener("click", () => openWeeklyReview(false)));
     weeklyReviewDialog?.addEventListener("cancel", (event) => {
       if (weeklyReviewDialog.dataset.required === "true") event.preventDefault();
     });
@@ -825,11 +1104,12 @@
       };
       weeklyReviewDialog.dataset.required = "false";
       saveState(state);
+      renderGoalSummary();
       weeklyReviewError.textContent = "";
       showToast("振り返りと次週の目標を保存しました");
       if (reviewRequired && !hasNextWeekPlan()) {
         reviewRequired = false;
-        window.setTimeout(() => openSchedule("next", true), 0);
+        window.setTimeout(() => openSchedule("next", false), 0);
       }
     });
 
@@ -840,28 +1120,230 @@
       showToast("未完了の予定を来週へ移す準備をしました");
     });
 
+    function renderCurriculumChoice() {
+      const store = window.TOTONOE_CURRICULUM_STORE;
+      const available = store.sortLessons((store.readAdminState().lessons || []).filter(store.isPublishedLesson));
+      const progress = store?.readLearnerState().lessonProgress || {};
+      const completed = (item) => store.isCompletedLessonProgress(progress[item.id]);
+      const allCourses = new Map();
+      available.forEach((item) => {
+        const key = store.lessonCurriculumKey(item);
+        if (!allCourses.has(key)) allCourses.set(key, []);
+        allCourses.get(key).push(item);
+      });
+      const continuing = [...allCourses.entries()].map(([key, items]) => {
+        const done = items.filter(completed).length;
+        const touched = items.some((item) => ["started", "in_progress"].includes(progress[item.id]?.status));
+        const latest = items.reduce((value, item) => Math.max(value, Date.parse(progress[item.id]?.completedAt || progress[item.id]?.startedAt || "") || 0), 0);
+        return { key, items, done, latest, touched };
+      }).filter((course) => (course.done > 0 || course.touched) && course.done < course.items.length)
+        .sort((a, b) => b.latest - a.latest || Number(b.key === state.selectedCurriculumKey) - Number(a.key === state.selectedCurriculumKey));
+      const selectedCourse = allCourses.get(state.selectedCurriculumKey);
+      const currentCourses = [...continuing];
+      if (selectedCourse && selectedCourse.some((item) => !completed(item)) && !currentCourses.some((course) => course.key === state.selectedCurriculumKey)) {
+        currentCourses.push({ key: state.selectedCurriculumKey, items: selectedCourse, done: selectedCourse.filter(completed).length });
+      }
+      const currentRoot = document.querySelector("#irohaCurrentLearningList");
+      currentRoot.replaceChildren();
+      if (!currentCourses.length) {
+        const empty = document.createElement("p");
+        empty.className = "iroha-current-empty";
+        empty.textContent = "学習中の講座はまだありません。分野一覧から講座を探せます。";
+        currentRoot.append(empty);
+      }
+      currentCourses.forEach((course, index) => {
+        const next = course.items.find((item) => !completed(item));
+        const categoryName = store.categories.find((item) => item.id === store.lessonCategoryId(course.items[0]))?.label || "カリキュラム";
+        const card = document.createElement("article");
+        card.className = `iroha-current-card${index === 0 ? " is-primary" : ""}`;
+        const label = document.createElement("span");
+        label.className = "status-label";
+        label.textContent = course.done || course.touched ? "学習中" : "選択中";
+        const title = document.createElement("h3");
+        title.textContent = store.lessonCurriculumTitle(course.items[0]);
+        const categoryText = document.createElement("p");
+        categoryText.textContent = categoryName;
+        const nextText = document.createElement("p");
+        nextText.className = "iroha-current-next";
+        nextText.textContent = `次のレッスン：${next.title}`;
+        const track = document.createElement("div");
+        track.className = "course-progress";
+        track.setAttribute("role", "progressbar");
+        track.setAttribute("aria-label", `${title.textContent}の進捗`);
+        track.setAttribute("aria-valuemin", "0");
+        track.setAttribute("aria-valuemax", String(course.items.length));
+        track.setAttribute("aria-valuenow", String(course.done));
+        const fill = document.createElement("span");
+        fill.style.width = `${Math.round(course.done / course.items.length * 100)}%`;
+        track.append(fill);
+        const count = document.createElement("p");
+        count.className = "progress-copy";
+        count.textContent = `${course.done} / ${course.items.length}レッスン完了`;
+        const link = document.createElement("a");
+        link.className = "primary-button";
+        link.href = `lesson.html?id=${encodeURIComponent(next.id)}`;
+        link.textContent = course.done || course.touched ? "続きから学ぶ" : "最初のレッスンへ";
+        card.append(label, title, categoryText, nextText, track, count, link);
+        currentRoot.append(card);
+      });
+      const selectedCategory = store.categories.some((item) => item.id === state.selectedCategory)
+        ? state.selectedCategory : state.selectedTool ? store.lessonCategoryId({ tool: state.selectedTool })
+          : currentCourses.length ? store.lessonCategoryId(currentCourses[0].items[0]) : "";
+      const category = store.categories.find((item) => item.id === selectedCategory);
+      const courses = new Map();
+      available.filter((item) => store.lessonCategoryId(item) === selectedCategory).forEach((item) => {
+        const key = store.lessonCurriculumKey(item);
+        if (!courses.has(key)) courses.set(key, []);
+        courses.get(key).push(item);
+      });
+      const legacyKey = state.selectedTool ? `${selectedCategory}:${state.selectedTool}` : "";
+      const selectedKey = courses.has(state.selectedCurriculumKey) ? state.selectedCurriculumKey : courses.has(legacyKey) ? legacyKey
+        : continuing.find((course) => courses.has(course.key))?.key || "";
+      const selectedLessons = courses.get(selectedKey) || [];
+      const nextLesson = selectedLessons.find((item) => !completed(item));
+      const startButton = document.querySelector("[data-start-lesson]");
+      const groupsRoot = document.querySelector("#irohaLessonGroups");
+      const categoryRoot = document.querySelector("#irohaCategoryList");
+      const courseRoot = document.querySelector("#irohaCurriculumList");
+      groupsRoot.replaceChildren();
+      categoryRoot.replaceChildren();
+      courseRoot.replaceChildren();
+
+      store.categories.forEach((item) => {
+        const lessons = available.filter((lesson) => store.lessonCategoryId(lesson) === item.id);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "curriculum-category";
+        button.dataset.category = item.id;
+        button.setAttribute("aria-pressed", String(item.id === selectedCategory));
+        button.setAttribute("aria-controls", "irohaCurriculumList");
+        button.setAttribute("aria-label", `${item.label}。${item.description}。${lessons.length ? `${new Set(lessons.map(store.lessonCurriculumKey)).size}講座` : "準備中"}`);
+        const image = document.createElement("img");
+        image.className = "curriculum-category-image";
+        image.src = `assets/category-${item.id}.webp`;
+        image.alt = "";
+        image.width = 640;
+        image.height = 427;
+        image.loading = "lazy";
+        image.decoding = "async";
+        const title = document.createElement("strong");
+        title.textContent = item.label;
+        button.append(image, title);
+        categoryRoot.append(button);
+      });
+      document.querySelector("#irohaCurriculumListTitle").textContent = category ? `${category.label}のカリキュラム` : "分野を選んでください";
+      document.querySelector("#irohaCategoryStatus").textContent = !category
+        ? "公開中のカリキュラムを表示します。" : courses.size ? `${courses.size}講座を公開中です。` : "公開中のカリキュラムは準備中です。";
+      [...courses.entries()].sort(([aKey, aItems], [bKey, bItems]) => {
+        const aPartial = aItems.some(completed) && aItems.some((item) => !completed(item));
+        const bPartial = bItems.some(completed) && bItems.some((item) => !completed(item));
+        return Number(bPartial) - Number(aPartial) || String(aKey).localeCompare(String(bKey), "ja");
+      }).forEach(([key, items]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "curriculum-course";
+        button.dataset.curriculumKey = key;
+        button.setAttribute("aria-pressed", String(key === selectedKey));
+        button.setAttribute("aria-controls", "irohaToolDetail");
+        const title = document.createElement("strong");
+        title.textContent = store.lessonCurriculumTitle(items[0]);
+        const tool = document.createElement("small");
+        tool.textContent = items[0].tool && items[0].tool !== title.textContent ? `使用ツール：${items[0].tool}` : category.label;
+        const summary = document.createElement("span");
+        summary.textContent = `${items.filter(completed).length} / ${items.length}レッスン完了`;
+        button.append(title, tool, summary);
+        courseRoot.append(button);
+      });
+
+      document.querySelector("#irohaToolDetail").hidden = !selectedLessons.length;
+      document.querySelector("#irohaToolDetailTitle").textContent = selectedLessons.length ? store.lessonCurriculumTitle(selectedLessons[0]) : "カリキュラムを選んでください";
+      document.querySelector("#irohaCurriculumChoice").textContent = selectedLessons.length
+        ? `${selectedLessons.filter(completed).length} / ${selectedLessons.length}レッスン完了 ・ 約${selectedLessons.reduce((sum, item) => sum + (Number(item.estimatedMinutes) || 0), 0)}分`
+        : "レッスンと進捗をここに表示します。";
+      document.querySelector("#irohaLessonStatus").textContent = nextLesson
+        ? `次に学ぶ：${nextLesson.title}`
+        : selectedLessons.length ? "公開中のレッスンはすべて完了しました。" : "分野とカリキュラムを選ぶと、レッスンを確認できます。";
+      startButton.hidden = !nextLesson;
+      startButton.textContent = nextLesson && selectedLessons.some(completed) ? "続きから学ぶ" : "最初のレッスンへ";
+
+      const groups = new Map();
+      selectedLessons.forEach((item) => {
+        const label = [item.level, item.module].filter(Boolean).join("｜") || "レッスン";
+        if (!groups.has(label)) groups.set(label, []);
+        groups.get(label).push(item);
+      });
+      groups.forEach((items, label) => {
+        const section = document.createElement("section");
+        section.className = "iroha-lesson-group";
+        const heading = document.createElement("h4");
+        heading.textContent = label;
+        const list = document.createElement("ol");
+        items.forEach((item) => {
+          const row = document.createElement("li");
+          const unlocked = store.lessonUnlockState(selectedLessons, item.id, progress).allowed;
+          const content = document.createElement(unlocked ? "a" : "span");
+          if (unlocked) content.href = `lesson.html?id=${encodeURIComponent(item.id)}`;
+          else content.className = "iroha-lesson-locked";
+          const number = document.createElement("b");
+          number.className = "lesson-order";
+          number.textContent = String(store.lessonVideoOrder(item) ?? selectedLessons.indexOf(item) + 1).padStart(2, "0");
+          const title = document.createElement("strong");
+          title.textContent = item.title;
+          const detail = document.createElement("span");
+          detail.textContent = `約${Number(item.estimatedMinutes) || 0}分 ・ ${completed(item) ? "完了" : unlocked ? "次に学ぶ" : "前のレッスンのアウトプット後に開放"}`;
+          content.append(number, title, detail);
+          row.append(content);
+          list.append(row);
+        });
+        section.append(heading, list);
+        groupsRoot.append(section);
+      });
+      return nextLesson;
+    }
     document.querySelector("[data-start-lesson]")?.addEventListener("click", () => {
-      const contentState = window.TOTONOE_CURRICULUM_STORE?.readAdminState();
-      const nextLesson = contentState?.lessons?.find((lesson) => lesson.workflowStatus === "published" && lesson.providerAssetId)
-        || contentState?.lessons?.[0];
-      window.location.href = nextLesson ? `lesson.html?id=${encodeURIComponent(nextLesson.id)}` : "lesson.html";
+      const lesson = renderCurriculumChoice();
+      if (lesson) window.location.href = `lesson.html?id=${encodeURIComponent(lesson.id)}`;
     });
 
-    document.querySelector("[data-open-history]")?.addEventListener("click", () => document.querySelector("#historyDialog")?.showModal());
-    document.querySelectorAll("[data-tool]").forEach((button) => button.addEventListener("click", () => {
-      document.querySelectorAll("[data-tool]").forEach((item) => item.classList.toggle("is-selected", item === button));
-      showToast(`${button.dataset.tool}のカリキュラムを選択しました`);
+    document.querySelectorAll("[data-open-history]").forEach((button) => button.addEventListener("click", () => {
+      const entries = document.querySelector("#historyEntries");
+      entries.replaceChildren();
+      state.learningLogs.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).forEach((log) => {
+        const item = document.createElement("li");
+        const title = document.createElement("strong");
+        title.textContent = "学習時間：" + formatDuration(log.minutes);
+        const date = document.createElement("span");
+        date.textContent = log.date || "日付未設定";
+        item.append(title, date);
+        entries.append(item);
+      });
+      document.querySelector("#historyEntriesEmpty").hidden = state.learningLogs.length > 0;
+      document.querySelector("#historyDialog")?.showModal();
     }));
+    document.querySelector("#irohaCategoryList")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      state.selectedCategory = button.dataset.category;
+      state.selectedCurriculumKey = "";
+      state.selectedTool = "";
+      saveState(state);
+      renderCurriculumChoice();
+      document.querySelector("#irohaCurriculumListTitle")?.focus();
+    });
+    document.querySelector("#irohaCurriculumList")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-curriculum-key]");
+      if (!button) return;
+      state.selectedCurriculumKey = button.dataset.curriculumKey;
+      saveState(state);
+      renderCurriculumChoice();
+      document.querySelector("#irohaToolDetail")?.focus();
+    });
 
     renderWeek();
     renderProgress();
+    renderGoalSummary();
+    renderCurriculumChoice();
     updateNextWeekStatus();
-    if (now.getDay() === 6 && !hasNextWeekPlan()) {
-      window.setTimeout(() => {
-        if (hasCurrentReview()) openSchedule("next", true);
-        else openWeeklyReview(true);
-      }, 0);
-    }
   }
 
   setupPricing();

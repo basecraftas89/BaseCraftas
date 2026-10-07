@@ -1,0 +1,19 @@
+{
+  "seminars": {
+    "https://therapis10.com/seminars/cmukhpr6p2bc35wwk0wjp50g9": "assets/home-banner-codex-20261019-v1.webp"
+  },
+  "services": [
+    {
+      "title": "たより｜TAYORI：必要なAI情報を、仕事の一歩へ。",
+      "href": "tayori.html",
+      "image": "assets/home-banner-tayori-v1.webp",
+      "published": true
+    },
+    {
+      "title": "いろは｜IROHA：基礎から学び、自分らしく活かす力へ（一般提供準備中）",
+      "href": "IROHA/index.html",
+      "image": "assets/home-banner-iroha-v1.webp",
+      "published": true
+    }
+  ]
+}

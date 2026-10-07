@@ -6,13 +6,11 @@ window.TOTONOE_CURRICULUM = Object.freeze({
     weekly: Object.freeze({ monthly: 980 }),
     curriculum: Object.freeze({
       monthly: 2980,
-      annual: 29800,
-      annualSavingsMonths: 2,
     }),
   }),
   entryFees: Object.freeze({
-    first: 9800,
-    rejoin: 4800,
+    first: 0,
+    rejoin: 0,
   }),
   campaign: null,
   apiBase: "/api/totonoe-member",

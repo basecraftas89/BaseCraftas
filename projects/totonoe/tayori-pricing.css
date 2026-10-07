@@ -1,4 +1,61 @@
-/* TAYORI LP: pricing and pre-launch state only. */
+/* TAYORI LP only: narrative, pricing and pre-launch state. */
+.tayori-trial-caption{font-size:.76rem;line-height:1.8;color:var(--ink-soft);margin:14px 0 10px}
+.tayori-member-link{font-size:.8rem;color:var(--teal-deep);text-underline-offset:4px}
+.tayori-problems{background:#f4f8f4}
+.tayori-problem-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:30px}
+.tayori-problem-banner{display:block;min-width:0;overflow:hidden;border:1px solid #d7e1d6;border-radius:20px;background:#fff;box-shadow:0 12px 30px rgba(24,64,45,.11);transition:transform .2s ease,box-shadow .2s ease}
+.tayori-problem-banner:hover{transform:translateY(-3px);box-shadow:0 17px 34px rgba(24,64,45,.18)}
+.tayori-problem-banner:focus-visible{outline:3px solid #b95732;outline-offset:4px}
+.tayori-problem-banner img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover}
+.tayori-one-step-banner{display:block;margin:30px 0 0;overflow:hidden;border:1px solid #d9e5d9;border-radius:22px;background:#e9f0e7;box-shadow:0 12px 30px rgba(24,64,45,.11);transition:transform .2s ease,box-shadow .2s ease}
+.tayori-one-step-banner:hover{transform:translateY(-3px);box-shadow:0 17px 34px rgba(24,64,45,.18)}
+.tayori-one-step-banner:focus-visible{outline:3px solid #b95732;outline-offset:4px}
+.tayori-one-step-banner picture,.tayori-one-step-banner img{display:block;width:100%;height:auto}
+.weekly-simple .final-cta>.container>p{color:inherit;line-height:1.8;margin:16px auto 24px}
+
+/* Public, non-interactive illustrations of the member experience. */
+.tayori-experience{background:#f5f8f4;scroll-margin-top:90px}
+.tayori-experience-lead{max-width:760px;margin:0 0 12px;color:var(--ink);font-size:1rem;line-height:1.9}
+.tayori-experience-disclaimer{max-width:850px;margin:0 0 26px;color:var(--ink-soft);font-size:.78rem;line-height:1.75}
+.tayori-experience-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.tayori-experience-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #d8e4dc;border-radius:18px;background:#fff;box-shadow:0 10px 26px rgba(24,64,45,.05)}
+.tayori-experience-frame{display:flex;flex-direction:column;flex:0 0 282px;height:282px;box-sizing:border-box;margin:13px 13px 0;overflow:hidden;border:1px solid #d7e2d9;border-radius:12px;background:#f7faf8}
+.tayori-experience-frame-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:#173e30;color:#fff;font-size:.68rem}
+.tayori-experience-mark{font-family:Montserrat,'Noto Sans JP',sans-serif;font-weight:700;white-space:nowrap}
+.tayori-experience-mark b{margin-left:5px;color:#e8bd95;font-size:.6rem;letter-spacing:.08em}
+.tayori-experience-frame-tag{padding:3px 7px;border:1px solid rgba(255,255,255,.44);border-radius:99px;white-space:nowrap;font-size:.57rem}
+.tayori-experience-frame-body{display:flex;flex-direction:column;flex:1;min-height:0;padding:13px}
+.tayori-experience-mini-heading{display:grid;gap:3px;margin:0 0 11px;color:#163d2f;line-height:1.4}
+.tayori-experience-mini-heading small{font:700 .57rem/1.2 Montserrat,sans-serif;letter-spacing:.1em;color:#8c6c54}
+.tayori-experience-mini-heading strong{font-size:.88rem}
+.tayori-experience-paper{position:relative;overflow:hidden;height:130px;border-radius:8px;background:#e2e9e3}
+.tayori-experience-paper img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 45%}
+.tayori-experience-paper span{position:absolute;right:7px;bottom:7px;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.95);color:#254533;font-size:.56rem;font-weight:700}
+.tayori-experience-mini-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tayori-experience-mini-actions span{display:inline-block;padding:7px 10px;border-radius:6px;background:#205641;color:#fff;font-size:.62rem;font-weight:700;line-height:1.25}
+.tayori-experience-mini-actions span+span{border:1px solid #c6d9cd;background:#fff;color:#205641}
+.tayori-experience-question{display:grid;gap:10px;min-height:125px;box-sizing:border-box;padding:14px;border:1px solid #d7e7dc;border-radius:9px;background:#fff}
+.tayori-experience-question>span{justify-self:start;padding:4px 7px;border-radius:99px;background:#e5efe7;color:#215440;font-size:.58rem;font-weight:700}
+.tayori-experience-question strong{color:#153c2f;font-size:.82rem}
+.tayori-experience-question p{margin:0;color:#587165;font-size:.66rem;line-height:1.65}
+.tayori-experience-video{position:relative;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:130px;box-sizing:border-box;padding:16px 46px 16px 14px;border-radius:9px;background:linear-gradient(135deg,#153e31,#2d6850);color:#fff}
+.tayori-experience-video small{color:#d1e6d6;font-size:.59rem}
+.tayori-experience-video strong{font-size:.78rem;line-height:1.55}
+.tayori-experience-play{position:absolute;right:11px;top:50%;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;color:#1c503a;font-size:.7rem;transform:translateY(-50%)}
+.tayori-experience-video-caption{margin-top:10px;color:#587165;font-size:.65rem;line-height:1.5}
+.tayori-experience-copy{flex:1;padding:18px 19px 22px}
+.tayori-experience-number{color:#a16647;font:700 .68rem/1 Montserrat,sans-serif;letter-spacing:.08em}
+.tayori-experience-copy h3{margin:9px 0 7px;color:#183f31;font-size:1rem;line-height:1.5}
+.tayori-experience-copy p{margin:0;color:var(--ink-soft);font-size:.79rem;line-height:1.75}
+.tayori-experience-image-link{display:block;width:min(100%,980px);margin:26px auto 0;overflow:hidden;border-radius:20px;box-shadow:0 12px 30px rgba(24,64,45,.14);transition:transform .2s ease,box-shadow .2s ease}
+.tayori-experience-image-link:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(24,64,45,.2)}
+.tayori-experience-image-link:focus-visible{outline:3px solid #b95732;outline-offset:5px}
+.tayori-experience-image-link picture,.tayori-experience-image-link img{display:block;width:100%;height:auto}
+@media(prefers-reduced-motion:reduce){.tayori-experience-image-link,.tayori-problem-banner,.tayori-one-step-banner{transition:none}.tayori-experience-image-link:hover,.tayori-problem-banner:hover,.tayori-one-step-banner:hover{transform:none}}
+@media(max-width:900px){.tayori-experience-grid{grid-template-columns:1fr;max-width:600px;margin-inline:auto}.tayori-experience-card{min-height:474px}}
+@media(max-width:600px){.tayori-experience-image-link{max-width:500px;margin-top:20px;border-radius:18px}}
+@media(max-width:900px){.tayori-problem-grid{grid-template-columns:1fr;max-width:560px;margin-inline:auto;gap:22px}}
+@media(max-width:600px){.tayori-one-step-banner{border-radius:18px}}
 .btn-disabled,.btn-disabled:hover{
   pointer-events:none;
   cursor:not-allowed;
@@ -30,18 +87,54 @@
 .tayori-audience-price .btn{width:100%;margin-top:auto;padding:11px 10px;font-size:.76rem}
 .weekly-payment-note{margin:-6px 0 0;text-align:center;font-size:.76rem;line-height:1.7;color:var(--ink-soft)}
 .tayori-single-price{display:flex;flex-direction:column;gap:10px;margin:18px 0;padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--sky-2)}
+.weekly-plan-card-personal .tayori-single-price{margin:2px 0 0}
+.weekly-plan-card-personal>.waitlist-form{margin-top:auto}
+.weekly-plan-card-team .info-table{min-width:0}
+.weekly-plan-card-team .info-table th,.weekly-plan-card-team .info-table td{padding:12px 10px;font-size:.8rem}
 .tayori-single-price>span{font-size:.82rem;font-weight:800;color:var(--ink-soft)}
 .tayori-single-price>strong{font-size:1.8rem;color:var(--teal-deep)}
 .tayori-single-price>strong small{font-size:.7rem;color:var(--ink-soft)}
 .tayori-single-price>b{font-size:.82rem;color:var(--teal-deep)}
 .waitlist-form{display:grid;gap:10px;margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.waitlist-form[hidden],[data-tayori-direct-signup][hidden]{display:none}
 .waitlist-form label{display:grid;gap:7px;font-size:.78rem;font-weight:700;color:var(--ink-soft)}
-.waitlist-form input[type="email"]{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+.waitlist-form input[type="email"]{box-sizing:border-box;min-width:0;width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit}
 .waitlist-form .waitlist-consent{display:block;font-size:.7rem;font-weight:500}
 .waitlist-form .waitlist-consent input{margin-right:5px}
 .waitlist-status{min-height:1.5em;margin:0;font-size:.76rem;color:var(--teal-deep)}
 .waitlist-honeypot{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important}
+@media(max-width:1000px){
+  .weekly-plan-grid{grid-template-columns:minmax(0,1fr)}
+  .weekly-plan-grid>.pricing-card{min-width:0}
+  .weekly-plan-card-team .table-wrap{max-width:100%}
+}
 @media(max-width:600px){
   .tayori-audience-prices{grid-template-columns:1fr}
   .tayori-audience-price>span{min-height:0}
+  .weekly-plan-card-team .info-table th,.weekly-plan-card-team .info-table td{padding:10px 6px;font-size:.72rem}
+}
+
+/* TAYORI benefits 05/06: page-scoped visuals, kept out of shared site CSS. */
+.benefit-four-crop{aspect-ratio:1672/650;overflow:hidden;border-radius:10px}
+.benefit-four-crop img{width:100%;height:auto;border-radius:0}
+.benefit-extra-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:36px 0 0;text-align:center}
+.benefit-extra-card{display:flex;flex-direction:column;align-items:center;min-width:0;padding:0 26px 24px;background:#f6faf7;border-radius:18px;color:#123d2d}
+.benefit-extra-number{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;margin-top:-27px;border-radius:50%;background:#0c4935;color:#fff;font:700 1.35rem/1 Montserrat,sans-serif}
+.benefit-extra-card h3{margin:18px 0 0;color:#113c2b;font-size:clamp(1.25rem,2vw,1.85rem);line-height:1.4}
+.weekly-benefit-slide .benefit-extra-art{display:block;width:min(100%,370px);height:188px;margin:14px auto 8px;object-fit:contain;background:transparent}
+.benefit-extra-lead{margin:6px 0 0;font-size:clamp(.94rem,1.4vw,1.13rem);font-weight:700;line-height:1.65}
+.benefit-extra-note{width:100%;margin-top:18px;padding:15px 17px;border-radius:12px;background:#e8f3ec;text-align:left}
+.benefit-extra-note p{margin:0;color:#224938;font-size:.85rem;line-height:1.7}
+.benefit-extra-note p+p{margin-top:10px;padding-top:10px;border-top:1px solid #c7dfcf}
+.benefit-extra-note strong{font-weight:700}
+.benefit-extra-note small{display:block;margin-top:10px;color:#426b57;font-size:.76rem;line-height:1.6}
+.benefit-extra-description{margin:18px 0 0;font-size:.86rem;line-height:1.7}
+.benefit-extra-link{display:inline-block;margin:14px 0 0;color:#0c4935;font-weight:700;text-underline-offset:3px}
+@media(max-width:680px){
+  .benefit-four-crop{border-radius:8px}
+  .benefit-four-crop img{border-radius:0}
+  .benefit-extra-grid{grid-template-columns:1fr;gap:36px}
+  .benefit-extra-card{padding:0 18px 20px}
+  .benefit-extra-number{width:48px;height:48px;flex-basis:48px;margin-top:-24px;font-size:1.05rem}
+  .weekly-benefit-slide .benefit-extra-art{height:160px}
 }

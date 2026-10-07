@@ -1,0 +1,43 @@
+.iroha-hero .service-detail-hero-inner{grid-template-columns:minmax(360px,560px) minmax(0,1fr)}
+.iroha-hero img{display:block;max-width:100%;aspect-ratio:16/9;object-fit:contain}
+.iroha-section-lead{max-width:760px;margin:0 0 28px;color:var(--ink-soft);font-size:1rem;line-height:1.9}
+.iroha-learning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.iroha-learning-grid article{padding:26px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.iroha-learning-grid article span{font:700 .76rem/1.5 var(--font-en);letter-spacing:.08em;color:var(--teal-deep)}
+.iroha-learning-grid article h3{margin:12px 0;color:var(--ink);font-size:1.18rem}
+.iroha-learning-grid article p,.iroha-flow-inner p{color:var(--ink-soft);line-height:1.85}
+.iroha-learning-flow{background:var(--sky-2)}
+.iroha-flow-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,70px);align-items:center}
+.iroha-flow-list{display:grid;gap:12px;margin:0;padding:0;list-style:none;counter-reset:iroha-step}
+.iroha-flow-list li{display:grid;grid-template-columns:42px 1fr;column-gap:14px;align-items:center;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;counter-increment:iroha-step}
+.iroha-flow-list li::before{content:counter(iroha-step,decimal-leading-zero);grid-row:span 2;color:var(--teal-deep);font:800 1.1rem/1 var(--font-en)}
+.iroha-flow-list li strong{color:var(--ink)}
+.iroha-flow-list li span{font-size:.85rem;line-height:1.6;color:var(--ink-soft)}
+.iroha-includes .btn{width:max-content;max-width:100%}
+@media(max-width:900px){.iroha-hero .service-detail-hero-inner,.iroha-flow-inner{grid-template-columns:1fr}.iroha-hero img{width:100%;max-width:640px}}
+@media(max-width:640px){.iroha-learning-grid{grid-template-columns:1fr}.iroha-includes .btn{width:100%}}
+.iroha-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px}.iroha-hero-actions .btn{margin:0}
+.iroha-problems{background:#f3f7f8}.iroha-problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.iroha-problem-grid article{padding:28px;background:white;border-radius:18px;border:1px solid var(--line)}.iroha-problem-grid span{font-size:.85rem;color:var(--teal-deep)}.iroha-problem-grid h3{margin:12px 0;font-size:1.2rem}.iroha-problem-grid p{line-height:1.9;color:var(--ink-soft)}.iroha-bridge{text-align:center;margin:36px 0 0;line-height:2;font-size:1.1rem}
+.iroha-learning-grid{gap:34px}.iroha-learning-grid article{position:relative;text-align:center}.iroha-learning-grid article:not(:last-child)::after{content:'→';position:absolute;right:-29px;top:45%;font-size:24px;color:var(--teal-deep)}.iroha-step-symbol{display:grid;place-items:center;width:80px;height:80px;border-radius:50%;margin:20px auto;background:#e3f5f1;color:var(--teal-deep);font-size:42px}.iroha-step-caption{display:block;color:var(--teal-deep);font-size:1.1rem}.iroha-learning-grid article p{text-align:left}
+.iroha-tayori-banner{display:block;max-width:680px;margin:24px 0;border-radius:20px;overflow:hidden}.iroha-tayori-banner img{display:block;width:100%;height:auto}.iroha-enrollment-fees{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}.iroha-enrollment-fees>div{padding:20px;background:#edf8f7;border-radius:14px}.iroha-enrollment-fees span{display:block;font-weight:700}.iroha-enrollment-fees strong{display:block;font-size:2rem;color:var(--teal-deep);margin-top:8px}.iroha-enrollment-fees small{font-size:.8rem}.iroha-enrollment-fees p{font-size:.8rem;margin:8px 0 0}.iroha-switch{margin:28px 0 36px;padding:28px;border:1px solid var(--line);border-radius:20px}.iroha-switch h3{font-size:1.3rem;margin:0 0 12px}.iroha-switch img{display:block;width:100%;height:auto;margin:20px 0}.iroha-switch-note{font-size:.85rem;color:var(--ink-soft)}
+@media(max-width:640px){.iroha-problem-grid{grid-template-columns:1fr}.iroha-hero-actions{flex-direction:column}.iroha-hero-actions .btn{width:100%}.iroha-learning-grid{gap:34px}.iroha-learning-grid article:not(:last-child)::after{content:'↓';right:calc(50% - 12px);top:auto;bottom:-34px}.iroha-enrollment-fees{grid-template-columns:1fr}.iroha-switch{padding:18px}.iroha-switch img{min-width:780px}.iroha-switch{overflow-x:auto}}
+
+@media(max-width:640px){.iroha-switch img{min-width:0}.iroha-switch{overflow:visible}}
+
+/* Generated transparent illustrations, with HTML explanations preserved. */
+.iroha-slide{display:block;width:100%;height:auto;max-width:1080px;margin:30px auto 36px}
+.iroha-learning-grid article:not(:last-child)::after{content:none}
+.iroha-flow-inner{grid-template-columns:1fr;gap:12px}.iroha-flow-inner>div{max-width:800px}.iroha-flow-list{grid-template-columns:repeat(3,minmax(0,1fr))}.iroha-flow-list li{grid-template-columns:1fr}.iroha-flow-list li::before{display:none}
+.iroha-switch .iroha-slide{max-width:1080px;margin:24px auto}.iroha-switch{background:#fafcf9}
+@media(max-width:640px){.iroha-flow-list{grid-template-columns:1fr}.iroha-slide{margin:24px auto}.iroha-switch .iroha-slide{min-width:0}}
+
+.iroha-team-table{overflow-x:auto;margin:24px 0}.iroha-team-table table{width:100%;min-width:500px;border-collapse:collapse;font-size:.85rem}.iroha-team-table caption{text-align:left;font-weight:700;margin-bottom:12px}.iroha-team-table th,.iroha-team-table td{padding:12px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.iroha-team-table thead{background:#edf8f7}.iroha-team-table strong{color:var(--teal-deep)}.iroha-team-note{font-size:.85rem;line-height:1.8}
+
+.iroha-monthly-policy{margin:28px 0;padding:26px;border-left:4px solid var(--teal-deep);background:#edf8f7;border-radius:12px}.iroha-monthly-policy h3{margin:0 0 12px;font-size:1.2rem}.iroha-monthly-policy p{line-height:1.9}.iroha-monthly-policy p:last-child{font-size:.85rem;color:var(--ink-soft)}
+
+.iroha-hero .service-detail-hero-inner{grid-template-columns:minmax(0,1fr) minmax(360px,560px)}
+.iroha-signup{max-width:740px;margin:40px auto;padding:32px 24px;border:1px solid var(--line);border-radius:24px;background:white}.iroha-signup-brand img{width:160px;height:auto;margin-bottom:28px}.iroha-signup h1{font-size:clamp(1.5rem,4vw,2rem)}.iroha-signup p{line-height:1.9}.iroha-signup-tabs{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}.iroha-signup-tabs [aria-current]{background:var(--teal-deep);color:white}.iroha-signup [hidden]{display:none!important}
+@media(max-width:900px){.iroha-hero .service-detail-hero-inner{grid-template-columns:1fr}}
+@media(max-width:640px){.iroha-signup{margin:16px;padding:24px 18px}}
+
+.iroha-enrollment-closed{padding:14px 20px;border:1px solid #b5cbbf;border-radius:8px;background:#edf4ed;color:#164d36;font-weight:700;line-height:1.7}
