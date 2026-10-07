@@ -15,7 +15,7 @@ if (process.env.TAYORI_LP_ONLY === "1") {
   }
   await mkdir(join(output, "assets"), { recursive: true });
   for (const name of [
-    "content-world-hero-v1.png", "content-world-questions-v1.png", "content-world-next-v1.png", "content-learning-paths-v1.png", "service-tsuzuri-home.webp", "service-tsumami-home.webp", "content-button-podcast-v1.png", "content-button-tsuzuri-v1.png", "content-button-tsumami-v1.png",
+    "content-world-hero-v1-optimized.webp", "content-world-questions-v1-optimized.webp", "content-world-next-v1-optimized.webp", "content-learning-paths-v1-optimized.webp", "service-tsuzuri-home.webp", "service-tsumami-home.webp", "content-button-podcast-v1-optimized.webp", "content-button-tsuzuri-v1-optimized.webp", "content-button-tsumami-v1-optimized.webp",
     "tayori-story-01-v1.webp", "tayori-story-02-v1.webp", "tayori-story-03-v1.webp",
     "tayori-problem-tsugumo-v1.webp",
     "tayori-problem-banner-01-v1.webp", "tayori-problem-banner-02-v1.webp", "tayori-problem-banner-03-v1.webp",
@@ -44,7 +44,7 @@ for (const name of [
   await cp(join(source, "TAYORI", name), join(output, "TAYORI", name));
 }
 await mkdir(join(output, 'TAYORI', 'assets'), {recursive: true});
-for (const name of ['archive-button.png', 'podcast-button.png']) await cp(join(source, 'TAYORI', 'assets', name), join(output, 'TAYORI', 'assets', name));
+for (const name of ['archive-button-optimized.webp', 'podcast-button-optimized.webp']) await cp(join(source, 'TAYORI', 'assets', name), join(output, 'TAYORI', 'assets', name));
 await writeFile(join(output,'TAYORI','weekend-media.json'),JSON.stringify(await weekendMediaData()));
 
 // Shared account management only: do not publish the IROHA landing page or lessons.
@@ -55,14 +55,14 @@ for (const name of ["mypage.html", "mypage.js", "member-shell.js", "curriculum.c
 
 await mkdir(join(output, "assets"), { recursive: true });
 for (const name of [
-  "content-world-hero-v1.png", "content-world-questions-v1.png", "content-world-next-v1.png", "content-learning-paths-v1.png", "service-tsuzuri-home.webp", "service-tsumami-home.webp", "content-button-podcast-v1.png", "content-button-tsuzuri-v1.png", "content-button-tsumami-v1.png",
+  "content-world-hero-v1-optimized.webp", "content-world-questions-v1-optimized.webp", "content-world-next-v1-optimized.webp", "content-learning-paths-v1-optimized.webp", "service-tsuzuri-home.webp", "service-tsumami-home.webp", "content-button-podcast-v1-optimized.webp", "content-button-tsuzuri-v1-optimized.webp", "content-button-tsumami-v1-optimized.webp",
   "totonoe-tayori-benefits-v4.webp",
   "tayori-benefit-05.webp", "tayori-benefit-06.webp",
-  "tayori-guide-priority-question-v1.png", "tayori-guide-answer-videos-v1.png",
-  "tayori-guide-backnumbers-v1.png", "tayori-guide-seminars-v2.png",
-  "tayori-signup-weekend-illustration-v1.png",
-  "tayori-signup-capacity-button-v1.png",
-  "tayori-signup-capacity-button-v2.png",
+  "tayori-guide-priority-question-v1-optimized.webp", "tayori-guide-answer-videos-v1-optimized.webp",
+  "tayori-guide-backnumbers-v1-optimized.webp", "tayori-guide-seminars-v2-optimized.webp",
+  "tayori-signup-weekend-illustration-v1-optimized.webp",
+  "tayori-signup-capacity-button-v1-optimized.webp",
+  "tayori-signup-capacity-button-v2-optimized.webp",
   "tayori-problem-banner-01-v1.webp", "tayori-problem-banner-02-v1.webp", "tayori-problem-banner-03-v1.webp",
   "tayori-problem-01-square-v2.webp", "tayori-problem-02-square-v2.webp", "tayori-problem-03-square-v2.webp",
   "tayori-one-step-trio-desktop-v1.webp", "tayori-one-step-trio-mobile-v1.webp",

@@ -122,7 +122,7 @@ img { display: block; max-width: 100%; }
 .sidebar-message { margin: auto 12px 0; padding-top: 24px; color: var(--ink-soft); border-top: 1px solid var(--line); font-size: .75rem; }
 .sidebar-message strong { color: var(--ink); font-size: 1.08rem; }
 .learning-main { min-width: 0; }
-.learning-hero { min-height: 250px; padding: 54px 52px 40px; position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; background: linear-gradient(90deg, rgba(247,250,245,.98) 0%, rgba(247,250,245,.9) 40%, rgba(247,250,245,.18) 70%), url("../assets/totonoe-weekly-hero.jpg") center 43% / cover no-repeat; }
+.learning-hero { min-height: 250px; padding: 54px 52px 40px; position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; background: linear-gradient(90deg, rgba(247,250,245,.98) 0%, rgba(247,250,245,.9) 40%, rgba(247,250,245,.18) 70%), url("../assets/totonoe-weekly-hero-optimized.webp") center 43% / cover no-repeat; }
 .learning-hero h1 { margin: 0; max-width: 690px; color: var(--ink); font-size: clamp(2rem, 3.6vw, 3.25rem); line-height: 1.35; }
 .learning-hero p:not(.eyebrow) { margin: 10px 0 0; font-size: .94rem; }
 .iroha-view-nav { margin: 0 28px; padding: 14px 0 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
@@ -640,7 +640,7 @@ dialog h2 { margin: 0 0 12px; color: var(--ink); }
   .mypage-app .learning-sidebar nav { grid-template-columns: repeat(4, 1fr); }
   .learning-sidebar nav a, .learning-sidebar nav button { min-width: 0; min-height: 54px; padding: 5px 2px; flex-direction: column; justify-content: center; gap: 2px; text-align: center; font-size: .58rem; }
   .learning-sidebar nav .material-symbols-rounded { font-size: 1.45rem; }
-  .learning-hero { min-height: 330px; padding: 34px 22px; display: block; background: linear-gradient(180deg, rgba(247,250,245,.95), rgba(247,250,245,.64)), url("../assets/totonoe-weekly-hero.jpg") 62% center / cover no-repeat; }
+  .learning-hero { min-height: 330px; padding: 34px 22px; display: block; background: linear-gradient(180deg, rgba(247,250,245,.95), rgba(247,250,245,.64)), url("../assets/totonoe-weekly-hero-optimized.webp") 62% center / cover no-repeat; }
   .iroha-view-nav { margin: 0 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
   .iroha-view-nav a { min-height: 58px; padding: 6px 3px; flex-direction: column; gap: 2px; font-size: .7rem; }
   .iroha-seminars { padding: 0 12px 34px; }

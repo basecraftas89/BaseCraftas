@@ -1,0 +1,771 @@
+{
+  "scope": "Originals retained locally; no deployment",
+  "unused_untracked": [
+    "projects/totonoe/assets/totonoe-shikko-values.jpg",
+    "projects/totonoe/assets/totonoe-weekly-filter.jpg",
+    "projects/totonoe/assets/totonoe-tayori-benefits-v3.webp",
+    "projects/totonoe/assets/weekend-morning-hero.jpg",
+    "projects/totonoe/assets/totonoe-service-overview-tayori-v1.jpg",
+    "projects/totonoe/assets/totonoe-service-corporate.jpg",
+    "projects/totonoe/assets/totonoe-service-weekend.jpg",
+    "projects/totonoe/assets/concept-pillars.jpg",
+    "projects/totonoe/assets/totonoe-corporate-domains.jpg",
+    "projects/totonoe/assets/totonoe-yohaku-value.jpg",
+    "projects/totonoe/assets/weekend-ai-two-fields.jpg",
+    "projects/totonoe/assets/totonoe-ourai-map.jpg",
+    "projects/totonoe/assets/totonoe-weekly-benefits.jpg",
+    "projects/totonoe/assets/totonoe-corporate-support-flow.jpg",
+    "projects/totonoe/assets/service-iroha.png",
+    "projects/totonoe/assets/totonoe-concept-map.jpg",
+    "projects/totonoe/assets/weekend-ai-how-flow.jpg",
+    "projects/totonoe/assets/totonoe-corporate-outcome.jpg",
+    "projects/totonoe/assets/service-tsumami.png",
+    "projects/totonoe/assets/totonoe-tayori-benefits-v1.jpg",
+    "projects/totonoe/assets/totonoe-corporate-approach.jpg",
+    "projects/totonoe/assets/reason-hero.jpg",
+    "projects/totonoe/assets/host-message.jpg",
+    "projects/totonoe/assets/service-tayori.png",
+    "projects/totonoe/assets/totonoe-service-overview.jpg",
+    "projects/totonoe/assets/philosophy/mission.jpg",
+    "projects/totonoe/assets/philosophy/vision.jpg",
+    "projects/totonoe/assets/philosophy/shikko.jpg",
+    "projects/totonoe/assets/characters/stories/mion/03-2_exhausted-at-sunset.png"
+  ],
+  "optimized": [
+    {
+      "original": "projects/totonoe/TAYORI/assets/archive-button.png",
+      "optimized": "projects/totonoe/TAYORI/assets/archive-button-optimized.webp",
+      "before": 201218,
+      "after": 23142,
+      "dimensions": [
+        800,
+        237
+      ]
+    },
+    {
+      "original": "projects/totonoe/TAYORI/assets/podcast-button.png",
+      "optimized": "projects/totonoe/TAYORI/assets/podcast-button-optimized.webp",
+      "before": 173077,
+      "after": 18878,
+      "dimensions": [
+        800,
+        222
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-corporate-hero.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-corporate-hero-optimized.webp",
+      "before": 191284,
+      "after": 125840,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-button-tsuzuri-v1.png",
+      "optimized": "projects/totonoe/assets/content-button-tsuzuri-v1-optimized.webp",
+      "before": 2006706,
+      "after": 256542,
+      "dimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-main-visual.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-main-visual-optimized.webp",
+      "before": 215489,
+      "after": 147348,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/member-kimura-profile.png",
+      "optimized": "projects/totonoe/assets/member-kimura-profile-optimized.webp",
+      "before": 566155,
+      "after": 54630,
+      "dimensions": [
+        753,
+        751
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/member-kojima-profile.png",
+      "optimized": "projects/totonoe/assets/member-kojima-profile-optimized.webp",
+      "before": 157668,
+      "after": 16184,
+      "dimensions": [
+        330,
+        330
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-world-questions-v1.png",
+      "optimized": "projects/totonoe/assets/content-world-questions-v1-optimized.webp",
+      "before": 2407338,
+      "after": 269642,
+      "dimensions": [
+        2172,
+        724
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-signup-weekend-illustration-v1.png",
+      "optimized": "projects/totonoe/assets/tayori-signup-weekend-illustration-v1-optimized.webp",
+      "before": 1115320,
+      "after": 48198,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-guide-seminars-v2.png",
+      "optimized": "projects/totonoe/assets/tayori-guide-seminars-v2-optimized.webp",
+      "before": 1382245,
+      "after": 108196,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/weekend-practice-cta.jpg",
+      "optimized": "projects/totonoe/assets/weekend-practice-cta-optimized.webp",
+      "before": 215252,
+      "after": 82446,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-weekly-hero.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-weekly-hero-optimized.webp",
+      "before": 225890,
+      "after": 99802,
+      "dimensions": [
+        1727,
+        911
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-button-podcast-v1.png",
+      "optimized": "projects/totonoe/assets/content-button-podcast-v1-optimized.webp",
+      "before": 1869401,
+      "after": 266880,
+      "dimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-world-next-v1.png",
+      "optimized": "projects/totonoe/assets/content-world-next-v1-optimized.webp",
+      "before": 2271292,
+      "after": 235538,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-learning-paths-v1.png",
+      "optimized": "projects/totonoe/assets/content-learning-paths-v1-optimized.webp",
+      "before": 2581575,
+      "after": 273418,
+      "dimensions": [
+        2172,
+        724
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-service-hero.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-service-hero-optimized.webp",
+      "before": 208347,
+      "after": 85408,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-world-hero-v1.png",
+      "optimized": "projects/totonoe/assets/content-world-hero-v1-optimized.webp",
+      "before": 2195560,
+      "after": 211750,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-guide-answer-videos-v1.png",
+      "optimized": "projects/totonoe/assets/tayori-guide-answer-videos-v1-optimized.webp",
+      "before": 1141554,
+      "after": 85072,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-guide-priority-question-v1.png",
+      "optimized": "projects/totonoe/assets/tayori-guide-priority-question-v1-optimized.webp",
+      "before": 1158692,
+      "after": 86590,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-weekly-newspaper-20260911.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-weekly-newspaper-20260911-optimized.webp",
+      "before": 499814,
+      "after": 231848,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-message-bg.jpg",
+      "optimized": "projects/totonoe/assets/totonoe-message-bg-optimized.webp",
+      "before": 157515,
+      "after": 100418,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/totonoe-logo.png",
+      "optimized": "projects/totonoe/assets/totonoe-logo-optimized.webp",
+      "before": 189786,
+      "after": 55530,
+      "dimensions": [
+        1442,
+        566
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/page-hero-service-v1.png",
+      "optimized": "projects/totonoe/assets/page-hero-service-v1-optimized.webp",
+      "before": 2359875,
+      "after": 257374,
+      "dimensions": [
+        2172,
+        724
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-guide-backnumbers-v1.png",
+      "optimized": "projects/totonoe/assets/tayori-guide-backnumbers-v1-optimized.webp",
+      "before": 1103088,
+      "after": 71902,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/weekend-ai-fixed-thumbnail.png",
+      "optimized": "projects/totonoe/assets/weekend-ai-fixed-thumbnail-optimized.webp",
+      "before": 2179850,
+      "after": 234976,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/content-button-tsumami-v1.png",
+      "optimized": "projects/totonoe/assets/content-button-tsumami-v1-optimized.webp",
+      "before": 1485993,
+      "after": 185202,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/service-tsuzuri.png",
+      "optimized": "projects/totonoe/assets/service-tsuzuri-optimized.webp",
+      "before": 1032144,
+      "after": 19202,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-signup-capacity-button-v1.png",
+      "optimized": "projects/totonoe/assets/tayori-signup-capacity-button-v1-optimized.webp",
+      "before": 252194,
+      "after": 13280,
+      "dimensions": [
+        960,
+        240
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/hero-main.jpg",
+      "optimized": "projects/totonoe/assets/hero-main-optimized.webp",
+      "before": 169664,
+      "after": 111174,
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/member-shindo-profile.jpg",
+      "optimized": "projects/totonoe/assets/member-shindo-profile-optimized.webp",
+      "before": 177894,
+      "after": 63114,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/tayori-signup-capacity-button-v2.png",
+      "optimized": "projects/totonoe/assets/tayori-signup-capacity-button-v2-optimized.webp",
+      "before": 252817,
+      "after": 12058,
+      "dimensions": [
+        960,
+        240
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-4_card-from-hakuto.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-4_card-from-hakuto-optimized.webp",
+      "before": 1993394,
+      "after": 148746,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-2_missed-morning.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-2_missed-morning-optimized.webp",
+      "before": 1898279,
+      "after": 157696,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-3_newspaper-at-cabin.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-3_newspaper-at-cabin-optimized.webp",
+      "before": 2405070,
+      "after": 266710,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-6_hero-tsugumo-right.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-6_hero-tsugumo-right-optimized.webp",
+      "before": 2427269,
+      "after": 268752,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-1_capable-before-dawn.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-1_capable-before-dawn-optimized.webp",
+      "before": 1964786,
+      "after": 178206,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/tsugumo/01-5_return-to-morning.png",
+      "optimized": "projects/totonoe/assets/characters/stories/tsugumo/01-5_return-to-morning-optimized.webp",
+      "before": 2336310,
+      "after": 252270,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/trio/04-4_tea-and-stories.png",
+      "optimized": "projects/totonoe/assets/characters/stories/trio/04-4_tea-and-stories-optimized.webp",
+      "before": 2470721,
+      "after": 279890,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/trio/04-5_sleep-talk-secret.png",
+      "optimized": "projects/totonoe/assets/characters/stories/trio/04-5_sleep-talk-secret-optimized.webp",
+      "before": 2154226,
+      "after": 210050,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/trio/04-1_tools-connect-them.png",
+      "optimized": "projects/totonoe/assets/characters/stories/trio/04-1_tools-connect-them-optimized.webp",
+      "before": 2195780,
+      "after": 210954,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/trio/04-3_first-time-together.png",
+      "optimized": "projects/totonoe/assets/characters/stories/trio/04-3_first-time-together-optimized.webp",
+      "before": 2317906,
+      "after": 259660,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/trio/04-2_walk-to-cabin.png",
+      "optimized": "projects/totonoe/assets/characters/stories/trio/04-2_walk-to-cabin-optimized.webp",
+      "before": 2672682,
+      "after": 344858,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/hakuto/02-4_meets-mion.png",
+      "optimized": "projects/totonoe/assets/characters/stories/hakuto/02-4_meets-mion-optimized.webp",
+      "before": 2477625,
+      "after": 313990,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/hakuto/02-1_successful-writer.png",
+      "optimized": "projects/totonoe/assets/characters/stories/hakuto/02-1_successful-writer-optimized.webp",
+      "before": 2077806,
+      "after": 198086,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/hakuto/02-5_secret-ai-reflection.png",
+      "optimized": "projects/totonoe/assets/characters/stories/hakuto/02-5_secret-ai-reflection-optimized.webp",
+      "before": 1969086,
+      "after": 179860,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/hakuto/02-3_newspaper-opens-door.png",
+      "optimized": "projects/totonoe/assets/characters/stories/hakuto/02-3_newspaper-opens-door-optimized.webp",
+      "before": 2334268,
+      "after": 255402,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/hakuto/02-2_trapped-in-old-notes.png",
+      "optimized": "projects/totonoe/assets/characters/stories/hakuto/02-2_trapped-in-old-notes-optimized.webp",
+      "before": 2062832,
+      "after": 199250,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything-v2.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything-v2-optimized.webp",
+      "before": 2445010,
+      "after": 294316,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-5_one-precise-catch.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-5_one-precise-catch-optimized.webp",
+      "before": 2389406,
+      "after": 267152,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-3_night-recording.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-3_night-recording-optimized.webp",
+      "before": 2164496,
+      "after": 216232,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-2_exhausted-at-sunset-v2.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-2_exhausted-at-sunset-v2-optimized.webp",
+      "before": 2269220,
+      "after": 252094,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-4_listen-and-focus.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-4_listen-and-focus-optimized.webp",
+      "before": 2333141,
+      "after": 261838,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "original": "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything.png",
+      "optimized": "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything-optimized.webp",
+      "before": 2512258,
+      "after": 318424,
+      "dimensions": [
+        1672,
+        941
+      ]
+    }
+  ],
+  "git_remove": [
+    "projects/totonoe/TAYORI/assets/archive-button.png",
+    "projects/totonoe/TAYORI/assets/podcast-button.png",
+    "projects/totonoe/assets/characters/stories/hakuto/02-1_successful-writer.png",
+    "projects/totonoe/assets/characters/stories/hakuto/02-2_trapped-in-old-notes.png",
+    "projects/totonoe/assets/characters/stories/hakuto/02-3_newspaper-opens-door.png",
+    "projects/totonoe/assets/characters/stories/hakuto/02-4_meets-mion.png",
+    "projects/totonoe/assets/characters/stories/hakuto/02-5_secret-ai-reflection.png",
+    "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything-v2.png",
+    "projects/totonoe/assets/characters/stories/mion/03-1_chasing-everything.png",
+    "projects/totonoe/assets/characters/stories/mion/03-2_exhausted-at-sunset-v2.png",
+    "projects/totonoe/assets/characters/stories/mion/03-2_exhausted-at-sunset.png",
+    "projects/totonoe/assets/characters/stories/mion/03-3_night-recording.png",
+    "projects/totonoe/assets/characters/stories/mion/03-4_listen-and-focus.png",
+    "projects/totonoe/assets/characters/stories/mion/03-5_one-precise-catch.png",
+    "projects/totonoe/assets/characters/stories/trio/04-1_tools-connect-them.png",
+    "projects/totonoe/assets/characters/stories/trio/04-2_walk-to-cabin.png",
+    "projects/totonoe/assets/characters/stories/trio/04-3_first-time-together.png",
+    "projects/totonoe/assets/characters/stories/trio/04-4_tea-and-stories.png",
+    "projects/totonoe/assets/characters/stories/trio/04-5_sleep-talk-secret.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-1_capable-before-dawn.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-2_missed-morning.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-3_newspaper-at-cabin.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-4_card-from-hakuto.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-5_return-to-morning.png",
+    "projects/totonoe/assets/characters/stories/tsugumo/01-6_hero-tsugumo-right.png",
+    "projects/totonoe/assets/concept-pillars.jpg",
+    "projects/totonoe/assets/host-message.jpg",
+    "projects/totonoe/assets/member-kimura-profile.png",
+    "projects/totonoe/assets/member-kojima-profile.png",
+    "projects/totonoe/assets/member-shindo-profile.jpg",
+    "projects/totonoe/assets/philosophy/mission.jpg",
+    "projects/totonoe/assets/philosophy/shikko.jpg",
+    "projects/totonoe/assets/philosophy/vision.jpg",
+    "projects/totonoe/assets/reason-hero.jpg",
+    "projects/totonoe/assets/service-iroha.png",
+    "projects/totonoe/assets/service-tayori.png",
+    "projects/totonoe/assets/service-tsumami.png",
+    "projects/totonoe/assets/service-tsuzuri.png",
+    "projects/totonoe/assets/tayori-guide-answer-videos-v1.png",
+    "projects/totonoe/assets/tayori-guide-backnumbers-v1.png",
+    "projects/totonoe/assets/tayori-guide-seminars-v2.png",
+    "projects/totonoe/assets/tayori-signup-capacity-button-v1.png",
+    "projects/totonoe/assets/tayori-signup-weekend-illustration-v1.png",
+    "projects/totonoe/assets/totonoe-concept-map.jpg",
+    "projects/totonoe/assets/totonoe-corporate-approach.jpg",
+    "projects/totonoe/assets/totonoe-corporate-domains.jpg",
+    "projects/totonoe/assets/totonoe-corporate-hero.jpg",
+    "projects/totonoe/assets/totonoe-corporate-outcome.jpg",
+    "projects/totonoe/assets/totonoe-corporate-support-flow.jpg",
+    "projects/totonoe/assets/totonoe-main-visual.jpg",
+    "projects/totonoe/assets/totonoe-message-bg.jpg",
+    "projects/totonoe/assets/totonoe-ourai-map.jpg",
+    "projects/totonoe/assets/totonoe-service-corporate.jpg",
+    "projects/totonoe/assets/totonoe-service-hero.jpg",
+    "projects/totonoe/assets/totonoe-service-overview-tayori-v1.jpg",
+    "projects/totonoe/assets/totonoe-service-overview.jpg",
+    "projects/totonoe/assets/totonoe-service-weekend.jpg",
+    "projects/totonoe/assets/totonoe-shikko-values.jpg",
+    "projects/totonoe/assets/totonoe-tayori-benefits-v1.jpg",
+    "projects/totonoe/assets/totonoe-tayori-benefits-v3.webp",
+    "projects/totonoe/assets/totonoe-weekly-benefits.jpg",
+    "projects/totonoe/assets/totonoe-weekly-filter.jpg",
+    "projects/totonoe/assets/totonoe-weekly-hero.jpg",
+    "projects/totonoe/assets/totonoe-weekly-newspaper-20260911.jpg",
+    "projects/totonoe/assets/totonoe-yohaku-value.jpg",
+    "projects/totonoe/assets/weekend-ai-how-flow.jpg",
+    "projects/totonoe/assets/weekend-ai-two-fields.jpg",
+    "projects/totonoe/assets/weekend-morning-hero.jpg",
+    "projects/totonoe/assets/weekend-practice-cta.jpg"
+  ],
+  "build_exclusions": [
+    "TAYORI/assets/archive-button.png",
+    "TAYORI/assets/podcast-button.png",
+    "assets/characters/stories/hakuto/02-1_successful-writer.png",
+    "assets/characters/stories/hakuto/02-2_trapped-in-old-notes.png",
+    "assets/characters/stories/hakuto/02-3_newspaper-opens-door.png",
+    "assets/characters/stories/hakuto/02-4_meets-mion.png",
+    "assets/characters/stories/hakuto/02-5_secret-ai-reflection.png",
+    "assets/characters/stories/mion/03-1_chasing-everything-v2.png",
+    "assets/characters/stories/mion/03-1_chasing-everything.png",
+    "assets/characters/stories/mion/03-2_exhausted-at-sunset-v2.png",
+    "assets/characters/stories/mion/03-2_exhausted-at-sunset.png",
+    "assets/characters/stories/mion/03-3_night-recording.png",
+    "assets/characters/stories/mion/03-4_listen-and-focus.png",
+    "assets/characters/stories/mion/03-5_one-precise-catch.png",
+    "assets/characters/stories/trio/04-1_tools-connect-them.png",
+    "assets/characters/stories/trio/04-2_walk-to-cabin.png",
+    "assets/characters/stories/trio/04-3_first-time-together.png",
+    "assets/characters/stories/trio/04-4_tea-and-stories.png",
+    "assets/characters/stories/trio/04-5_sleep-talk-secret.png",
+    "assets/characters/stories/tsugumo/01-1_capable-before-dawn.png",
+    "assets/characters/stories/tsugumo/01-2_missed-morning.png",
+    "assets/characters/stories/tsugumo/01-3_newspaper-at-cabin.png",
+    "assets/characters/stories/tsugumo/01-4_card-from-hakuto.png",
+    "assets/characters/stories/tsugumo/01-5_return-to-morning.png",
+    "assets/characters/stories/tsugumo/01-6_hero-tsugumo-right.png",
+    "assets/concept-pillars.jpg",
+    "assets/content-button-podcast-v1.png",
+    "assets/content-button-tsumami-v1.png",
+    "assets/content-button-tsuzuri-v1.png",
+    "assets/content-learning-paths-v1.png",
+    "assets/content-world-hero-v1.png",
+    "assets/content-world-next-v1.png",
+    "assets/content-world-questions-v1.png",
+    "assets/hero-main.jpg",
+    "assets/host-message.jpg",
+    "assets/member-kimura-profile.png",
+    "assets/member-kojima-profile.png",
+    "assets/member-shindo-profile.jpg",
+    "assets/page-hero-service-v1.png",
+    "assets/philosophy/mission.jpg",
+    "assets/philosophy/shikko.jpg",
+    "assets/philosophy/vision.jpg",
+    "assets/reason-hero.jpg",
+    "assets/service-iroha.png",
+    "assets/service-tayori.png",
+    "assets/service-tsumami.png",
+    "assets/service-tsuzuri.png",
+    "assets/tayori-guide-answer-videos-v1.png",
+    "assets/tayori-guide-backnumbers-v1.png",
+    "assets/tayori-guide-priority-question-v1.png",
+    "assets/tayori-guide-seminars-v2.png",
+    "assets/tayori-signup-capacity-button-v1.png",
+    "assets/tayori-signup-capacity-button-v2.png",
+    "assets/tayori-signup-weekend-illustration-v1.png",
+    "assets/totonoe-concept-map.jpg",
+    "assets/totonoe-corporate-approach.jpg",
+    "assets/totonoe-corporate-domains.jpg",
+    "assets/totonoe-corporate-hero.jpg",
+    "assets/totonoe-corporate-outcome.jpg",
+    "assets/totonoe-corporate-support-flow.jpg",
+    "assets/totonoe-logo.png",
+    "assets/totonoe-main-visual.jpg",
+    "assets/totonoe-message-bg.jpg",
+    "assets/totonoe-ourai-map.jpg",
+    "assets/totonoe-service-corporate.jpg",
+    "assets/totonoe-service-hero.jpg",
+    "assets/totonoe-service-overview-tayori-v1.jpg",
+    "assets/totonoe-service-overview.jpg",
+    "assets/totonoe-service-weekend.jpg",
+    "assets/totonoe-shikko-values.jpg",
+    "assets/totonoe-tayori-benefits-v1.jpg",
+    "assets/totonoe-tayori-benefits-v3.webp",
+    "assets/totonoe-weekly-benefits.jpg",
+    "assets/totonoe-weekly-filter.jpg",
+    "assets/totonoe-weekly-hero.jpg",
+    "assets/totonoe-weekly-newspaper-20260911.jpg",
+    "assets/totonoe-yohaku-value.jpg",
+    "assets/weekend-ai-fixed-thumbnail.png",
+    "assets/weekend-ai-how-flow.jpg",
+    "assets/weekend-ai-two-fields.jpg",
+    "assets/weekend-morning-hero.jpg",
+    "assets/weekend-practice-cta.jpg"
+  ],
+  "changed_references": [
+    "projects/index.html",
+    "projects/totonoe/team.html",
+    "projects/totonoe/legal.html",
+    "projects/totonoe/index.html",
+    "projects/totonoe/styles.css",
+    "projects/totonoe/products.html",
+    "projects/totonoe/contents.html",
+    "projects/totonoe/corporate.html",
+    "projects/totonoe/service-content.js",
+    "projects/totonoe/cancellation.html",
+    "projects/totonoe/service.html",
+    "projects/totonoe/tayori.html",
+    "projects/totonoe/seminars.html",
+    "projects/totonoe/faq.html",
+    "projects/totonoe/privacy.html",
+    "projects/totonoe/weekend-ai.html",
+    "projects/totonoe/TAYORI/checkout-complete.html",
+    "projects/totonoe/TAYORI/index.html",
+    "projects/totonoe/TAYORI/subscribe.html",
+    "projects/totonoe/TAYORI/login.html",
+    "projects/totonoe/TAYORI/login-20261001.html",
+    "projects/totonoe/tsuzuri/index.html",
+    "projects/totonoe/IROHA/checkout-complete.html",
+    "projects/totonoe/IROHA/lesson.html",
+    "projects/totonoe/IROHA/index.html",
+    "projects/totonoe/IROHA/admin.html",
+    "projects/totonoe/IROHA/subscribe.html",
+    "projects/totonoe/IROHA/mypage.html",
+    "projects/totonoe/IROHA/dashboard.html",
+    "projects/totonoe/IROHA/curriculum-badges-20261001.css",
+    "projects/totonoe/IROHA/curriculum.css",
+    "projects/totonoe/characters/index.html",
+    "projects/totonoe/data/contents/character-story-mion-which-shadow.json",
+    "projects/totonoe/data/contents/character-story-tsugumo-morning-call.json",
+    "projects/totonoe/data/contents/character-story-three-same-gift.json",
+    "projects/totonoe/data/contents/character-story-hakuto-beyond-window.json",
+    "projects/totonoe/data/contents/index.json",
+    "projects/totonoe/assets/member-world-banners-v2-prompts.json",
+    "projects/totonoe/tsumami/index.html",
+    "apps/totonoe-public-ui/manifest.json",
+    "apps/tsuzuri-studio/index.html",
+    "apps/tsuzuri-studio/tayori-password.html",
+    "apps/totonoe-member-ui/manifest.json",
+    "apps/tayori-site/build-assets.mjs",
+    "apps/tsuzuri-studio-api/security.test.mjs",
+    "apps/tsuzuri-studio-api/tayori-seminars.test.mjs",
+    "apps/tsuzuri-studio-api/src/public-render.js",
+    "apps/tsuzuri-studio-api/src/worker.js"
+  ]
+}

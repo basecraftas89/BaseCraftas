@@ -1063,7 +1063,7 @@ async function listArticles(env) {
 
 async function publicWeekendEvent(env) {
   return json({ event: {
-    hero_url: "/projects/totonoe/assets/weekend-ai-fixed-thumbnail.png",
+    hero_url: "/projects/totonoe/assets/weekend-ai-fixed-thumbnail-optimized.webp",
     fixed: true,
   } }, { headers: { "cache-control": "no-store" } });
 }

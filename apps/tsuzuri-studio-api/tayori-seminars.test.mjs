@@ -10,7 +10,7 @@ test("TAYORIの5タブと4枚の案内画像を表示する", () => {
   try {
     const document = dom.window.document;
     assert.deepEqual([...document.querySelectorAll("[data-tayori-tab]")].map((tab) => tab.dataset.tayoriTab), ["home", "questions", "answers", "backnumbers", "seminars"]);
-    for (const filename of ["tayori-guide-priority-question-v1.png", "tayori-guide-answer-videos-v1.png", "tayori-guide-backnumbers-v1.png", "tayori-guide-seminars-v2.png"]) {
+    for (const filename of ["tayori-guide-priority-question-v1-optimized.webp", "tayori-guide-answer-videos-v1-optimized.webp", "tayori-guide-backnumbers-v1-optimized.webp", "tayori-guide-seminars-v2-optimized.webp"]) {
       assert.ok(document.querySelector(`.subview-guide img[src$="${filename}"]`));
       assert.ok(existsSync(`projects/totonoe/assets/${filename}`));
     }

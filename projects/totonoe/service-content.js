@@ -1143,7 +1143,7 @@
           } catch (e) { return; }
         }
         var image = document.createElement('img');
-        var imageUrl = item.image || (item.youtubeId ? ytThumbUrl(item.youtubeId) : 'assets/service-tsuzuri.png');
+        var imageUrl = item.image || (item.youtubeId ? ytThumbUrl(item.youtubeId) : 'assets/service-tsuzuri-optimized.webp');
         // Studio thumbnails use article-relative paths; resolve against the article directory.
         if (imageUrl.indexOf('../assets/') === 0) imageUrl = imageUrl.slice(3);
         image.src = imageUrl;

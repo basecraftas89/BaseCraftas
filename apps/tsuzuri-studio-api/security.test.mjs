@@ -110,7 +110,7 @@ test('public weekend event always exposes the fixed thumbnail without authentica
  f.sql.prepare("UPDATE articles SET status='published', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(latest.id);
  const response=await f.call('/public-content/weekend-event.json','GET',undefined,'');
  assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
- const body=await response.json();assert.equal(body.event.hero_url,'/projects/totonoe/assets/weekend-ai-fixed-thumbnail.png');
+ const body=await response.json();assert.equal(body.event.hero_url,'/projects/totonoe/assets/weekend-ai-fixed-thumbnail-optimized.webp');
  assert.deepEqual(Object.keys(body.event).sort(),['fixed','hero_url']);
 });
 

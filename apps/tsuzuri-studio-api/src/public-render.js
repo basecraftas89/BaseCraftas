@@ -107,7 +107,7 @@ ${sticker ? '<link rel="stylesheet" href="../character-stickers.css?v=20260923b"
 <header class="site-header scrolled" id="siteHeader">
   <div class="header-inner">
     <a href="../index.html" class="brand" aria-label="ToToNoE+ トップへ">
-      <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
+      <img src="../assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="brand-logo" width="1442" height="566" decoding="async">
     </a>
     <nav class="site-nav" id="siteNav">
       <a href="../index.html">TOP</a>
@@ -151,7 +151,7 @@ ${sticker ? '<link rel="stylesheet" href="../character-stickers.css?v=20260923b"
   <div class="container footer-grid">
     <div class="footer-brand">
       <a href="../index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
-        <img src="../assets/totonoe-logo.png" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
+        <img src="../assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
       </a>
       <p>本質に向き合い、専門職が大切にしたいことへ戻れる余白をつくるチームプロジェクト。</p>
     </div>

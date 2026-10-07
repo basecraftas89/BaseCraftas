@@ -6,7 +6,8 @@ import {safeUrl,safeSourceId,splitMemberBody} from '../apps/tsuzuri-studio-api/s
 import {articleHtml} from '../apps/tsuzuri-studio-api/src/public-render.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const out = path.join(root, 'dist');
+const outArg = process.argv.indexOf('--out');
+const out = outArg >= 0 ? path.resolve(process.argv[outArg + 1]) : path.join(root, 'dist');
 await build({entryPoints:[path.join(root,'apps/tsuzuri-studio/security-entry.js')],bundle:true,format:'iife',platform:'browser',legalComments:'inline',minify:true,outfile:path.join(root,'apps/tsuzuri-studio/security.js')});
 await rm(out,{recursive:true,force:true});
 await mkdir(out,{recursive:true});
@@ -16,6 +17,8 @@ const trees = ['css','js','images','services','products','projects','apps/tsuzur
 const blocked = /(?:^|\/)(?:node_modules|\.git|\.wrangler|\.pet-runs|scripts|tests?)(?:\/|$)|(?:\.test\.|security-entry\.js$)/;
 // Retain forthcoming service drafts locally; never ship their LPs.
 const unpublishedPages = new Set(['projects/totonoe/corporate.html', 'projects/totonoe/products.html', 'services/branding.html']);
+const imagePolicy = JSON.parse(await readFile(path.join(root, 'projects/totonoe/image-optimization.json'), 'utf8'));
+const excludedImages = new Set(imagePolicy.build_exclusions.map(file => 'projects/totonoe/' + file));
 const copied=[];
 async function copyFile(relative) {
   await mkdir(path.dirname(path.join(out,relative)),{recursive:true});
@@ -24,7 +27,7 @@ async function copyFile(relative) {
 async function walk(relative) {
   for(const entry of await readdir(path.join(root,relative),{withFileTypes:true})) {
     const name=path.posix.join(relative,entry.name);
-    if(entry.name.startsWith('.')||blocked.test(name)||entry.isSymbolicLink()||unpublishedPages.has(name))continue;
+    if(entry.name.startsWith('.')||blocked.test(name)||entry.isSymbolicLink()||unpublishedPages.has(name)||excludedImages.has(name))continue;
     if(entry.isDirectory()){await walk(name);continue;}
     const publicJson=/^projects\/totonoe\/data\/(columns|contents)\/[a-z0-9-]+\.json$/.test(name);
     if(extensions.has(path.extname(name))||publicJson)await copyFile(name);
