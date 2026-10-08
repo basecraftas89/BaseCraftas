@@ -165,3 +165,10 @@ body[data-page^="story-"] .illustrated-title::before,body[data-page=contact] .il
 /* Hero subtitles are deliberately short, readable single lines. */
 .title-content>.hero-subtitle{white-space:nowrap!important;font-size:clamp(12px,1.1vw,15px);letter-spacing:0;line-height:1.8}
 @media(max-width:560px){.title-content>.hero-subtitle{font-size:13px}}
+
+/* Keep the cloud-news illustration at its natural wide hero proportions. */
+body[data-page=news] .scene-title{height:auto;aspect-ratio:1672/941;min-height:0}
+body[data-page=news] .scene-title>img:first-child{object-fit:cover;object-position:center}
+@media(max-width:560px){body[data-page=news] .scene-title{aspect-ratio:auto}body[data-page=news] .scene-title>img:first-child{aspect-ratio:1672/941}}
+.hero-video{position:absolute;z-index:0;object-fit:cover;pointer-events:none}.hero-video[hidden]{display:none}.hero-motion-toggle{position:absolute;right:22px;bottom:35px;z-index:5;padding:9px 16px;border:1px solid #fff5;border-radius:30px;background:#102d38e6;color:#fff3d8;font:inherit;font-size:12px;cursor:pointer}.hero-motion-toggle:focus-visible{outline:3px solid #f4ce78;outline-offset:3px}.hero-motion-toggle[hidden]{display:none}
+.welcome-routes{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:1.5rem 0}.mini-lessons{padding-block:3rem}.mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}.mini-grid article{padding:1.6rem;border:1px solid #85b6a7;border-radius:1.2rem;background:var(--panel,#173e49);color:var(--text,#fff)}.mini-grid h3{font-size:1.35rem}.mini-grid p{line-height:1.9}.mini-grid a{color:inherit;text-decoration:underline}.lesson-prompt{padding:1rem;border-left:3px solid #e4c977;background:#ffffff0a}.reading-time{padding:1rem;border-radius:.7rem;background:#ffffff10}.mini-grid .fine-print{font-size:.8rem}html[data-theme=light] .mini-grid article{background:#fff;color:#183842}@media(max-width:800px){.mini-grid{grid-template-columns:1fr}.service-panel{margin-top:1rem}}

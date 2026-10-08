@@ -150,3 +150,39 @@ document.addEventListener('keydown', event => {
     activityMenu.querySelector('summary').focus();
   }
 });
+
+(() => {
+ if (!window.matchMedia || !window.IntersectionObserver || !window.ResizeObserver) return;
+ const connection = navigator.connection;
+ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+ document.querySelectorAll('[data-hero-video]').forEach(hero => {
+  const img = hero.querySelector('picture img, :scope > img:first-child');
+  if (!img) return;
+  const video = document.createElement('video');
+  video.className = 'hero-video'; video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'metadata';
+  video.poster = img.src; video.setAttribute('aria-hidden', 'true');
+  const control = document.createElement('button'); control.className = 'hero-motion-toggle'; control.type = 'button'; control.textContent = '動画を停止';
+  hero.append(video, control);
+  let visible = false, stopped = false, failed = false;
+  const fit = () => {
+   const r = img.getBoundingClientRect(), h = hero.getBoundingClientRect();
+   Object.assign(video.style, {left: `${r.left-h.left}px`,top: `${r.top-h.top}px`,width: `${r.width}px`,height: `${r.height}px`,objectPosition: getComputedStyle(img).objectPosition});
+  };
+  const sync = () => {
+   const active = visible && !stopped && !reduced.matches && !connection?.saveData && !failed && !document.hidden;
+   video.hidden = reduced.matches || Boolean(connection?.saveData) || failed;
+   control.hidden = reduced.matches || Boolean(connection?.saveData) || failed;
+   control.textContent = stopped ? '動画を再生' : '動画を停止';
+   if (active) {
+    if (!video.getAttribute('src')) video.src = hero.dataset.heroVideo;
+    video.play().catch(() => {stopped=true; control.textContent='動画を再生';});
+   } else video.pause();
+  };
+  control.addEventListener('click', () => {stopped = !stopped; sync();});
+  video.addEventListener('error', () => {failed=true; sync();});
+  connection?.addEventListener?.('change',sync);
+ reduced.addEventListener('change', sync); document.addEventListener('visibilitychange', sync);
+  new IntersectionObserver(entries => {visible=entries[0].isIntersecting; sync();}).observe(hero);
+  new ResizeObserver(fit).observe(hero); img.addEventListener('load',fit); fit(); sync();
+ });
+})();
