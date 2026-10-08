@@ -1,7 +1,8 @@
 from pathlib import Path
+import os
 from html.parser import HTMLParser
 from urllib.parse import urlsplit,urljoin,unquote
-root=Path(__file__).resolve().parents[1]/'dist-projects-optimized'
+root=Path(os.environ.get('PROJECTS_RELEASE_OUTPUT',Path(__file__).resolve().parents[1]/'dist-projects-optimized'))
 class Page(HTMLParser):
  def __init__(self):super().__init__();self.refs=[];self.ids=set()
  def handle_starttag(self,tag,attrs):
@@ -9,7 +10,7 @@ class Page(HTMLParser):
   if tag=='meta' and a.get('property',a.get('name')) in {'og:image','twitter:image'} and a.get('content'):self.refs.append(a['content'])
   if a.get('srcset'):self.refs.extend(x.strip().split()[0] for x in a['srcset'].split(','))
   if 'id' in a:self.ids.add(a['id'])
-  for k in ['src','href','poster']:
+  for k in ['src','href','poster','data-hero-video']:
    if k in a and not (tag=='link' and a.get('rel')=='canonical'):self.refs.append(a[k])
 pages={}
 for f in root.rglob('*.html'):
