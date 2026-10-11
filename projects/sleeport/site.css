@@ -172,3 +172,23 @@ body[data-page=news] .scene-title>img:first-child{object-fit:cover;object-positi
 @media(max-width:560px){body[data-page=news] .scene-title{aspect-ratio:auto}body[data-page=news] .scene-title>img:first-child{aspect-ratio:1672/941}}
 .hero-video{position:absolute;z-index:0;object-fit:cover;pointer-events:none}.hero-video[hidden]{display:none}.hero-motion-toggle{position:absolute;right:22px;bottom:35px;z-index:5;padding:9px 16px;border:1px solid #fff5;border-radius:30px;background:#102d38e6;color:#fff3d8;font:inherit;font-size:12px;cursor:pointer}.hero-motion-toggle:focus-visible{outline:3px solid #f4ce78;outline-offset:3px}.hero-motion-toggle[hidden]{display:none}
 .welcome-routes{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:1.5rem 0}.mini-lessons{padding-block:3rem}.mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}.mini-grid article{padding:1.6rem;border:1px solid #85b6a7;border-radius:1.2rem;background:var(--panel,#173e49);color:var(--text,#fff)}.mini-grid h3{font-size:1.35rem}.mini-grid p{line-height:1.9}.mini-grid a{color:inherit;text-decoration:underline}.lesson-prompt{padding:1rem;border-left:3px solid #e4c977;background:#ffffff0a}.reading-time{padding:1rem;border-radius:.7rem;background:#ffffff10}.mini-grid .fine-print{font-size:.8rem}html[data-theme=light] .mini-grid article{background:#fff;color:#183842}@media(max-width:800px){.mini-grid{grid-template-columns:1fr}.service-panel{margin-top:1rem}}
+
+/* 2026-10-11: static model-faithful scenes, with contained editorial images. */
+body[data-visual-revision] .illustrated-section{background:transparent!important;padding:28px 0;overflow:visible}
+body[data-visual-revision] .illustrated-inner{max-width:1160px;margin-inline:auto;padding:36px;gap:44px;border-radius:36px;border:1px solid #628c8659;box-shadow:0 18px 46px #03192126;isolation:isolate}
+body[data-visual-revision] .illustrated-inner>img{display:block;position:relative;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:70% center;border-radius:26px;overflow:hidden;box-shadow:0 10px 26px #0319213d}
+body[data-visual-revision] .forest-section .illustrated-inner{background:#163c3f}
+body[data-visual-revision] .market-section .illustrated-inner{background:#153542}
+body[data-visual-revision] .learning-section{padding-block:44px}
+body[data-visual-revision] .learning-section .illustrated-inner{background:#f4eddf;color:#193c48;border-color:#d9cbaa}
+body[data-visual-revision] .learning-section .illustrated-inner p{color:#425f67}
+body[data-visual-revision] .learning-section .illustrated-inner .eyebrow{color:#2a695a}
+body[data-visual-revision] .illustrated-inner h2{font-size:clamp(26px,2.5vw,34px);margin-top:8px}
+body[data-visual-revision] .official-model-hero>img:first-child{object-position:center}
+body[data-visual-revision] .illustrated-title:not(.scene-title){min-height:340px}
+:root[data-theme=light] body[data-visual-revision] .forest-section .illustrated-inner{background:#e4eee5;border-color:#b6cdbb}
+:root[data-theme=light] body[data-visual-revision] .market-section .illustrated-inner{background:#e5edf0;border-color:#b4cbd2}
+:root[data-theme=light] body[data-visual-revision] .learning-section .illustrated-inner{background:#fffcf4}
+@media(max-width:800px){body[data-visual-revision] .illustrated-section{padding-inline:24px}body[data-visual-revision] .illustrated-inner{padding:26px;gap:28px;border-radius:28px}}
+@media(max-width:560px){body[data-visual-revision] .illustrated-section{padding:18px 20px}body[data-visual-revision] .illustrated-inner,body[data-visual-revision] .illustrated-inner.reverse{display:flex;flex-direction:column;align-items:stretch;padding:18px;gap:24px;border-radius:26px}body[data-visual-revision] .illustrated-inner>img{border-radius:18px;aspect-ratio:16/10}body[data-visual-revision] .illustrated-inner>div{padding:0 6px 8px}body[data-visual-revision] .illustrated-title:not(.scene-title){min-height:0}body[data-visual-revision] .official-model-hero>img:first-child{height:auto;aspect-ratio:16/9;object-fit:contain}}
+body[data-visual-revision] .profile-image img{object-position:right center;}

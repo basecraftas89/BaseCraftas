@@ -35,7 +35,7 @@ while queue:
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'none'
-  X-BaseCraftas-Projects-Release: 20261008
+  X-BaseCraftas-Projects-Release: 20261011
 ''')
 (OUT/'404.html').write_text('<!doctype html><html lang="ja"><meta charset="utf-8"><title>ページが見つかりません</title><h1>ページが見つかりません</h1><a href="/projects/">プロジェクト一覧へ</a></html>')
 files=[p for p in OUT.rglob('*') if p.is_file()]
