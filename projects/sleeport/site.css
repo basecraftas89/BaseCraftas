@@ -194,5 +194,9 @@ body[data-visual-revision] .illustrated-title:not(.scene-title){min-height:340px
 body[data-visual-revision] .profile-image img{object-position:right center;}
 
 /* Keep reclining dolphin's entire horizontal silhouette visible. */
-body[data-visual-revision="character-poses-20261011"] .profile-image img{aspect-ratio:16/9;object-fit:contain;height:auto;width:100%;border-radius:22px;}
-body[data-visual-revision="character-poses-20261011"] .pose-portrait{aspect-ratio:16/9!important;object-fit:contain!important;height:auto!important;border-radius:22px!important;width:100%!important;}
+
+.learning-route-stop{display:flex;align-items:flex-start;gap:18px}.learning-route-stop .route-number{flex:0 0 40px;margin:0}.learning-route-stop>div{min-width:0;flex:1}
+@media(max-width:560px){.learning-route{grid-template-columns:1fr}.learning-route-stop{gap:16px}}
+
+.learning-route-stop .route-number{width:40px;height:40px;min-height:40px;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:50%}
+@media(min-width:561px) and (max-width:1000px){.learning-route{grid-template-columns:repeat(2,minmax(0,1fr))}}
