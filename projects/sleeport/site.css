@@ -192,3 +192,7 @@ body[data-visual-revision] .illustrated-title:not(.scene-title){min-height:340px
 @media(max-width:800px){body[data-visual-revision] .illustrated-section{padding-inline:24px}body[data-visual-revision] .illustrated-inner{padding:26px;gap:28px;border-radius:28px}}
 @media(max-width:560px){body[data-visual-revision] .illustrated-section{padding:18px 20px}body[data-visual-revision] .illustrated-inner,body[data-visual-revision] .illustrated-inner.reverse{display:flex;flex-direction:column;align-items:stretch;padding:18px;gap:24px;border-radius:26px}body[data-visual-revision] .illustrated-inner>img{border-radius:18px;aspect-ratio:16/10}body[data-visual-revision] .illustrated-inner>div{padding:0 6px 8px}body[data-visual-revision] .illustrated-title:not(.scene-title){min-height:0}body[data-visual-revision] .official-model-hero>img:first-child{height:auto;aspect-ratio:16/9;object-fit:contain}}
 body[data-visual-revision] .profile-image img{object-position:right center;}
+
+/* Keep reclining dolphin's entire horizontal silhouette visible. */
+body[data-visual-revision="character-poses-20261011"] .profile-image img{aspect-ratio:16/9;object-fit:contain;height:auto;width:100%;border-radius:22px;}
+body[data-visual-revision="character-poses-20261011"] .pose-portrait{aspect-ratio:16/9!important;object-fit:contain!important;height:auto!important;border-radius:22px!important;width:100%!important;}
