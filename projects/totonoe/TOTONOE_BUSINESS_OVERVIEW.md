@@ -4,6 +4,14 @@
 
 対象：事業、サービス、マネタイズ、ホームページ、運営基盤
 
+
+## 2026年10月17日：第21回の公開音声・録画とTAYORI一覧（本番反映済み）
+
+- 第21回「指輪型AIで何が変わる？Gemini活用と偽メールへの備え」（2026-10-17）を公開Podcastと動画アーカイブ、TAYORIの同じ2一覧へ反映。stand.fm `6ad34d763054e4cbe5ed5eb4`、Drive動画 `1jzQpGVvEpcGI4A6vuHbVDewEmjZdZhto` を再利用し、重複投稿・共有変更は行っていない。
+- 現行公開JSから欠落していた確認済み第20回の2件も復元。その他の公開JS本文、既存TAYORI20回分、朝会ページHTML、お知らせを保持した。今週PDFは既存同期で会員DBに登録済みで、追加登録なし。
+- 最新本番コード全文・23モジュール・bindings・アセット設定を保持した応答差分のみを既存 `basecraftas-tayori` Workerへ配信。version `007e5c6f-bd86-47b4-a829-cd970a1368de`。HTTP readbackで第21回各1件、未ログイン資料・動画APIの401を確認。会員ログイン後の画面・再生はブラウザ担当の確認待ち。
+- GitHubは第20回専用ブランチを基準にした第21回専用ブランチへ必要差分のみ保存する。古いmainの全体buildは実施しない。追加お知らせ・メール・定期処理は作成しない。
+
 ## 2026年9月22日：つまみの固定動画廃止とStudio登録の安定化（本番反映済み）
 
 - `service-content.js` に固定していた旧YouTube動画3件を削除し、つまみの動画表示元をStudioの公開JSONへ一本化した。GitHub `main` の `a846fcb` と静的Workerへ反映し、公開ページと公開JSONで旧3件が含まれないことを確認した。確認時のWorker Version IDは `bdfa3fc1-d34b-4ef7-8a92-95d7226c7efd`。
