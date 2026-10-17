@@ -1,8 +1,71 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-10-17T16:49:01.918Z",
+  "updated_at": "2026-10-17T16:51:26.324Z",
   "articles": [
+    {
+      "id": "article_959afcc4-3c6b-45e4-a5ce-da44d37047e4",
+      "revision": 23,
+      "slug": "gemini-4-argon-workspace-access-check",
+      "title": "Gemini 4 Argonに追加課金する価値は？公式評価と仕事での活かし方を考える",
+      "excerpt": "Argonがいいと聞くけれど、もうChatGPTやClaudeに課金していたら、追加する意味って何だろう。公式の数字を見ながら、僕ならどんな仕事で試したいか、Googleに期待していることも書いてみました。",
+      "category": "content",
+      "destination": "tsuzuri",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "topic_tags": [
+        "Gemini",
+        "Google Workspace",
+        "AIリテラシー",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "tags": [
+        "Gemini",
+        "Google Workspace",
+        "AIリテラシー",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "main_actor_id": "shindo-toshiki",
+      "main_actor": {
+        "id": "shindo-toshiki",
+        "name": "神藤 俊希"
+      },
+      "speaker_ids": [],
+      "speakers": [],
+      "media_url": "",
+      "episode_no": null,
+      "source_published_at": "",
+      "source_type": "external",
+      "source_id": "",
+      "seminar_details": null,
+      "public_target": "つづり｜TSUZURI",
+      "external_link": null,
+      "seo": {
+        "title": "",
+        "description": "",
+        "hero_alt": "",
+        "author_type": "Organization",
+        "author_name": "",
+        "author_url": "",
+        "reviewer_name": "",
+        "reviewer_url": "",
+        "related_ids": []
+      },
+      "first_published_at": "2026-10-17",
+      "content_modified_at": "2026-10-17",
+      "content_hash": "f1de6f14a29e4226f49bfe550b5f864938b9927fdba0c1d9ddd55f504df0ed54",
+      "hero_url": "https://basecraftas.com/column-media/contents/2026/10/c1872d37-aad4-4772-93ae-22ebf665d819-argon-hero.jpg",
+      "has_member_section": false,
+      "status": "published",
+      "url": "tsuzuri/gemini-4-argon-workspace-access-check.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/gemini-4-argon-workspace-access-check.html",
+      "published_at": "2026-10-17",
+      "updated_at": "2026-10-17T16:51:25.446Z"
+    },
     {
       "id": "article_9bf54016-7c20-493e-8bbd-397bb309a2f8",
       "revision": 17,
