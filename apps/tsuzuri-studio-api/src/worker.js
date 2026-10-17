@@ -1224,7 +1224,7 @@ async function publicationStatus(request, env, id) {
 }
 
 async function enqueuePublish(request, env, id) {
-  const auth = await requireRole(request, env, ["admin"]);
+  const auth = await requireRole(request, env, ["admin", "editor"]);
   if (auth.error) return auth.error;
 
   const article = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();

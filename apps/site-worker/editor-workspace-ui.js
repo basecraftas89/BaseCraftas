@@ -8,6 +8,7 @@ export function patchEditorWorkspaceScript(source){
  once("async function publish(){\n    if(busyPublishing)return;", "async function publish(){\n    if(busyPublishing){toast('公開処理中です。完了するまでお待ちください');return;}");
  once("busyPublishing=true;var lockedControls=", "var publishButtonLabel=button.textContent;button.textContent='公開準備中…';setPublication('保存中…','公開する内容をチームに保存しています');busyPublishing=true;var lockedControls=");
  once("await syncRemoteArticle(p);\n      setPublication('公開処理中'", "await syncRemoteArticle(p);\n      if(!sourceOnly){setPublication('公開前の確認中…','この版の確認記録を確認しています');var review=await api('/api/articles/'+p.id+'/editorial-review');if(review.required&&review.block)throw new Error(review.block);}\n      setPublication('公開処理中'");
+ once("}catch(error){setPublication('公開を完了できませんでした',error.message);saveError(error);}", "}catch(error){if(error.status===403)error.message='このアカウントに記事の公開権限がありません。公開権限のあるメンバーへ依頼してください。';setPublication('公開を完了できませんでした',error.message);saveError(error);}");
  once("button.disabled=false;els.editor.contentEditable='true';renderDashboard();renderPosts();}", "button.disabled=false;button.textContent=publishButtonLabel;els.editor.contentEditable='true';renderDashboard();renderPosts();}");
  return source;
 }
