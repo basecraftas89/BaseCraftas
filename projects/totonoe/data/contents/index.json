@@ -1,8 +1,69 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-09-22T14:52:58.643Z",
+  "updated_at": "2026-10-17T16:48:22.822Z",
   "articles": [
+    {
+      "id": "article_9926c3ac-fa3a-4726-8509-0fbda9061943",
+      "revision": 24,
+      "slug": "ainatura-interface",
+      "title": "指輪型AI「Natura Interface」で変わる仕事の入口——スマホを開かず、その場で頼む未来",
+      "excerpt": "AIに頼むためにスマホを開く。そのひと手間がなくなると何が変わるのか。操作の入口の変遷をたどり、リングより耳をふさがない小さなマイクが欲しい、という僕の感想も交えて考えます。",
+      "category": "content",
+      "destination": "tsuzuri",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "topic_tags": [
+        "AI活用",
+        "情報管理",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "tags": [
+        "AI活用",
+        "情報管理",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "main_actor_id": "shindo-toshiki",
+      "main_actor": {
+        "id": "shindo-toshiki",
+        "name": "神藤 俊希"
+      },
+      "speaker_ids": [],
+      "speakers": [],
+      "media_url": "",
+      "episode_no": null,
+      "source_published_at": "",
+      "source_type": "external",
+      "source_id": "",
+      "seminar_details": null,
+      "public_target": "つづり｜TSUZURI",
+      "external_link": null,
+      "seo": {
+        "title": "",
+        "description": "",
+        "hero_alt": "",
+        "author_type": "Organization",
+        "author_name": "",
+        "author_url": "",
+        "reviewer_name": "",
+        "reviewer_url": "",
+        "related_ids": []
+      },
+      "first_published_at": "2026-10-17",
+      "content_modified_at": "2026-10-17",
+      "content_hash": "461bcd59b8d3c7d01295ed163d962244c45f2074227895dd49881393b4c98819",
+      "hero_url": "https://basecraftas.com/column-media/contents/2026/10/74bc33bf-1ef1-413b-92fd-8702c4ebd0ed-natura-hero.jpg",
+      "has_member_section": false,
+      "status": "published",
+      "url": "tsuzuri/ainatura-interface.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/ainatura-interface.html",
+      "published_at": "2026-10-17",
+      "updated_at": "2026-10-17T16:48:21.590Z"
+    },
     {
       "id": "article_7ab773e0-6e8f-43e6-a5d4-1f188fdabafb",
       "revision": 4,
