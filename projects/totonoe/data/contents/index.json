@@ -1,8 +1,71 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-10-17T17:10:24.650Z",
+  "updated_at": "2026-10-17T23:19:59.232Z",
   "articles": [
+    {
+      "id": "article_3de05860-f897-433f-8666-31a4bcb68934",
+      "revision": 186,
+      "slug": "ai-presentation-audience-decision-message",
+      "title": "AI時代のプレゼン資料づくり｜きれいに作った先で「伝わるか」を確かめる",
+      "excerpt": "柳井氏の白背景・黒文字のシンプルな資料を入口に、AIで整った見た目をつくれる今こそ大切にしたい「相手に正確に伝わるか」を考えます。発表用と配布用の使い分け、伝わり方の確認手順も整理します。",
+      "category": "content",
+      "destination": "tsuzuri",
+      "content_type": "column",
+      "content_type_label": "つづり｜TSUZURI",
+      "topic_tags": [
+        "AI活用",
+        "資料作成",
+        "プレゼン設計",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "tags": [
+        "AI活用",
+        "資料作成",
+        "プレゼン設計",
+        "医療介護",
+        "産業保健",
+        "週末のAI整え習慣"
+      ],
+      "main_actor_id": "shindo-toshiki",
+      "main_actor": {
+        "id": "shindo-toshiki",
+        "name": "神藤 俊希"
+      },
+      "speaker_ids": [],
+      "speakers": [],
+      "media_url": "",
+      "episode_no": null,
+      "source_published_at": "",
+      "source_type": "external",
+      "source_id": "",
+      "seminar_details": null,
+      "public_target": "つづり｜TSUZURI",
+      "external_link": null,
+      "seo": {
+        "title": "",
+        "description": "",
+        "hero_alt": "",
+        "author_type": "Organization",
+        "author_name": "",
+        "author_url": "",
+        "reviewer_name": "",
+        "reviewer_url": "",
+        "related_ids": []
+      },
+      "first_published_at": "2026-10-17",
+      "content_modified_at": "2026-10-17T23:19:58.583Z",
+      "content_hash": "b1823c1450937206308de540c81864b1651430d533cf62850d1144514fafc4bf",
+      "hero_url": "https://basecraftas.com/column-media/contents/2026/10/8c437cde-8324-4989-9eae-e1ace4a8ad7a-presentation-hero.jpg",
+      "has_member_section": false,
+      "status": "published",
+      "url": "tsuzuri/ai-presentation-audience-decision-message.html",
+      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/ai-presentation-audience-decision-message.html",
+      "published_at": "2026-10-17",
+      "updated_at": "2026-10-17T23:19:58.547Z"
+    },
     {
       "id": "article_7ab773e0-6e8f-43e6-a5d4-1f188fdabafb",
       "revision": 4,
