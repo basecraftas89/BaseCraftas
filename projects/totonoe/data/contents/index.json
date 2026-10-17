@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-13T00:00:00.000Z",
   "article_count": 5,
-  "updated_at": "2026-10-17T17:10:07.974Z",
+  "updated_at": "2026-10-17T17:10:14.624Z",
   "articles": [
     {
       "id": "article_3de05860-f897-433f-8666-31a4bcb68934",
@@ -128,67 +128,6 @@
       "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/gemini-4-argon-workspace-access-check.html",
       "published_at": "2026-10-17",
       "updated_at": "2026-10-17T16:51:25.446Z"
-    },
-    {
-      "id": "article_9bf54016-7c20-493e-8bbd-397bb309a2f8",
-      "revision": 17,
-      "slug": "phishing-lookalike-url-official-entry-check",
-      "title": "フィッシングはURL確認だけで防げる？キリル文字から考える、見抜く力に頼らない対策",
-      "excerpt": "URLを見て確認したのに、見抜けない。だったら「もっと気をつけて」で終わらせず、確認する流れを変えたいですよね。キリル文字の仕組みから、受け取る側・送る側でできることを、僕なりに考えてみました。",
-      "category": "content",
-      "destination": "tsuzuri",
-      "content_type": "column",
-      "content_type_label": "つづり｜TSUZURI",
-      "topic_tags": [
-        "情報管理",
-        "AIリテラシー",
-        "医療介護",
-        "産業保健",
-        "週末のAI整え習慣"
-      ],
-      "tags": [
-        "情報管理",
-        "AIリテラシー",
-        "医療介護",
-        "産業保健",
-        "週末のAI整え習慣"
-      ],
-      "main_actor_id": "shindo-toshiki",
-      "main_actor": {
-        "id": "shindo-toshiki",
-        "name": "神藤 俊希"
-      },
-      "speaker_ids": [],
-      "speakers": [],
-      "media_url": "",
-      "episode_no": null,
-      "source_published_at": "",
-      "source_type": "external",
-      "source_id": "",
-      "seminar_details": null,
-      "public_target": "つづり｜TSUZURI",
-      "external_link": null,
-      "seo": {
-        "title": "",
-        "description": "",
-        "hero_alt": "",
-        "author_type": "Organization",
-        "author_name": "",
-        "author_url": "",
-        "reviewer_name": "",
-        "reviewer_url": "",
-        "related_ids": []
-      },
-      "first_published_at": "2026-10-17",
-      "content_modified_at": "2026-10-17",
-      "content_hash": "32c5cd4a7ccf0a5ac79a58eb9b5e9add34c90685b58b7d2c45717c3817bb3d0d",
-      "hero_url": "https://basecraftas.com/column-media/contents/2026/10/738e8c15-8b79-4a46-8fb2-0fee06ea2fdd-phishing-hero.jpg",
-      "has_member_section": false,
-      "status": "published",
-      "url": "tsuzuri/phishing-lookalike-url-official-entry-check.html",
-      "absolute_url": "https://basecraftas.com/projects/totonoe/tsuzuri/phishing-lookalike-url-official-entry-check.html",
-      "published_at": "2026-10-17",
-      "updated_at": "2026-10-17T16:49:01.122Z"
     },
     {
       "id": "article_7ab773e0-6e8f-43e6-a5d4-1f188fdabafb",
