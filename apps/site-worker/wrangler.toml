@@ -1,5 +1,5 @@
 name = "basecraftas"
-main = "worker.js"
+main = "published-runtime/worker.js"
 compatibility_date = "2026-09-11"
 workers_dev = false
 preview_urls = false
@@ -8,10 +8,28 @@ preview_urls = false
 # deployment. Character stories are generated from Studio JSON during this
 # step, so deploying a stale dist directory would otherwise remove their URLs.
 [build]
-command = "npm run build"
+command = "node scripts/public-release-guard.mjs --source && npm run build"
 cwd = "."
 
 [assets]
 directory = "../../dist"
 binding = "ASSETS"
 run_worker_first = true
+
+[[services]]
+binding = "MEMBER_API"
+service = "column-studio-api"
+
+[[services]]
+binding = "MEMBER_UI_ASSETS"
+service = "totonoe-member-ui"
+
+[[services]]
+binding = "PUBLIC_UI_ASSETS"
+service = "totonoe-public-ui"
+
+# Existing binary media imports from the confirmed runtime.
+[[rules]]
+type = "Data"
+globs = ["**/*.bin"]
+fallthrough = true
