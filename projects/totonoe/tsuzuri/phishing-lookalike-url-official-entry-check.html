@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index,follow">
+<meta name="content-revision" content="17">
+<title>フィッシングはURL確認だけで防げる？キリル文字から考える、見抜く力に頼らない対策｜ToToNoE+ つづり｜TSUZURI</title>
+<meta name="description" content="URLを見て確認したのに、見抜けない。だったら「もっと気をつけて」で終わらせず、確認する流れを変えたいですよね。キリル文字の仕組みから、受け取る側・送る側でできることを、僕なりに考えてみました。">
+<link rel="canonical" href="https://basecraftas.com/projects/totonoe/tsuzuri/phishing-lookalike-url-official-entry-check.html">
+<meta property="og:title" content="フィッシングはURL確認だけで防げる？キリル文字から考える、見抜く力に頼らない対策｜ToToNoE+ つづり｜TSUZURI">
+<meta property="og:description" content="URLを見て確認したのに、見抜けない。だったら「もっと気をつけて」で終わらせず、確認する流れを変えたいですよね。キリル文字の仕組みから、受け取る側・送る側でできることを、僕なりに考えてみました。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://basecraftas.com/projects/totonoe/tsuzuri/phishing-lookalike-url-official-entry-check.html">
+<meta property="og:image" content="https://basecraftas.com/column-media/contents/2026/10/738e8c15-8b79-4a46-8fb2-0fee06ea2fdd-phishing-hero.jpg">
+<meta property="og:image:alt" content="フィッシングはURL確認だけで防げる？キリル文字から考える、見抜く力に頼らない対策">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://basecraftas.com/column-media/contents/2026/10/738e8c15-8b79-4a46-8fb2-0fee06ea2fdd-phishing-hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=20260916-content-hub">
+
+<style>
+.column-actor{display:flex;align-items:center;gap:.75rem;margin-top:1.2rem;color:var(--ink-soft);font-size:.9rem}
+.column-actor strong{color:var(--teal-deep)}
+.content-media-link{margin-top:1.2rem}
+.content-media-link a{display:inline-flex;align-items:center;gap:.4rem;padding:.72rem 1rem;border-radius:999px;background:var(--teal-deep);color:#fff;font-weight:700;text-decoration:none}
+.column-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.3rem}
+.column-tags span{padding:.3rem .6rem;border-radius:999px;background:rgba(61,107,94,.12);color:var(--teal-deep);font-size:.74rem}
+.column-hero-image{margin:0 0 2.25rem}
+.column-hero-image img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:18px;background:#fff;box-shadow:var(--shadow-sm)}
+.column-body-inner{font-size:1rem;line-height:2.08;overflow-wrap:anywhere}
+.column-body-inner h2{margin:2.8rem 0 1rem;font-size:1.65rem;color:var(--teal-deep)}
+.column-body-inner h3{margin:2rem 0 .8rem;font-size:1.28rem;color:var(--teal-deep)}
+.column-body-inner figure{margin:1.8rem 0}.column-body-inner figure img{display:block;width:100%;height:auto}.column-body-inner figcaption{margin-top:.65rem;font-size:.8rem;line-height:1.7;color:var(--ink-soft)}
+.column-body-inner hr{border:0;border-top:2px solid #8ba897;margin:3rem 0 2rem}
+.column-body-inner p+p{margin-top:1.1rem}
+.column-body-inner a{color:var(--sage);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
+.column-body-inner mark{background:#fff0a8;padding:.05em .22em;border-radius:.2em}
+.column-body-inner blockquote{margin:2rem 0;padding:1.3rem 1.5rem;border-left:4px solid var(--sun);background:var(--sky-2)}
+.editor-bubble{display:grid;grid-template-columns:92px minmax(0,1fr);gap:1rem;align-items:start;margin:2rem 0}
+.editor-bubble.right{grid-template-columns:minmax(0,1fr) 92px}
+.editor-bubble.right .bubble-avatar{order:2}
+.bubble-avatar{text-align:center}
+.character-icon{width:82px;height:82px;object-fit:cover;border-radius:50%;box-shadow:var(--shadow-card)}
+.character-nameplate{display:block;width:110px;max-width:110px;margin:.35rem 0 0 50%;transform:translateX(-50%)}
+.bubble-copy{padding:1.2rem 1.4rem;border:1px solid var(--line);border-radius:14px;background:var(--sky-2)}
+.column-back{display:inline-block;margin-top:3rem;color:var(--teal-deep);font-weight:700}
+.member-content-gate{margin:2.5rem 0 0;padding:1.5rem;border:1px solid rgba(61,107,94,.24);border-radius:16px;background:linear-gradient(135deg,#f3f8f5,#fffaf4);text-align:center}
+.member-content-gate strong,.member-content-gate span{display:block}.member-content-gate strong{color:var(--teal-deep);font-size:1.08rem}.member-content-gate span{margin:.45rem 0 1rem;color:var(--ink-soft);font-size:.88rem}.member-content-gate button{display:inline-flex;justify-content:center;align-items:center;min-height:42px;padding:.65rem 1.1rem;border:0;border-radius:999px;background:var(--teal-deep);color:#fff;font:700 .86rem/1.3 inherit;cursor:pointer}.member-content-status{margin:.8rem 0 0!important;font-size:.78rem!important;color:var(--ink-soft)!important}
+.article-share{margin:3.3rem 0 0;padding-top:1.5rem;border-top:1px solid var(--line)}.article-share h2{margin:0 0 .35rem!important;font-size:1rem!important}.article-share p{margin:0 0 .9rem;color:var(--ink-soft);font-size:.82rem}.article-share-buttons{display:flex;flex-wrap:wrap;gap:.55rem}.article-share-buttons button{min-height:40px;padding:.55rem .9rem;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--teal-deep);font-weight:700;cursor:pointer}.article-share-buttons button:hover{border-color:var(--sage);background:var(--sky-2)}
+@media(max-width:700px){.column-hero{padding:7rem 2rem 3rem}.column-wrap{width:min(100% - 32px,880px)}.editor-bubble,.editor-bubble.right{grid-template-columns:1fr}.editor-bubble.right .bubble-avatar{order:0}}
+/* Shared by public articles, previews and the Studio editor. */
+.editor-bubble .character-nameplate{display:none!important}
+.editor-bubble{--avatar-size:72px;--bubble-fill:#f3f6f4;--bubble-line:#cdd8d1;display:grid!important;grid-template-columns:var(--avatar-size) minmax(0,1fr)!important;gap:16px!important;align-items:start!important;margin:1.8em 0!important;max-width:100%;clear:both}
+.editor-bubble.right{grid-template-columns:minmax(0,1fr) var(--avatar-size)!important}
+.editor-bubble .bubble-avatar{width:var(--avatar-size)!important;min-width:0;text-align:center;grid-column:1;grid-row:1;order:0!important}
+.editor-bubble.right .bubble-avatar{grid-column:2;order:2!important}
+.editor-bubble .character-icon{display:block!important;width:var(--avatar-size)!important;height:var(--avatar-size)!important;max-width:100%!important;object-fit:contain;border-radius:50%;margin:0!important}
+.editor-bubble .bubble-copy{position:relative;grid-column:2;grid-row:1;min-width:0;margin:0!important;padding:16px 18px!important;border:1px solid var(--bubble-line)!important;border-radius:16px!important;background:var(--bubble-fill)!important;overflow-wrap:anywhere;line-height:1.85}
+.editor-bubble.right .bubble-copy{grid-column:1}
+.editor-bubble .bubble-copy::before{content:"";position:absolute;top:22px;left:-7px;width:12px;height:12px;background:var(--bubble-fill);border-left:1px solid var(--bubble-line);border-bottom:1px solid var(--bubble-line);transform:rotate(45deg)}
+.editor-bubble.right .bubble-copy::before{left:auto;right:-7px;border:0;border-right:1px solid var(--bubble-line);border-top:1px solid var(--bubble-line)}
+.editor-bubble .bubble-copy>:first-child{margin-top:0!important}.editor-bubble .bubble-copy>:last-child{margin-bottom:0!important}
+html[data-studio-theme=dark] .editor-bubble{--bubble-fill:#252525;--bubble-line:#555}
+@media(max-width:700px){.editor-bubble{--avatar-size:48px;gap:12px!important;margin:1.4em 0!important}.editor-bubble .bubble-copy{padding:12px 14px!important;font-size:15px;line-height:1.8}.editor-bubble .bubble-copy::before{top:17px}}
+@media(max-width:700px){.column-article .column-article-hero{padding-top:88px;padding-bottom:40px}.column-article .column-article-hero h1{font-size:clamp(26px,7vw,32px);line-height:1.45;overflow-wrap:anywhere;text-wrap:balance}.column-body-inner h2,.column-body-inner h3{scroll-margin-top:100px}.column-body-inner figure{max-width:100%}}
+
+</style>
+<link rel="stylesheet" href="/projects/totonoe/shared-header.css?v=20261005-content-label-v6"><script src="/projects/totonoe/shared-header.js?v=20261009-no-logo-character" defer></script></head>
+<body class="totonoe-header-layout"><header class="site-header totonoe-shared-header" id="siteHeader">
+<div class="header-inner"><a href="/projects/totonoe/" class="brand" aria-label="ToToNoE+ トップへ"><img src="/projects/totonoe/assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="brand-logo" width="1442" height="566"></a>
+<a href="/projects/totonoe/TAYORI/login.html" class="home-login">会員ログイン →</a><button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-controls="siteNav" aria-expanded="false"><span></span><span></span><span></span></button></div>
+<nav class="site-nav home-navigation" id="siteNav" aria-label="メインナビゲーション">
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/seminars.html">セミナー</a><button class="header-menu-toggle" aria-label="セミナーの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/weekend-ai.html">週末のAI整え習慣</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/contents.html">コンテンツ</a><button class="header-menu-toggle" aria-label="コンテンツの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/tsuzuri/">つづり｜TSUZURI</a><a href="/projects/totonoe/tsumami/">つまみ｜TSUMAMI</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/service.html">サービス</a><button class="header-menu-toggle" aria-label="サービスの項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/tayori.html">たより｜TAYORI</a><a href="/projects/totonoe/IROHA/">いろは｜IROHA</a></div></div>
+<div class="nav-dropdown"><a class="nav-main" href="/projects/totonoe/team.html">ToToNoE+について</a><button class="header-menu-toggle" aria-label="ToToNoE+についての項目を開く" aria-expanded="false">⌄</button><div class="nav-menu"><a href="/projects/totonoe/team.html">チーム</a><a href="/projects/totonoe/characters/">キャラクターと世界観</a><a href="/projects/totonoe/faq.html">よくある質問</a></div></div>
+</nav></header>
+
+<main>
+  <article class="column-article" data-article-id="article_9bf54016-7c20-493e-8bbd-397bb309a2f8">
+    <section class="column-article-hero">
+      <div class="container">
+        <figure class="column-hero-image"><img src="https://basecraftas.com/column-media/contents/2026/10/738e8c15-8b79-4a46-8fb2-0fee06ea2fdd-phishing-hero.jpg" alt=""></figure>
+        <p class="eyebrow">つづり｜TSUZURI / 2026-10-17</p>
+        <h1>フィッシングはURL確認だけで防げる？キリル文字から考える、見抜く力に頼らない対策</h1>
+        <p class="column-lead">URLを見て確認したのに、見抜けない。だったら「もっと気をつけて」で終わらせず、確認する流れを変えたいですよね。キリル文字の仕組みから、受け取る側・送る側でできることを、僕なりに考えてみました。</p>
+        <p class="column-actor">Main Actor <strong>神藤 俊希</strong> / Speaker <strong>—</strong></p>
+        
+        <div class="column-tags"><span>情報管理</span><span>AIリテラシー</span><span>医療介護</span><span>産業保健</span><span>週末のAI整え習慣</span></div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container column-article-body column-body-inner">
+        <p>今回の話で、僕が一番怖いなと思ったのは、「URLを見て確認すれば大丈夫」という対策が、それだけでは通用しないことなんですよね。怪しい文字の羅列だったら気づけても、いつもの文字とほとんど同じに見えたら、どうでしょうか。</p><p>「ちゃんと確認したから大丈夫」と思った人も、そこで止まってしまうかもしれない。だから、<mark><strong>見抜く力だけに頼らない流れへ、変えていく必要がある</strong></mark>と思うんです。メールのリンクはいったん触らず、いつもの公式アプリや、正しいと確認して登録したブックマークから開く。まずは、その習慣を考えたいです。</p><figure><img src="https://basecraftas.com/column-media/contents/2026/10/d2d0c249-64e5-4168-881a-9a66285946ea-phishing-source.webp" alt="2026年10月17日開催資料「8_10_17.pdf」p.13：ToToNoE+制作の元スライド全体" loading="lazy" width="100%" /><figcaption>2026年10月17日開催資料「8_10_17.pdf」p.13：ToToNoE+制作の元スライド全体</figcaption></figure><p>TAYORI・IROHAの有効な会員の方は、<a href="https://basecraftas.com/projects/totonoe/TAYORI/?view=backnumbers" target="_blank" rel="noopener noreferrer">会員ページで最新号・バックナンバーを確認できます</a>。</p><p>10月17日の「週末のAI整え習慣」でも話した内容です。共有された投稿が指す個別の事件については、発生や経緯まで確認できていません。ここではUnicode・ICANN・IPAの資料を見ながら、仕組みと対策を整理して、そこから僕が考えたことを書いていきます。</p><h2>キリル文字って、そもそも何なのか</h2><p>キリル文字は、ロシア語やウクライナ語などの表記に使われる文字体系です。英語などのラテン文字とは別の文字ですが、一部に字形の似たものがあります。例えば、ラテン文字の「a」はU+0061、キリル文字の「а」はU+0430です。大文字でも、ラテン文字の「A」はU+0041、キリル文字の「А」はU+0410で、それぞれ別の文字として符号が割り当てられています。U+で始まる番号はUnicodeのコードポイントです。</p><p>見た目は似ていても、コンピューターには別の文字なんですよね。使うフォントによって、似て見える度合いも変わります。Unicodeのセキュリティ仕様は、文字列のこうした視覚的な混同を扱っています。<a href="https://www.unicode.org/charts/PDF/U0400.pdf" target="_blank" rel="noopener noreferrer">原典：Unicodeのキリル文字表</a>／<a href="https://www.unicode.org/reports/tr39/" target="_blank" rel="noopener noreferrer">Unicode Security Mechanisms（識別子と似た文字の検出）</a></p><figure><img src="https://basecraftas.com/column-media/contents/2026/10/0c4c6e17-943d-4e80-8afd-dd8d938f22c3-phishing-1.webp" alt="補足図解1：見た目が似ていても異なる文字の例。ToToNoE+の独自概念図。公式画面ではありません。" loading="lazy" width="100%" /><figcaption>補足図解1：見た目が似ていても異なる文字の例。ToToNoE+の独自概念図。公式画面ではありません。</figcaption></figure><p>日本語などを含め、さまざまな文字をドメイン名に使う仕組みが国際化ドメイン名（IDN）です。似た字形を悪用して別のドメインを本物のように見せる手口は、IDNホモグラフ攻撃と呼ばれます。キリル文字や多言語のドメイン自体が危険なのではありません。ブラウザーや登録側にも対策があり、常に同じ表示になるわけではありませんが、利用者による目視だけを安全判断の根拠にしないことが大切です。</p><p>ICANNは2005年にも、この問題を取り上げています。なので、今回AIが初めて生み出した手口だとは言えないんですよね。<a href="https://www.icann.org/en/announcements/details/icann-statement-on-idn-homograph-attacks-and-request-for-public-comment-23-2-2005-en" target="_blank" rel="noopener noreferrer">原典：ICANNのIDNホモグラフ攻撃に関する説明</a></p><h2>少し知っているからこそ、安心してしまわないか</h2><p>ここで気になったのが、何も知らない人だけの話ではない、というところです。「変なドメインじゃないか確認する」と知っている人ほど、本物っぽく見えたときに「確認できた」と思ってしまうかもしれない。僕は、そこが怖いなと思ったんですよね。知識がいらないという話ではなくて、<mark>知っている対策も更新していかないといけない</mark>ということです。</p><p>ただ、「少し知識がある人が一番引っかかる」とまで言えるデータは、今回確認できていません。誰が危ないかを決めたいのではなくて、僕自身も「知っているから大丈夫」で止まらないようにしたい、という話です。</p><blockquote><p><strong>この記事の要点</strong></p><p>URLを見たことと、安全だと確かめられたことは、同じではないんですよね。見抜けないこともあると考えて、メールから離れて確認する習慣と、戻れる入口をセットで用意しておきたいです。</p></blockquote><div class="editor-bubble" data-character="mion-question"><div class="bubble-avatar" contenteditable="false"><img class="character-icon" src="https://basecraftas.com/projects/totonoe/assets/characters/mion-question.png" alt="ミオン" /></div><div class="bubble-copy"><p>文字の違いを毎回探すのは難しそう。いつもの入口から確かめる方法を覚えたいな。</p></div></div><h2>メールのリンクを押す前に、いつもの入口へ戻る</h2><p>IPAも、普段のブックマークや正規アプリから開く方法を案内しています。アカウント停止、請求、支払い、本人確認、健康情報の入力。こういう大事な操作を求められたら、僕はまずメールのリンクを使わずに確かめる流れにした方がいいと思います。<a href="https://www.ipa.go.jp/security/anshin/attention/2021/mgdayori20210831.html" target="_blank" rel="noopener noreferrer">IPAの案内はこちら</a>です。</p><p>差出人の名前に見覚えがあっても、それだけで今回の依頼まで本物とは限りません。メールに書かれた電話番号へかければ安心、でもないんですよね。以前から確認してある入口や連絡先に戻る。検索広告も、そのまま正規の入口だと決めつけないようにしたいです。</p><figure><img src="https://basecraftas.com/column-media/contents/2026/10/4911be90-993b-49db-aa69-0251ee82e1b5-phishing-2.webp" alt="補足図解2：リンクを離れ、公式の入口・通知・担当窓口で確認する。ToToNoE+の独自概念図。公式画面ではありません。" loading="lazy" width="100%" /><figcaption>補足図解2：リンクを離れ、公式の入口・通知・担当窓口で確認する。ToToNoE+の独自概念図。公式画面ではありません。</figcaption></figure><blockquote><p><strong>実践チェック｜まず変えたい4つの行動</strong></p><ol><li>重要な手続きを促すメールが来ても、メール内のリンクはいったん使わない。</li><li>正規アプリや、正しいと確認して登録したブックマークから開く。</li><li>公式サービスの通知・履歴と照合する。見当たらなくても、それだけで偽物と断定せず既知の窓口に確認する。</li><li>判断できなければ止まって相談する。既に入力・ダウンロードした場合も、責められることを恐れず組織の対応窓口へ速やかに報告する。</li></ol></blockquote><div class="editor-bubble right" data-character="tsugumo-proposal"><div class="bubble-avatar" contenteditable="false"><img class="character-icon" src="https://basecraftas.com/projects/totonoe/assets/characters/tsugumo-proposal.png" alt="ツグモ" /></div><div class="bubble-copy"><p>「急いで」と書いてあっても、いったんリンクから離れよう。相談先も一緒に決めておくと動きやすいね。</p></div></div><h2>「気をつけて」で終わらず、職場の流れも変えたい</h2><p>職場でも、「気をつけましょう」と言うだけだと、忙しいときにどう動けばいいかが残らないですよね。請求書や健診予約、アカウント更新なら、どこで確かめるのか。分からなければ誰に聞けばいいのか。僕は、そこまで一緒に用意しておくのが大事だと思っています。急ぎの依頼でも、確認のために少し止まっていい。そういう流れにしておきたいです。</p><p>組織側では、迷惑メール対策、ソフトウェアの更新、多要素認証、必要最小限のアクセス権、事故時の連絡経路などを担当者と組み合わせて考えてみます。どれか一つで被害をゼロにできるわけではありません。メールの見分け方だけを繰り返す研修から、架空のメールを使って「どこに戻り、誰に相談するか」まで練習する研修へ変えていくことも提案したいです。</p><p>医療・介護では患者・利用者の情報、産業保健では職員の健康情報や本人確認情報を、確認のために新たな送信先へ渡さないことも大切です。不審メールを外部AIへ丸ごと貼ると、含まれている機微な情報まで送信する可能性があります。組織で定めた報告・相談経路を使います。</p><h2>そうなると、メールを送る側も考えないといけないですよね</h2><p>一方で、みんながメールのリンクを押さなくなったら、メルマガを送る側はどうなるんだろう、とも思うんです。クリック数だけでは、ちゃんと届いているかが分かりにくくなるかもしれない。これは僕の考えで、今回の手口によってクリック率が下がったと確認したデータがあるわけではありません。</p><p>そうなると、「信用して押してください」だけでは難しいですよね。公式サイトにも同じ案内を載せておく。メールには記事名や開催日、どこから探せるかを書いておく。ログインや健康情報の入力は、公式の画面からできるようにしておく。こうしておけば、受け手は自分が知っている入口から確かめられます。</p><p><mark>本物っぽく見せるだけではなく、別の入口からも確かめられるようにする。</mark>受け取る側の対策が変わるなら、送る側の案内の仕方も変えていく必要があるんじゃないかなと思っています。</p><div class="editor-bubble" data-character="hakuto-question"><div class="bubble-avatar" contenteditable="false"><img class="character-icon" src="https://basecraftas.com/projects/totonoe/assets/characters/hakuto-question.png" alt="ハクト" /></div><div class="bubble-copy"><p>見抜けなかった人を責めるより、立ち止まって相談できる手順を整えたいですね。どこへ戻れば安心して確かめられるでしょうか。</p></div></div><p>見抜けなかった人に「もっと気をつけて」と言うだけでは、同じことを繰り返してしまうかもしれません。見抜けない自分でも、一度止まって、確かめられるようにしておく。まずは、よく使うサービスの正しい入口と、困ったときの相談先を一つ確認するところからでいいと思うんですよね。</p><hr /><div><h2>自社サービスのご案内</h2><blockquote><p><strong>この記事から、次の一歩へ</strong></p><p>「うちの現場ではどうしたらいいだろう」と考えたい方には、TAYORIの案内を置いておきます。AIや情報の確かめ方を学んでいきたい方は、IROHAの案内も見てみてください。</p></blockquote><h3>TAYORI｜たより</h3><p>医療・介護の現場の困りごとに、AI・DXに関わる人はどう向き合っているのか。TAYORIは、その領域の知見を持つ人の考え方や事例を共有して、知見を蓄積していくサービスです。内容や参加方法、料金は案内ページで確認できます。個別の回答や、この記事のテーマの教材が必ずあるという案内ではありません。</p><figure><a href="https://basecraftas.com/projects/totonoe/tayori.html" target="_blank" rel="noopener noreferrer"><img src="https://basecraftas.com/projects/totonoe/assets/service-tayori-final-20261011.webp" alt="TAYORI｜たよりのサービス案内" loading="lazy" width="100%" /></a></figure><p><a href="https://basecraftas.com/projects/totonoe/tayori.html" target="_blank" rel="noopener noreferrer">TAYORIのサービス内容を確認する</a></p><h3>IROHA｜いろは</h3><p>IROHAは、AIの基礎を知るところから、道具を選んで仕事に活かすところまで学ぶためのサービスです。利用プランや会員条件は、案内ページを見てみてください。この記事のテーマそのものの教材が、すでに用意されているとは限りません。</p><figure><a href="https://basecraftas.com/projects/totonoe/IROHA/" target="_blank" rel="noopener noreferrer"><img src="https://basecraftas.com/projects/totonoe/assets/service-iroha-final-20261011.webp" alt="IROHA｜いろはの学習案内" loading="lazy" width="100%" /></a></figure><p><a href="https://basecraftas.com/projects/totonoe/IROHA/" target="_blank" rel="noopener noreferrer">IROHAの学習内容と利用条件を確認する</a></p></div><hr /><p>執筆：神藤 俊希｜編集：ToToNoE+｜情報確認日：2026年10月17日。確認できた事実と僕の考察・提案を分けています。キャラクターは編集上の語り手で、実在の専門家の発言ではありません。</p><h2>出典・共有元</h2><p><a href="https://www.unicode.org/charts/PDF/U0400.pdf" target="_blank" rel="noopener noreferrer">Unicode：キリル文字表</a>／<a href="https://www.unicode.org/reports/tr39/" target="_blank" rel="noopener noreferrer">Unicode Technical Standard #39</a>（識別子・似た文字の検出）。文字体系と視覚的混同の解説に使用しました。</p><p><a href="https://www.icann.org/en/announcements/details/icann-statement-on-idn-homograph-attacks-and-request-for-public-comment-23-2-2005-en" target="_blank" rel="noopener noreferrer">ICANN：IDN Homograph Attacks</a>、<a href="https://www.ipa.go.jp/security/anshin/attention/2021/mgdayori20210831.html" target="_blank" rel="noopener noreferrer">IPA：フィッシングへの注意喚起</a>。共有の入口：<a href="https://x.com/polymarketjapan/status/2110577826613350799" target="_blank" rel="noopener noreferrer">Xの投稿</a>。投稿が指す個別事件の発生・経緯は未確認です。</p><hr /><div><h2>ToToNoE+の最新情報を受け取る</h2><p><a href="https://www.instagram.com/totonoe_ai_essential/" target="_blank" rel="noopener noreferrer"><img src="https://basecraftas.com/projects/totonoe/assets/social-icon-instagram.svg" width="24" height="24" alt="" /> Instagram ↗</a> <a href="https://lin.ee/wao84Bl" target="_blank" rel="noopener noreferrer"><img src="https://basecraftas.com/projects/totonoe/assets/social-icon-line.svg" width="24" height="24" alt="" /> 公式LINE ↗</a> <a href="https://www.youtube.com/channel/UCFFL3IR9Owjn3BGvKklakQQ" target="_blank" rel="noopener noreferrer"><img src="https://basecraftas.com/projects/totonoe/assets/social-icon-youtube.svg" width="24" height="24" alt="" /> YouTube ↗</a></p></div>
+        
+        
+        <section class="article-share" aria-labelledby="articleShareTitle"><h2 id="articleShareTitle">この記事を共有する</h2><p>気づきを、必要な人へ届ける。</p><div class="article-share-buttons"><button type="button" data-share="x">X</button><button type="button" data-share="threads">Threads</button><button type="button" data-share="instagram">Instagram</button><button type="button" data-share="copy">リンクをコピー</button></div><p class="member-content-status" role="status" data-share-status></p></section>
+        <a class="column-back" href="../tsuzuri/">← つづり｜TSUZURI一覧へ戻る</a>
+      </div>
+    </section>
+  </article>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="footer-logo-link" aria-label="ToToNoE+ トップへ">
+        <img src="../assets/totonoe-logo-optimized.webp" alt="ToToNoE+" class="footer-logo" width="1442" height="566" loading="lazy" decoding="async">
+      </a>
+      <p>本質に向き合い、専門職が大切にしたいことへ戻れる余白をつくるチームプロジェクト。</p>
+    </div>
+    <nav class="footer-nav" aria-label="フッターナビゲーション">
+      <a href="../index.html">TOP</a>
+      <a href="../weekend-ai.html">週末のAI整え習慣</a>
+      <a href="../service.html">サービス</a><a href="../contents.html">コンテンツ</a>
+      <a href="../team.html">チーム</a>
+      <a href="../faq.html">FAQ</a>
+    </nav>
+  </div>
+  <div class="footer-base">
+    <span>© 2026 ToToNoE+ / Base Craftas</span>
+    <a href="../privacy.html">プライバシーポリシー</a>
+    <a href="../legal.html">特定商取引法に基づく表記</a>
+    <a href="../cancellation.html">キャンセル・解約ポリシー</a>
+  </div>
+</footer>
+<script src="../common.js?v=20260905a"></script>
+<script src="../article-actions.js?v=20260913a"></script>
+</body>
+</html>
