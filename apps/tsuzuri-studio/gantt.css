@@ -28,3 +28,10 @@
 html[data-studio-theme=dark] .gantt-status-buttons button[aria-pressed=true]{background:#17382c;color:#fff;border-color:#8bcab3}html[data-studio-theme=dark] .gantt-progress-track{background:#404844}html[data-studio-theme=dark] .gantt-progress-track>i{background:#8bcab3}
 #ganttDialog label[hidden]{display:none!important}
 #ganttDialog form>header{top:0}#ganttDialog form>footer{bottom:0}
+/* Keep all five progress choices close to the gauge. */
+#ganttDialog fieldset.gantt-progress-control{position:relative;padding:10px 12px}
+#ganttDialog .gantt-progress-control output{font-size:23px;padding-right:110px}
+#ganttDialog .gantt-progress-control #ganttProgressClear{position:absolute;top:12px;right:12px;margin:0;padding:5px 8px;min-height:30px;font-size:11px}
+#ganttDialog .gantt-progress-control>label{margin-top:6px}#ganttDialog .gantt-progress-control input[type=range]{height:24px}
+#ganttDialog .gantt-progress-steps{margin:5px 0 6px}#ganttDialog .gantt-progress-numeric{margin-top:4px}#ganttDialog #ganttProgressHint{margin:5px 0 0;font-size:11px;line-height:1.5}
+#ganttDialog .gantt-status-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#ganttDialog .gantt-status-buttons button{min-height:56px;padding:8px}#ganttDialog .gantt-status-buttons button strong{font-size:12px}#ganttDialog .gantt-status-buttons button small{font-size:10px}
