@@ -35,3 +35,6 @@ html[data-studio-theme=dark] .gantt-status-buttons button[aria-pressed=true]{bac
 #ganttDialog .gantt-progress-control>label{margin-top:6px}#ganttDialog .gantt-progress-control input[type=range]{height:24px}
 #ganttDialog .gantt-progress-steps{margin:5px 0 6px}#ganttDialog .gantt-progress-numeric{margin-top:4px}#ganttDialog #ganttProgressHint{margin:5px 0 0;font-size:11px;line-height:1.5}
 #ganttDialog .gantt-status-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#ganttDialog .gantt-status-buttons button{min-height:56px;padding:8px}#ganttDialog .gantt-status-buttons button strong{font-size:12px}#ganttDialog .gantt-status-buttons button small{font-size:10px}
+
+/* Recurring tasks */
+.gantt-repeat-control{border:1px solid var(--line,#ccd7d2);border-radius:12px;padding:16px;display:grid;gap:12px}.gantt-repeat-control legend{font-weight:700}.gantt-repeat-control [hidden]{display:none!important}.gantt-repeat-control #ganttRepeatOptions{display:grid;gap:12px}.gantt-label .gantt-repeat-badge{display:inline-block;font-size:11px;font-weight:600;margin-left:4px;padding:2px 6px;border:1px solid currentColor;border-radius:5px}
