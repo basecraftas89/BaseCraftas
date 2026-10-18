@@ -1,4 +1,4 @@
-import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId,scheduleChanges,recurrenceWithdrawal} from './gantt-recurrence.js';
+import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId,scheduleChanges,recurrenceWithdrawal,validateTaskTime,scheduleChanged} from './gantt-recurrence.js';
 import {TEAM_NAMES,normalizeOwners} from './studio-team.js';
 import {validateKptLinks} from './gantt-kpt.js';
 export const GANTT_CATEGORIES={"たより": "たより（メルマガ・現場実装）", "いろは": "いろは（基礎学習・eラーニング）", "ほどく（仮称）": "ほどく（法人研修・業務診断）", "ねづく（仮称）": "ねづく（スクール・実践コミュニティ）", "つづり": "つづり（コラム）", "つまみ": "つまみ（動画）", "発信・集客": "発信・集客（SNS・セミナー）", "事業全体": "事業全体（運営・基盤）", "将来構想": "将来構想（新しい取り組み）"};
@@ -20,6 +20,7 @@ export function validateTask(input) {
   for(const key of ['start','end']){task[key]=input[key]||'';if(task[key]&&(!/^20\d\d-\d\d-\d\d$/.test(task[key])||!Number.isFinite(Date.parse(task[key]))||new Date(task[key]).toISOString().slice(0,10)!==task[key]))throw new Error('日付を確認してください');}
   if(Boolean(task.start)!==Boolean(task.end)||task.start>task.end)throw new Error('開始日と終了日を確認してください');
   if((task.certainty==='undated')!==!task.start)throw new Error('日程未定は日付を空欄にしてください');
+  validateTaskTime(task,input);
   task.progress=input.progress==null?null:input.progress;
   if(task.progress!==null&&(!Number.isInteger(task.progress)||task.progress<0||task.progress>100))throw new Error('進捗率は0〜100で入力してください');
   if(task.status==='done')task.progress=100;
@@ -56,6 +57,7 @@ export async function ganttRequest(request,env,requireRole,id='') {
   }
   if(oldRepeat?.withdrawnAt)return reply({message:'取り下げ済みの作業は履歴として閲覧できます。'},400);
   if(request.method==='PATCH'&&input.recurrence===undefined&&oldRepeat?.recurrence)input.recurrence=oldRepeat.recurrence;
+  if(oldRepeat)for(const k of ['startTime','endTime','timeZone'])if(input[k]===undefined)input[k]=oldRepeat[k]||'';
   let task;try{task=validateTask(input)}catch(e){return reply({error:'invalid_task',message:e.message},400)}
   if(request.method==='PATCH'){const oldRow=await env.DB.prepare('SELECT payload FROM studio_gantt_tasks WHERE id=?').bind(id).first();if(oldRow){const old=JSON.parse(oldRow.payload);if(input.collaborators===undefined)task.collaborators=old.collaborators||[];for(const key of ['kptSourceId','kptSourceTitle','kptDue','kptDone','kptPreviousStatus','kptPreviousProgress','legacyOwner'])if(old[key]!==undefined)task[key]=old[key];if(old.kptSourceId)task.kptLinks=old.kptLinks;if(old.kptLinks?.length){if(old.kptDone){task.status='done';task.progress=100;}else if(task.status==='done')return reply({message:'Tryの達成はKPT画面で更新してください。'},400);}}}
   if(task.dependency){const rows=await env.DB.prepare('SELECT id, payload FROM studio_gantt_tasks').all();const byId=new Map(rows.results.map(r=>[r.id,JSON.parse(r.payload)]));let dep=task.dependency;const seen=new Set([id]);if(!byId.has(dep))return reply({error:'invalid_dependency'},400);while(dep){if(seen.has(dep))return reply({error:'dependency_cycle'},400);seen.add(dep);dep=byId.get(dep)?.dependency;}}
@@ -65,7 +67,7 @@ export async function ganttRequest(request,env,requireRole,id='') {
   if(request.method==='POST')id=crypto.randomUUID();
   if(request.method==='PATCH'&&(!oldRowForRepeat||oldRowForRepeat.revision!==input.revision))return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
   let following=[];let seriesRows=[];
-  if(oldRepeat?.recurrence&&(oldRepeat.start!==task.start||oldRepeat.end!==task.end)){
+  if(oldRepeat?.recurrence&&(scheduleChanged(task,oldRepeat))){
    seriesRows=(await env.DB.prepare('SELECT id,payload,revision FROM studio_gantt_tasks').all()).results;
    try{following=scheduleChanges(task,{...oldRepeat,id},input.scheduleScope,seriesRows);}catch(e){return reply({message:e.message},400);}
   }

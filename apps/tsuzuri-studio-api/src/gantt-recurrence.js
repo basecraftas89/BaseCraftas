@@ -1,3 +1,13 @@
+export function validateTaskTime(task,input){
+ const valid=t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+ const start=input.startTime??'',end=input.endTime??'';
+ if(start!==''&&!valid(start)||end!==''&&!valid(end)||Boolean(start)!==Boolean(end))throw Error('開始時刻と終了時刻を両方、00:00〜23:59で設定してください。');
+ if(input.timeZone&&input.timeZone!=='Asia/Tokyo')throw Error('時刻は日本時間で設定してください。');
+ if(start&&(!task.start||!task.end||task.start+'T'+start>=task.end+'T'+end))throw Error('終了日時は開始日時より後にしてください。日をまたぐ場合は終了日も変更してください。');
+ task.startTime=start;task.endTime=end;task.timeZone=start?'Asia/Tokyo':'';return task;
+}
+export const scheduleChanged=(task,old)=>Boolean(old)&&(old.start!==task.start||old.end!==task.end||(old.startTime||'')!==(task.startTime||'')||(old.endTime||'')!==(task.endTime||''));
+
 export const REPEAT_LABELS={daily:'毎日',weekly:'毎週',biweekly:'2週間ごと',monthly:'毎月'};
 const date=v=>typeof v==='string'&&/^20\d\d-\d\d-\d\d$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
 const day=86400000;
@@ -13,7 +23,7 @@ export function recurrenceForSave(task,old){
  const requested=task.recurrence;
  if(!requested)return null;
  const same=old?.recurrence&&old.recurrence.frequency===requested.frequency&&old.start===task.start&&old.end===task.end;
- return {...requested,anchorStart:same?old.recurrence.anchorStart:task.start,anchorEnd:same?old.recurrence.anchorEnd:task.end,index:same?old.recurrence.index||0:0};
+ return {...requested,anchorStart:same?old.recurrence.anchorStart:task.start,anchorEnd:same?old.recurrence.anchorEnd:task.end,index:same?old.recurrence.index||0:0,anchorStartTime:same?(old.recurrence.anchorStartTime??old.startTime??''):(task.startTime||''),anchorEndTime:same?(old.recurrence.anchorEndTime??old.endTime??''):(task.endTime||'')};
 }
 export function nextOccurrence(task){
  const r=task.recurrence;if(!r||task.repeatNextId||task.withdrawnAt||task.repeatStopped)return null;
@@ -26,13 +36,13 @@ export function nextOccurrence(task){
  const start=new Date(Date.parse(end)-(Date.parse(r.anchorEnd||task.end)-Date.parse(r.anchorStart||task.start))).toISOString().slice(0,10);
  if(!date(start)||!date(end)||r.until&&end>r.until)return null;
  const {id,revision,updated_at,repeatNextId,repeatParentId,...fields}=task;
- return {...fields,start,end,status:'planned',progress:0,dependency:'',recurrence:{...r,index},repeatParentId:task.id};
+ return {...fields,start,end,startTime:r.anchorStartTime??task.startTime??'',endTime:r.anchorEndTime??task.endTime??'',timeZone:(r.anchorStartTime??task.startTime)?'Asia/Tokyo':'',status:'planned',progress:0,dependency:'',recurrence:{...r,index},repeatParentId:task.id};
 }
 export async function occurrenceId(parentId){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gantt-repeat:'+parentId));return 'repeat-'+Array.from(new Uint8Array(bytes)).slice(0,16).map(v=>v.toString(16).padStart(2,'0')).join('');}
 
 // Date-only series edits preserve task content, status and ownership.
 export function scheduleChanges(task,old,scope,rows){
- if(!old?.recurrence||old.start===task.start&&old.end===task.end)return [];
+ if(!old?.recurrence||!scheduleChanged(task,old))return [];
  if(!['once','following'].includes(scope))throw Error('日程変更の範囲を選んでください。');
  if(scope==='once'){
   if(task.recurrence?.frequency!==old.recurrence.frequency)throw Error('今回だけの日程変更では、繰り返し期間を変更できません。');
@@ -52,12 +62,12 @@ export function scheduleChanges(task,old,scope,rows){
   if(children.length>=49)throw Error('一度に変更できるのは50件までです。');
   children.push({row,task:next});current=next;
  }
- task.recurrence={...task.recurrence,anchorStart:task.start,anchorEnd:task.end,index:0};
+ task.recurrence={...task.recurrence,anchorStart:task.start,anchorEnd:task.end,index:0,anchorStartTime:task.startTime||'',anchorEndTime:task.endTime||''};
  let cursor=task;
  for(const child of children){
   const next=nextOccurrence({...cursor,repeatNextId:undefined});
   if(!next)throw Error('変更後の日程が繰り返し終了日を超えます。終了日を見直してください。');
-  child.task={...child.task,start:next.start,end:next.end,recurrence:next.recurrence};cursor=child.task;
+  child.task={...child.task,start:next.start,end:next.end,startTime:next.startTime,endTime:next.endTime,timeZone:next.timeZone,recurrence:next.recurrence};cursor=child.task;
  }
  return children;
 }
