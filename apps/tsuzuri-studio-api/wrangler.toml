@@ -1,5 +1,5 @@
 name = "column-studio-api"
-main = "src/worker.js"
+main = "published-runtime/worker.js"
 compatibility_date = "2026-09-11"
 workers_dev = false
 compatibility_flags = ["nodejs_compat"]
@@ -63,3 +63,7 @@ database_id = "67c5a478-7a5d-48af-9e81-c34da1362263"
 [[r2_buckets]]
 binding = "MEDIA"
 bucket_name = "column-studio-media"
+
+[build]
+command = "node scripts/studio-api-release-guard.mjs"
+cwd = "."

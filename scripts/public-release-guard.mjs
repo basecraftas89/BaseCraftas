@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 export function assertStudioContinuity(name,source){
  if(name!=='basecraftas')return;
- for(const marker of ['restoreStudioSitemapHtml','restoreStudioAnalyticsHtml','siteMapPanel','mapCanvas','journeyLinkPanel','journeyLinks','journeyMetrics'])if(!source.includes(marker))throw Error('Release blocked: missing Studio feature '+marker);
+ for(const marker of ['restoreStudioSitemapHtml','restoreStudioAnalyticsHtml','siteMapPanel','mapCanvas','journeyLinkPanel','journeyLinks','journeyMetrics','withWeeklyAccessUI','weeklyAccessReports','accessOriginCards'])if(!source.includes(marker))throw Error('Release blocked: missing Studio feature '+marker);
 }
 export function relativeWorkerModules(source){return [...new Set([...source.matchAll(/\bfrom\s*["'](\.\/[^"']+)["']/g)].map(m=>m[1].replace(/^\.\//,'')))];}
 export function assertWorkerModules(source,names){const present=new Set(names.map(n=>n.replace(/^\.\//,'')));for(const name of relativeWorkerModules(source))if(!present.has(name))throw Error('Release blocked: missing Worker module '+name);}
