@@ -29,3 +29,35 @@ export function nextOccurrence(task){
  return {...fields,start,end,status:'planned',progress:0,dependency:'',recurrence:{...r,index},repeatParentId:task.id};
 }
 export async function occurrenceId(parentId){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gantt-repeat:'+parentId));return 'repeat-'+Array.from(new Uint8Array(bytes)).slice(0,16).map(v=>v.toString(16).padStart(2,'0')).join('');}
+
+// Date-only series edits preserve task content, status and ownership.
+export function scheduleChanges(task,old,scope,rows){
+ if(!old?.recurrence||old.start===task.start&&old.end===task.end)return [];
+ if(!['once','following'].includes(scope))throw Error('日程変更の範囲を選んでください。');
+ if(scope==='once'){
+  if(task.recurrence?.frequency!==old.recurrence.frequency)throw Error('今回だけの日程変更では、繰り返し期間を変更できません。');
+  task.recurrence={...old.recurrence,until:task.recurrence.until};return [];
+ }
+ if(!task.recurrence)throw Error('日程をまとめて変更する場合は繰り返しを設定してください。');
+ const children=[];let current=old;const seen=new Set([old.id]);
+ for(;;){
+  const found=rows.filter(r=>JSON.parse(r.payload).repeatParentId===current.id);
+  const nextId=current.repeatNextId||found[0]?.id;
+  if(found.length>1)throw Error('後続の作業が複数あります。個別に確認してください。');
+  if(!nextId)break;
+  const row=rows.find(r=>r.id===nextId);if(!row||seen.has(nextId))throw Error('後続の作業を確認できません。再読み込みしてください。');
+  seen.add(nextId);const next={...JSON.parse(row.payload),id:row.id};
+  if(next.status==='done')throw Error('次回以降に完了済みの作業があります。今回だけ変更してください。');
+  if(next.kptSourceId||next.kptLinks?.length)throw Error('後続のTryはKPTで管理してください。');
+  if(children.length>=49)throw Error('一度に変更できるのは50件までです。');
+  children.push({row,task:next});current=next;
+ }
+ task.recurrence={...task.recurrence,anchorStart:task.start,anchorEnd:task.end,index:0};
+ let cursor=task;
+ for(const child of children){
+  const next=nextOccurrence({...cursor,repeatNextId:undefined});
+  if(!next)throw Error('変更後の日程が繰り返し終了日を超えます。終了日を見直してください。');
+  child.task={...child.task,start:next.start,end:next.end,recurrence:next.recurrence};cursor=child.task;
+ }
+ return children;
+}

@@ -1,4 +1,4 @@
-import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId} from './gantt-recurrence.js';
+import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId,scheduleChanges} from './gantt-recurrence.js';
 import {TEAM_NAMES,normalizeOwners} from './studio-team.js';
 import {validateKptLinks} from './gantt-kpt.js';
 export const GANTT_CATEGORIES={"たより": "たより（メルマガ・現場実装）", "いろは": "いろは（基礎学習・eラーニング）", "ほどく（仮称）": "ほどく（法人研修・業務診断）", "ねづく（仮称）": "ねづく（スクール・実践コミュニティ）", "つづり": "つづり（コラム）", "つまみ": "つまみ（動画）", "発信・集客": "発信・集客（SNS・セミナー）", "事業全体": "事業全体（運営・基盤）", "将来構想": "将来構想（新しい取り組み）"};
@@ -51,17 +51,28 @@ export async function ganttRequest(request,env,requireRole,id='') {
   for(const key of ['repeatNextId','repeatParentId'])if(oldRepeat?.[key])task[key]=oldRepeat[key];
   if(request.method==='POST')id=crypto.randomUUID();
   if(request.method==='PATCH'&&(!oldRowForRepeat||oldRowForRepeat.revision!==input.revision))return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
+  let following=[];let seriesRows=[];
+  if(oldRepeat?.recurrence&&(oldRepeat.start!==task.start||oldRepeat.end!==task.end)){
+   seriesRows=(await env.DB.prepare('SELECT id,payload,revision FROM studio_gantt_tasks').all()).results;
+   try{following=scheduleChanges(task,{...oldRepeat,id},input.scheduleScope,seriesRows);}catch(e){return reply({message:e.message},400);}
+  }
   let next=task.status==='done'?nextOccurrence({...task,id}):null;
   if(next){next.id=await occurrenceId(id);task.repeatNextId=next.id;}
   const payload=JSON.stringify(task),revision=request.method==='POST'?1:input.revision+1;
-  const write=request.method==='POST'?env.DB.prepare('INSERT INTO studio_gantt_tasks(id,payload,updated_by) VALUES(?,?,?)').bind(id,payload,auth.email):env.DB.prepare('UPDATE studio_gantt_tasks SET payload=?, revision=revision+1, updated_by=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=?').bind(payload,auth.email,id,input.revision);
+  const snapshots=following.length?[oldRowForRepeat,...following.map(x=>x.row)]:[];
+  const guards=following.length?' AND '+snapshots.map((r,i)=>'EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').join(' AND '):'';
+  const guardArgs=following.length?[[id,oldRowForRepeat],...following.map(x=>[x.row.id,x.row])].flatMap(([key,r])=>[key,r.revision,r.payload]):[];
+  const write=request.method==='POST'?env.DB.prepare('INSERT INTO studio_gantt_tasks(id,payload,updated_by) VALUES(?,?,?)').bind(id,payload,auth.email):env.DB.prepare('UPDATE studio_gantt_tasks SET payload=?, revision=revision+1, updated_by=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=?'+guards).bind(payload,auth.email,id,input.revision,...guardArgs);
   let result;
-  if(next){
+  if(following.length){
+   const updates=following.map(x=>env.DB.prepare('UPDATE studio_gantt_tasks SET payload=?,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=? AND EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').bind(JSON.stringify((({id,...t})=>t)(x.task)),auth.email,x.row.id,x.row.revision,id,revision,payload));
+   result=(await env.DB.batch([write,...updates]))[0];
+  }else if(next){
    const {id:nextId,...nextPayload}=next;
    const insert=env.DB.prepare('INSERT OR IGNORE INTO studio_gantt_tasks(id,payload,updated_by) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').bind(nextId,JSON.stringify(nextPayload),auth.email,id,revision,payload);
    result=(await env.DB.batch([write,insert]))[0];
   }else result=await write.run();
   if(!result.meta.changes)return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
   if(next)next={...next,revision:1};
-  return reply({task:{...task,id,revision},nextTask:next},request.method==='POST'?201:200);
+  return reply({task:{...task,id,revision},nextTask:next,updatedTasks:following.map(x=>({...x.task,revision:x.row.revision+1})),scheduleScope:input.scheduleScope},request.method==='POST'?201:200);
 }
