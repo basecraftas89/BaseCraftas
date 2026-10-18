@@ -16,7 +16,7 @@ export function recurrenceForSave(task,old){
  return {...requested,anchorStart:same?old.recurrence.anchorStart:task.start,anchorEnd:same?old.recurrence.anchorEnd:task.end,index:same?old.recurrence.index||0:0};
 }
 export function nextOccurrence(task){
- const r=task.recurrence;if(!r||task.repeatNextId)return null;
+ const r=task.recurrence;if(!r||task.repeatNextId||task.withdrawnAt||task.repeatStopped)return null;
  const index=(r.index||0)+1,anchor=r.anchorEnd||task.end;
  if(!date(anchor))return null;
  let end;
@@ -60,4 +60,36 @@ export function scheduleChanges(task,old,scope,rows){
   child.task={...child.task,start:next.start,end:next.end,recurrence:next.recurrence};cursor=child.task;
  }
  return children;
+}
+
+// Soft withdrawal retains history; only ordinary recurring tasks are eligible.
+export async function recurrenceWithdrawal(rows,id,action,at){
+ if(!['skip','stop'].includes(action))throw Error('取り下げる範囲を選んでください。');
+ const byId=new Map(rows.map(r=>[r.id,{...JSON.parse(r.payload),id:r.id}])),selected=byId.get(id);
+ if(!selected?.recurrence||selected.kptSourceId||selected.kptLinks?.length)throw Error('通常の繰り返し作業を選んでください。');
+ if(selected.withdrawnAt||selected.repeatStopped)throw Error('この作業はすでに取り下げ・停止されています。再読み込みしてください。');
+ if(action==='skip'&&selected.status==='done')throw Error('完了済みの作業は取り下げできません。');
+ const chain=[],seen=new Set();let current=selected;
+ while(current){
+  if(seen.has(current.id)||chain.length>=25)throw Error('繰り返し作業のつながりを確認してください。一度に25件までです。');
+  seen.add(current.id);chain.push(current);
+  const children=[...byId.values()].filter(t=>t.repeatParentId===current.id);
+  if(children.length>1)throw Error('次回の作業が複数あるため個別に確認してください。');
+  const nextId=current.repeatNextId||children[0]?.id;
+  if(nextId&&!byId.has(nextId))throw Error('次回の作業を確認できません。再読み込みしてください。');
+  current=nextId?byId.get(nextId):null;
+ }
+ const updated=[],change=t=>{const row=rows.find(r=>r.id===t.id);updated.push({row,task:t});};let nextTask=null;
+ if(action==='skip'){
+  let nextId=selected.repeatNextId||chain[1]?.id;
+  if(!nextId){nextTask=nextOccurrence(selected);if(nextTask){nextTask.id=await occurrenceId(selected.id);nextId=nextTask.id;}}
+  change({...selected,withdrawnAt:at,withdrawalReason:'once',...(nextId?{repeatNextId:nextId}:{})});
+ }else{
+  for(const t of chain){
+   if(t.id!==id&&t.status==='done')continue;
+   if(t.kptSourceId||t.kptLinks?.length)throw Error('後続のTryはKPTで管理してください。');
+   change({...t,repeatStopped:true,repeatStoppedAt:at,...(t.status==='done'?{}:{withdrawnAt:t.withdrawnAt||at,withdrawalReason:'series'})});
+  }
+ }
+ return {updated,nextTask,snapshots:chain.map(t=>rows.find(r=>r.id===t.id))};
 }

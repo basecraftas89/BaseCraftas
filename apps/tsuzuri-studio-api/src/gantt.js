@@ -1,4 +1,4 @@
-import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId,scheduleChanges} from './gantt-recurrence.js';
+import {validateRecurrence,recurrenceForSave,nextOccurrence,occurrenceId,scheduleChanges,recurrenceWithdrawal} from './gantt-recurrence.js';
 import {TEAM_NAMES,normalizeOwners} from './studio-team.js';
 import {validateKptLinks} from './gantt-kpt.js';
 export const GANTT_CATEGORIES={"たより": "たより（メルマガ・現場実装）", "いろは": "いろは（基礎学習・eラーニング）", "ほどく（仮称）": "ほどく（法人研修・業務診断）", "ねづく（仮称）": "ねづく（スクール・実践コミュニティ）", "つづり": "つづり（コラム）", "つまみ": "つまみ（動画）", "発信・集客": "発信・集客（SNS・セミナー）", "事業全体": "事業全体（運営・基盤）", "将来構想": "将来構想（新しい取り組み）"};
@@ -33,22 +33,35 @@ export async function ganttRequest(request,env,requireRole,id='') {
   const read=request.method==='GET';
   const auth=await requireRole(request,env,read?['admin','editor','viewer']:['admin','editor']);
   if(auth.error)return auth.error;
-  if(read&&!id){const result=await env.DB.prepare('SELECT id, payload, revision, updated_at FROM studio_gantt_tasks ORDER BY created_at, id').all();return reply({tasks:result.results.map(r=>({...normalizeOwners(JSON.parse(r.payload)),id:r.id,revision:r.revision,updated_at:r.updated_at}))});}
+  if(read&&!id){const result=await env.DB.prepare('SELECT id, payload, revision, updated_at FROM studio_gantt_tasks ORDER BY created_at, id').all();return reply({tasks:result.results.filter(r=>new URL(request.url).searchParams.get('includeWithdrawn')==='1'||!JSON.parse(r.payload).withdrawnAt).map(r=>({...normalizeOwners(JSON.parse(r.payload)),id:r.id,revision:r.revision,updated_at:r.updated_at}))});}
   if(!['POST','PATCH','DELETE'].includes(request.method))return reply({error:'method_not_allowed'},405);
   if((request.method==='POST'&&id)||(request.method!=='POST'&&!id))return reply({error:'not_found'},404);
   let input;try{const reader=request.body?.getReader();if(!reader)throw Error('empty');let size=0;const chunks=[];for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>32768){await reader.cancel();return reply({error:'request_too_large'},413)}chunks.push(value)}const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length}input=JSON.parse(new TextDecoder().decode(bytes));}catch{return reply({error:'invalid_json'},400)}
   if(request.method!=='POST'&&(!Number.isInteger(input?.revision)||input.revision<1))return reply({error:'revision_required'},400);
-  if(request.method==='DELETE'){const r=await env.DB.prepare('DELETE FROM studio_gantt_tasks WHERE id=? AND revision=? AND NOT EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE json_extract(payload, \'$.dependency\')=?)').bind(id,input.revision,id).run();return r.meta.changes?reply({ok:true}):reply({error:'conflict',message:'他の更新または後続タスクがあります。再読み込みして確認してください。'},409);}
+  if(request.method==='DELETE'){const existing=await env.DB.prepare('SELECT payload FROM studio_gantt_tasks WHERE id=?').bind(id).first();if(existing&&JSON.parse(existing.payload).recurrence)return reply({message:'繰り返し作業は取り下げ・停止を選んでください。履歴は残ります。'},400);const r=await env.DB.prepare('DELETE FROM studio_gantt_tasks WHERE id=? AND revision=? AND NOT EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE json_extract(payload, \'$.dependency\')=?)').bind(id,input.revision,id).run();return r.meta.changes?reply({ok:true}):reply({error:'conflict',message:'他の更新または後続タスクがあります。再読み込みして確認してください。'},409);}
   if(request.method==='PATCH'&&input.kptLinks===undefined){const existing=await env.DB.prepare('SELECT payload FROM studio_gantt_tasks WHERE id=?').bind(id).first();if(existing)input.kptLinks=JSON.parse(existing.payload).kptLinks||[];}
   const oldRowForRepeat=id?await env.DB.prepare('SELECT payload, revision FROM studio_gantt_tasks WHERE id=?').bind(id).first():null;
   const oldRepeat=oldRowForRepeat?JSON.parse(oldRowForRepeat.payload):null;
+  if(request.method==='PATCH'&&input.repeatAction!==undefined){
+   if(!oldRowForRepeat||oldRowForRepeat.revision!==input.revision)return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
+   const rows=(await env.DB.prepare('SELECT id,payload,revision FROM studio_gantt_tasks').all()).results;
+   let plan;try{plan=await recurrenceWithdrawal(rows,id,input.repeatAction,new Date().toISOString());}catch(e){return reply({message:e.message},400);}
+   const selected=plan.updated.find(x=>x.row.id===id),strip=t=>{const {id,...p}=t;return JSON.stringify(p);},payload=strip(selected.task),revision=input.revision+1;
+   const guards=plan.snapshots.map(()=> 'EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').join(' AND '),args=plan.snapshots.flatMap(r=>[r.id,r.revision,r.payload]);
+   const first=env.DB.prepare('UPDATE studio_gantt_tasks SET payload=?,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=? AND '+guards).bind(payload,auth.email,id,input.revision,...args);
+   const rest=plan.updated.filter(x=>x.row.id!==id).map(x=>env.DB.prepare('UPDATE studio_gantt_tasks SET payload=?,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=? AND EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').bind(strip(x.task),auth.email,x.row.id,x.row.revision,id,revision,payload));
+   if(plan.nextTask){const {id:nextId,...p}=plan.nextTask;rest.push(env.DB.prepare('INSERT OR IGNORE INTO studio_gantt_tasks(id,payload,updated_by) SELECT ?,?,? WHERE EXISTS (SELECT 1 FROM studio_gantt_tasks WHERE id=? AND revision=? AND payload=?)').bind(nextId,JSON.stringify(p),auth.email,id,revision,payload));}
+   const results=await env.DB.batch([first,...rest]);if(!results[0].meta.changes)return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
+   return reply({task:{...selected.task,revision},updatedTasks:plan.updated.map(x=>({...x.task,revision:x.row.revision+1})),nextTask:plan.nextTask?{...plan.nextTask,revision:1}:null});
+  }
+  if(oldRepeat?.withdrawnAt)return reply({message:'取り下げ済みの作業は履歴として閲覧できます。'},400);
   if(request.method==='PATCH'&&input.recurrence===undefined&&oldRepeat?.recurrence)input.recurrence=oldRepeat.recurrence;
   let task;try{task=validateTask(input)}catch(e){return reply({error:'invalid_task',message:e.message},400)}
   if(request.method==='PATCH'){const oldRow=await env.DB.prepare('SELECT payload FROM studio_gantt_tasks WHERE id=?').bind(id).first();if(oldRow){const old=JSON.parse(oldRow.payload);if(input.collaborators===undefined)task.collaborators=old.collaborators||[];for(const key of ['kptSourceId','kptSourceTitle','kptDue','kptDone','kptPreviousStatus','kptPreviousProgress','legacyOwner'])if(old[key]!==undefined)task[key]=old[key];if(old.kptSourceId)task.kptLinks=old.kptLinks;if(old.kptLinks?.length){if(old.kptDone){task.status='done';task.progress=100;}else if(task.status==='done')return reply({message:'Tryの達成はKPT画面で更新してください。'},400);}}}
   if(task.dependency){const rows=await env.DB.prepare('SELECT id, payload FROM studio_gantt_tasks').all();const byId=new Map(rows.results.map(r=>[r.id,JSON.parse(r.payload)]));let dep=task.dependency;const seen=new Set([id]);if(!byId.has(dep))return reply({error:'invalid_dependency'},400);while(dep){if(seen.has(dep))return reply({error:'dependency_cycle'},400);seen.add(dep);dep=byId.get(dep)?.dependency;}}
   if(task.recurrence&&(task.kptSourceId||task.kptLinks?.length))return reply({message:'KPTのTryは繰り返しにせず、KPTで管理してください。'},400);
   task.recurrence=recurrenceForSave(task,oldRepeat);
-  for(const key of ['repeatNextId','repeatParentId'])if(oldRepeat?.[key])task[key]=oldRepeat[key];
+  for(const key of ['repeatNextId','repeatParentId','repeatStopped','repeatStoppedAt'])if(oldRepeat?.[key])task[key]=oldRepeat[key];
   if(request.method==='POST')id=crypto.randomUUID();
   if(request.method==='PATCH'&&(!oldRowForRepeat||oldRowForRepeat.revision!==input.revision))return reply({message:'他のメンバーが更新しました。再読み込みしてください。'},409);
   let following=[];let seriesRows=[];
