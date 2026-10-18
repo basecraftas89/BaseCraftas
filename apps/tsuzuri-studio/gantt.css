@@ -38,3 +38,10 @@ html[data-studio-theme=dark] .gantt-status-buttons button[aria-pressed=true]{bac
 
 /* Recurring tasks */
 .gantt-repeat-control{border:1px solid var(--line,#ccd7d2);border-radius:12px;padding:16px;display:grid;gap:12px}.gantt-repeat-control legend{font-weight:700}.gantt-repeat-control [hidden]{display:none!important}.gantt-repeat-control #ganttRepeatOptions{display:grid;gap:12px}.gantt-label .gantt-repeat-badge{display:inline-block;font-size:11px;font-weight:600;margin-left:4px;padding:2px 6px;border:1px solid currentColor;border-radius:5px}
+
+/* Future occurrences remain display-only until the real task is complete. */
+.gantt-row.has-forecast .gantt-bar:not(.gantt-forecast-bar){top:36px}
+.gantt-row .gantt-forecast-bar{min-height:26px;border:2px dashed var(--category-color,#637083);background:color-mix(in srgb,var(--category-color,#637083) 9%,var(--paper));color:var(--ink);border-radius:5px;z-index:1}
+.gantt-row .gantt-forecast-bar>span{padding:4px 5px;font-size:10px}.gantt-upcoming-list{padding-left:0;list-style:none;display:grid;gap:7px}.gantt-upcoming-list li{font-size:13px}.gantt-upcoming-list li>span{display:inline-block;padding:2px 6px;border:1px dashed currentColor;border-radius:4px;font-size:11px;margin-right:7px}
+
+.gantt-row.has-forecast .gantt-undated{top:36px}
