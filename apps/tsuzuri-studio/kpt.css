@@ -34,3 +34,5 @@ html[data-studio-theme=dark] .topbar :is(button,a,span,strong,small,.breadcrumb,
 #kptRoot .kpt-report-card:hover,#kptRoot .kpt-report-card:focus-visible{border-color:var(--ink,#183c32);box-shadow:0 0 0 2px var(--line,#dce4df)}
 .kpt-report-open-label{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line,#dce4df);font-size:12px;font-weight:700}
 #kptReportDetail{scroll-margin-top:88px}#kptReportDetail h2:focus{outline:none}
+
+#kptRoot.kpt-archive-active #kptIdentity,#kptRoot.kpt-archive-active #kptPeriod{display:none}
