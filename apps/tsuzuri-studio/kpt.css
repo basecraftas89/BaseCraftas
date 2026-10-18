@@ -36,3 +36,5 @@ html[data-studio-theme=dark] .topbar :is(button,a,span,strong,small,.breadcrumb,
 #kptReportDetail{scroll-margin-top:88px}#kptReportDetail h2:focus{outline:none}
 
 #kptRoot.kpt-archive-active #kptIdentity,#kptRoot.kpt-archive-active #kptPeriod{display:none}
+
+.kpt-try-archived{border-style:dashed!important}.kpt-try-archived>label{text-decoration:line-through;color:var(--muted)}#kptTryList footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
