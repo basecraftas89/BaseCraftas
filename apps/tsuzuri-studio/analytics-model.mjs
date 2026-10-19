@@ -3,7 +3,7 @@ export const people=[['kanto-toshiki','神藤 俊希'],['kajiwara-yusuke','梶�
 const aliases={'/projects/totonoe/index.html':'/projects/totonoe/','/projects/totonoe/index':'/projects/totonoe/'};
 for(const name of ['tayori','service','contents','weekend-ai','seminars','team','faq','privacy','tokusho','cancel'])aliases['/projects/totonoe/'+name+'.html']='/projects/totonoe/'+name;
 export function canonical(p){return aliases[p]||p;}
-export function pageName(p){p=canonical(p);return ({'/projects/totonoe/':'ToToNoE+ トップ','/projects/totonoe/tayori':'TAYORIの案内','/projects/totonoe/service':'サービス一覧','/projects/totonoe/tsuzuri/':'つづり一覧','/projects/totonoe/tsumami/':'つまみ一覧','/projects/totonoe/IROHA/index.html':'IROHAの案内','/projects/totonoe/seminars':'セミナー一覧'})[p]||p;}
+export function pageName(p){p=canonical(p);return ({'/projects/totonoe/':'ToToNoE+ トップ','/projects/totonoe/tayori':'TAYORIの案内','/projects/totonoe/tayori/':'TAYORIの案内','/projects/totonoe/service':'サービス一覧','/projects/totonoe/tsuzuri/':'つづり一覧','/projects/totonoe/tsumami/':'つまみ一覧','/projects/totonoe/IROHA/index.html':'IROHAの案内','/projects/totonoe/seminars':'セミナー一覧'})[p]||p;}
 export function totals(links=[]){return Object.fromEntries(['visits','signup_sessions','checkout_sessions','completed_sessions','recurring_sessions'].map(k=>[k,links.reduce((n,l)=>n+Number(l[k]||0),0)]));}
 export function sources(links=[]){const m=new Map();for(const l of links)m.set(l.source,(m.get(l.source)||0)+Number(l.visits||0));return [...m].map(([source,visits])=>({source,visits})).sort((a,b)=>b.visits-a.visits||a.source.localeCompare(b.source));}
 export function topInsight(links=[]){const rows=sources(links).filter(r=>r.source!=='direct'&&r.visits>0);if(!rows.length)return '判別できた流入元はまだありません。計測リンクから情報を増やしましょう。';const top=rows.filter(r=>r.visits===rows[0].visits);return '判別できた流入元で最多：'+top.map(r=>media[r.source]||r.source).join('・')+' '+rows[0].visits+'訪問'+(top.length>1?'（同率）':'');}
@@ -11,3 +11,17 @@ export function landings(rows=[]){const m=new Map();for(const r of rows){const p
 export function previousPeriod(start,end){const n=(Date.parse(end)-Date.parse(start))/86400000+1;return {start:new Date(Date.parse(start)-n*86400000).toISOString().slice(0,10),end:new Date(Date.parse(start)-86400000).toISOString().slice(0,10)};}
 export function comparison(current,prior){if(current.quality?.partial_period||prior.quality?.partial_period)return {available:false,message:'計測開始前を含むため、前期間比は表示しません。'};return {available:true,current:totals(current.links),previous:totals(prior.links)};}
 export function selectArticles(items=[],includeUnpublished=false,sort='visits'){return items.filter(a=>includeUnpublished||['published','unknown'].includes(a.status)).sort((a,b)=>Number(b[sort]||0)-Number(a[sort]||0)||a.title.localeCompare(b.title,'ja'));}
+
+export const linkPages=[['/projects/totonoe/','ToToNoE+ トップ'],['/projects/totonoe/tayori/','TAYORI'],['/projects/totonoe/IROHA/index.html','IROHA'],['/projects/totonoe/tsuzuri/','つづり一覧'],['/projects/totonoe/tsumami/','つまみ一覧']];
+export function linkDestination(value,origin='https://basecraftas.com'){
+ const u=new URL(value,origin);
+ if(u.origin!==origin||u.username||u.password||u.search||u.hash||!/^\/projects\/totonoe\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_.-]*\/?$/.test(u.pathname)||/\/(?:login|admin|mypage|checkout|subscribe|member-invite|api)(?:[./]|$)/i.test(u.pathname))throw Error('公開ページのURLを選んでください。ログイン・申込・管理画面は対象外です。');
+ if(/\/IROHA\//.test(u.pathname)&&u.pathname!=='/projects/totonoe/IROHA/index.html')throw Error('IROHAは公開案内ページを選んでください。');
+ if(/\/TAYORI\//.test(u.pathname))throw Error('TAYORIは公開案内ページを選んでください。');
+ return canonical(u.pathname);
+}
+export function measurementUrl(path,owner,source,key,origin='https://basecraftas.com'){
+ if(!people.some(p=>p[0]===owner)||!media[source]||source==='direct'||source.startsWith('ai_')||source.startsWith('search_')||!key.startsWith(owner+'_')||!/^[a-z0-9_-]{1,150}$/.test(key))throw Error('担当者・媒体・リンクキーを確認してください。');
+ const u=new URL(linkDestination(path,origin),origin);u.search=new URLSearchParams({utm_source:source,utm_medium:'social',utm_campaign:'totonoe_team',utm_content:key});return u.href;
+}
+export function registeredLinks(items,links){return items.flatMap(i=>(i.measurement_links||[]).map(l=>({initiative:i,link:l,visits:links.filter(g=>g.source===l.source&&g.link_key===l.link_key).reduce((n,g)=>n+Number(g.visits||0),0)})));}
