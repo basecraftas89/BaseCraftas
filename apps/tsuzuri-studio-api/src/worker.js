@@ -2920,7 +2920,7 @@ function analyticsAggregate(rows, labelField, valueField = "visits") {
   return [...totals].map(([label, visits]) => ({ label, visits })).sort((left, right) => right.visits - left.visits || left.label.localeCompare(right.label, "ja"));
 }
 
-const ANALYTICS_INITIATIVE_CHANNELS = new Set(["x", "instagram", "youtube", "email", "event", "website", "ai", "other"]);
+const ANALYTICS_INITIATIVE_CHANNELS = new Set(["x","instagram","facebook","line","note","youtube","threads","linkedin","sns","eight","prairie_card","email","event","website","ai","other"]);
 const ANALYTICS_INITIATIVE_TYPES = new Set(["social_post", "article", "video", "email", "event", "site_update", "advertising", "other"]);
 const ANALYTICS_RESULT_STATUSES = new Set(["pending", "success", "partial", "hold", "improve"]);
 const ANALYTICS_MEMBER_IDS = new Set(TOTONOE_MEMBERS.map((person) => person.id));

@@ -12594,9 +12594,16 @@ async function journeySummary(request, env) {
   if (!/^20\d\d-\d\d-\d\d$/.test(start) || !/^20\d\d-\d\d-\d\d$/.test(end) || !Number.isFinite(from) || !Number.isFinite(to) || from >= to || to - from > 93 * 864e5) return out({ error: "invalid_date_range" }, 400);
   const outcomesAsOf = (/* @__PURE__ */ new Date()).toISOString();
   const lower = new Date(Math.max(from, Date.parse(config.started_at))).toISOString(), upper = new Date(to).toISOString();
-  const { results: sessions = [] } = await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+  const analyticsOwner=url.searchParams.get('owner')??'all',analyticsSource=url.searchParams.get('source')||'all',analyticsService=url.searchParams.get('service')||'all';
+const analyticsMatches=s=>(analyticsOwner==='all'||s.owner===analyticsOwner)&&(analyticsSource==='all'||s.source===analyticsSource);
+const analyticsServicePath=p=>analyticsService==='weekly'?/\/(?:tayori|TAYORI)(?:[./]|$)/.test(p||''):analyticsService==='curriculum'?/\/IROHA(?:[./]|$)/.test(p||''):true;
+const {results:rawSessions=[]}=await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+let sessions=rawSessions.filter(analyticsMatches);
   const { results: events = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,c.content_id FROM journey_events e LEFT JOIN journey_content_events c ON c.event_id=e.id JOIN journey_sessions s ON s.id=e.session_id WHERE s.started_at>=? AND s.started_at<? AND e.occurred_at<? ORDER BY e.occurred_at,e.id").bind(lower, upper, upper).all();
-  const { results: articleEvents = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+if(analyticsService!=='all'){const ids=new Set(events.filter(e=>analyticsServicePath(e.path)||analyticsServicePath(e.target)).map(e=>e.session_id));sessions=sessions.filter(s=>analyticsServicePath(s.landing_path)||ids.has(s.id));}
+const analyticsServiceIds=new Set(sessions.map(s=>s.id));
+  const {results:rawArticleEvents=[]}=await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+const articleEvents=rawArticleEvents.filter(e=>analyticsMatches(e)&&(analyticsService==='all'||analyticsServiceIds.has(e.session_id)));
   const { results: articleCatalog = [] } = await env.DB.prepare("SELECT id,slug,title,status,destination FROM articles WHERE destination IN ('totonoe','tsuzuri','characters') AND content_type='column' AND deleted_at IS NULL").all();
   const articles = summarizeArticleTraffic(articleEvents, articleCatalog);
   const { results: conversions = [] } = await env.DB.prepare(`SELECT jc.session_id, a.status,
@@ -17175,7 +17182,7 @@ function analyticsJapanDate(daysAgo = 0) {
   return new Date(Date.now() + 9 * 60 * 60 * 1e3 - daysAgo * 864e5).toISOString().slice(0, 10);
 }
 __name(analyticsJapanDate, "analyticsJapanDate");
-var ANALYTICS_INITIATIVE_CHANNELS = /* @__PURE__ */ new Set(["x", "instagram", "youtube", "email", "event", "website", "ai", "other"]);
+var ANALYTICS_INITIATIVE_CHANNELS = /* @__PURE__ */ new Set(["x","instagram","facebook","line","note","youtube","threads","linkedin","sns","eight","prairie_card","email","event","website","ai","other"]);
 var ANALYTICS_INITIATIVE_TYPES = /* @__PURE__ */ new Set(["social_post", "article", "video", "email", "event", "site_update", "advertising", "other"]);
 var ANALYTICS_RESULT_STATUSES = /* @__PURE__ */ new Set(["pending", "success", "partial", "hold", "improve"]);
 var ANALYTICS_MEMBER_IDS = new Set(TOTONOE_MEMBERS.map((person) => person.id));
@@ -21622,9 +21629,16 @@ var StudioWeeklyAccess20261018 = (() => {
     if (!/^20\d\d-\d\d-\d\d$/.test(start) || !/^20\d\d-\d\d-\d\d$/.test(end) || !Number.isFinite(from) || !Number.isFinite(to) || from >= to || to - from > 93 * 864e5) return out({ error: "invalid_date_range" }, 400);
     const outcomesAsOf = (/* @__PURE__ */ new Date()).toISOString();
     const lower = new Date(Math.max(from, Date.parse(config.started_at))).toISOString(), upper = new Date(to).toISOString();
-    const { results: sessions = [] } = await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+    const analyticsOwner=url.searchParams.get('owner')??'all',analyticsSource=url.searchParams.get('source')||'all',analyticsService=url.searchParams.get('service')||'all';
+const analyticsMatches=s=>(analyticsOwner==='all'||s.owner===analyticsOwner)&&(analyticsSource==='all'||s.source===analyticsSource);
+const analyticsServicePath=p=>analyticsService==='weekly'?/\/(?:tayori|TAYORI)(?:[./]|$)/.test(p||''):analyticsService==='curriculum'?/\/IROHA(?:[./]|$)/.test(p||''):true;
+const {results:rawSessions=[]}=await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+let sessions=rawSessions.filter(analyticsMatches);
     const { results: events = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,c.content_id FROM journey_events e LEFT JOIN journey_content_events c ON c.event_id=e.id JOIN journey_sessions s ON s.id=e.session_id WHERE s.started_at>=? AND s.started_at<? AND e.occurred_at<? ORDER BY e.occurred_at,e.id").bind(lower, upper, upper).all();
-    const { results: articleEvents = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+if(analyticsService!=='all'){const ids=new Set(events.filter(e=>analyticsServicePath(e.path)||analyticsServicePath(e.target)).map(e=>e.session_id));sessions=sessions.filter(s=>analyticsServicePath(s.landing_path)||ids.has(s.id));}
+const analyticsServiceIds=new Set(sessions.map(s=>s.id));
+    const {results:rawArticleEvents=[]}=await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+const articleEvents=rawArticleEvents.filter(e=>analyticsMatches(e)&&(analyticsService==='all'||analyticsServiceIds.has(e.session_id)));
     const { results: articleCatalog = [] } = await env.DB.prepare("SELECT id,slug,title,status,destination FROM articles WHERE destination IN ('totonoe','tsuzuri','characters') AND content_type='column' AND deleted_at IS NULL").all();
     const articles = summarizeArticleTraffic(articleEvents, articleCatalog);
     const { results: conversions = [] } = await env.DB.prepare(`SELECT jc.session_id, a.status,
@@ -22019,9 +22033,16 @@ var StudioWeeklyAccess20261018v2 = (() => {
     if (!/^20\d\d-\d\d-\d\d$/.test(start) || !/^20\d\d-\d\d-\d\d$/.test(end) || !Number.isFinite(from) || !Number.isFinite(to) || from >= to || to - from > 93 * 864e5) return out({ error: "invalid_date_range" }, 400);
     const outcomesAsOf = (/* @__PURE__ */ new Date()).toISOString();
     const lower = new Date(Math.max(from, Date.parse(config.started_at))).toISOString(), upper = new Date(to).toISOString();
-    const { results: sessions = [] } = await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+    const analyticsOwner=url.searchParams.get('owner')??'all',analyticsSource=url.searchParams.get('source')||'all',analyticsService=url.searchParams.get('service')||'all';
+const analyticsMatches=s=>(analyticsOwner==='all'||s.owner===analyticsOwner)&&(analyticsSource==='all'||s.source===analyticsSource);
+const analyticsServicePath=p=>analyticsService==='weekly'?/\/(?:tayori|TAYORI)(?:[./]|$)/.test(p||''):analyticsService==='curriculum'?/\/IROHA(?:[./]|$)/.test(p||''):true;
+const {results:rawSessions=[]}=await env.DB.prepare("SELECT id,source,owner,link_key,landing_path,started_at FROM journey_sessions WHERE started_at>=? AND started_at<?").bind(lower, upper).all();
+let sessions=rawSessions.filter(analyticsMatches);
     const { results: events = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,c.content_id FROM journey_events e LEFT JOIN journey_content_events c ON c.event_id=e.id JOIN journey_sessions s ON s.id=e.session_id WHERE s.started_at>=? AND s.started_at<? AND e.occurred_at<? ORDER BY e.occurred_at,e.id").bind(lower, upper, upper).all();
-    const { results: articleEvents = [] } = await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+if(analyticsService!=='all'){const ids=new Set(events.filter(e=>analyticsServicePath(e.path)||analyticsServicePath(e.target)).map(e=>e.session_id));sessions=sessions.filter(s=>analyticsServicePath(s.landing_path)||ids.has(s.id));}
+const analyticsServiceIds=new Set(sessions.map(s=>s.id));
+    const {results:rawArticleEvents=[]}=await env.DB.prepare("SELECT e.session_id,e.kind,e.path,e.target,e.occurred_at,s.source,s.owner FROM journey_events e JOIN journey_sessions s ON s.id=e.session_id WHERE e.occurred_at>=? AND e.occurred_at<? AND e.path LIKE ? ORDER BY e.occurred_at,e.id").bind(lower, upper, "/projects/totonoe/tsuzuri/%").all();
+const articleEvents=rawArticleEvents.filter(e=>analyticsMatches(e)&&(analyticsService==='all'||analyticsServiceIds.has(e.session_id)));
     const { results: articleCatalog = [] } = await env.DB.prepare("SELECT id,slug,title,status,destination FROM articles WHERE destination IN ('totonoe','tsuzuri','characters') AND content_type='column' AND deleted_at IS NULL").all();
     const articles = summarizeArticleTraffic(articleEvents, articleCatalog);
     const { results: conversions = [] } = await env.DB.prepare(`SELECT jc.session_id, a.status,

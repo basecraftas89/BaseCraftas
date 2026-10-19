@@ -1,0 +1,37 @@
+(() => {
+ 'use strict';
+ const form=document.getElementById('corporate-contact');if(!form||form.dataset.paused==='true')return;
+ const button=document.getElementById('contact-submit'),status=document.getElementById('contact-status'),error=document.getElementById('contact-error'),success=document.getElementById('contact-success');
+ const original=button.innerHTML;let session=null,busy=false,requestId=crypto.randomUUID(),lastPayload='';
+ const api='/api/corporate-contact';
+ const selected=new URLSearchParams(location.search).get('service');
+ const topic=selected==='branding'?'growth':selected;if(['growth','flow','vital','other','undecided'].includes(topic))form.elements.topic.value=topic;
+ async function getSession(){const r=await fetch(api,{headers:{accept:'application/json'},cache:'no-store'});const j=await r.json();if(!r.ok||!j.ok||!j.token)throw Error('session');session=j;return j;}
+ getSession().catch(()=>{});
+ const showError=(name,message)=>{const el=form.elements[name],out=document.getElementById(name+'-error');if(out){out.textContent=message;out.hidden=!message;}if(el&&'setAttribute'in el){if(message)el.setAttribute('aria-invalid','true');else el.removeAttribute('aria-invalid');}};
+ form.addEventListener('input',e=>{if(e.target.name)showError(e.target.name,'');});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();if(busy)return;error.hidden=true;let first=null;
+  const data=Object.fromEntries(new FormData(form));for(const k of ['name','email','organization','message','phone','role','url','website'])data[k]=String(data[k]||'').trim();data.consent=form.elements.consent.checked;
+  const invalid=(name,message)=>{showError(name,message);if(!first)first=form.elements[name];};
+  for(const n of ['name','email','message','consent','url'])showError(n,'');
+  if(!data.name)invalid('name','お名前をご入力ください。');
+  if(!data.email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))invalid('email','メールアドレスをご確認ください。');
+  if(!data.message)invalid('message','ご相談内容をご入力ください。');
+  if(data.url&&!/^https?:\/\/[^\s]+$/i.test(data.url)){form.querySelector('.contact-optional').open=true;invalid('url','https:// から始まるURLをご入力ください。');}
+  if(!data.consent)invalid('consent','個人情報の取り扱いをご確認のうえ、同意にチェックしてください。');
+  if(first){first.focus();return;}
+  const payload=JSON.stringify(data);if(lastPayload&&lastPayload!==payload)requestId=crypto.randomUUID();lastPayload=payload;
+  busy=true;button.disabled=true;button.textContent='送信しています…';form.setAttribute('aria-busy','true');status.textContent='受付を確認しています。そのままお待ちください。';
+  try{
+   if(!session||session.expiresAt<Date.now()+10000)await getSession();
+   const r=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,requestId,token:session.token}),signal:AbortSignal.timeout(60000)});
+   let j;try{j=await r.json();}catch{throw Error('network');}
+   if(!r.ok||!j.ok){if(j.fields)Object.entries(j.fields).forEach(([n,m])=>showError(n,m));throw Error(j.error||'delivery');}
+   form.hidden=true;success.hidden=false;document.getElementById('contact-receipt').textContent='受付番号：'+j.receipt;status.textContent='';success.focus();
+  }catch(e){
+   error.textContent=e.message==='daily_limit'?'本日のフォーム受付上限に達しました。お手数ですが、下記メールアドレスへご連絡ください。':e.message==='rate_limit'?'短時間に送信が続いたため、少し時間をおいてお試しください。':e.message==='invalid_session'?'ページを開いてから時間が経ったため、送信を確認できませんでした。入力内容は残っています。もう一度送信してください。':'送信完了を確認できませんでした。入力内容は残っています。時間をおいてもう一度お試しいただくか、下記メールアドレスへご連絡ください。';
+   if(e.message==='invalid_session')session=null;error.hidden=false;status.textContent='';error.focus();
+  }finally{busy=false;button.disabled=false;button.innerHTML=original;form.removeAttribute('aria-busy');}
+ });
+})();

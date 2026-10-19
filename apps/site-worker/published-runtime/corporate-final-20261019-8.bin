@@ -1,0 +1,136 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow"><title>代表プロフィール — Base Craftas</title><meta name="description" content="人と組織が本来の価値を発揮し続けられる土台を整える。Base Craftasの代表プロフィール。"><link rel="icon" href="/_basecraftas/redesign-20261018/assets/logo.png"><link rel="stylesheet" href="/_basecraftas/final-20261019/style.css"><script src="/_basecraftas/redesign-20261018/src/main.js" defer></script><link rel="canonical" href="https://basecraftas.com/profile/"></head><body><a class="skip" href="#main">本文へ移動</a><header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="Base Craftas トップ"><img src="/_basecraftas/redesign-20261018/assets/logo.png" alt="Base Craftas" width="142" height="53"></a><nav id="main-nav" class="nav" aria-label="メインメニュー"><a href="/">トップ</a><a href="/about/">私たちについて</a><a href="/services/">サービス</a><a href="/projects/">プロジェクト</a><a href="/products/">プロダクト</a><a href="/profile/" aria-current="page">プロフィール</a><a class="mobile-contact" href="https://basecraftas.com/contact">お問い合わせ</a></nav><a class="button terra contact-head" href="https://basecraftas.com/contact">お問い合わせ<span aria-hidden="true">→</span></a><button class="menu-button" aria-expanded="false" aria-controls="main-nav">メニュー <span aria-hidden="true">☰</span></button></div></header><main id="main"><section class="hero"><div class="wrap hero-grid"><div><span class="eyebrow">PROFILE</span><h1>代表プロフィール</h1><p>神藤 俊希｜Base Craftas 代表・理学療法士<br>現場での経験と、いまの活動につながる想い。</p></div><img src="/_basecraftas/final-20261019/profile-introduction-v3-title-only.webp" alt="元のアイコンの人物が、自己紹介と書いたホワイトボードを示すイラスト" class="hero-art" width="1200" height="800" decoding="async"></div></section><style>
+.profile-main { display:grid; grid-template-columns:1fr 2fr; gap:5rem; align-items:start; }
+.profile-photo-area { position:sticky; top:100px; }
+.profile-photo-box { width:100%; aspect-ratio:1; border-radius:20px; background:var(--soft); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Montserrat',sans-serif; font-size:5rem; font-weight:700; color:var(--sub); overflow:hidden; }
+.profile-photo-box img { width:100%; height:100%; object-fit:cover; }
+.profile-name-block { margin-top:1.5rem; }
+.profile-name-ja { font-size:1.5rem; font-weight:700; color:var(--green); }
+.profile-name-en { font-family:'Montserrat',sans-serif; font-size:.88rem; letter-spacing:.08em; color:var(--sub); margin-top:.2rem; }
+.profile-role { display:inline-block; margin-top:.8rem; padding:.3rem .9rem; background:var(--soft); border:1px solid var(--line); border-radius:50px; font-size:.8rem; color:var(--sub); }
+.profile-socials { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.2rem; }
+.profile-social-link { position:relative; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border:1px solid var(--line); border-radius:50%; background:#fff; color:var(--green); transition:background-color .2s ease, color .2s ease, transform .2s ease; }
+.profile-social-link:hover,.profile-social-link:focus-visible { background:var(--green); color:#fff; transform:translateY(-2px); outline:none; }
+.profile-social-link::after { content:attr(data-tooltip); position:absolute; top:calc(100% + .55rem); left:50%; z-index:3; padding:.3rem .55rem; border-radius:4px; background:var(--green); color:#fff; font-size:.7rem; white-space:nowrap; opacity:0; pointer-events:none; transform:translate(-50%,-3px); transition:opacity .18s ease, transform .18s ease; }
+.profile-social-link:hover::after,.profile-social-link:focus-visible::after { opacity:1; transform:translate(-50%,0); }
+.profile-social-link svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.profile-social-x,.profile-social-note,.profile-social-stand { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; line-height:1; }
+.profile-social-spotify svg { fill:currentColor; stroke:none; }
+.profile-body h2 { font-size:1.5rem; margin-top:3rem; margin-bottom:1.2rem; padding-bottom:.6rem; border-bottom:2px solid var(--soft); }
+.profile-body h2:first-child { margin-top:0; }
+.profile-body p { font-size:.95rem; color:var(--sub); line-height:2.15; margin-bottom:1.2rem; }
+.career-list { list-style:none; margin:.8rem 0 1.2rem; }
+.career-list li { display:flex; gap:1.5rem; padding:.8rem 0; border-bottom:1px solid var(--line); font-size:.92rem; color:var(--sub); line-height:1.8; }
+.career-year { font-family:'Montserrat',sans-serif; font-size:.8rem; letter-spacing:.05em; color:var(--terra); font-weight:600; flex-shrink:0; min-width:4.5rem; padding-top:.05rem; }
+.skill-tags { display:flex; flex-wrap:wrap; gap:.6rem; margin:.8rem 0 1.6rem; }
+.skill-tag { padding:.35rem .9rem; background:var(--soft); border:1px solid var(--line); border-radius:50px; font-size:.82rem; color:var(--sub); }
+.profile-visual { width:min(100%, 1040px); margin:2.2rem auto 3.8rem; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; box-shadow:0 12px 28px rgba(26,51,44,.07); }
+.profile-visual img { display:block; width:100%; height:auto; }
+.profile-timeline { list-style:none; margin:1.2rem 0 3.2rem; padding:0; border-left:2px solid var(--line); }
+.profile-timeline li { display:grid; grid-template-columns:92px 1fr; gap:1.2rem; padding:0 0 1.7rem 1.5rem; position:relative; }
+.profile-timeline li::before { content:""; position:absolute; width:10px; height:10px; border-radius:50%; background:var(--terra); left:-6px; top:.35rem; }
+.profile-timeline-year { font-family:'Montserrat',sans-serif; font-size:.82rem; font-weight:700; color:var(--terra); }
+.profile-timeline h3 { font-size:1rem; color:var(--green); margin:0 0 .35rem; }
+.profile-timeline p { margin:0; }
+.profile-note { font-size:.85rem; color:var(--sub); margin-top:-.7rem; }
+@media(max-width:1024px){ .profile-main{ grid-template-columns:1fr; gap:3rem; } .profile-photo-area{ position:static; display:grid; grid-template-columns:180px 1fr; gap:2rem; align-items:start; } .profile-photo-box{ border-radius:14px; } }
+@media(max-width:768px){ .profile-photo-area{ grid-template-columns:1fr; } .profile-visual{margin:1.7rem auto 3rem;border-radius:7px}.profile-timeline li{grid-template-columns:1fr;gap:.35rem;padding-left:1.2rem}.profile-timeline-year{font-size:.78rem} }
+
+.legacy-profile .profile-main{grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:64px}.legacy-profile .profile-body{min-width:0}.legacy-profile .profile-photo-area{top:120px}.legacy-profile .profile-body h2{font-size:28px;margin-top:64px}.legacy-profile .profile-body p{font-size:17px;line-height:1.95}.legacy-profile .profile-visual{margin:28px 0 48px;box-shadow:none;border-radius:6px}.legacy-profile .profile-social-link{width:44px;height:44px;transition:none}.legacy-profile .profile-social-link:hover{transform:none}.legacy-profile .profile-photo-box{border-radius:8px}.legacy-profile .profile-body h2:first-child{margin-top:0}@media(max-width:1024px){.legacy-profile .profile-main{grid-template-columns:1fr;gap:48px}.legacy-profile .profile-photo-area{position:static;grid-template-columns:180px 1fr}.legacy-profile .profile-body{max-width:860px}}@media(max-width:600px){.legacy-profile .profile-photo-area{grid-template-columns:1fr;gap:20px}.legacy-profile .profile-photo-box{max-width:260px}.legacy-profile .profile-name-block{margin-top:0}.legacy-profile .profile-body h2{font-size:25px}.legacy-profile .profile-timeline li{grid-template-columns:1fr}}.profile-origin-story{margin:36px 0 48px;padding:28px;background:var(--soft);border:1px solid var(--line);border-radius:8px}.profile-origin-story>h3{font-size:24px;margin:12px 0 18px}.profile-experiences{list-style:none;padding:0;margin:24px 0;counter-reset:experience}.profile-experiences li{counter-increment:experience;padding:24px 0;border-top:1px solid var(--line)}.profile-experiences h4{font-size:19px;line-height:1.7;margin:0 0 12px}.profile-experiences h4::before{content:"0" counter(experience);display:block;color:var(--terra);font-size:14px;margin-bottom:5px}.legacy-profile .profile-experiences p{margin-bottom:0}.profile-origin-meaning{padding-top:24px;border-top:2px solid var(--green)}.profile-origin-meaning h4{font-size:21px;margin:0 0 16px}@media(max-width:600px){.profile-origin-story{padding:20px}.profile-origin-story>h3{font-size:22px}.profile-origin-story br{display:none}}@media(min-width:801px){.legacy-profile .profile-main{display:grid;grid-template-columns:clamp(180px,24vw,260px) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:start}.legacy-profile .profile-photo-area{position:sticky;top:112px;align-self:start;display:block;min-width:0}.legacy-profile .profile-photo-box{width:min(100%,max(120px,calc(100dvh - 340px)));max-width:260px}.legacy-profile .profile-name-block{margin-top:20px}.legacy-profile .profile-socials{gap:8px}.legacy-profile .profile-social-link{width:40px;height:40px}.legacy-profile .profile-role{padding:5px 10px;font-size:12px}}@media(max-width:800px){.legacy-profile .profile-main{grid-template-columns:1fr}.legacy-profile .profile-photo-area{position:static}}.profile-experience-details{margin:0 0 36px;border:1px solid var(--line);border-radius:6px}.profile-experience-details>summary{padding:16px 20px;cursor:pointer;font-weight:700}.profile-experience-details .profile-origin-story{margin:0;border:0;border-radius:0}.profile-experience-details[open]>summary{border-bottom:1px solid var(--line)}.profile-origin-story{background:#fff;border:0;border-radius:0;padding:0;margin:32px 0 48px}.profile-experiences{display:grid;gap:0;margin:24px 0}.profile-experiences li{background:#fff;padding:24px 0}.profile-experiences h4::before{content:counter(experience);font-size:22px;font-weight:700;color:var(--green)}@media(max-width:600px){.profile-origin-story{padding:0}}</style><section class="section legacy-profile"><div class="wrap">
+    <div class="profile-main">
+      <!-- 左カラム: 写真・基本情報 -->
+      <div class="profile-photo-area">
+        <div class="profile-photo-box"><img loading="lazy" decoding="async" src="/images/x-profile-top.jpg" alt="神藤 俊希のXプロフィール画像"></div>
+        <div class="profile-name-block">
+          <div class="profile-name-ja">神藤 俊希</div>
+          <div class="profile-name-en">Toshiki Kando / Founder</div>
+          <span class="profile-role">理学療法士 × AI・SNS・組織支援</span>
+          <div class="profile-socials" aria-label="神藤俊希のSNSアカウント">
+            <a class="profile-social-link" href="https://www.instagram.com/kanto_aipt_kawagoe/" target="_blank" rel="noopener" aria-label="Instagram" data-tooltip="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"></rect><circle cx="12" cy="12" r="4"></circle><path d="M17.3 6.7h.01"></path></svg>
+            </a>
+            <a class="profile-social-link profile-social-x" href="https://x.com/kanto_aipt_sns" target="_blank" rel="noopener" aria-label="X" data-tooltip="X">X</a>
+            <a class="profile-social-link profile-social-note" href="https://note.com/kanto_okekawa89" target="_blank" rel="noopener" aria-label="note" data-tooltip="note">n</a>
+            <a class="profile-social-link profile-social-stand" href="https://stand.fm/channels/605bc3ca2b49b926c82491cc" target="_blank" rel="noopener" aria-label="stand.fm" data-tooltip="stand.fm">st</a>
+            <a class="profile-social-link profile-social-spotify" href="https://open.spotify.com/show/3EFepIoDS1YHzamPxsMMua?si=01dd655cc74f4782" target="_blank" rel="noopener" aria-label="Spotify" data-tooltip="Spotify">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.38 0 0 5.38 0 12s5.38 12 12 12 12-5.38 12-12S18.62 0 12 0Zm5.5 17.34c-.22.35-.68.46-1.03.24-2.82-1.72-6.37-2.11-10.55-1.16-.4.09-.81-.16-.9-.56-.09-.4.16-.8.56-.9 4.57-1.04 8.49-.59 11.68 1.36.35.22.46.67.24 1.02Zm1.47-3.27c-.28.44-.86.57-1.29.3-3.23-1.99-8.16-2.57-11.98-1.4-.5.15-1.02-.13-1.17-.62-.15-.5.13-1.02.62-1.17 4.37-1.33 9.8-.69 13.52 1.6.44.27.57.85.3 1.29Zm.13-3.4C15.23 8.37 8.84 8.16 5.15 9.33c-.59.18-1.21-.14-1.39-.73-.18-.58.14-1.2.73-1.39 4.23-1.33 11.27-1.08 15.75 1.58.53.31.7.99.39 1.52-.31.52-.99.69-1.53.36Z"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右カラム: プロフィール本文 -->
+      <div class="profile-body">
+        <h2>自己紹介</h2>
+        <p>
+          理学療法士として医療・健康領域の現場に関わりながら、AI、SNSマーケティング、業務設計を掛け合わせた発信・事業・組織支援を行っています。
+        </p>
+        <p>
+          臨床現場で、多くの優れた専門家が持つ価値が、必要な人や組織に十分届いていない現状を見てきました。Base Craftasでは、専門性を言葉にし、伝わる導線と動く仕組みを整えることで、その価値が社会へ正しく届く土台をつくります。
+        </p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/images/08_custom/profile-summary.jpg" alt="Base Craftas代表 神藤俊希のプロフィール。理学療法士、健康経営アドバイザー、SNSマーケティング、AI活用支援などの活動領域">
+        </figure>
+
+        <h2>歩み</h2>
+        <p>臨床の現場から始まり、専門職の価値を社会へ届ける支援へ。経験を重ねるなかで、活動の領域を広げてきました。</p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/images/08_custom/profile-origin-public.jpg" alt="理学療法士を志した原点。スポーツとの出会いと、身近な家族の病気を通して仕事の価値を実感した経緯">
+        </figure>
+        <ol class="profile-timeline">
+          <li><span class="profile-timeline-year">2019</span><div><h3>理学療法士として臨床を開始</h3><p>急性期・運動器・人工関節領域をはじめ、複数の医療現場で臨床経験を積みました。</p></div></li>
+          <li><span class="profile-timeline-year">2020</span><div><h3>SNS発信を開始</h3><p>全国の臨床家とつながるなかで、専門性を持つ人の価値を「届ける」役割の重要性を実感しました。</p></div></li>
+          <li><span class="profile-timeline-year">2023</span><div><h3>AI活用・コンテンツ制作を開始</h3><p>生成AI、動画、情報整理を通じて、専門性を必要な人へ届けるためのデジタルスキルを実践しました。</p></div></li>
+          <li><span class="profile-timeline-year">2023–2025</span><div><h3>医療機関の立ち上げ・広報・組織運営を経験</h3><p>リハビリテーション部門、院内セミナー、SNS広報、採用・組織づくりに関わり、現場と組織の両面を学びました。</p></div></li>
+          <li><span class="profile-timeline-year">2025–</span><div><h3>Base Craftasを開始</h3><p>臨床の理解にAI・SNS・業務改善を掛け合わせ、専門職や組織が持つ価値を発揮するための支援を行っています。</p></div></li>
+        </ol>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/images/08_custom/profile-turning-point.jpg" alt="臨床経験とSNS発信を通して、専門職の価値を届ける側へ役割を広げた転機">
+        </figure>
+
+        <h2>現在の活動</h2>
+        <p>非常勤理学療法士・スポーツチーム支援などの現場に関わりながら、医療機関の発信・マーケティング支援、AI活用・業務改善支援、産業保健・健康経営の領域を横断して活動しています。</p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/_basecraftas/final-20261019/profile-current-activities-v2.webp" alt="臨床・スポーツトレーナー、発信とマーケティング、AI活用と業務改善、産業保健と健康経営を横断する現在の活動">
+        </figure>
+
+        <h2>事業の原体験</h2>
+
+        <p>自分自身が経験した採用条件・学ぶ環境・働き方のミスマッチも、支援の原点の一つです。事業所の実情が正しく伝わり、人も組織も納得して選べる状態を大切にしています。</p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/_basecraftas/final-20261019/profile-origin-mismatch-v3-no-weekdays.webp" width="1672" height="941" alt="支援の原点：採用条件・学ぶ環境・働き方の相違を経験し、実情が伝わり納得して選べる採用を支援したいという思い">
+        </figure>
+        
+        <section class="profile-origin-story" aria-labelledby="recruitment-origin-title">
+          <span class="eyebrow">MY EXPERIENCE</span>
+          <h3 id="recruitment-origin-title">採用のミスマッチを経験して、<br>「正しく伝わること」の大切さを知った。</h3>
+          <p>自分自身も、入職前に聞いていた条件や働く環境と、実際との間に隔たりを感じる経験を重ねてきました。</p>
+          <ol class="profile-experiences">
+            <li><h4>内定時と異なる条件を受け取り、入職を辞退</h4><p>2023年3月、翌4月から入職する予定だった職場から届いた採用条件に、内定時に聞いていた条件と50万円の差がありました。大切な条件が一致していないことから、入職を辞退しました。</p></li>
+            <li><h4>学びたい技術を使えるはずが、入職後に使えなくなった</h4><p>その後、運動器エコーを使えると聞き、通勤距離が遠くても学びたいという思いで転職を決めました。しかし入職直後、エコーを扱っていた理学療法士2名が退職し、その方たちがいなくなったためエコーは使えないと伝えられました。そこで働くことを選んだ理由と、実際の環境に大きな隔たりがありました。</p></li>
+            <li><h4>合意していた働き方が、実現しなかった</h4><p>立ち上げから関わり、セミナー事業なども担当した職場では、入職時に週4日勤務の条件を提示し、合意を得ていました。しかし最終的にその働き方は実現せず、自己都合退職という扱いで職場を離れることになりました。</p></li>
+          </ol>
+          <div class="profile-origin-meaning"><h4>人にも、事業所にも、納得できる選択を。</h4><p>こうした経験が、事業所の理念や魅力だけでなく、働く条件や現場の実情まで正しく伝わることを大切にする原点の一つです。</p><p>採用のためによく見せるだけではなく、事業所がもともと持っている価値を言葉にし、そこで働く人との認識を揃える。人も組織も、自分たちで納得して選べる状態をつくりたいと考えています。</p></div>
+        </section>
+        <h2>人生のテーマ</h2>
+        <p>
+          私の活動を通じたテーマは、自己理解から納得できる選択肢を増やすことです。人や組織が自分たちの状態と価値を理解できれば、他者から与えられた一つの正解ではなく、より良い選択をつくれると考えています。
+        </p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/images/08_custom/profile-life-theme.jpg" alt="内省、自己理解、選択肢、納得感ある選択という人生テーマ">
+        </figure>
+
+        <h2>こんな方とご一緒したい</h2>
+        <p>専門性はあるが伝え方や導線づくりに悩む医療機関、自分たちの価値をより社会へ届けたい専門職、組織のAI・DX活用を整理したい企業やチームのご相談をお受けしています。</p>
+        <figure class="profile-visual">
+          <img loading="lazy" decoding="async" src="/images/08_custom/profile-action.jpg" alt="医療機関、企業とチーム、専門職、AIとDXを検討中の方へ向けた相談案内">
+        </figure>
+
+        <div style="margin-top:2.4rem">
+          <a href="/contact" class="button terra">神藤 俊希に相談する</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="consult"><div class="wrap"><div><h2>まずは、今のお困りごとから。</h2><p>まだ言葉になっていないことも、一緒に整理するところから始めます。</p></div><a class="button terra" href="https://basecraftas.com/contact">無料相談・お問い合わせ<span aria-hidden="true">→</span></a></div></section></main><footer class="site-footer"><div class="wrap"><div class="footer-top"><a href="/" aria-label="Base Craftas トップ"><img src="/_basecraftas/redesign-20261018/assets/logo.png" alt="Base Craftas" width="145" height="54"></a><nav class="footer-nav" aria-label="フッターメニュー"><a href="/">トップ</a><a href="/about/">私たちについて</a><a href="/services/">サービス</a><a href="/projects/">プロジェクト</a><a href="/products/">プロダクト</a><a href="/profile/">プロフィール</a><a href="/services/#faq">よくあるご質問</a><a href="https://basecraftas.com/contact">お問い合わせ</a></nav></div><div class="footer-bottom"><div>© 2026 Base Craftas</div><div><a href="https://basecraftas.com/privacy-policy.html">プライバシーポリシー</a></div></div></div></footer></body></html>
