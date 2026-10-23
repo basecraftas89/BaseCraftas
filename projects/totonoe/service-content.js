@@ -30,7 +30,11 @@
      ・theme（任意）を入れるとカードに副題が表示されます
      ===================================================== */
   var EPISODES = [
+    {"url": "https://stand.fm/episodes/6adbe23657bec19e2c61e5ae", "no": 22, "theme": "AIにどこまで任せる？Muse・1PasswordとPHP問題", "date": "2026-10-24"},
+    {"url":"https://stand.fm/episodes/6ad34d763054e4cbe5ed5eb4","no":21,"theme":"指輪型AIで何が変わる？Gemini活用と偽メールへの備え","date":"2026-10-17"},
+    {"url":"https://stand.fm/episodes/6ac966b36200428e6703d78f","no":20,"theme":"AIに入れる前に！情報漏えいを防ぐ習慣","date":"2026-10-10"},
     {"url": "https://stand.fm/episodes/6ac033c007ef172482bdae69", "no": 19, "theme": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践", "date": "2026-10-03"},
+    {"url":"https://stand.fm/episodes/6aba6667296167d378e5e37d","no":18,"theme":"ChatGPT＆Claude最新モデルリリース！今はアツいのはこれ！","date":"9/26"},
     { url: 'https://stand.fm/episodes/6a405981f6da955ea231d2a6', no: 1, theme: 'AI相談の落とし穴〜安倍全監督の事例と医療現場のリスク〜', date: '5/30' },
     { url: 'https://stand.fm/episodes/6a4059c8ac08572069cc0537', no: 2, theme: 'AIに代替されるPT・選ばれるPT〜臨床とテクノロジーの境界線〜', date: '6/6' },
     { url: 'https://stand.fm/episodes/6a405a0cf6da955ea231d2b4', no: 3, theme: 'Claude最強モデル登場！Fable 5の実力とスクショアプリ開発', date: '6/13' },
@@ -676,7 +680,11 @@
          中の動画は個別設定なしで自動的に同じ権限になります。
      ===================================================== */
   var ARCHIVES = [
+    {"no": 22, "date": "2026-10-24", "driveId": "1s32mhje73-RUrPlTxG8MSaZZQ2JmUbfI", "title": "AIにどこまで任せる？Muse・1PasswordとPHP問題"},
+    {"no":21,"date":"2026-10-17","driveId":"1jzQpGVvEpcGI4A6vuHbVDewEmjZdZhto","title":"指輪型AIで何が変わる？Gemini活用と偽メールへの備え"},
+    {"no":20,"date":"2026-10-10","driveId":"1CiycV-3DBCpatpeqI5sQGomDgwJ448GZ","title":"AIに入れる前に！情報漏えいを防ぐ習慣"},
     {"no": 19, "date": "2026-10-03", "driveId": "1vGsbLh4Ljh_peSbdcA7Y3bfr7lhe8Crc", "title": "AI動画制作は台本がカギ！PR動画づくりと音声生成の実践"},
+    {"no":18,"date":"2026-09-26","driveId":"1syUKMbFP8m6oifWVy3p86-yZPqSvqoo-","title":"ChatGPT＆Claude最新モデルリリース！今はアツいのはこれ！"},
     { no: 17, date: '2026-09-19', driveId: '1c4FYxTu2-o_HIsT1hKJE56sE4W-0Ma-A',
       title: 'AIが面接？Xで話題の"なりすまし面接" とAI機能統合の流れ' },
     { no: 16, date: '2026-09-12', driveId: '1CyWRj2CwUuFJizNqo99iTyrZXyUuLdEo',
